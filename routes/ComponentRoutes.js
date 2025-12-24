@@ -1,0 +1,72 @@
+const express = require('express');
+const router = express.Router();
+const Component = require('../models/Component');
+const { requireAdmin } = require('../middleware/auth');
+
+// GET all
+router.get('/', async (req, res) => {
+  try {
+    const components = await Component.find();
+    res.json({ success: true, count: components.length, data: components });
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+// GET by slug
+router.get('/slug/:slug', async (req, res) => {
+  try {
+    const comp = await Component.findOne({ slug: req.params.slug });
+    if (!comp) return res.status(404).json({ success: false, error: 'Component not found' });
+    res.json({ success: true, data: comp });
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+// GET by id
+router.get('/:id', async (req, res) => {
+  try {
+    const comp = await Component.findById(req.params.id);
+    if (!comp) return res.status(404).json({ success: false, error: 'Component not found' });
+    res.json({ success: true, data: comp });
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+// CREATE (protected)
+router.post('/', requireAdmin, async (req, res) => {
+  try {
+    const comp = new Component(req.body);
+    await comp.save();
+    res.status(201).json({ success: true, data: comp });
+  } catch (err) {
+    console.error('CREATE COMPONENT ERROR:', err);
+    res.status(400).json({ success: false, error: err.message });
+  }
+});
+
+// UPDATE (protected)
+router.put('/:id', requireAdmin, async (req, res) => {
+  try {
+    const comp = await Component.findByIdAndUpdate(req.params.id, req.body, { new: true, runValidators: true });
+    if (!comp) return res.status(404).json({ success: false, error: 'Component not found' });
+    res.json({ success: true, data: comp });
+  } catch (err) {
+    res.status(400).json({ success: false, error: err.message });
+  }
+});
+
+// DELETE (protected)
+router.delete('/:id', requireAdmin, async (req, res) => {
+  try {
+    const comp = await Component.findByIdAndDelete(req.params.id);
+    if (!comp) return res.status(404).json({ success: false, error: 'Component not found' });
+    res.json({ success: true, message: 'Component deleted', deletedId: comp._id });
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+module.exports = router;

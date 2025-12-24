@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Addresses | ShopNest</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="script.js" defer></script>
+</head>
+<body class="bg-gray-50">
+    <custom-navbar></custom-navbar>
+    <main class="container mx-auto px-4 py-8">
+        <div class="flex flex-col md:flex-row gap-8">
+            <aside class="w-full md:w-64 flex-shrink-0">
+                <div class="bg-white p-6 rounded-lg shadow-sm">
+                    <div class="flex items-center mb-6">
+                        <img src="http://static.photos/people/200x200/5" alt="User" class="w-12 h-12 rounded-full mr-4">
+                        <div>
+                            <h3 class="font-semibold">John Doe</h3>
+                            <span class="text-sm text-gray-500">Gold Member</span>
+                        </div>
+                    </div>
+                    <ul class="space-y-2">
+                        <li><a href="/account.html" class="flex items-center p-2 rounded-lg hover:bg-gray-100">
+                            <i class="fas fa-user-circle mr-3"></i> My Profile</a></li>
+                        <li><a href="/orders.html" class="flex items-center p-2 rounded-lg hover:bg-gray-100">
+                            <i class="fas fa-box-open mr-3"></i> My Orders</a></li>
+                        <li><a href="/wishlist.html" class="flex items-center p-2 rounded-lg hover:bg-gray-100">
+                            <i class="fas fa-heart mr-3"></i> Wishlist</a></li>
+                        <li><a href="/addresses.html" class="flex items-center p-2 rounded-lg bg-blue-50 text-blue-600">
+                            <i class="fas fa-map-marker-alt mr-3"></i> Addresses</a></li>
+                        <li><a href="/settings.html" class="flex items-center p-2 rounded-lg hover:bg-gray-100">
+                            <i class="fas fa-cog mr-3"></i> Settings</a></li>
+                    </ul>
+                </div>
+            </aside>
+
+            <div class="flex-grow">
+                <div class="flex justify-between items-center mb-6">
+                    <h1 class="text-3xl font-bold">My Addresses</h1>
+                <button id="addNewAddress" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition">
+                    <i class="fas fa-plus mr-2"></i> Add New Address
+                </button>
+</div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div id="addressContainer" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <!-- Addresses will be loaded here -->
+                    </div>
+                    <!-- Address Form Modal -->
+                    <div id="addressModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden">
+                        <div class="bg-white p-6 rounded-lg shadow-lg w-full max-w-md">
+                            <div class="flex justify-between items-center mb-4">
+                                <h3 class="text-xl font-bold" id="modalTitle">Add New Address</h3>
+                                <button id="closeModal" class="text-gray-500 hover:text-gray-700">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                            </div>
+                            <form id="addressForm">
+                                <input type="hidden" id="addressId">
+                                <div class="mb-4">
+                                    <label class="block text-gray-700 mb-2">Address Type</label>
+                                    <input type="text" id="addressType" class="w-full border rounded-lg px-4 py-2" placeholder="Home, Work, etc." required>
+                                </div>
+                                <div class="mb-4">
+                                    <label class="block text-gray-700 mb-2">Full Name</label>
+                                    <input type="text" id="fullName" class="w-full border rounded-lg px-4 py-2" required>
+                                </div>
+                                <div class="mb-4">
+                                    <label class="block text-gray-700 mb-2">Street Address</label>
+                                    <input type="text" id="streetAddress" class="w-full border rounded-lg px-4 py-2" required>
+                                </div>
+                                <div class="mb-4">
+                                    <label class="block text-gray-700 mb-2">Municipality</label>
+                                    <input type="text" id="municipality" class="w-full border rounded-lg px-4 py-2" required>
+                                </div>
+                                <div class="grid grid-cols-2 gap-4 mb-4">
+                                    <div>
+                                        <label class="block text-gray-700 mb-2">District</label>
+                                        <input type="text" id="district" class="w-full border rounded-lg px-4 py-2" required>
+                                    </div>
+                                    <div>
+                                        <label class="block text-gray-700 mb-2">Province</label>
+                                        <select id="province" class="w-full border rounded-lg px-4 py-2" required>
+                                            <option value="">Select Province</option>
+                                            <option value="1">Province 1</option>
+                                            <option value="2">Madhesh</option>
+                                            <option value="3">Bagmati</option>
+                                            <option value="4">Gandaki</option>
+                                            <option value="5">Lumbini</option>
+                                            <option value="6">Karnali</option>
+                                            <option value="7">Sudurpashchim</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="mb-4">
+                                    <label class="block text-gray-700 mb-2">Phone Number</label>
+                                    <input type="tel" id="phoneNumber" class="w-full border rounded-lg px-4 py-2" placeholder="+977 98xxxxxxxx" required>
+                                </div>
+                                <div class="mb-4 flex items-center">
+                                    <input type="checkbox" id="isDefault" class="mr-2">
+                                    <label for="isDefault">Set as default shipping address</label>
+                                </div>
+                                <div class="flex justify-end gap-3">
+                                    <button type="button" id="cancelAddress" class="border border-gray-300 px-4 py-2 rounded-lg hover:bg-gray-100">
+                                        Cancel
+                                    </button>
+                                    <button type="submit" class="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700">
+                                        Save Address
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+</div>
+            </div>
+        </div>
+    </main>
+    <custom-footer></custom-footer>
+    <script src="components/navbar.js"></script>
+    <script src="components/footer.js"></script>
+    <script>
+        // Address management logic
+        document.addEventListener('DOMContentLoaded', () => {
+            const addressContainer = document.getElementById('addressContainer');
+            const addNewAddressBtn = document.getElementById('addNewAddress');
+            const addressModal = document.getElementById('addressModal');
+            const closeModalBtn = document.getElementById('closeModal');
+            const cancelAddressBtn = document.getElementById('cancelAddress');
+            const addressForm = document.getElementById('addressForm');
+            const modalTitle = document.getElementById('modalTitle');
+            
+            // Sample addresses data
+            let addresses = [
+                {
+                    id: 1,
+                    type: 'Home',
+                    name: 'Ram Shrestha',
+                    street: '123 Kathmandu Road',
+                    municipality: 'Kathmandu',
+                    district: 'Kathmandu',
+                    province: '3',
+                    phone: '+977 9801234567',
+                    isDefault: true
+                }
+            ];
+
+            // Render addresses
+            function renderAddresses() {
+                addressContainer.innerHTML = '';
+                addresses.forEach(address => {
+                    const provinceNames = {
+                        '1': 'Province 1',
+                        '2': 'Madhesh',
+                        '3': 'Bagmati',
+                        '4': 'Gandaki',
+                        '5': 'Lumbini',
+                        '6': 'Karnali',
+                        '7': 'Sudurpashchim'
+                    };
+                    
+                    const addressElement = document.createElement('div');
+                    addressElement.className = `bg-white p-6 rounded-lg shadow-sm ${address.isDefault ? 'border-2 border-blue-500' : 'border'} relative`;
+                    addressElement.innerHTML = `
+                        <div class="absolute top-4 right-4 flex gap-2">
+                            <button class="edit-btn text-blue-600 hover:text-blue-800" data-id="${address.id}">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button class="delete-btn text-red-500 hover:text-red-700" data-id="${address.id}">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                        <h3 class="font-semibold text-lg mb-2">${address.name}</h3>
+                        <p class="text-gray-700 mb-2">${address.street}</p>
+                        <p class="text-gray-700 mb-2">${address.municipality}, ${address.district}</p>
+                        <p class="text-gray-700 mb-2">${provinceNames[address.province]} Province</p>
+                        <p class="text-gray-700 mb-4">Nepal</p>
+                        <p class="text-gray-700"><i class="fas fa-phone-alt mr-2"></i> ${address.phone}</p>
+                        ${address.isDefault ? `
+                            <div class="mt-4 pt-4 border-t">
+                                <span class="inline-block px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded">Default Shipping</span>
+                            </div>
+                        ` : ''}
+                    `;
+                    addressContainer.appendChild(addressElement);
+                });
+
+                // Add event listeners to buttons
+                document.querySelectorAll('.edit-btn').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        const addressId = parseInt(e.currentTarget.dataset.id);
+                        editAddress(addressId);
+                    });
+                });
+
+                document.querySelectorAll('.delete-btn').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        const addressId = parseInt(e.currentTarget.dataset.id);
+                        deleteAddress(addressId);
+                    });
+                });
+            }
+
+            // Open modal for new address
+            addNewAddressBtn.addEventListener('click', () => {
+                modalTitle.textContent = 'Add New Address';
+                addressForm.reset();
+                document.getElementById('addressId').value = '';
+                addressModal.classList.remove('hidden');
+            });
+
+            // Close modal
+            closeModalBtn.addEventListener('click', () => {
+                addressModal.classList.add('hidden');
+            });
+
+            cancelAddressBtn.addEventListener('click', () => {
+                addressModal.classList.add('hidden');
+            });
+
+            // Handle form submission
+            addressForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                
+                const addressData = {
+                    id: document.getElementById('addressId').value || Date.now(),
+                    type: document.getElementById('addressType').value,
+                    name: document.getElementById('fullName').value,
+                    street: document.getElementById('streetAddress').value,
+                    municipality: document.getElementById('municipality').value,
+                    district: document.getElementById('district').value,
+                    province: document.getElementById('province').value,
+                    phone: document.getElementById('phoneNumber').value,
+                    isDefault: document.getElementById('isDefault').checked
+                };
+
+                if (addressData.isDefault) {
+                    addresses.forEach(addr => addr.isDefault = false);
+                }
+
+                const existingIndex = addresses.findIndex(a => a.id.toString() === addressData.id.toString());
+                if (existingIndex >= 0) {
+                    addresses[existingIndex] = addressData;
+                } else {
+                    addresses.push(addressData);
+                }
+
+                renderAddresses();
+                addressModal.classList.add('hidden');
+            });
+
+            // Edit address
+            function editAddress(id) {
+                const address = addresses.find(a => a.id === id);
+                if (!address) return;
+
+                modalTitle.textContent = 'Edit Address';
+                document.getElementById('addressId').value = address.id;
+                document.getElementById('addressType').value = address.type;
+                document.getElementById('fullName').value = address.name;
+                document.getElementById('streetAddress').value = address.street;
+                document.getElementById('municipality').value = address.municipality;
+                document.getElementById('district').value = address.district;
+                document.getElementById('province').value = address.province;
+                document.getElementById('phoneNumber').value = address.phone;
+                document.getElementById('isDefault').checked = address.isDefault;
+                
+                addressModal.classList.remove('hidden');
+            }
+
+            // Delete address
+            function deleteAddress(id) {
+                if (confirm('Are you sure you want to delete this address?')) {
+                    addresses = addresses.filter(a => a.id !== id);
+                    renderAddresses();
+                }
+            }
+
+            // Initial render
+            renderAddresses();
+        });
+    </script>
+</body>
+</html>

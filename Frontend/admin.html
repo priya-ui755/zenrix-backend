@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Zenrix Admin</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="p-4">
+    <h1 class="text-2xl font-bold mb-6">Zenrix Admin</h1>
+    
+    <div class="mb-8">
+        <h2 class="text-xl font-bold mb-3">Add Product</h2>
+        <form id="addForm" class="space-y-3">
+            <input type="text" name="name" placeholder="Product Name" class="border p-2 w-full" required>
+            <input type="number" name="price" placeholder="Price" class="border p-2 w-full" required>
+            <button class="bg-blue-600 text-white p-2 w-full">Add Product</button>
+        </form>
+    </div>
+    
+    <h2 class="text-xl font-bold mb-3">Products in Database</h2>
+    <div id="productList">Loading...</div>
+    
+    <script>
+        const API = 'http://localhost:3000/api';
+        
+        // Load products
+        async function loadProducts() {
+            const res = await fetch(API + '/products');
+            const data = await res.json();
+            
+            document.getElementById('productList').innerHTML = 
+                data.data.map(p => `
+                    <div class="border p-3 mb-2">
+                        <strong>${p.name}</strong> - $${p.price}
+                    </div>
+                `).join('');
+        }
+        
+        // Add product
+        document.getElementById('addForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const formData = new FormData(e.target);
+            const product = {
+                name: formData.get('name'),
+                price: parseFloat(formData.get('price')),
+                description: 'New product',
+                image: 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e',
+                category: 'electronics',
+                stock: 10,
+                rating: 4.5
+            };
+            
+            // ensure admin token
+            let token = localStorage.getItem('adminToken');
+            if (!token) {
+                const pw = prompt('Admin password required to add product:');
+                if (!pw) {
+                    document.getElementById('productList').insertAdjacentHTML('afterbegin', '<div class="p-2 bg-yellow-100 text-yellow-800 rounded mb-2">Cancelled</div>');
+                    setTimeout(() => document.querySelector('#productList .p-2')?.remove(), 3000);
+                    return;
+                }
+                const loginRes = await fetch(API + '/admin/login', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({ password: pw }) });
+                const loginJson = await loginRes.json();
+                if (!loginJson.success) {
+                    document.getElementById('productList').insertAdjacentHTML('afterbegin', '<div class="p-2 bg-red-100 text-red-800 rounded mb-2">Login failed</div>');
+                    setTimeout(() => document.querySelector('#productList .p-2')?.remove(), 3000);
+                    return;
+                }
+                token = loginJson.token;
+                localStorage.setItem('adminToken', token);
+            }
+
+            const res = await fetch(API + '/products', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token},
+                body: JSON.stringify(product)
+            });
+            const result = await res.json();
+            if (result && result.success) {
+                document.getElementById('productList').insertAdjacentHTML('afterbegin', '<div class="p-2 bg-green-100 text-green-800 rounded mb-2">Product added</div>');
+                setTimeout(() => document.querySelector('#productList .p-2')?.remove(), 3000);
+                e.target.reset();
+                loadProducts();
+            } else {
+                document.getElementById('productList').insertAdjacentHTML('afterbegin', '<div class="p-2 bg-red-100 text-red-800 rounded mb-2">Failed: ' + (result && result.error ? result.error : 'Unknown') + '</div>');
+                setTimeout(() => document.querySelector('#productList .p-2')?.remove(), 4000);
+            }
+        });
+        
+        loadProducts();
+    </script>
+</body>
+</html>

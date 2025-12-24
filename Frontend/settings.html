@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Account Settings | ShopNest</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="script.js" defer></script>
+</head>
+<body class="bg-gray-50">
+    <custom-navbar></custom-navbar>
+    <main class="container mx-auto px-4 py-8">
+        <div class="bg-white rounded-lg shadow p-8">
+            <div id="pageContent" class="prose max-w-none"></div>
+        </div>
+            <aside class="w-full md:w-64 flex-shrink-0">
+                <div class="bg-white p-6 rounded-lg shadow-sm">
+                    <div class="flex items-center mb-6">
+                        <img src="http://static.photos/people/200x200/5" alt="User" class="w-12 h-12 rounded-full mr-4">
+                        <div>
+                            <h3 class="font-semibold">John Doe</h3>
+                            <span class="text-sm text-gray-500">Gold Member</span>
+                        </div>
+                    </div>
+                    <ul class="space-y-2">
+                        <li><a href="/account.html" class="flex items-center p-2 rounded-lg hover:bg-gray-100">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 inline-block mr-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><circle cx="12" cy="8" r="3"/><path d="M4 20a8 8 0 0 1 16 0"/></svg> My Profile</a></li>
+                        <li><a href="/orders.html" class="flex items-center p-2 rounded-lg hover:bg-gray-100">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 inline-block mr-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><path d="M21 16V8l-9-5-9 5v8l9 5 9-5z"/></svg> My Orders</a></li>
+                        <li><a href="/wishlist.html" class="flex items-center p-2 rounded-lg hover:bg-gray-100">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 inline-block mr-3 text-red-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><path d="M20.8 4.6c-1.4-1.6-3.9-1.8-5.6-.4l-.7.6-.7-.6C11.1 2 9 2.2 7.6 3.8c-2.1 2.4-2 6 0 8.5L12 21l4.4-9.7c2-2.5 2.1-6.1 0-8.7z"/></svg> Wishlist</a></li>
+                        <li><a href="/addresses.html" class="flex items-center p-2 rounded-lg hover:bg-gray-100">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 inline-block mr-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><path d="M12 2C8 2 5 5 5 9c0 5 7 13 7 13s7-8 7-13c0-4-3-7-7-7z"/><circle cx="12" cy="9" r="2"/></svg> Addresses</a></li>
+                        <li><a href="/settings.html" class="flex items-center p-2 rounded-lg bg-blue-50 text-blue-600">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 inline-block mr-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><path d="M12 15.5A3.5 3.5 0 1 0 12 8.5a3.5 3.5 0 0 0 0 7z"/><path d="M19.4 15a1.6 1.6 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.6 1.6 0 0 0-1.82-.33 1.6 1.6 0 0 0-1 1.5V21a2 2 0 0 1-4 0v-.06a1.6 1.6 0 0 0-1-1.5 1.6 1.6 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06a1.6 1.6 0 0 0 .33-1.82 1.6 1.6 0 0 0-1.5-1H3a2 2 0 0 1 0-4h.06a1.6 1.6 0 0 0 1.5-1 1.6 1.6 0 0 0-.33-1.82l-.06-.06A2 2 0 0 1 7.3 3.7l.06.06a1.6 1.6 0 0 0 1.82.33H9.7a1.6 1.6 0 0 0 1-1.5V3a2 2 0 0 1 4 0v.06a1.6 1.6 0 0 0 1 1.5h.06a1.6 1.6 0 0 0 1.82-.33l.06-.06A2 2 0 0 1 20.6 6.7z"/></svg> Settings</a></li>
+                    </ul>
+                </div>
+            </aside>
+
+            <div class="flex-grow">
+                <h1 class="text-3xl font-bold mb-6">Account Settings</h1>
+                
+                <div class="bg-white rounded-lg shadow-sm p-6">
+                    <h2 class="text-xl font-bold mb-4">Notification Preferences</h2>
+                    <div class="space-y-4 mb-6">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <h3 class="font-semibold">Email Notifications</h3>
+                                <p class="text-sm text-gray-500">Receive updates about your orders and promotions</p>
+                            </div>
+                            <label class="relative inline-flex items-center cursor-pointer">
+                                <input type="checkbox" value="" class="sr-only peer" checked>
+                                <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                            </label>
+                        </div>
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <h3 class="font-semibold">SMS Notifications</h3>
+                                <p class="text-sm text-gray-500">Receive order updates via text message</p>
+                            </div>
+                            <label class="relative inline-flex items-center cursor-pointer">
+                                <input type="checkbox" value="" class="sr-only peer">
+                                <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                            </label>
+                        </div>
+                    </div>
+
+                    <h2 class="text-xl font-bold mb-4">Privacy Settings</h2>
+                    <div class="space-y-4 mb-6">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <h3 class="font-semibold">Personalized Recommendations</h3>
+                                <p class="text-sm text-gray-500">Get product recommendations based on your shopping habits</p>
+                            </div>
+                            <label class="relative inline-flex items-center cursor-pointer">
+                                <input type="checkbox" value="" class="sr-only peer" checked>
+                                <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                            </label>
+                        </div>
+                    </div>
+
+                    <h2 class="text-xl font-bold mb-4">Account Management</h2>
+                    <div class="space-y-4">
+                        <button class="text-red-500 hover:text-red-700 flex items-center">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 inline-block mr-2" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><path d="M17 11a5 5 0 0 0-9.9-1"/><path d="M1 1l22 22"/></svg> Deactivate Account
+                        </button>
+                        <button class="text-red-600 hover:text-red-800 flex items-center">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 inline-block mr-2" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><path d="M3 6h18"/><path d="M8 6v12a2 2 0 0 0 2 2h4a2 2 0 0 0 2-2V6"/><path d="M10 11v6M14 11v6"/></svg> Delete Account
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+    <custom-footer></custom-footer>
+
+    <script src="components/navbar.js"></script>
+    <script src="components/footer.js"></script>
+</body>
+</html>

@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Orders | ShopNest</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="script.js" defer></script>
+</head>
+<body class="bg-gray-50">
+    <custom-navbar></custom-navbar>
+    <main class="container mx-auto px-4 py-8">
+        <div class="flex flex-col md:flex-row gap-8">
+            <aside class="w-full md:w-64 flex-shrink-0">
+                <div class="bg-white p-6 rounded-lg shadow-sm">
+                    <div class="flex items-center mb-6">
+                        <img src="http://static.photos/people/200x200/5" alt="User" class="w-12 h-12 rounded-full mr-4">
+                        <div>
+                            <h3 class="font-semibold">John Doe</h3>
+                            <span class="text-sm text-gray-500">Gold Member</span>
+                        </div>
+                    </div>
+                    <ul class="space-y-2">
+                        <li><a href="/account.html" class="flex items-center p-2 rounded-lg hover:bg-gray-100">
+                            <i class="fas fa-user-circle mr-3"></i> My Profile</a></li>
+                        <li><a href="/orders.html" class="flex items-center p-2 rounded-lg bg-blue-50 text-blue-600">
+                            <i class="fas fa-box-open mr-3"></i> My Orders</a></li>
+                        <li><a href="/wishlist.html" class="flex items-center p-2 rounded-lg hover:bg-gray-100">
+                            <i class="fas fa-heart mr-3"></i> Wishlist</a></li>
+                        <li><a href="/addresses.html" class="flex items-center p-2 rounded-lg hover:bg-gray-100">
+                            <i class="fas fa-map-marker-alt mr-3"></i> Addresses</a></li>
+                        <li><a href="/settings.html" class="flex items-center p-2 rounded-lg hover:bg-gray-100">
+                            <i class="fas fa-cog mr-3"></i> Settings</a></li>
+                    </ul>
+                </div>
+            </aside>
+
+            <div class="flex-grow">
+                <h1 class="text-3xl font-bold mb-6">My Orders</h1>
+                
+                <div class="bg-white rounded-lg shadow-sm overflow-hidden">
+                    <div class="overflow-x-auto">
+                        <table class="w-full">
+                            <thead class="bg-gray-100">
+                                <tr>
+                                    <th class="text-left py-3 px-4 font-semibold">Order #</th>
+                                    <th class="text-left py-3 px-4 font-semibold">Date</th>
+                                    <th class="text-left py-3 px-4 font-semibold">Status</th>
+                                    <th class="text-left py-3 px-4 font-semibold">Total</th>
+                                    <th class="text-right py-3 px-4 font-semibold">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y">
+                                <tr>
+                                    <td class="py-4 px-4">
+                                        <a href="order-details.html?id=1001" class="text-blue-600 hover:underline">#1001</a>
+                                    </td>
+<td class="py-4 px-4">May 15, 2023</td>
+                                    <td class="py-4 px-4">
+                                        <span class="inline-block px-3 py-1 rounded-full text-sm font-semibold bg-green-100 text-green-800">
+                                            Delivered
+                                        </span>
+                                    </td>
+                                    <td class="py-4 px-4">$149.98</td>
+                                    <td class="py-4 px-4 text-right">
+                                        <a href="order-details.html?id=1001" class="text-blue-600 hover:underline mr-3">View</a>
+<a href="#" class="text-blue-600 hover:underline">Reorder</a>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="py-4 px-4">
+                                        <a href="/order-details.html?id=1000" class="text-blue-600 hover:underline">#1000</a>
+                                    </td>
+                                    <td class="py-4 px-4">May 5, 2023</td>
+                                    <td class="py-4 px-4">
+                                        <span class="inline-block px-3 py-1 rounded-full text-sm font-semibold bg-green-100 text-green-800">
+                                            Delivered
+                                        </span>
+                                    </td>
+                                    <td class="py-4 px-4">$89.99</td>
+                                    <td class="py-4 px-4 text-right">
+                                        <a href="/order-details.html?id=1000" class="text-blue-600 hover:underline mr-3">View</a>
+                                        <a href="#" class="text-blue-600 hover:underline">Reorder</a>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="py-4 px-4">
+                                        <a href="/order-details.html?id=999" class="text-blue-600 hover:underline">#999</a>
+                                    </td>
+                                    <td class="py-4 px-4">April 22, 2023</td>
+                                    <td class="py-4 px-4">
+                                        <span class="inline-block px-3 py-1 rounded-full text-sm font-semibold bg-yellow-100 text-yellow-800">
+                                            Shipped
+                                        </span>
+                                    </td>
+                                    <td class="py-4 px-4">$199.97</td>
+                                    <td class="py-4 px-4 text-right">
+                                        <a href="order-details.html?id=999" class="text-blue-600 hover:underline mr-3">View</a>
+<a href="#" class="text-blue-600 hover:underline">Track</a>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="py-4 px-4">
+                                        <a href="/order-details.html?id=998" class="text-blue-600 hover:underline">#998</a>
+                                    </td>
+                                    <td class="py-4 px-4">April 10, 2023</td>
+                                    <td class="py-4 px-4">
+                                        <span class="inline-block px-3 py-1 rounded-full text-sm font-semibold bg-red-100 text-red-800">
+                                            Cancelled
+                                        </span>
+                                    </td>
+                                    <td class="py-4 px-4">$59.99</td>
+                                    <td class="py-4 px-4 text-right">
+                                        <a href="order-details.html?id=998" class="text-blue-600 hover:underline">View</a>
+</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="flex justify-between items-center mt-6">
+                    <div class="text-sm text-gray-500">
+                        Showing 1 to 4 of 4 orders
+                    </div>
+                    <nav class="flex items-center gap-2">
+                        <button class="px-4 py-2 border rounded text-gray-600 bg-gray-100" disabled>Previous</button>
+                        <button class="px-4 py-2 border rounded bg-blue-600 text-white">1</button>
+                        <button class="px-4 py-2 border rounded text-gray-600 bg-gray-100" disabled>Next</button>
+                    </nav>
+                </div>
+            </div>
+        </div>
+    </main>
+    <custom-footer></custom-footer>
+
+    <script src="components/navbar.js"></script>
+    <script src="components/footer.js"></script>
+</body>
+</html>

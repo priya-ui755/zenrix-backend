@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Zenrix - Nepali Digital Marketplace</title>
+<link rel="stylesheet" href="style.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="script.js" defer></script>
+</head>
+<body class="bg-gray-50">
+    <custom-navbar></custom-navbar>
+    <main class="container mx-auto px-4 py-8">
+        <div id="pageContent" class="prose max-w-none">Loading page content…</div>
+
+        <section class="featured-products mb-12">
+            <h2 class="text-2xl font-bold mb-6">Featured Products</h2>
+            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6" id="featuredProducts">
+                <!-- Products will be loaded via JavaScript -->
+            </div>
+        </section>
+
+
+
+
+
+    </main>
+    <custom-footer></custom-footer>
+
+    <script src="components/navbar.js"></script>
+    <script src="components/footer.js"></script>
+<!-- ========== ZENRIX CHATBOT ========== -->
+<div id="chatbot-container">
+  <!-- Chat Button -->
+  <button id="chatbot-toggle" class="fixed bottom-6 right-6 bg-blue-600 text-white w-14 h-14 rounded-full shadow-lg hover:bg-blue-700 transition-all z-50 flex items-center justify-center" aria-label="Open chat">
+    <!-- chat bubble svg -->
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden>
+      <path d="M21 15a2 2 0 0 1-2 2H8l-5 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" stroke="#fff" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+  </button>
+
+  <!-- Chat Window -->
+  <div id="chatbot-window" class="fixed bottom-24 right-6 w-80 h-96 bg-white rounded-lg shadow-xl hidden flex flex-col z-50 border">
+    <!-- Header -->
+    <div class="bg-gradient-to-r from-blue-500 to-purple-600 text-white p-4 rounded-t-lg flex justify-between items-center">
+      <div class="flex items-center">
+        <div class="w-8 h-8 bg-white rounded-full flex items-center justify-center mr-3">
+          <!-- robot svg -->
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden>
+            <path d="M8 7h8v4H8z" stroke="#2563EB" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M12 11v4" stroke="#2563EB" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+            <rect x="7" y="3" width="10" height="6" rx="2" stroke="#2563EB" stroke-width="1.2" fill="#fff"/>
+          </svg>
+        </div>
+        <div>
+          <h3 class="font-bold">Zenrix Assistant</h3>
+          <p class="text-xs opacity-80">Online • 24/7 Support</p>
+        </div>
+      </div>
+      <button id="chatbot-close" class="text-white hover:text-gray-200" aria-label="Close chat">
+        <!-- close X svg -->
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden>
+          <path d="M18 6L6 18M6 6l12 12" stroke="#fff" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </button>
+    </div>
+
+    <!-- Messages -->
+    <div id="chatbot-messages" class="flex-grow p-4 overflow-y-auto space-y-3">
+      <div class="flex">
+        <div class="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center mr-2 flex-shrink-0">
+          <!-- small robot svg -->
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden>
+            <path d="M8 7h8v4H8z" stroke="#2563EB" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"/>
+            <rect x="7" y="3" width="10" height="6" rx="2" stroke="#2563EB" stroke-width="1" fill="#fff"/>
+          </svg>
+        </div>
+        <div class="bg-gray-100 rounded-lg p-3 max-w-[80%]">
+          <p class="text-sm">Hello! 👋 I'm Zenrix Assistant. How can I help you today?</p>
+          <p class="text-xs text-gray-500 mt-2">Try asking about: products, delivery, or returns</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Input -->
+    <div class="border-t p-4">
+      <div class="flex space-x-2">
+        <input type="text" id="chatbot-input" placeholder="Type your message..." 
+               class="flex-grow border rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+        <button id="chatbot-send" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700" aria-label="Send message">
+          <!-- paper plane svg -->
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden>
+            <path d="M22 2L11 13" stroke="#fff" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M22 2l-7 20 1-7 7-13z" stroke="#fff" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </button>
+      </div>
+      <div class="flex flex-wrap gap-2 mt-3">
+        <button class="quick-btn" data-msg="What products do you have?">Products</button>
+        <button class="quick-btn" data-msg="What is delivery time?">Delivery</button>
+        <button class="quick-btn" data-msg="How to return product?">Returns</button>
+        <button class="quick-btn" data-msg="Contact support">Contact</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Chatbot JavaScript -->
+<script>
+// Chatbot functionality
+document.addEventListener('DOMContentLoaded', function() {
+  const toggleBtn = document.getElementById('chatbot-toggle');
+  const closeBtn = document.getElementById('chatbot-close');
+  const chatWindow = document.getElementById('chatbot-window');
+  const chatInput = document.getElementById('chatbot-input');
+  const sendBtn = document.getElementById('chatbot-send');
+  const messagesDiv = document.getElementById('chatbot-messages');
+  const quickBtns = document.querySelectorAll('.quick-btn');
+
+  // Toggle chat window
+  toggleBtn.addEventListener('click', () => {
+    chatWindow.classList.toggle('hidden');
+    if (!chatWindow.classList.contains('hidden')) {
+      chatInput.focus();
+    }
+  });
+
+  closeBtn.addEventListener('click', () => {
+    chatWindow.classList.add('hidden');
+  });
+
+  // Send message
+  function sendMessage() {
+    const message = chatInput.value.trim();
+    if (message) {
+      addMessage('user', message);
+      chatInput.value = '';
+      getBotResponse(message);
+    }
+  }
+
+  sendBtn.addEventListener('click', sendMessage);
+  chatInput.addEventListener('keypress', (e) => {
+    if (e.key === 'Enter') sendMessage();
+  });
+
+  // Quick buttons
+  quickBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      const msg = btn.getAttribute('data-msg');
+      addMessage('user', msg);
+      getBotResponse(msg);
+    });
+  });
+
+  // Add message to chat
+  function addMessage(sender, text) {
+    const messageDiv = document.createElement('div');
+    messageDiv.className = `flex ${sender === 'user' ? 'justify-end' : ''}`;
+    
+    messageDiv.innerHTML = `
+      ${sender === 'bot' ? `
+        <div class="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center mr-2 flex-shrink-0">
+          <!-- small robot svg -->
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden>
+            <path d="M8 7h8v4H8z" stroke="#2563EB" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"/>
+            <rect x="7" y="3" width="10" height="6" rx="2" stroke="#2563EB" stroke-width="1" fill="#fff"/>
+          </svg>
+        </div>
+      ` : ''}
+      <div class="${sender === 'user' ? 'bg-blue-600 text-white' : 'bg-gray-100'} rounded-lg p-3 max-w-[80%]">
+        <p class="text-sm">${text}</p>
+        <p class="text-xs ${sender === 'user' ? 'text-blue-200' : 'text-gray-500'} mt-1">${new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</p>
+      </div>
+      ${sender === 'user' ? `
+        <div class="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center ml-2 flex-shrink-0">
+          <!-- small user svg -->
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden>
+            <path d="M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8z" stroke="#2563EB" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M4 21a8 8 0 0 1 16 0" stroke="#2563EB" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+      ` : ''}
+    `;
+    
+    messagesDiv.appendChild(messageDiv);
+    messagesDiv.scrollTop = messagesDiv.scrollHeight;
+  }
+
+  // Bot responses
+  function getBotResponse(userMessage) {
+    const msg = userMessage.toLowerCase();
+    let response = '';
+    
+    // Simple response logic
+    if (msg.includes('hello') || msg.includes('hi') || msg.includes('hey')) {
+      response = "Hello! Welcome to Zenrix. How can I assist you today?";
+    } else if (msg.includes('product') || msg.includes('item')) {
+      response = "We have electronics, fashion, home goods, and beauty products. Check our Products page for all items!";
+    } else if (msg.includes('price') || msg.includes('cost')) {
+      response = "Products start from $24.99. Check individual product pages for exact prices.";
+    } else if (msg.includes('delivery') || msg.includes('shipping')) {
+      response = "We deliver in 3-5 business days. Free shipping on orders over $50!";
+    } else if (msg.includes('return') || msg.includes('refund')) {
+      response = "We have a 30-day return policy. Contact support@zenrix.com for returns.";
+    } else if (msg.includes('contact') || msg.includes('support')) {
+      response = "Email: support@zenrix.com\nPhone: +977 9801234567\nHours: 9AM-6PM (NPT)";
+    } else if (msg.includes('order') || msg.includes('track')) {
+      response = "Check your Orders page for order status. Need help? Contact our support team.";
+    } else {
+      response = "I'm here to help! For detailed questions, please contact our support team at support@zenrix.com";
+    }
+    
+    // Simulate typing delay
+    setTimeout(() => {
+      addMessage('bot', response);
+    }, 1000);
+  }
+});
+</script>
+
+<!-- Chatbot CSS -->
+<style>
+#chatbot-window {
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+  border: 1px solid #e5e7eb;
+}
+
+#chatbot-messages {
+  scroll-behavior: smooth;
+}
+
+.quick-btn {
+  background: #f3f4f6;
+  border: 1px solid #e5e7eb;
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.quick-btn:hover {
+  background: #e5e7eb;
+  transform: translateY(-1px);
+}
+
+.hidden {
+  display: none !important;
+}
+
+/* Smooth animations */
+#chatbot-toggle, #chatbot-window {
+  transition: all 0.3s ease;
+}
+
+#chatbot-toggle:hover {
+  transform: scale(1.1);
+}
+</style>
+<!-- ========== END CHATBOT ========== -->
+</body>
+</html>

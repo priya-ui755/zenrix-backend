@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Profile | ShopNest</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="script.js" defer></script>
+</head>
+<body class="bg-gray-50">
+    <custom-navbar></custom-navbar>
+    <main class="container mx-auto px-4 py-8">
+        <div class="bg-white rounded-lg shadow p-8">
+            <div id="pageContent" class="prose max-w-none"></div>
+        </div>
+            <aside class="w-full md:w-64 flex-shrink-0">
+                <div class="bg-white p-6 rounded-lg shadow-sm">
+                    <div class="flex flex-col items-center mb-6">
+                        <img src="http://static.photos/people/200x200/5" alt="User" class="w-24 h-24 rounded-full mb-4">
+                        <h3 class="font-semibold text-lg">John Doe</h3>
+                        <span class="text-sm text-gray-500">Gold Member</span>
+                        <button class="mt-2 text-sm text-blue-600 hover:text-blue-800">Edit Profile</button>
+                    </div>
+                    <ul class="space-y-2">
+                        <li><a href="/account.html" class="flex items-center p-2 rounded-lg hover:bg-gray-100">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 inline-block mr-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><circle cx="12" cy="8" r="3"/><path d="M4 20a8 8 0 0 1 16 0"/></svg> Account Overview</a></li>
+                        <li><a href="/profile.html" class="flex items-center p-2 rounded-lg bg-blue-50 text-blue-600">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 inline-block mr-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><path d="M3 21v-3a4 4 0 0 1 4-4h2l8-8 4 4-8 8v2a4 4 0 0 1-4 4H7"/></svg> Profile</a></li>
+                        <li><a href="/orders.html" class="flex items-center p-2 rounded-lg hover:bg-gray-100">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 inline-block mr-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><path d="M21 16V8l-9-5-9 5v8l9 5 9-5z"/></svg> Orders</a></li>
+                        <li><a href="/addresses.html" class="flex items-center p-2 rounded-lg hover:bg-gray-100">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 inline-block mr-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><path d="M12 2C8 2 5 5 5 9c0 5 7 13 7 13s7-8 7-13c0-4-3-7-7-7z"/><circle cx="12" cy="9" r="2"/></svg> Addresses</a></li>
+                        <li><a href="/payment.html" class="flex items-center p-2 rounded-lg hover:bg-gray-100">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 inline-block mr-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><rect x="2" y="6" width="20" height="12" rx="2"/><path d="M2 10h20"/></svg> Payment Methods</a></li>
+                    </ul>
+                </div>
+            </aside>
+
+            <div class="flex-grow">
+                <div class="bg-white p-6 rounded-lg shadow-sm">
+                    <h2 class="text-2xl font-bold mb-6">Personal Information</h2>
+                <form id="profileForm">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                        <div>
+                            <label class="block text-gray-700 mb-2">First Name</label>
+                            <input type="text" id="profileFirstName" class="w-full border rounded-lg px-4 py-2" required>
+                        </div>
+                        <div>
+                            <label class="block text-gray-700 mb-2">Last Name</label>
+                            <input type="text" id="profileLastName" class="w-full border rounded-lg px-4 py-2" required>
+                        </div>
+                        <div>
+                            <label class="block text-gray-700 mb-2">Email</label>
+                            <input type="email" id="profileEmail" class="w-full border rounded-lg px-4 py-2" required>
+                        </div>
+                        <div>
+                            <label class="block text-gray-700 mb-2">Phone</label>
+                            <input type="tel" id="profilePhone" class="w-full border rounded-lg px-4 py-2">
+                        </div>
+                        <div>
+                            <label class="block text-gray-700 mb-2">Date of Birth</label>
+                            <input type="date" id="profileDob" class="w-full border rounded-lg px-4 py-2">
+                        </div>
+                        <div>
+                            <label class="block text-gray-700 mb-2">Gender</label>
+                            <select id="profileGender" class="w-full border rounded-lg px-4 py-2">
+                                <option value="Male">Male</option>
+                                <option value="Female">Female</option>
+                                <option value="Other">Other</option>
+                                <option value="Prefer not to say">Prefer not to say</option>
+                            </select>
+                        </div>
+                    </div>
+                    <button type="submit" class="bg-blue-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-blue-700 transition">
+                        Save Changes
+                    </button>
+                    <div id="profileSuccess" class="mt-4 text-green-600 hidden">Profile updated successfully!</div>
+                    <div id="profileError" class="mt-4 text-red-600 hidden">Error updating profile. Please try again.</div>
+                </form>
+<div class="border-t mt-8 pt-6">
+                        <h3 class="text-lg font-semibold mb-4">Change Password</h3>
+                        <form class="space-y-4">
+                            <div>
+                                <label class="block text-gray-700 mb-2">Current Password</label>
+                                <input type="password" class="w-full border rounded-lg px-4 py-2">
+                            </div>
+                            <div>
+                                <label class="block text-gray-700 mb-2">New Password</label>
+                                <input type="password" class="w-full border rounded-lg px-4 py-2">
+                            </div>
+                            <div>
+                                <label class="block text-gray-700 mb-2">Confirm New Password</label>
+                                <input type="password" class="w-full border rounded-lg px-4 py-2">
+                            </div>
+                            <button type="submit" class="bg-blue-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-blue-700 transition">
+                                Update Password
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+    <custom-footer></custom-footer>
+
+    <script src="components/navbar.js"></script>
+    <script src="components/footer.js"></script>
+</body>
+</html>

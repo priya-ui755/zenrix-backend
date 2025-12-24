@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Order Details | ShopNest</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="script.js" defer></script>
+</head>
+<body class="bg-gray-50">
+    <custom-navbar></custom-navbar>
+    <main class="container mx-auto px-4 py-8">
+        <div class="flex flex-col md:flex-row gap-8">
+            <aside class="w-full md:w-64 flex-shrink-0">
+                <div class="bg-white p-6 rounded-lg shadow-sm">
+                    <div class="flex items-center mb-6">
+                        <img src="http://static.photos/people/200x200/5" alt="User" class="w-12 h-12 rounded-full mr-4">
+                        <div>
+                            <h3 class="font-semibold">John Doe</h3>
+                            <span class="text-sm text-gray-500">Gold Member</span>
+                        </div>
+                    </div>
+                    <ul class="space-y-2">
+                        <li><a href="/account.html" class="flex items-center p-2 rounded-lg hover:bg-gray-100">
+                            <i class="fas fa-user-circle mr-3"></i> My Profile</a></li>
+                        <li><a href="/orders.html" class="flex items-center p-2 rounded-lg bg-blue-50 text-blue-600">
+                            <i class="fas fa-box-open mr-3"></i> My Orders</a></li>
+                        <li><a href="/wishlist.html" class="flex items-center p-2 rounded-lg hover:bg-gray-100">
+                            <i class="fas fa-heart mr-3"></i> Wishlist</a></li>
+                        <li><a href="/addresses.html" class="flex items-center p-2 rounded-lg hover:bg-gray-100">
+                            <i class="fas fa-map-marker-alt mr-3"></i> Addresses</a></li>
+                    </ul>
+                </div>
+            </aside>
+
+            <div class="flex-grow">
+                <div class="flex justify-between items-center mb-6">
+                    <h1 class="text-3xl font-bold">Order #<span id="orderId">1001</span></h1>
+                    <a href="/orders.html" class="text-blue-600 hover:text-blue-800">
+                        <i class="fas fa-arrow-left mr-1"></i> Back to Orders
+                    </a>
+                </div>
+
+                <div class="bg-white rounded-lg shadow-sm p-6 mb-6">
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+                        <div>
+                            <h3 class="font-semibold mb-2">Order Status</h3>
+                            <p class="text-green-600 font-medium" id="orderStatus">Delivered</p>
+                        </div>
+                        <div>
+                            <h3 class="font-semibold mb-2">Order Date</h3>
+                            <p id="orderDate">May 15, 2023</p>
+                        </div>
+                        <div>
+                            <h3 class="font-semibold mb-2">Total Amount</h3>
+                            <p class="font-bold" id="orderTotal">$149.98</p>
+                        </div>
+                    </div>
+
+                    <div class="border-t pt-6">
+                        <h3 class="font-semibold mb-4">Delivery Information</h3>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div>
+                                <h4 class="text-gray-500 mb-2">Shipping Address</h4>
+                                <p id="shippingAddress">
+                                    John Doe<br>
+                                    123 Main Street<br>
+                                    Apartment 4B<br>
+                                    New York, NY 10001<br>
+                                    United States<br>
+                                    Phone: +1 234 567 890
+                                </p>
+                            </div>
+                            <div>
+                                <h4 class="text-gray-500 mb-2">Payment Method</h4>
+                                <div class="flex items-center">
+                                    <i class="fas fa-credit-card text-xl mr-3 text-gray-600"></i>
+                                    <span id="paymentMethod">Visa ending in 4242</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-lg shadow-sm overflow-hidden">
+                    <h2 class="text-xl font-bold p-6 border-b">Order Items</h2>
+                    <div id="orderItems">
+                        <!-- Items will be loaded here -->
+                        <div class="p-6 border-b">
+                            <div class="flex flex-col sm:flex-row gap-6">
+                                <div class="flex-shrink-0">
+                                    <img src="http://static.photos/technology/200x200/1" alt="Product" class="w-20 h-20 object-contain">
+                                </div>
+                                <div class="flex-grow">
+                                    <h3 class="font-semibold">Wireless Headphones</h3>
+                                    <p class="text-gray-600">SKU: WH-001</p>
+                                    <div class="flex items-center mt-1">
+                                        <i class="fas fa-star text-yellow-400"></i>
+                                        <i class="fas fa-star text-yellow-400"></i>
+                                        <i class="fas fa-star text-yellow-400"></i>
+                                        <i class="fas fa-star text-yellow-400"></i>
+                                        <i class="fas fa-star-half-alt text-yellow-400"></i>
+                                    </div>
+                                </div>
+                                <div class="flex flex-col items-end">
+                                    <p class="text-blue-600 font-semibold">$99.99</p>
+                                    <p class="text-sm text-gray-500">Qty: 1</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="p-6 bg-gray-50">
+                        <div class="flex justify-between items-center mb-2">
+                            <span>Subtotal</span>
+                            <span id="orderSubtotal">$149.98</span>
+                        </div>
+                        <div class="flex justify-between items-center mb-2">
+                            <span>Shipping</span>
+                            <span id="orderShipping">Free</span>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <span>Tax</span>
+                            <span id="orderTax">$12.00</span>
+                        </div>
+                        <div class="border-t mt-4 pt-4 flex justify-between items-center font-bold">
+                            <span>Total</span>
+                            <span id="orderGrandTotal">$161.98</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+    <custom-footer></custom-footer>
+
+    <script src="components/navbar.js"></script>
+    <script src="components/footer.js"></script>
+</body>
+</html>
