@@ -8,7 +8,7 @@ module.exports = defineConfig({
   webServer: {
     command: 'npm run start',
     port: 3000,
-    reuseExistingServer: false,
+    reuseExistingServer: true,
   },
   use: {
     baseURL: 'http://localhost:3000',
