@@ -1,5 +1,37 @@
 const { test, expect } = require('@playwright/test');
 const diagUtil = require('../helpers/e2e-utils');
+const path = require('path');
+
+// Per-test hooks to collect diagnostics and traces when E2E_DIAGNOSTICS=true
+test.beforeEach(async ({ page }) => {
+  // attach console/pageerror collectors
+  page._e2e_logs = [];
+  page.on('console', m => page._e2e_logs.push({ type: m.type(), text: m.text() }));
+  page.on('pageerror', e => page._e2e_logs.push({ type: 'pageerror', text: e.message }));
+
+  if (diagUtil.diagnosticsEnabled()) {
+    try { await diagUtil.startTracing(page.context()); } catch (e) { console.warn('Tracing start failed', e); }
+  }
+});
+
+test.afterEach(async ({ page }, testInfo) => {
+  if (!diagUtil.diagnosticsEnabled()) return;
+
+  if (testInfo.status !== 'passed') {
+    const safeTitle = testInfo.title.replace(/[^\w\-]+/g, '_').slice(0,200);
+    try { await diagUtil.writeDiagnosticScreenshot(`${safeTitle}.png`, page); } catch(e) {}
+    const html = await page.content().catch(()=>null);
+    if (html) diagUtil.writeDiagnosticFile(`${safeTitle}.html`, html);
+    const lastErrors = await page.evaluate(() => window._lastErrors || []).catch(()=>null);
+    if (lastErrors) diagUtil.writeDiagnosticJson(`${safeTitle}.errors.json`, lastErrors);
+    const logs = page._e2e_logs || [];
+    if (logs && logs.length>0) diagUtil.writeDiagnosticJson(`${safeTitle}.console.json`, logs);
+    try { await diagUtil.stopTracing(`${safeTitle}.zip`, page.context()); } catch (e) { console.warn('Tracing stop failed', e); }
+  } else {
+    // stop tracing quietly on success
+    try { await page.context().tracing.stop(); } catch (e) { /* ignore */ }
+  }
+});
 
 test('Admin CRUD and ordering flow (E2E)', async ({ page, request }) => {
   // Load admin dashboard (served from /admin-dashboard.html)

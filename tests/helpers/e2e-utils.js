@@ -40,10 +40,36 @@ async function writeDiagnosticScreenshot(name, page) {
   }
 }
 
+async function startTracing(context) {
+  if (!diagnosticsEnabled()) return false;
+  try {
+    await context.tracing.start({ screenshots: true, snapshots: true });
+    return true;
+  } catch (err) {
+    console.warn('Could not start tracing', err);
+    return false;
+  }
+}
+
+async function stopTracing(name, context) {
+  if (!diagnosticsEnabled()) return false;
+  try {
+    const d = ensureTmpDir();
+    const p = path.join(d, name);
+    await context.tracing.stop({ path: p });
+    return true;
+  } catch (err) {
+    console.warn('Could not stop tracing', err);
+    return false;
+  }
+}
+
 module.exports = {
   diagnosticsEnabled,
   writeDiagnosticFile,
   writeDiagnosticJson,
   ensureTmpDir,
-  writeDiagnosticScreenshot
+  writeDiagnosticScreenshot,
+  startTracing,
+  stopTracing
 };
