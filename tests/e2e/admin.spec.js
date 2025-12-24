@@ -219,7 +219,7 @@ test('Admin CRUD and ordering flow (E2E)', async ({ page, request }) => {
         const diag = require('../helpers/e2e-utils');
         if (diag.diagnosticsEnabled()) {
           diag.writeDiagnosticFile('admin_edit_modal_failure.html', html);
-          await page.screenshot({ path: 'tmp/admin_edit_modal_failure.png', fullPage: true });
+          await diag.writeDiagnosticScreenshot('admin_edit_modal_failure.png', page);
           diag.writeDiagnosticJson('admin_edit_modal_state.json', state);
           throw new Error('Edit modal did not become visible; saved tmp/admin_edit_modal_failure.{html,png} and tmp/admin_edit_modal_state.json');
         } else {
@@ -233,7 +233,7 @@ test('Admin CRUD and ordering flow (E2E)', async ({ page, request }) => {
       const diag = require('../helpers/e2e-utils');
       if (diag.diagnosticsEnabled()) {
         diag.writeDiagnosticFile('admin_edit_modal_failure.html', html);
-        await page.screenshot({ path: 'tmp/admin_edit_modal_failure.png', fullPage: true });
+        await diag.writeDiagnosticScreenshot('admin_edit_modal_failure.png', page);
         diag.writeDiagnosticJson('admin_edit_modal_state.json', state);
         throw new Error('Edit modal did not become visible and onclick id could not be determined; saved diagnostic files');
       } else {

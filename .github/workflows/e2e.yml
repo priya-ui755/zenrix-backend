@@ -36,10 +36,13 @@ jobs:
           # diagnostics off by default in CI
           E2E_DIAGNOSTICS: 'false'
 
-      - name: Upload diagnostics on failure
+      - name: Upload Playwright artifacts (traces/videos/screenshots) on failure
         if: failure()
         uses: actions/upload-artifact@v4
         with:
-          name: e2e-diagnostics
-          path: tmp/**
+          name: e2e-artifacts
+          path: |
+            tmp/**
+            test-results/**
+            playwright-report/**
           retention-days: 7

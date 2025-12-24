@@ -15,7 +15,7 @@ E2E diagnostics (optional):
 - Example (local): `E2E_DIAGNOSTICS=true npx playwright test tests/e2e/admin.spec.js`.
 
 Continuous Integration:
-- A GitHub Actions workflow has been added at `.github/workflows/e2e.yml` to run Playwright tests on `pull_request` and pushes to `main` (headless). Diagnostics are off in CI by default.
+- A GitHub Actions workflow has been added at `.github/workflows/e2e.yml` to run Playwright tests on `pull_request` and pushes to `main` (headless). The CI workflow will upload Playwright artifacts (`test-results/`, `playwright-report/`, and any `tmp/` diagnostics) on failure to assist debugging; artifacts are retained for 7 days. Diagnostics are off in CI by default.
 Notes:
 - Admin actions (create/update/delete product, pages, and components) require an admin login. Use `POST /api/admin/login` with `{ password }` to obtain a JWT.
 - CMS endpoints:

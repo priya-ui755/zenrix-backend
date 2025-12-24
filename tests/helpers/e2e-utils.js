@@ -27,9 +27,23 @@ function writeDiagnosticJson(name, obj) {
   return writeDiagnosticFile(name, JSON.stringify(obj, null, 2));
 }
 
+async function writeDiagnosticScreenshot(name, page) {
+  if (!diagnosticsEnabled()) return false;
+  try {
+    const d = ensureTmpDir();
+    const p = path.join(d, name);
+    await page.screenshot({ path: p, fullPage: true });
+    return true;
+  } catch (err) {
+    console.warn('Could not write diagnostic screenshot', err);
+    return false;
+  }
+}
+
 module.exports = {
   diagnosticsEnabled,
   writeDiagnosticFile,
   writeDiagnosticJson,
-  ensureTmpDir
+  ensureTmpDir,
+  writeDiagnosticScreenshot
 };
