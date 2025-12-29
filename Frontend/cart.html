@@ -3,279 +3,257 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Shopping Cart | ShopNest</title>
-    <link rel="stylesheet" href="style.css">
+    <title>Cart | Zenrix</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="script.js" defer></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
-<body class="bg-gray-50">
+<body class="bg-gradient-to-br from-gray-50 to-gray-100 min-h-screen">
     <custom-navbar></custom-navbar>
-    <main class="container mx-auto px-4 py-8">
-        <h1 class="text-3xl font-bold mb-8">Your Shopping Cart</h1>
-        
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            <div class="lg:col-span-2">
-                <div class="bg-white rounded-lg shadow-sm overflow-hidden">
-                    <div class="divide-y">
-                        <!-- Cart items will be loaded here -->
-                        <div id="cartItems" class="p-6">
-                            <div class="text-center py-12">
-                                <i class="fas fa-shopping-cart text-4xl text-gray-300 mb-4"></i>
-                                <p class="text-gray-500">Your cart is empty</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+
+    <!-- Loading -->
+    <div id="loadingState" class="flex items-center justify-center min-h-screen">
+        <div class="text-center">
+            <div class="animate-spin rounded-full h-16 w-16 border-b-4 border-indigo-600 mx-auto mb-4"></div>
+            <p class="text-gray-600">Loading your cart...</p>
+        </div>
+    </div>
+
+    <!-- Not logged in -->
+    <div id="notLoggedInState" class="hidden container mx-auto px-4 py-16">
+        <div class="max-w-md mx-auto bg-white rounded-2xl shadow-xl p-8 text-center">
+            <div class="w-20 h-20 bg-indigo-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <i class="fas fa-user-lock text-3xl text-indigo-600"></i>
             </div>
-
-            <div>
-                <div class="bg-white rounded-lg shadow-sm p-6 sticky top-4">
-                    <h2 class="text-xl font-bold mb-4">Order Summary</h2>
-                    <div class="space-y-4 mb-6">
-                        <div class="flex justify-between">
-                            <span>Subtotal</span>
-                            <span id="cartSubtotal">$0.00</span>
-                        </div>
-                        <div class="flex justify-between">
-                            <span>Shipping</span>
-                            <span id="cartShipping">Free</span>
-                        </div>
-                        <div class="flex justify-between">
-                            <span>Tax</span>
-                            <span id="cartTax">$0.00</span>
-                        </div>
-                        <div class="border-t pt-4 flex justify-between font-bold text-lg">
-                            <span>Total</span>
-                            <span id="cartTotal">$0.00</span>
-                        </div>
-                    </div>
-                    <a href="/checkout.html" class="block w-full bg-blue-600 text-white text-center py-3 rounded-lg font-semibold hover:bg-blue-700 transition">
-                        Proceed to Checkout
-                    </a>
-                    <p class="text-sm text-gray-500 mt-4">
-                        <i class="fas fa-lock mr-1"></i> Secure checkout
-                    </p>
-                </div>
-
-                <div class="bg-white rounded-lg shadow-sm p-6 mt-4">
-                    <h3 class="font-semibold mb-2">Have a coupon?</h3>
-                    <div class="flex">
-                        <input type="text" placeholder="Enter coupon code" class="flex-grow border rounded-l-lg px-4 py-2">
-                        <button class="bg-gray-200 px-4 py-2 rounded-r-lg hover:bg-gray-300 transition">
-                            Apply
-                        </button>
-                    </div>
-                </div>
+            <h2 class="text-2xl font-bold text-gray-900 mb-2">Please log in</h2>
+            <p class="text-gray-600 mb-6">Sign in to see and manage your cart</p>
+            <div class="space-y-3">
+                <a href="login.html" class="block w-full bg-indigo-600 text-white px-6 py-3 rounded-xl font-semibold hover:bg-indigo-700 transition">
+                    <i class="fas fa-sign-in-alt mr-2"></i> Log In
+                </a>
+                <a href="register.html" class="block w-full bg-gray-100 text-gray-700 px-6 py-3 rounded-xl font-semibold hover:bg-gray-200 transition">
+                    <i class="fas fa-user-plus mr-2"></i> Create Account
+                </a>
             </div>
         </div>
+    </div>
+
+    <!-- Cart content -->
+    <main id="cartContent" class="hidden container mx-auto px-4 py-10 space-y-6">
+        <header class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+            <div>
+                <p class="text-sm text-indigo-600 font-semibold uppercase tracking-wide">Your cart</p>
+                <h1 class="text-3xl font-bold text-gray-900 mt-1">Ready to checkout?</h1>
+                <p class="text-gray-600">Review items, adjust quantities, and place your order</p>
+            </div>
+            <div class="flex items-center gap-3">
+                <a href="products.html" class="px-4 py-2 rounded-xl border border-gray-200 bg-white text-gray-800 font-semibold hover:border-indigo-200 hover:text-indigo-600 transition">
+                    <i class="fas fa-arrow-left mr-2"></i>Continue shopping
+                </a>
+                <a href="orders.html" class="px-4 py-2 rounded-xl bg-indigo-600 text-white font-semibold hover:bg-indigo-700 transition">
+                    <i class="fas fa-box mr-2"></i>View orders
+                </a>
+            </div>
+        </header>
+
+        <section class="grid grid-cols-1 xl:grid-cols-3 gap-6">
+            <div class="xl:col-span-2 space-y-4" id="cartItems">
+                <div class="bg-white rounded-2xl shadow p-6 text-center text-gray-500">Your cart is empty.</div>
+            </div>
+
+            <aside class="space-y-4">
+                <div class="bg-white rounded-2xl shadow p-6 sticky top-6">
+                    <h2 class="text-xl font-bold text-gray-900 mb-4">Order summary</h2>
+                    <div class="space-y-3 text-gray-700">
+                        <div class="flex items-center justify-between">
+                            <span>Items</span>
+                            <span id="summaryCount">0</span>
+                        </div>
+                        <div class="flex items-center justify-between">
+                            <span>Subtotal</span>
+                            <span id="summarySubtotal">$0.00</span>
+                        </div>
+                        <div class="flex items-center justify-between">
+                            <span>Shipping</span>
+                            <span class="text-green-600 font-semibold">Free</span>
+                        </div>
+                        <div class="flex items-center justify-between">
+                            <span>Tax (est.)</span>
+                            <span class="text-gray-500">Included</span>
+                        </div>
+                        <div class="border-t pt-4 flex items-center justify-between font-bold text-lg text-gray-900">
+                            <span>Total</span>
+                            <span id="summaryTotal">$0.00</span>
+                        </div>
+                    </div>
+                    <button id="checkoutBtn" class="mt-6 w-full bg-indigo-600 text-white py-3 rounded-xl font-semibold hover:bg-indigo-700 transition disabled:opacity-60 disabled:cursor-not-allowed">
+                        <i class="fas fa-lock mr-2"></i>Secure checkout
+                    </button>
+                    <p class="text-xs text-gray-500 mt-2 text-center">You can review your order before paying.</p>
+                </div>
+
+                <div class="bg-white rounded-2xl shadow p-6">
+                    <h3 class="font-semibold text-gray-900 mb-2">Have a coupon?</h3>
+                    <div class="flex gap-2">
+                        <input id="couponInput" type="text" placeholder="Enter code" class="flex-grow border border-gray-200 rounded-xl px-4 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                        <button class="px-4 py-2 rounded-xl bg-gray-100 text-gray-700 font-semibold">Apply</button>
+                    </div>
+                    <p class="text-xs text-gray-500 mt-2">Coupons are coming soon.</p>
+                </div>
+            </aside>
+        </section>
     </main>
+
     <custom-footer></custom-footer>
 
     <script src="components/navbar.js"></script>
     <script src="components/footer.js"></script>
-<!-- ========== ZENRIX CHATBOT ========== -->
-<div id="chatbot-container">
-  <!-- Chat Button -->
-  <button id="chatbot-toggle" class="fixed bottom-6 right-6 bg-blue-600 text-white w-14 h-14 rounded-full shadow-lg hover:bg-blue-700 transition-all z-50 flex items-center justify-center">
-    <i class="fas fa-comment-dots text-xl"></i>
-  </button>
+    <script>
+        function getAuthToken() { return localStorage.getItem('userToken'); }
+        function isLoggedIn() { return !!getAuthToken(); }
 
-  <!-- Chat Window -->
-  <div id="chatbot-window" class="fixed bottom-24 right-6 w-80 h-96 bg-white rounded-lg shadow-xl hidden flex flex-col z-50 border">
-    <!-- Header -->
-    <div class="bg-gradient-to-r from-blue-500 to-purple-600 text-white p-4 rounded-t-lg flex justify-between items-center">
-      <div class="flex items-center">
-        <div class="w-8 h-8 bg-white rounded-full flex items-center justify-center mr-3">
-          <i class="fas fa-robot text-blue-600"></i>
-        </div>
-        <div>
-          <h3 class="font-bold">Zenrix Assistant</h3>
-          <p class="text-xs opacity-80">Online • 24/7 Support</p>
-        </div>
-      </div>
-      <button id="chatbot-close" class="text-white hover:text-gray-200">
-        <i class="fas fa-times"></i>
-      </button>
-    </div>
+        async function fetchJson(url, options = {}) {
+            const res = await fetch(url, options);
+            return res.json();
+        }
 
-    <!-- Messages -->
-    <div id="chatbot-messages" class="flex-grow p-4 overflow-y-auto space-y-3">
-      <div class="flex">
-        <div class="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center mr-2 flex-shrink-0">
-          <i class="fas fa-robot text-blue-600 text-sm"></i>
-        </div>
-        <div class="bg-gray-100 rounded-lg p-3 max-w-[80%]">
-          <p class="text-sm">Hello! 👋 I'm Zenrix Assistant. How can I help you today?</p>
-          <p class="text-xs text-gray-500 mt-2">Try asking about: products, delivery, or returns</p>
-        </div>
-      </div>
-    </div>
+        function renderSummary(items) {
+            const count = items.reduce((sum, i) => sum + (i.quantity || 0), 0);
+            const subtotal = items.reduce((sum, i) => sum + (i.subtotal || 0), 0);
+            document.getElementById('summaryCount').textContent = `${count} ${count === 1 ? 'item' : 'items'}`;
+            document.getElementById('summarySubtotal').textContent = `$${subtotal.toFixed(2)}`;
+            document.getElementById('summaryTotal').textContent = `$${subtotal.toFixed(2)}`;
+            const checkoutBtn = document.getElementById('checkoutBtn');
+            checkoutBtn.disabled = items.length === 0;
+        }
 
-    <!-- Input -->
-    <div class="border-t p-4">
-      <div class="flex space-x-2">
-        <input type="text" id="chatbot-input" placeholder="Type your message..." 
-               class="flex-grow border rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
-        <button id="chatbot-send" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700">
-          <i class="fas fa-paper-plane"></i>
-        </button>
-      </div>
-      <div class="flex flex-wrap gap-2 mt-3">
-        <button class="quick-btn" data-msg="What products do you have?">Products</button>
-        <button class="quick-btn" data-msg="What is delivery time?">Delivery</button>
-        <button class="quick-btn" data-msg="How to return product?">Returns</button>
-        <button class="quick-btn" data-msg="Contact support">Contact</button>
-      </div>
-    </div>
-  </div>
-</div>
+        function renderCart(items) {
+            const container = document.getElementById('cartItems');
+            if (!items.length) {
+                container.innerHTML = '<div class="bg-white rounded-2xl shadow p-6 text-center text-gray-500">Your cart is empty.</div>';
+                renderSummary([]);
+                return;
+            }
 
-<!-- Chatbot JavaScript -->
-<script>
-// Chatbot functionality
-document.addEventListener('DOMContentLoaded', function() {
-  const toggleBtn = document.getElementById('chatbot-toggle');
-  const closeBtn = document.getElementById('chatbot-close');
-  const chatWindow = document.getElementById('chatbot-window');
-  const chatInput = document.getElementById('chatbot-input');
-  const sendBtn = document.getElementById('chatbot-send');
-  const messagesDiv = document.getElementById('chatbot-messages');
-  const quickBtns = document.querySelectorAll('.quick-btn');
+            container.innerHTML = items.map(item => {
+                const img = item.image || 'https://via.placeholder.com/120x120?text=Product';
+                const price = item.price || 0;
+                const qty = item.quantity || 0;
+                const subtotal = item.subtotal || price * qty;
+                const title = item.name || 'Item';
+                const decClasses = qty <= 1 ? 'px-3 py-2 text-gray-400 cursor-not-allowed' : 'px-3 py-2 text-gray-600 hover:bg-gray-50';
+                const decDisabled = qty <= 1 ? 'disabled' : '';
+                return `
+                    <article class="bg-white rounded-2xl shadow p-4 flex gap-4">
+                        <div class="w-24 h-24 bg-gray-100 rounded-xl flex items-center justify-center overflow-hidden">
+                            <img src="${img}" alt="${title}" class="object-cover w-full h-full">
+                        </div>
+                        <div class="flex-1 space-y-2">
+                            <div class="flex items-start justify-between gap-3">
+                                <div>
+                                    <p class="font-semibold text-gray-900">${title}</p>
+                                    <p class="text-sm text-gray-500">Unit: $${price.toFixed(2)}</p>
+                                </div>
+                                <button class="text-gray-400 hover:text-rose-600" aria-label="Remove" data-remove="${item.id}">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                            </div>
+                            <div class="flex items-center justify-between">
+                                <div class="inline-flex items-center border border-gray-200 rounded-xl overflow-hidden">
+                                    <button class="${decClasses}" ${decDisabled} data-decrement="${item.id}">-</button>
+                                    <span class="px-4 py-2 text-gray-900 font-semibold">${qty}</span>
+                                    <button class="px-3 py-2 text-gray-600 hover:bg-gray-50" data-increment="${item.id}">+</button>
+                                </div>
+                                <p class="text-lg font-bold text-gray-900">$${subtotal.toFixed(2)}</p>
+                            </div>
+                        </div>
+                    </article>
+                `;
+            }).join('');
 
-  // Toggle chat window
-  toggleBtn.addEventListener('click', () => {
-    chatWindow.classList.toggle('hidden');
-    if (!chatWindow.classList.contains('hidden')) {
-      chatInput.focus();
-    }
-  });
+            renderSummary(items);
 
-  closeBtn.addEventListener('click', () => {
-    chatWindow.classList.add('hidden');
-  });
+            container.querySelectorAll('[data-remove]').forEach(btn => {
+                btn.addEventListener('click', () => removeCartItem(btn.getAttribute('data-remove')));
+            });
+            container.querySelectorAll('[data-increment]').forEach(btn => {
+                btn.addEventListener('click', () => changeQty(btn.getAttribute('data-increment'), 1));
+            });
+            container.querySelectorAll('[data-decrement]').forEach(btn => {
+                btn.addEventListener('click', () => changeQty(btn.getAttribute('data-decrement'), -1));
+            });
+        }
 
-  // Send message
-  function sendMessage() {
-    const message = chatInput.value.trim();
-    if (message) {
-      addMessage('user', message);
-      chatInput.value = '';
-      getBotResponse(message);
-    }
-  }
+        async function loadCart() {
+            const token = getAuthToken();
+            const headers = { Authorization: `Bearer ${token}` };
+            const res = await fetchJson('/api/users/cart/summary', { headers });
+            if (!res.success) throw new Error(res.error || 'Failed to load cart');
+            window.__cartItems = res.data.items || [];
+            renderCart(window.__cartItems);
+        }
 
-  sendBtn.addEventListener('click', sendMessage);
-  chatInput.addEventListener('keypress', (e) => {
-    if (e.key === 'Enter') sendMessage();
-  });
+        async function changeQty(itemId, delta) {
+            const item = (window.__cartItems || []).find(i => i.id === itemId);
+            if (!item) return;
+            const next = Math.max(1, (item.quantity || 0) + delta);
+            const token = getAuthToken();
+            const headers = { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` };
+            const res = await fetchJson(`/api/users/cart/${itemId}`, { method: 'PUT', headers, body: JSON.stringify({ quantity: next }) });
+            if (res.success) {
+                await loadCart();
+            }
+        }
 
-  // Quick buttons
-  quickBtns.forEach(btn => {
-    btn.addEventListener('click', () => {
-      const msg = btn.getAttribute('data-msg');
-      addMessage('user', msg);
-      getBotResponse(msg);
-    });
-  });
+        async function removeCartItem(itemId) {
+            const token = getAuthToken();
+            const headers = { Authorization: `Bearer ${token}` };
+            const res = await fetchJson(`/api/users/cart/${itemId}`, { method: 'DELETE', headers });
+            if (res.success) {
+                await loadCart();
+            }
+        }
 
-  // Add message to chat
-  function addMessage(sender, text) {
-    const messageDiv = document.createElement('div');
-    messageDiv.className = `flex ${sender === 'user' ? 'justify-end' : ''}`;
-    
-    messageDiv.innerHTML = `
-      ${sender === 'bot' ? `
-        <div class="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center mr-2 flex-shrink-0">
-          <i class="fas fa-robot text-blue-600 text-sm"></i>
-        </div>
-      ` : ''}
-      <div class="${sender === 'user' ? 'bg-blue-600 text-white' : 'bg-gray-100'} rounded-lg p-3 max-w-[80%]">
-        <p class="text-sm">${text}</p>
-        <p class="text-xs ${sender === 'user' ? 'text-blue-200' : 'text-gray-500'} mt-1">${new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</p>
-      </div>
-      ${sender === 'user' ? `
-        <div class="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center ml-2 flex-shrink-0">
-          <i class="fas fa-user text-blue-600 text-sm"></i>
-        </div>
-      ` : ''}
-    `;
-    
-    messagesDiv.appendChild(messageDiv);
-    messagesDiv.scrollTop = messagesDiv.scrollHeight;
-  }
+        async function checkout() {
+            const btn = document.getElementById('checkoutBtn');
+            btn.disabled = true;
+            btn.textContent = 'Placing order...';
+            const token = getAuthToken();
+            const headers = { Authorization: `Bearer ${token}` };
+            const res = await fetchJson('/api/users/orders/checkout', { method: 'POST', headers });
+            if (res.success) {
+                await loadCart();
+                alert('Order placed successfully. You can view it in Orders.');
+                window.location.href = 'orders.html';
+            } else {
+                alert(res.error || 'Could not place order');
+            }
+            btn.disabled = false;
+            btn.textContent = 'Secure checkout';
+        }
 
-  // Bot responses
-  function getBotResponse(userMessage) {
-    const msg = userMessage.toLowerCase();
-    let response = '';
-    
-    // Simple response logic
-    if (msg.includes('hello') || msg.includes('hi') || msg.includes('hey')) {
-      response = "Hello! Welcome to Zenrix. How can I assist you today?";
-    } else if (msg.includes('product') || msg.includes('item')) {
-      response = "We have electronics, fashion, home goods, and beauty products. Check our Products page for all items!";
-    } else if (msg.includes('price') || msg.includes('cost')) {
-      response = "Products start from $24.99. Check individual product pages for exact prices.";
-    } else if (msg.includes('delivery') || msg.includes('shipping')) {
-      response = "We deliver in 3-5 business days. Free shipping on orders over $50!";
-    } else if (msg.includes('return') || msg.includes('refund')) {
-      response = "We have a 30-day return policy. Contact support@zenrix.com for returns.";
-    } else if (msg.includes('contact') || msg.includes('support')) {
-      response = "Email: support@zenrix.com\nPhone: +977 9801234567\nHours: 9AM-6PM (NPT)";
-    } else if (msg.includes('order') || msg.includes('track')) {
-      response = "Check your Orders page for order status. Need help? Contact our support team.";
-    } else {
-      response = "I'm here to help! For detailed questions, please contact our support team at support@zenrix.com";
-    }
-    
-    // Simulate typing delay
-    setTimeout(() => {
-      addMessage('bot', response);
-    }, 1000);
-  }
-});
-</script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            const loading = document.getElementById('loadingState');
+            const notLogged = document.getElementById('notLoggedInState');
+            const content = document.getElementById('cartContent');
 
-<!-- Chatbot CSS -->
-<style>
-#chatbot-window {
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
-  border: 1px solid #e5e7eb;
-}
+            if (!isLoggedIn()) {
+                loading.classList.add('hidden');
+                notLogged.classList.remove('hidden');
+                return;
+            }
 
-#chatbot-messages {
-  scroll-behavior: smooth;
-}
+            try {
+                await loadCart();
+                loading.classList.add('hidden');
+                content.classList.remove('hidden');
+            } catch (err) {
+                console.error('Cart load error:', err);
+                loading.classList.add('hidden');
+                notLogged.classList.remove('hidden');
+            }
 
-.quick-btn {
-  background: #f3f4f6;
-  border: 1px solid #e5e7eb;
-  padding: 6px 12px;
-  border-radius: 20px;
-  font-size: 12px;
-  cursor: pointer;
-  transition: all 0.2s;
-}
-
-.quick-btn:hover {
-  background: #e5e7eb;
-  transform: translateY(-1px);
-}
-
-.hidden {
-  display: none !important;
-}
-
-/* Smooth animations */
-#chatbot-toggle, #chatbot-window {
-  transition: all 0.3s ease;
-}
-
-#chatbot-toggle:hover {
-  transform: scale(1.1);
-}
-</style>
-<!-- ========== END CHATBOT ========== -->
-
+            document.getElementById('checkoutBtn').addEventListener('click', checkout);
+        });
+    </script>
 </body>
 </html>

@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register | Zenrix</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50 min-h-screen flex items-center justify-center p-4">
+    
+    <div class="w-full max-w-md">
+        <!-- Logo/Brand -->
+        <div class="text-center mb-8">
+            <a href="index.html" class="inline-block">
+                <h1 class="text-4xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">Zenrix</h1>
+            </a>
+            <p class="text-gray-600 mt-2">Create your account and start shopping</p>
+        </div>
+
+        <!-- Register Card -->
+        <div class="bg-white rounded-2xl shadow-2xl p-8">
+            <div class="text-center mb-6">
+                <div class="w-16 h-16 bg-gradient-to-br from-purple-500 to-pink-500 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <i class="fas fa-user-plus text-2xl text-white"></i>
+                </div>
+                <h2 class="text-2xl font-bold text-gray-900">Create Account</h2>
+            </div>
+
+            <form id="registerForm" class="space-y-5">
+                <!-- First Name & Last Name -->
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">
+                            First Name
+                        </label>
+                        <input type="text" id="firstName" required 
+                            class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-purple-500 focus:ring-2 focus:ring-purple-200 transition"
+                            placeholder="John">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">
+                            Last Name
+                        </label>
+                        <input type="text" id="lastName" required 
+                            class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-purple-500 focus:ring-2 focus:ring-purple-200 transition"
+                            placeholder="Doe">
+                    </div>
+                </div>
+
+                <!-- Email -->
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-2">
+                        <i class="fas fa-envelope text-purple-500 mr-2"></i>Email Address
+                    </label>
+                    <input type="email" id="email" required 
+                        class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-purple-500 focus:ring-2 focus:ring-purple-200 transition"
+                        placeholder="your@email.com">
+                </div>
+
+                <!-- Password -->
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-2">
+                        <i class="fas fa-lock text-purple-500 mr-2"></i>Password
+                    </label>
+                    <div class="relative">
+                        <input type="password" id="password" required minlength="6"
+                            class="w-full px-4 py-3 pr-12 border-2 border-gray-200 rounded-xl focus:border-purple-500 focus:ring-2 focus:ring-purple-200 transition"
+                            placeholder="••••••••">
+                        <button type="button" onclick="togglePassword('password')" 
+                            class="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                    </div>
+                    <p class="text-xs text-gray-500 mt-1">Minimum 6 characters</p>
+                </div>
+
+                <!-- Confirm Password -->
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-2">
+                        <i class="fas fa-lock text-purple-500 mr-2"></i>Confirm Password
+                    </label>
+                    <div class="relative">
+                        <input type="password" id="confirmPassword" required minlength="6"
+                            class="w-full px-4 py-3 pr-12 border-2 border-gray-200 rounded-xl focus:border-purple-500 focus:ring-2 focus:ring-purple-200 transition"
+                            placeholder="••••••••">
+                        <button type="button" onclick="togglePassword('confirmPassword')" 
+                            class="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Terms & Conditions -->
+                <div>
+                    <label class="flex items-start gap-3 cursor-pointer">
+                        <input type="checkbox" id="terms" required class="w-5 h-5 text-purple-600 rounded mt-0.5">
+                        <span class="text-sm text-gray-600">
+                            I agree to the <a href="terms.html" class="text-purple-600 hover:text-purple-700 font-medium">Terms of Service</a> and 
+                            <a href="privacy.html" class="text-purple-600 hover:text-purple-700 font-medium">Privacy Policy</a>
+                        </span>
+                    </label>
+                </div>
+
+                <!-- Error Message -->
+                <div id="errorMessage" class="hidden bg-red-50 border-2 border-red-200 rounded-xl p-4">
+                    <div class="flex items-center gap-3">
+                        <i class="fas fa-exclamation-circle text-red-600 text-xl"></i>
+                        <span id="errorText" class="text-red-700 font-medium"></span>
+                    </div>
+                </div>
+
+                <!-- Submit Button -->
+                <button type="submit" id="registerBtn"
+                    class="w-full bg-gradient-to-r from-purple-600 to-pink-600 text-white px-6 py-4 rounded-xl font-semibold hover:from-purple-700 hover:to-pink-700 transition shadow-lg hover:shadow-xl transform hover:-translate-y-0.5">
+                    <i class="fas fa-user-plus mr-2"></i>Create Account
+                </button>
+            </form>
+
+            <!-- Login Link -->
+            <p class="text-center mt-6 text-gray-600">
+                Already have an account? 
+                <a href="login.html" class="text-purple-600 hover:text-purple-700 font-semibold">Log In</a>
+            </p>
+        </div>
+
+        <!-- Back to Home -->
+        <div class="text-center mt-6">
+            <a href="index.html" class="text-gray-600 hover:text-gray-900 inline-flex items-center gap-2">
+                <i class="fas fa-arrow-left"></i>
+                Back to Home
+            </a>
+        </div>
+    </div>
+
+    <script>
+        function togglePassword(inputId) {
+            const input = document.getElementById(inputId);
+            const icon = event.target.closest('button').querySelector('i');
+            if (input.type === 'password') {
+                input.type = 'text';
+                icon.classList.remove('fa-eye');
+                icon.classList.add('fa-eye-slash');
+            } else {
+                input.type = 'password';
+                icon.classList.remove('fa-eye-slash');
+                icon.classList.add('fa-eye');
+            }
+        }
+
+        function showError(message) {
+            const errorDiv = document.getElementById('errorMessage');
+            const errorText = document.getElementById('errorText');
+            errorText.textContent = message;
+            errorDiv.classList.remove('hidden');
+            setTimeout(() => errorDiv.classList.add('hidden'), 5000);
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            document.getElementById('registerForm').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                
+                const password = document.getElementById('password').value;
+                const confirmPassword = document.getElementById('confirmPassword').value;
+                
+                // Validate password match
+                if (password !== confirmPassword) {
+                    showError('Passwords do not match');
+                    return;
+                }
+                
+                const registerBtn = document.getElementById('registerBtn');
+                const originalText = registerBtn.innerHTML;
+                registerBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Creating account...';
+                registerBtn.disabled = true;
+                
+                try {
+                    const firstName = document.getElementById('firstName').value;
+                    const lastName = document.getElementById('lastName').value;
+                    const email = document.getElementById('email').value;
+                    
+                    const res = await fetch('/api/users/register', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({ firstName, lastName, email, password })
+                    });
+                    
+                    const data = await res.json();
+                    
+                    if (data.success) {
+                        // Store token and user data
+                        localStorage.setItem('userToken', data.token);
+                        localStorage.setItem('userData', JSON.stringify(data.user));
+                        
+                        // Redirect to profile
+                        window.location.href = 'profile.html';
+                    } else {
+                        throw new Error(data.error || 'Registration failed');
+                    }
+                } catch (err) {
+                    showError(err.message);
+                    registerBtn.innerHTML = originalText;
+                    registerBtn.disabled = false;
+                }
+            });
+        });
+    </script>
+</body>
+</html>

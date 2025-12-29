@@ -113,8 +113,14 @@
                     <button data-tab="components" id="tab-components" class="py-4 px-2 border-b-2 border-transparent text-gray-500 hover:text-gray-700 font-medium whitespace-nowrap">
                         Components
                     </button>
+                    <button data-tab="hero" id="tab-hero" class="py-4 px-2 border-b-2 border-transparent text-gray-500 hover:text-gray-700 font-medium whitespace-nowrap">
+                        Hero Settings
+                    </button>
                     <button data-tab="careers" id="tab-careers" class="py-4 px-2 border-b-2 border-transparent text-gray-500 hover:text-gray-700 font-medium whitespace-nowrap">
                         Careers
+                    </button>
+                    <button data-tab="subscribers" id="tab-subscribers" class="py-4 px-2 border-b-2 border-transparent text-gray-500 hover:text-gray-700 font-medium whitespace-nowrap">
+                        Subscribers
                     </button>
                 </div>
             </div>
@@ -155,13 +161,13 @@
                             </div>
                         </div>
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">Main Image URL *</label>
-                            <input type="text" name="image" required placeholder="https://images.unsplash.com/photo-..." class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Main Image (Upload, max 5MB) *</label>
+                            <input type="file" name="image" accept="image/*" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
                         </div>
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">Additional Images (Optional, one per line)</label>
-                            <textarea name="images" rows="3" placeholder="https://image1.jpg&#10;https://image2.jpg&#10;https://image3.jpg" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"></textarea>
-                            <p class="text-xs text-gray-500 mt-1">Enter up to 4 image URLs, one per line</p>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Additional Images (up to 4 files)</label>
+                            <input type="file" name="images" accept="image/*" multiple class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                            <p class="text-xs text-gray-500 mt-1">You can select up to 4 additional images. Each max 5MB.</p>
                         </div>
                         <div>
                             <label class="flex items-center space-x-2">
@@ -183,38 +189,63 @@
 
             <!-- Pages Tab -->
             <div id="content-pages" class="p-6 hidden">
-                <div class="mb-6">
-                    <h2 class="text-xl font-bold text-gray-800 mb-4">Add New Page</h2>
+                <div class="bg-gradient-to-r from-purple-50 to-pink-50 rounded-xl p-6 mb-6 border border-purple-100">
+                    <h2 class="text-2xl font-bold text-gray-800 mb-2 flex items-center">
+                        <svg class="w-6 h-6 mr-2 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"/>
+                        </svg>
+                        Add New Page
+                    </h2>
+                    <p class="text-sm text-gray-600 mb-4">Create custom pages for your website with rich content</p>
                     <form id="addPageForm" class="space-y-4">
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-2">Slug *</label>
-                                <input type="text" name="slug" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent">
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Slug (URL) *</label>
+                                <input type="text" name="slug" required placeholder="about-us" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent">
+                                <p class="text-xs text-gray-500 mt-1">Will appear as: /page-slug</p>
                             </div>
                             <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-2">Title *</label>
-                                <input type="text" name="title" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent">
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Page Title *</label>
+                                <input type="text" name="title" required placeholder="About Us" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent">
                             </div>
                         </div>
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">Content</label>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Page Content</label>
                             <div id="addPageEditor" class="bg-white border border-gray-300 rounded-lg" style="min-height: 200px;"></div>
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Meta Description (SEO)</label>
+                                <textarea name="meta_description" rows="2" placeholder="Brief description for search engines..." class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"></textarea>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Keywords (SEO)</label>
+                                <input type="text" name="meta_keywords" placeholder="keyword1, keyword2, keyword3" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent">
+                            </div>
                         </div>
                         <div>
                             <label class="flex items-center space-x-2">
-                                <input type="checkbox" name="published" class="w-4 h-4 text-purple-600 rounded focus:ring-2 focus:ring-purple-500">
+                                <input type="checkbox" name="published" checked class="w-4 h-4 text-purple-600 rounded focus:ring-2 focus:ring-purple-500">
                                 <span class="text-sm font-medium text-gray-700">Publish immediately</span>
                             </label>
                         </div>
-                        <button type="submit" class="w-full bg-purple-600 text-white px-6 py-3 rounded-lg font-medium hover:bg-purple-700 transition">
-                            Create Page
+                        <button type="submit" class="w-full bg-gradient-to-r from-purple-600 to-pink-600 text-white px-6 py-3 rounded-lg font-medium hover:from-purple-700 hover:to-pink-700 transition shadow-md hover:shadow-lg">
+                            <span class="flex items-center justify-center">
+                                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+                                </svg>
+                                Create Page
+                            </span>
                         </button>
                     </form>
                 </div>
 
                 <div class="mt-8">
-                    <h2 class="text-xl font-bold text-gray-800 mb-4">All Pages</h2>
-                    <div id="pagesList" class="space-y-4"></div>
+                    <div class="flex items-center justify-between mb-4">
+                        <h2 class="text-xl font-bold text-gray-800">All Pages</h2>
+                        <span id="pagesCount" class="text-sm text-gray-500">0 pages</span>
+                    </div>
+                    <div id="pagesList" class="grid grid-cols-1 lg:grid-cols-2 gap-4"></div>
                 </div>
             </div>
 
@@ -252,6 +283,88 @@
                 <div class="mt-8">
                     <h2 class="text-xl font-bold text-gray-800 mb-4">All Components</h2>
                     <div id="componentsList" class="space-y-4"></div>
+                </div>
+            </div>
+
+            <!-- Hero Settings Tab -->
+            <div id="content-hero" class="p-6 hidden">
+                <div class="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl p-6 mb-6 border border-blue-100">
+                    <div class="flex items-center justify-between mb-4">
+                        <div>
+                            <h2 class="text-2xl font-bold text-gray-800 flex items-center">
+                                <svg class="w-6 h-6 mr-2 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01"/>
+                                </svg>
+                                Homepage Hero Section
+                            </h2>
+                            <p class="text-sm text-gray-600 mt-1">Customize your homepage hero banner</p>
+                        </div>
+                        <button id="refreshHero" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition">
+                            Refresh
+                        </button>
+                    </div>
+                    
+                    <form id="heroForm" class="space-y-4">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Hero Title *</label>
+                                <input type="text" name="title" required placeholder="Welcome to Zenrix" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Subtitle *</label>
+                                <input type="text" name="subtitle" required placeholder="Your tagline here" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                            </div>
+                        </div>
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">CTA Button Text *</label>
+                                <input type="text" name="ctaText" required placeholder="Shop Now" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">CTA Button Link *</label>
+                                <input type="text" name="ctaLink" required placeholder="/products.html" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                            </div>
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Background Image URL *</label>
+                            <input type="url" name="backgroundImage" required placeholder="https://images.unsplash.com/photo-..." class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                            <p class="text-xs text-gray-500 mt-1">Recommended: 1920x1080px or larger</p>
+                        </div>
+                        
+                        <div class="bg-white p-4 rounded-lg border border-gray-200">
+                            <label class="flex items-center space-x-3 cursor-pointer">
+                                <input type="checkbox" name="enabled" checked class="w-5 h-5 text-blue-600 rounded focus:ring-2 focus:ring-blue-500">
+                                <div>
+                                    <span class="text-sm font-medium text-gray-900">Enable Hero Section</span>
+                                    <p class="text-xs text-gray-500">Toggle hero visibility on homepage</p>
+                                </div>
+                            </label>
+                        </div>
+                        
+                        <button type="submit" class="w-full bg-gradient-to-r from-blue-600 to-indigo-600 text-white px-6 py-3 rounded-lg font-medium hover:from-blue-700 hover:to-indigo-700 transition shadow-md hover:shadow-lg">
+                            <span class="flex items-center justify-center">
+                                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                                </svg>
+                                Save Hero Settings
+                            </span>
+                        </button>
+                    </form>
+                </div>
+
+                <!-- Preview Section -->
+                <div class="bg-white rounded-xl shadow-md p-6">
+                    <h3 class="text-lg font-bold text-gray-800 mb-4">Preview</h3>
+                    <div id="heroPreview" class="relative rounded-lg overflow-hidden" style="min-height: 300px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+                        <div class="absolute inset-0 bg-black bg-opacity-40"></div>
+                        <div class="relative z-10 flex flex-col items-center justify-center h-full text-center p-8" style="min-height: 300px;">
+                            <h1 id="previewTitle" class="text-4xl font-bold text-white mb-4">Welcome to Zenrix</h1>
+                            <p id="previewSubtitle" class="text-xl text-white mb-6">Your one-stop digital marketplace</p>
+                            <button id="previewCta" class="bg-white text-blue-600 px-8 py-3 rounded-lg font-semibold hover:bg-gray-100 transition">Shop Now</button>
+                        </div>
+                    </div>
                 </div>
             </div>
 
@@ -319,6 +432,38 @@
                 <div class="mt-8">
                     <h2 class="text-xl font-bold text-gray-800 mb-4">Active Job Openings</h2>
                     <div id="careersList" class="space-y-4"></div>
+                </div>
+            </div>
+
+            <!-- Subscribers Tab -->
+            <div id="content-subscribers" class="p-6 hidden">
+                <div class="flex items-center justify-between mb-4">
+                    <div>
+                        <h2 class="text-xl font-bold text-gray-800">Subscribers</h2>
+                        <p class="text-sm text-gray-500">Email opt-ins from homepage</p>
+                    </div>
+                    <div class="flex space-x-2">
+                        <button id="exportSubscribers" class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition flex items-center space-x-2">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                            </svg>
+                            <span>Export Excel</span>
+                        </button>
+                        <button id="refreshSubscribers" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition">Refresh</button>
+                    </div>
+                </div>
+                <div class="overflow-x-auto bg-white shadow rounded-lg border border-gray-200">
+                    <table class="min-w-full divide-y divide-gray-200">
+                        <thead class="bg-gray-50">
+                            <tr>
+                                <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600">Email</th>
+                                <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600">Source</th>
+                                <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600">Date</th>
+                                <th class="px-4 py-3 text-right text-xs font-semibold text-gray-600">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="subscribersTable" class="divide-y divide-gray-100"></tbody>
+                    </table>
                 </div>
             </div>
         </div>
@@ -407,6 +552,92 @@
         </div>
     </div>
 
+    <!-- Edit Page Modal -->
+    <div id="editPageModal" class="fixed inset-0 bg-black bg-opacity-50 modal-backdrop hidden flex items-center justify-center z-50">
+        <div class="bg-white rounded-2xl shadow-2xl p-8 w-full max-w-3xl max-h-[90vh] overflow-y-auto slide-in">
+            <h2 class="text-2xl font-bold text-gray-800 mb-6">Edit Page</h2>
+            <form id="editPageForm" class="space-y-4">
+                <input type="hidden" name="id">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Slug *</label>
+                        <input type="text" name="slug" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Title *</label>
+                        <input type="text" name="title" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent">
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Content</label>
+                    <div id="editPageEditor" class="bg-white border border-gray-300 rounded-lg" style="min-height: 200px;"></div>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Meta Description</label>
+                        <textarea name="meta_description" rows="2" placeholder="SEO description..." class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"></textarea>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Meta Keywords</label>
+                        <input type="text" name="meta_keywords" placeholder="keyword1, keyword2, keyword3" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent">
+                    </div>
+                </div>
+                <div>
+                    <label class="flex items-center space-x-2">
+                        <input type="checkbox" name="published" class="w-4 h-4 text-purple-600 rounded focus:ring-2 focus:ring-purple-500">
+                        <span class="text-sm font-medium text-gray-700">Published</span>
+                    </label>
+                </div>
+                <div class="flex space-x-3 pt-4">
+                    <button type="submit" class="flex-1 bg-purple-600 text-white px-6 py-3 rounded-lg font-medium hover:bg-purple-700 transition">
+                        Save Changes
+                    </button>
+                    <button type="button" id="closeEditPageModalBtn" class="flex-1 bg-gray-200 text-gray-700 px-6 py-3 rounded-lg font-medium hover:bg-gray-300 transition">
+                        Cancel
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Edit Component Modal -->
+    <div id="editComponentModal" class="fixed inset-0 bg-black bg-opacity-50 modal-backdrop hidden flex items-center justify-center z-50">
+        <div class="bg-white rounded-2xl shadow-2xl p-8 w-full max-w-3xl max-h-[90vh] overflow-y-auto slide-in">
+            <h2 class="text-2xl font-bold text-gray-800 mb-6">Edit Component</h2>
+            <form id="editComponentForm" class="space-y-4">
+                <input type="hidden" name="id">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Slug *</label>
+                        <input type="text" name="slug" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-yellow-500 focus:border-transparent">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Name *</label>
+                        <input type="text" name="name" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-yellow-500 focus:border-transparent">
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">HTML</label>
+                    <textarea name="html" rows="10" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-yellow-500 focus:border-transparent font-mono text-sm"></textarea>
+                </div>
+                <div>
+                    <label class="flex items-center space-x-2">
+                        <input type="checkbox" name="published" class="w-4 h-4 text-yellow-600 rounded focus:ring-2 focus:ring-yellow-500">
+                        <span class="text-sm font-medium text-gray-700">Published</span>
+                    </label>
+                </div>
+                <div class="flex space-x-3 pt-4">
+                    <button type="submit" class="flex-1 bg-yellow-600 text-white px-6 py-3 rounded-lg font-medium hover:bg-yellow-700 transition">
+                        Save Changes
+                    </button>
+                    <button type="button" id="closeEditComponentModalBtn" class="flex-1 bg-gray-200 text-gray-700 px-6 py-3 rounded-lg font-medium hover:bg-gray-300 transition">
+                        Cancel
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <!-- Toast Container -->
     <div id="toastContainer" class="fixed top-6 right-6 z-50 space-y-2"></div>
 
@@ -414,7 +645,10 @@
     <script>
         const API_URL = '/api';
         let quillAdd = null;
+        let quillEdit = null;
         let productsCache = {};
+        let pagesCache = {};
+        let componentsCache = {};
 
         // Toast notification
         function showToast(type, message) {
@@ -503,7 +737,7 @@
 
         // Tab switching
         function switchTab(tab) {
-            ['products', 'pages', 'components'].forEach(t => {
+            ['products', 'pages', 'components', 'hero', 'careers', 'subscribers'].forEach(t => {
                 document.getElementById(`tab-${t}`).classList.remove('border-blue-600', 'text-blue-600');
                 document.getElementById(`tab-${t}`).classList.add('border-transparent', 'text-gray-500');
                 document.getElementById(`content-${t}`).classList.add('hidden');
@@ -581,28 +815,38 @@
             }
 
             const formData = new FormData(e.target);
-            const imagesText = formData.get('images') || '';
-            const imagesArray = imagesText.split('\n').map(s => s.trim()).filter(s => s.length > 0);
-            
-            const data = {
-                name: formData.get('name'),
-                price: parseFloat(formData.get('price')),
-                description: formData.get('description'),
-                category: formData.get('category'),
-                stock: parseInt(formData.get('stock')),
-                image: formData.get('image'),
-                images: imagesArray,
-                featured: formData.get('featured') === 'on'
-            };
+            // Validate file sizes (max 5MB each)
+            const mainFile = formData.get('image');
+            if (!mainFile || !mainFile.size) {
+                showToast('error', 'Main image is required');
+                return;
+            }
+            if (mainFile.size > 5 * 1024 * 1024) {
+                showToast('error', 'Main image exceeds 5MB limit');
+                return;
+            }
+
+            const extraFiles = formData.getAll('images');
+            if (extraFiles.length > 4) {
+                showToast('error', 'You can upload up to 4 additional images');
+                return;
+            }
+            for (const f of extraFiles) {
+                if (f.size > 5 * 1024 * 1024) {
+                    showToast('error', `Additional image ${f.name} exceeds 5MB limit`);
+                    return;
+                }
+            }
+
+            formData.append('featured', formData.get('featured') === 'on');
 
             try {
                 const res = await fetch(`${API_URL}/products`, {
                     method: 'POST',
                     headers: {
-                        'Content-Type': 'application/json',
                         'Authorization': `Bearer ${token}`
                     },
-                    body: JSON.stringify(data)
+                    body: formData
                 });
 
                 const result = await res.json();
@@ -801,27 +1045,50 @@
                 const data = await res.json();
                 
                 if (data.success) {
+                    pagesCache = {};
+                    data.data.forEach(p => pagesCache[p._id] = p);
+                    
                     document.getElementById('totalPages').textContent = data.count;
+                    document.getElementById('pagesCount').textContent = `${data.count} page(s)`;
                     
                     const list = document.getElementById('pagesList');
+                    if (!data.count) {
+                        list.innerHTML = `
+                            <div class="col-span-full text-center py-12 text-gray-500">
+                                <svg class="w-16 h-16 mx-auto mb-4 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                                </svg>
+                                <p>No pages yet. Create your first page above!</p>
+                            </div>
+                        `;
+                        return;
+                    }
+                    
                     list.innerHTML = data.data.map(p => `
-                        <div class="bg-white border border-gray-200 rounded-lg p-6 card-hover">
-                            <div class="flex items-start justify-between">
+                        <div class="bg-white border-2 border-gray-100 rounded-xl p-6 hover:border-purple-300 hover:shadow-lg transition-all duration-200">
+                            <div class="flex items-start justify-between mb-3">
                                 <div class="flex-1">
-                                    <h3 class="font-semibold text-gray-800 text-lg">${p.title}</h3>
-                                    <p class="text-sm text-gray-600 mt-1">/${p.slug}</p>
-                                    <div class="flex items-center space-x-3 mt-3">
-                                        <span class="${p.published ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700'} px-3 py-1 rounded text-xs font-medium">
-                                            ${p.published ? '✓ Published' : 'Draft'}
-                                        </span>
-                                        <span class="text-xs text-gray-500">${new Date(p.createdAt).toLocaleDateString()}</span>
-                                    </div>
+                                    <h3 class="font-bold text-gray-800 text-lg mb-1">${p.title}</h3>
+                                    <p class="text-sm text-purple-600 font-medium">/${p.slug}</p>
                                 </div>
-                                <div class="flex flex-col space-y-2 ml-4">
-                                    <button data-edit-page="${p._id}" class="px-4 py-2 bg-blue-100 text-blue-600 rounded-lg hover:bg-blue-200 transition whitespace-nowrap">
+                                <span class="${p.published ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700'} px-3 py-1 rounded-full text-xs font-semibold">
+                                    ${p.published ? '✓ Live' : 'Draft'}
+                                </span>
+                            </div>
+                            ${p.content ? `<div class="text-sm text-gray-600 line-clamp-2 mb-3">${p.content.replace(/<[^>]*>/g, '').substring(0, 100)}...</div>` : ''}
+                            ${p.meta && p.meta.description ? `<p class="text-xs text-gray-500 italic mb-3">"${p.meta.description.substring(0, 80)}..."</p>` : ''}
+                            <div class="flex items-center justify-between pt-3 border-t border-gray-100">
+                                <span class="text-xs text-gray-500">
+                                    <svg class="w-4 h-4 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                                    </svg>
+                                    ${new Date(p.createdAt).toLocaleDateString()}
+                                </span>
+                                <div class="flex space-x-2">
+                                    <button data-edit-page="${p._id}" class="px-3 py-1.5 bg-purple-100 text-purple-700 rounded-lg hover:bg-purple-200 transition text-sm font-medium">
                                         Edit
                                     </button>
-                                    <button data-delete-page="${p._id}" class="px-4 py-2 bg-red-100 text-red-600 rounded-lg hover:bg-red-200 transition whitespace-nowrap">
+                                    <button data-delete-page="${p._id}" class="px-3 py-1.5 bg-red-100 text-red-600 rounded-lg hover:bg-red-200 transition text-sm font-medium">
                                         Delete
                                     </button>
                                 </div>
@@ -852,7 +1119,11 @@
                 slug: formData.get('slug'),
                 title: formData.get('title'),
                 content: content,
-                published: formData.get('published') === 'on'
+                published: formData.get('published') === 'on',
+                meta: {
+                    description: formData.get('meta_description') || '',
+                    keywords: formData.get('meta_keywords') || ''
+                }
             };
 
             try {
@@ -910,9 +1181,93 @@
         }
 
         function editPage(id) {
-            console.log('Edit page:', id);
-            showToast('info', 'Page edit feature coming soon - use delete and recreate for now');
+            const page = pagesCache[id];
+            if (!page) {
+                showToast('error', 'Page not found');
+                return;
+            }
+
+            const form = document.getElementById('editPageForm');
+            form.querySelector('[name="id"]').value = page._id;
+            form.querySelector('[name="slug"]').value = page.slug;
+            form.querySelector('[name="title"]').value = page.title;
+            form.querySelector('[name="published"]').checked = page.published;
+            
+            if (page.meta) {
+                form.querySelector('[name="meta_description"]').value = page.meta.description || '';
+                form.querySelector('[name="meta_keywords"]').value = page.meta.keywords || '';
+            }
+
+            // Initialize Quill editor for edit
+            setTimeout(() => {
+                if (!quillEdit) {
+                    quillEdit = new Quill('#editPageEditor', {
+                        theme: 'snow',
+                        placeholder: 'Write your page content here...'
+                    });
+                }
+                quillEdit.root.innerHTML = page.content || '';
+            }, 100);
+
+            document.getElementById('editPageModal').classList.remove('hidden');
         }
+
+        function closeEditPageModal() {
+            document.getElementById('editPageModal').classList.add('hidden');
+            if (quillEdit) {
+                quillEdit.root.innerHTML = '';
+            }
+        }
+
+        document.getElementById('closeEditPageModalBtn')?.addEventListener('click', closeEditPageModal);
+
+        document.getElementById('editPageForm')?.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const token = getAdminToken();
+            if (!token) {
+                showToast('error', 'Please login first');
+                openLoginModal();
+                return;
+            }
+
+            const formData = new FormData(e.target);
+            const id = formData.get('id');
+            const content = quillEdit ? quillEdit.root.innerHTML : '';
+            
+            const data = {
+                slug: formData.get('slug'),
+                title: formData.get('title'),
+                content: content,
+                published: formData.get('published') === 'on',
+                meta: {
+                    description: formData.get('meta_description') || '',
+                    keywords: formData.get('meta_keywords') || ''
+                }
+            };
+
+            try {
+                const res = await fetch(`${API_URL}/pages/${id}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify(data)
+                });
+
+                const result = await res.json();
+
+                if (result.success) {
+                    showToast('success', '✅ Page updated!');
+                    closeEditPageModal();
+                    loadPages();
+                } else {
+                    showToast('error', '❌ Failed: ' + (result.error || 'Unknown error'));
+                }
+            } catch (err) {
+                showToast('error', '❌ Network error: ' + err.message);
+            }
+        });
 
         // Components CRUD
         async function loadComponents() {
@@ -921,27 +1276,36 @@
                 const data = await res.json();
                 
                 if (data.success) {
+                    componentsCache = {};
+                    data.data.forEach(c => componentsCache[c._id] = c);
+                    
                     document.getElementById('totalComponents').textContent = data.count;
                     
                     const list = document.getElementById('componentsList');
                     list.innerHTML = data.data.map(c => `
-                        <div class="bg-white border border-gray-200 rounded-lg p-6 card-hover">
-                            <div class="flex items-start justify-between">
+                        <div class="bg-white border-2 border-gray-100 rounded-xl p-6 hover:border-yellow-300 hover:shadow-lg transition-all duration-200">
+                            <div class="flex items-start justify-between mb-3">
                                 <div class="flex-1">
-                                    <h3 class="font-semibold text-gray-800 text-lg">${c.name}</h3>
-                                    <p class="text-sm text-gray-600 mt-1">${c.slug}</p>
-                                    <div class="flex items-center space-x-3 mt-3">
-                                        <span class="${c.published ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700'} px-3 py-1 rounded text-xs font-medium">
-                                            ${c.published ? '✓ Published' : 'Draft'}
-                                        </span>
-                                        <span class="text-xs text-gray-500">${new Date(c.createdAt).toLocaleDateString()}</span>
-                                    </div>
+                                    <h3 class="font-bold text-gray-800 text-lg mb-1">${c.name}</h3>
+                                    <p class="text-sm text-yellow-600 font-medium">${c.slug}</p>
                                 </div>
-                                <div class="flex flex-col space-y-2 ml-4">
-                                    <button data-edit-component="${c._id}" class="px-4 py-2 bg-blue-100 text-blue-600 rounded-lg hover:bg-blue-200 transition whitespace-nowrap">
+                                <span class="${c.published ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700'} px-3 py-1 rounded-full text-xs font-semibold">
+                                    ${c.published ? '✓ Live' : 'Draft'}
+                                </span>
+                            </div>
+                            ${c.html ? `<pre class="text-xs text-gray-600 bg-gray-50 p-3 rounded border border-gray-200 overflow-x-auto mb-3 max-h-20">${c.html.substring(0, 150)}${c.html.length > 150 ? '...' : ''}</pre>` : ''}
+                            <div class="flex items-center justify-between pt-3 border-t border-gray-100">
+                                <span class="text-xs text-gray-500">
+                                    <svg class="w-4 h-4 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                                    </svg>
+                                    ${new Date(c.createdAt).toLocaleDateString()}
+                                </span>
+                                <div class="flex space-x-2">
+                                    <button data-edit-component="${c._id}" class="px-3 py-1.5 bg-yellow-100 text-yellow-700 rounded-lg hover:bg-yellow-200 transition text-sm font-medium">
                                         Edit
                                     </button>
-                                    <button data-delete-component="${c._id}" class="px-4 py-2 bg-red-100 text-red-600 rounded-lg hover:bg-red-200 transition whitespace-nowrap">
+                                    <button data-delete-component="${c._id}" class="px-3 py-1.5 bg-red-100 text-red-600 rounded-lg hover:bg-red-200 transition text-sm font-medium">
                                         Delete
                                     </button>
                                 </div>
@@ -1027,9 +1391,70 @@
         }
 
         function editComponent(id) {
-            console.log('Edit component:', id);
-            showToast('info', 'Component edit feature coming soon - use delete and recreate for now');
+            const component = componentsCache[id];
+            if (!component) {
+                showToast('error', 'Component not found');
+                return;
+            }
+
+            const form = document.getElementById('editComponentForm');
+            form.querySelector('[name="id"]').value = component._id;
+            form.querySelector('[name="slug"]').value = component.slug;
+            form.querySelector('[name="name"]').value = component.name;
+            form.querySelector('[name="html"]').value = component.html || '';
+            form.querySelector('[name="published"]').checked = component.published;
+
+            document.getElementById('editComponentModal').classList.remove('hidden');
         }
+
+        function closeEditComponentModal() {
+            document.getElementById('editComponentModal').classList.add('hidden');
+        }
+
+        document.getElementById('closeEditComponentModalBtn')?.addEventListener('click', closeEditComponentModal);
+
+        document.getElementById('editComponentForm')?.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const token = getAdminToken();
+            if (!token) {
+                showToast('error', 'Please login first');
+                openLoginModal();
+                return;
+            }
+
+            const formData = new FormData(e.target);
+            const id = formData.get('id');
+            
+            const data = {
+                slug: formData.get('slug'),
+                name: formData.get('name'),
+                html: formData.get('html'),
+                published: formData.get('published') === 'on'
+            };
+
+            try {
+                const res = await fetch(`${API_URL}/components/${id}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify(data)
+                });
+
+                const result = await res.json();
+
+                if (result.success) {
+                    showToast('success', '✅ Component updated!');
+                    closeEditComponentModal();
+                    loadComponents();
+                } else {
+                    showToast('error', '❌ Failed: ' + (result.error || 'Unknown error'));
+                }
+            } catch (err) {
+                showToast('error', '❌ Network error: ' + err.message);
+            }
+        });
 
         // Careers CRUD
         async function loadCareers() {
@@ -1082,6 +1507,123 @@
             } catch (err) {
                 console.error('Failed to load careers:', err);
                 showToast('error', 'Failed to load careers');
+            }
+        }
+
+        // Subscribers
+        async function loadSubscribers() {
+            const token = getAdminToken();
+            if (!token) {
+                showToast('error', 'Please login to view subscribers');
+                openLoginModal();
+                return;
+            }
+
+            try {
+                const res = await fetch(`${API_URL}/subscribers/admin/all`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const data = await res.json();
+
+                if (data.success) {
+                    const tbody = document.getElementById('subscribersTable');
+                    if (!data.data.length) {
+                        tbody.innerHTML = `
+                            <tr>
+                                <td colspan="4" class="px-4 py-4 text-center text-sm text-gray-500">No subscribers yet</td>
+                            </tr>
+                        `;
+                    } else {
+                        tbody.innerHTML = data.data.map(sub => `
+                            <tr class="hover:bg-gray-50">
+                                <td class="px-4 py-3 text-sm text-gray-800">${sub.email}</td>
+                                <td class="px-4 py-3 text-sm text-gray-600 capitalize">${sub.source || 'homepage'}</td>
+                                <td class="px-4 py-3 text-sm text-gray-600">${new Date(sub.createdAt).toLocaleDateString()} ${new Date(sub.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</td>
+                                <td class="px-4 py-3 text-right">
+                                    <button data-delete-subscriber="${sub._id}" class="px-3 py-1 text-xs bg-red-100 text-red-600 rounded hover:bg-red-200">Delete</button>
+                                </td>
+                            </tr>
+                        `).join('');
+                    }
+                    attachSubscriberEventListeners();
+                } else {
+                    showToast('error', 'Failed to load subscribers');
+                }
+            } catch (err) {
+                console.error('Failed to load subscribers:', err);
+                showToast('error', 'Failed to load subscribers: ' + err.message);
+            }
+        }
+
+        function attachSubscriberEventListeners() {
+            document.querySelectorAll('[data-delete-subscriber]').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const id = this.getAttribute('data-delete-subscriber');
+                    deleteSubscriber(id);
+                });
+            });
+        }
+
+        async function deleteSubscriber(id) {
+            if (!confirm('Delete this subscriber?')) return;
+            const token = getAdminToken();
+            if (!token) {
+                showToast('error', 'Please login first');
+                openLoginModal();
+                return;
+            }
+
+            try {
+                const res = await fetch(`${API_URL}/subscribers/${id}`, {
+                    method: 'DELETE',
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const data = await res.json();
+
+                if (data.success) {
+                    showToast('success', 'Subscriber deleted');
+                    loadSubscribers();
+                } else {
+                    showToast('error', data.error || 'Failed to delete subscriber');
+                }
+            } catch (err) {
+                showToast('error', 'Network error: ' + err.message);
+            }
+        }
+
+        async function exportSubscribers() {
+            const token = getAdminToken();
+            if (!token) {
+                showToast('error', 'Please login to export subscribers');
+                openLoginModal();
+                return;
+            }
+
+            try {
+                showToast('info', 'Generating Excel file...');
+                const res = await fetch(`${API_URL}/subscribers/export/excel`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+
+                if (!res.ok) {
+                    showToast('error', 'Failed to export subscribers');
+                    return;
+                }
+
+                const blob = await res.blob();
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                const date = new Date().toISOString().split('T')[0];
+                a.download = `subscribers_${date}.xlsx`;
+                document.body.appendChild(a);
+                a.click();
+                a.remove();
+                window.URL.revokeObjectURL(url);
+                showToast('success', '✅ Excel file downloaded!');
+            } catch (err) {
+                console.error('Export error:', err);
+                showToast('error', 'Network error: ' + err.message);
             }
         }
 
@@ -1232,7 +1774,14 @@
                                                 <p class="font-semibold text-lg text-gray-800">${app.firstName} ${app.lastName}</p>
                                                 <p class="text-sm text-gray-600 mt-1">📧 <a href="mailto:${app.email}" class="hover:underline">${app.email}</a></p>
                                                 <p class="text-sm text-gray-600">📱 ${app.phone}</p>
-                                                ${app.resumeFileName ? `<p class="text-sm text-blue-600 mt-1">📄 <span class="font-medium">${app.resumeFileName}</span></p>` : ''}
+                                                ${app.resumeFileName ? `
+                                                    <div class="flex items-center space-x-3 mt-2">
+                                                        <p class="text-sm text-blue-600">📄 <span class="font-medium">${app.resumeFileName}</span></p>
+                                                        <button class="download-resume px-3 py-1 bg-blue-100 text-blue-700 rounded-md text-xs font-semibold hover:bg-blue-200" data-app-id="${app._id}" data-job-id="${jobId}" data-filename="${app.resumeFileName || 'resume'}">
+                                                            Download
+                                                        </button>
+                                                    </div>
+                                                ` : ''}
                                             </div>
                                             <select class="status-select px-4 py-2 rounded-lg border border-gray-300 text-sm font-medium" data-app-id="${app._id}" data-job-id="${jobId}" data-current="${app.status}">
                                                 <option value="submitted" ${app.status === 'submitted' ? 'selected' : ''}>Submitted</option>
@@ -1294,6 +1843,40 @@
                         });
                     });
 
+                    // Attach resume download handlers
+                    modal.querySelectorAll('.download-resume').forEach(btn => {
+                        btn.addEventListener('click', async function() {
+                            const appId = this.dataset.appId;
+                            const jobIdVal = this.dataset.jobId;
+                            const filename = this.dataset.filename || 'resume';
+
+                            try {
+                                const res = await fetch(`${API_URL}/careers/${jobIdVal}/applications/${appId}/resume`, {
+                                    headers: { 'Authorization': `Bearer ${token}` }
+                                });
+
+                                if (!res.ok) {
+                                    showToast('error', 'Failed to download resume');
+                                    return;
+                                }
+
+                                const blob = await res.blob();
+                                const url = window.URL.createObjectURL(blob);
+                                const a = document.createElement('a');
+                                a.href = url;
+                                a.download = filename;
+                                document.body.appendChild(a);
+                                a.click();
+                                a.remove();
+                                window.URL.revokeObjectURL(url);
+                                showToast('success', 'Resume download started');
+                            } catch (err) {
+                                console.error('Download error:', err);
+                                showToast('error', 'Network error while downloading');
+                            }
+                        });
+                    });
+
                     showToast('success', `📧 ${applications.length} application(s) loaded!`);
                 } else {
                     showToast('info', 'No applications yet for this job');
@@ -1304,12 +1887,111 @@
             }
         }
 
+        // Hero Settings
+        async function loadHero() {
+            try {
+                const res = await fetch(`${API_URL}/hero`);
+                const data = await res.json();
+                
+                if (data.success && data.data) {
+                    const hero = data.data;
+                    const form = document.getElementById('heroForm');
+                    
+                    form.querySelector('[name="title"]').value = hero.title || '';
+                    form.querySelector('[name="subtitle"]').value = hero.subtitle || '';
+                    form.querySelector('[name="ctaText"]').value = hero.ctaText || '';
+                    form.querySelector('[name="ctaLink"]').value = hero.ctaLink || '';
+                    form.querySelector('[name="backgroundImage"]').value = hero.backgroundImage || '';
+                    form.querySelector('[name="enabled"]').checked = hero.enabled !== false;
+                    
+                    // Update preview
+                    updateHeroPreview(hero);
+                }
+            } catch (err) {
+                console.error('Failed to load hero:', err);
+                showToast('error', 'Failed to load hero settings');
+            }
+        }
+
+        function updateHeroPreview(hero) {
+            document.getElementById('previewTitle').textContent = hero.title || 'Welcome to Zenrix';
+            document.getElementById('previewSubtitle').textContent = hero.subtitle || 'Your tagline';
+            document.getElementById('previewCta').textContent = hero.ctaText || 'Shop Now';
+            
+            const preview = document.getElementById('heroPreview');
+            if (hero.backgroundImage) {
+                preview.style.backgroundImage = `url(${hero.backgroundImage})`;
+                preview.style.backgroundSize = 'cover';
+                preview.style.backgroundPosition = 'center';
+            }
+        }
+
+        document.getElementById('heroForm')?.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const token = getAdminToken();
+            if (!token) {
+                showToast('error', 'Please login first');
+                openLoginModal();
+                return;
+            }
+
+            const formData = new FormData(e.target);
+            const data = {
+                title: formData.get('title'),
+                subtitle: formData.get('subtitle'),
+                ctaText: formData.get('ctaText'),
+                ctaLink: formData.get('ctaLink'),
+                backgroundImage: formData.get('backgroundImage'),
+                enabled: formData.get('enabled') === 'on'
+            };
+
+            try {
+                const res = await fetch(`${API_URL}/hero`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify(data)
+                });
+
+                const result = await res.json();
+
+                if (result.success) {
+                    showToast('success', '✅ Hero settings saved!');
+                    updateHeroPreview(result.data);
+                } else {
+                    showToast('error', '❌ Failed: ' + (result.error || 'Unknown error'));
+                }
+            } catch (err) {
+                showToast('error', '❌ Network error: ' + err.message);
+            }
+        });
+
+        // Live preview updates
+        document.getElementById('heroForm')?.addEventListener('input', (e) => {
+            const form = e.target.form;
+            if (form && form.id === 'heroForm') {
+                const preview = {
+                    title: form.querySelector('[name="title"]').value,
+                    subtitle: form.querySelector('[name="subtitle"]').value,
+                    ctaText: form.querySelector('[name="ctaText"]').value,
+                    backgroundImage: form.querySelector('[name="backgroundImage"]').value
+                };
+                updateHeroPreview(preview);
+            }
+        });
+
+        document.getElementById('refreshHero')?.addEventListener('click', loadHero);
+
         // Load all data
         function loadAllData() {
             loadProducts();
             loadPages();
             loadComponents();
+            loadHero();
             loadCareers();
+            loadSubscribers();
         }
 
         // Initialize Quill editors
@@ -1362,6 +2044,16 @@
                         openLoginModal();
                     }
                 });
+            }
+
+            const refreshSubscribersBtn = document.getElementById('refreshSubscribers');
+            if (refreshSubscribersBtn) {
+                refreshSubscribersBtn.addEventListener('click', loadSubscribers);
+            }
+
+            const exportSubscribersBtn = document.getElementById('exportSubscribers');
+            if (exportSubscribersBtn) {
+                exportSubscribersBtn.addEventListener('click', exportSubscribers);
             }
         });
     </script>

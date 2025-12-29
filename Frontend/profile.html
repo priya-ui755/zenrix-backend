@@ -3,108 +3,784 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>My Profile | ShopNest</title>
-    <link rel="stylesheet" href="style.css">
+    <title>My Profile | Zenrix</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="script.js" defer></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
-<body class="bg-gray-50">
+<body class="bg-gradient-to-br from-gray-50 to-gray-100 min-h-screen">
     <custom-navbar></custom-navbar>
-    <main class="container mx-auto px-4 py-8">
-        <div class="bg-white rounded-lg shadow p-8">
-            <div id="pageContent" class="prose max-w-none"></div>
+    
+    <!-- Loading State -->
+    <div id="loadingState" class="flex items-center justify-center min-h-screen">
+        <div class="text-center">
+            <div class="animate-spin rounded-full h-16 w-16 border-b-4 border-indigo-600 mx-auto mb-4"></div>
+            <p class="text-gray-600">Loading profile...</p>
         </div>
-            <aside class="w-full md:w-64 flex-shrink-0">
-                <div class="bg-white p-6 rounded-lg shadow-sm">
-                    <div class="flex flex-col items-center mb-6">
-                        <img src="http://static.photos/people/200x200/5" alt="User" class="w-24 h-24 rounded-full mb-4">
-                        <h3 class="font-semibold text-lg">John Doe</h3>
-                        <span class="text-sm text-gray-500">Gold Member</span>
-                        <button class="mt-2 text-sm text-blue-600 hover:text-blue-800">Edit Profile</button>
+    </div>
+
+    <!-- Not Logged In State -->
+    <div id="notLoggedInState" class="hidden container mx-auto px-4 py-16">
+        <div class="max-w-md mx-auto bg-white rounded-2xl shadow-xl p-8 text-center">
+            <div class="w-20 h-20 bg-indigo-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <i class="fas fa-user-lock text-3xl text-indigo-600"></i>
+            </div>
+            <h2 class="text-2xl font-bold text-gray-900 mb-2">Please Log In</h2>
+            <p class="text-gray-600 mb-6">You need to be logged in to view your profile</p>
+            <div class="space-y-3">
+                <a href="login.html" class="block w-full bg-indigo-600 text-white px-6 py-3 rounded-xl font-semibold hover:bg-indigo-700 transition">
+                    <i class="fas fa-sign-in-alt mr-2"></i> Log In
+                </a>
+                <a href="register.html" class="block w-full bg-gray-100 text-gray-700 px-6 py-3 rounded-xl font-semibold hover:bg-gray-200 transition">
+                    <i class="fas fa-user-plus mr-2"></i> Create Account
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Profile Content -->
+    <main id="profileContent" class="hidden container mx-auto px-4 py-8">
+        <div class="grid grid-cols-1 lg:grid-cols-4 gap-6">
+            
+            <!-- Sidebar -->
+            <aside class="lg:col-span-1">
+                <div class="bg-white rounded-2xl shadow-lg overflow-hidden sticky top-8">
+                    <!-- Profile Header -->
+                    <div class="bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500 p-6 text-white text-center">
+                        <div class="relative inline-block">
+                            <img id="sidebarAvatar" src="https://ui-avatars.com/api/?name=User&size=200&background=4f46e5&color=fff" alt="Avatar" class="w-24 h-24 rounded-full border-4 border-white shadow-lg mx-auto">
+                            <button type="button" onclick="triggerAvatarSelect()" class="absolute bottom-0 right-0 bg-white text-indigo-600 w-8 h-8 rounded-full shadow-lg hover:bg-indigo-50 transition">
+                                <i class="fas fa-camera text-sm"></i>
+                            </button>
+                            <input id="avatarInput" type="file" accept="image/*" class="hidden" />
+                        </div>
+                        <h3 id="sidebarName" class="font-bold text-xl mt-4">Loading...</h3>
+                        <div id="sidebarTier" class="inline-flex items-center gap-2 mt-2 px-3 py-1 bg-white/20 backdrop-blur-sm rounded-full text-sm">
+                            <i class="fas fa-crown"></i>
+                            <span>Bronze Member</span>
+                        </div>
                     </div>
-                    <ul class="space-y-2">
-                        <li><a href="/account.html" class="flex items-center p-2 rounded-lg hover:bg-gray-100">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 inline-block mr-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><circle cx="12" cy="8" r="3"/><path d="M4 20a8 8 0 0 1 16 0"/></svg> Account Overview</a></li>
-                        <li><a href="/profile.html" class="flex items-center p-2 rounded-lg bg-blue-50 text-blue-600">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 inline-block mr-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><path d="M3 21v-3a4 4 0 0 1 4-4h2l8-8 4 4-8 8v2a4 4 0 0 1-4 4H7"/></svg> Profile</a></li>
-                        <li><a href="/orders.html" class="flex items-center p-2 rounded-lg hover:bg-gray-100">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 inline-block mr-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><path d="M21 16V8l-9-5-9 5v8l9 5 9-5z"/></svg> Orders</a></li>
-                        <li><a href="/addresses.html" class="flex items-center p-2 rounded-lg hover:bg-gray-100">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 inline-block mr-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><path d="M12 2C8 2 5 5 5 9c0 5 7 13 7 13s7-8 7-13c0-4-3-7-7-7z"/><circle cx="12" cy="9" r="2"/></svg> Addresses</a></li>
-                        <li><a href="/payment.html" class="flex items-center p-2 rounded-lg hover:bg-gray-100">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 inline-block mr-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><rect x="2" y="6" width="20" height="12" rx="2"/><path d="M2 10h20"/></svg> Payment Methods</a></li>
-                    </ul>
+                    
+                    <!-- Navigation Menu -->
+                    <nav class="p-4">
+                        <ul class="space-y-1">
+                            <li>
+                                <a href="account.html" class="flex items-center gap-3 p-3 rounded-xl hover:bg-gray-50 transition group">
+                                    <div class="w-10 h-10 bg-gray-100 rounded-lg flex items-center justify-center group-hover:bg-indigo-100 transition">
+                                        <i class="fas fa-home text-gray-600 group-hover:text-indigo-600"></i>
+                                    </div>
+                                    <span class="font-medium text-gray-700">Dashboard</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="profile.html" class="flex items-center gap-3 p-3 rounded-xl bg-indigo-50 text-indigo-600">
+                                    <div class="w-10 h-10 bg-indigo-100 rounded-lg flex items-center justify-center">
+                                        <i class="fas fa-user"></i>
+                                    </div>
+                                    <span class="font-semibold">My Profile</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="orders.html" class="flex items-center gap-3 p-3 rounded-xl hover:bg-gray-50 transition group">
+                                    <div class="w-10 h-10 bg-gray-100 rounded-lg flex items-center justify-center group-hover:bg-indigo-100 transition">
+                                        <i class="fas fa-shopping-bag text-gray-600 group-hover:text-indigo-600"></i>
+                                    </div>
+                                    <span class="font-medium text-gray-700">Orders</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="addresses.html" class="flex items-center gap-3 p-3 rounded-xl hover:bg-gray-50 transition group">
+                                    <div class="w-10 h-10 bg-gray-100 rounded-lg flex items-center justify-center group-hover:bg-indigo-100 transition">
+                                        <i class="fas fa-map-marker-alt text-gray-600 group-hover:text-indigo-600"></i>
+                                    </div>
+                                    <span class="font-medium text-gray-700">Addresses</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="wishlist.html" class="flex items-center gap-3 p-3 rounded-xl hover:bg-gray-50 transition group">
+                                    <div class="w-10 h-10 bg-gray-100 rounded-lg flex items-center justify-center group-hover:bg-indigo-100 transition">
+                                        <i class="fas fa-heart text-gray-600 group-hover:text-indigo-600"></i>
+                                    </div>
+                                    <span class="font-medium text-gray-700">Wishlist</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="settings.html" class="flex items-center gap-3 p-3 rounded-xl hover:bg-gray-50 transition group">
+                                    <div class="w-10 h-10 bg-gray-100 rounded-lg flex items-center justify-center group-hover:bg-indigo-100 transition">
+                                        <i class="fas fa-cog text-gray-600 group-hover:text-indigo-600"></i>
+                                    </div>
+                                    <span class="font-medium text-gray-700">Settings</span>
+                                </a>
+                            </li>
+                            <li class="pt-4 border-t">
+                                <button onclick="logout()" class="flex items-center gap-3 p-3 rounded-xl hover:bg-red-50 transition group w-full text-left">
+                                    <div class="w-10 h-10 bg-gray-100 rounded-lg flex items-center justify-center group-hover:bg-red-100 transition">
+                                        <i class="fas fa-sign-out-alt text-gray-600 group-hover:text-red-600"></i>
+                                    </div>
+                                    <span class="font-medium text-gray-700 group-hover:text-red-600">Logout</span>
+                                </button>
+                            </li>
+                        </ul>
+                    </nav>
                 </div>
             </aside>
 
-            <div class="flex-grow">
-                <div class="bg-white p-6 rounded-lg shadow-sm">
-                    <h2 class="text-2xl font-bold mb-6">Personal Information</h2>
-                <form id="profileForm">
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-                        <div>
-                            <label class="block text-gray-700 mb-2">First Name</label>
-                            <input type="text" id="profileFirstName" class="w-full border rounded-lg px-4 py-2" required>
-                        </div>
-                        <div>
-                            <label class="block text-gray-700 mb-2">Last Name</label>
-                            <input type="text" id="profileLastName" class="w-full border rounded-lg px-4 py-2" required>
-                        </div>
-                        <div>
-                            <label class="block text-gray-700 mb-2">Email</label>
-                            <input type="email" id="profileEmail" class="w-full border rounded-lg px-4 py-2" required>
-                        </div>
-                        <div>
-                            <label class="block text-gray-700 mb-2">Phone</label>
-                            <input type="tel" id="profilePhone" class="w-full border rounded-lg px-4 py-2">
-                        </div>
-                        <div>
-                            <label class="block text-gray-700 mb-2">Date of Birth</label>
-                            <input type="date" id="profileDob" class="w-full border rounded-lg px-4 py-2">
-                        </div>
-                        <div>
-                            <label class="block text-gray-700 mb-2">Gender</label>
-                            <select id="profileGender" class="w-full border rounded-lg px-4 py-2">
-                                <option value="Male">Male</option>
-                                <option value="Female">Female</option>
-                                <option value="Other">Other</option>
-                                <option value="Prefer not to say">Prefer not to say</option>
-                            </select>
-                        </div>
+            <!-- Main Content -->
+            <div class="lg:col-span-3 space-y-6">
+                
+                <!-- Personal Information Card -->
+                <div class="bg-white rounded-2xl shadow-lg overflow-hidden">
+                    <div class="bg-gradient-to-r from-indigo-500 to-purple-500 p-6 text-white">
+                        <h2 class="text-2xl font-bold flex items-center gap-3">
+                            <i class="fas fa-user-circle"></i>
+                            Personal Information
+                        </h2>
+                        <p class="text-indigo-100 mt-1">Manage your personal details and preferences</p>
                     </div>
-                    <button type="submit" class="bg-blue-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-blue-700 transition">
-                        Save Changes
-                    </button>
-                    <div id="profileSuccess" class="mt-4 text-green-600 hidden">Profile updated successfully!</div>
-                    <div id="profileError" class="mt-4 text-red-600 hidden">Error updating profile. Please try again.</div>
-                </form>
-<div class="border-t mt-8 pt-6">
-                        <h3 class="text-lg font-semibold mb-4">Change Password</h3>
-                        <form class="space-y-4">
-                            <div>
-                                <label class="block text-gray-700 mb-2">Current Password</label>
-                                <input type="password" class="w-full border rounded-lg px-4 py-2">
+                    
+                    <div class="p-6">
+                        <form id="profileForm" class="space-y-6">
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <!-- First Name -->
+                                <div>
+                                    <label class="block text-sm font-semibold text-gray-700 mb-2">
+                                        <i class="fas fa-user text-indigo-500 mr-2"></i>First Name
+                                    </label>
+                                    <input type="text" id="firstName" required 
+                                        class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 transition">
+                                </div>
+                                
+                                <!-- Last Name -->
+                                <div>
+                                    <label class="block text-sm font-semibold text-gray-700 mb-2">
+                                        <i class="fas fa-user text-indigo-500 mr-2"></i>Last Name
+                                    </label>
+                                    <input type="text" id="lastName" required 
+                                        class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 transition">
+                                </div>
+                                
+                                <!-- Email (Read-only) -->
+                                <div>
+                                    <label class="block text-sm font-semibold text-gray-700 mb-2">
+                                        <i class="fas fa-envelope text-indigo-500 mr-2"></i>Email Address
+                                    </label>
+                                    <input type="email" id="email" readonly 
+                                        class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl bg-gray-50 text-gray-600 cursor-not-allowed">
+                                    <p class="text-xs text-gray-500 mt-1">Email cannot be changed</p>
+                                </div>
+                                
+                                <!-- Phone -->
+                                <div>
+                                    <label class="block text-sm font-semibold text-gray-700 mb-2">
+                                        <i class="fas fa-phone text-indigo-500 mr-2"></i>Phone Number
+                                    </label>
+                                    <input type="tel" id="phone" placeholder="+1 (555) 000-0000"
+                                        class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 transition">
+                                </div>
+                                
+                                <!-- Date of Birth -->
+                                <div>
+                                    <label class="block text-sm font-semibold text-gray-700 mb-2">
+                                        <i class="fas fa-birthday-cake text-indigo-500 mr-2"></i>Date of Birth
+                                    </label>
+                                    <input type="date" id="dateOfBirth"
+                                        class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 transition">
+                                </div>
+                                
+                                <!-- Gender -->
+                                <div>
+                                    <label class="block text-sm font-semibold text-gray-700 mb-2">
+                                        <i class="fas fa-venus-mars text-indigo-500 mr-2"></i>Gender
+                                    </label>
+                                    <select id="gender"
+                                        class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 transition">
+                                        <option value="Male">Male</option>
+                                        <option value="Female">Female</option>
+                                        <option value="Other">Other</option>
+                                        <option value="Prefer not to say">Prefer not to say</option>
+                                    </select>
+                                </div>
                             </div>
-                            <div>
-                                <label class="block text-gray-700 mb-2">New Password</label>
-                                <input type="password" class="w-full border rounded-lg px-4 py-2">
+                            
+                            <!-- Success/Error Messages -->
+                            <div id="profileSuccess" class="hidden bg-green-50 border-2 border-green-200 rounded-xl p-4 flex items-center gap-3">
+                                <i class="fas fa-check-circle text-green-600 text-xl"></i>
+                                <span class="text-green-700 font-medium">Profile updated successfully!</span>
                             </div>
-                            <div>
-                                <label class="block text-gray-700 mb-2">Confirm New Password</label>
-                                <input type="password" class="w-full border rounded-lg px-4 py-2">
+                            <div id="profileError" class="hidden bg-red-50 border-2 border-red-200 rounded-xl p-4 flex items-center gap-3">
+                                <i class="fas fa-exclamation-circle text-red-600 text-xl"></i>
+                                <span class="text-red-700 font-medium">Error updating profile. Please try again.</span>
                             </div>
-                            <button type="submit" class="bg-blue-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-blue-700 transition">
-                                Update Password
+                            
+                            <!-- Submit Button -->
+                            <div class="flex gap-4">
+                                <button type="submit" 
+                                    class="flex-1 bg-gradient-to-r from-indigo-600 to-purple-600 text-white px-8 py-4 rounded-xl font-semibold hover:from-indigo-700 hover:to-purple-700 transition shadow-lg hover:shadow-xl transform hover:-translate-y-0.5">
+                                    <i class="fas fa-save mr-2"></i>Save Changes
+                                </button>
+                                <button type="button" onclick="loadProfile()"
+                                    class="px-8 py-4 bg-gray-100 text-gray-700 rounded-xl font-semibold hover:bg-gray-200 transition">
+                                    <i class="fas fa-undo mr-2"></i>Reset
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Change Password Card -->
+                <div class="bg-white rounded-2xl shadow-lg overflow-hidden">
+                    <div class="bg-gradient-to-r from-purple-500 to-pink-500 p-6 text-white">
+                        <h2 class="text-2xl font-bold flex items-center gap-3">
+                            <i class="fas fa-lock"></i>
+                            Change Password
+                        </h2>
+                        <p class="text-purple-100 mt-1">Update your password to keep your account secure</p>
+                    </div>
+                    
+                    <div class="p-6">
+                        <form id="passwordForm" class="space-y-6">
+                            <!-- Current Password -->
+                            <div>
+                                <label class="block text-sm font-semibold text-gray-700 mb-2">
+                                    <i class="fas fa-key text-purple-500 mr-2"></i>Current Password
+                                </label>
+                                <div class="relative">
+                                    <input type="password" id="currentPassword" required
+                                        class="w-full px-4 py-3 pr-12 border-2 border-gray-200 rounded-xl focus:border-purple-500 focus:ring-2 focus:ring-purple-200 transition">
+                                    <button type="button" onclick="togglePassword('currentPassword')" 
+                                        class="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600">
+                                        <i class="fas fa-eye"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            
+                            <!-- New Password -->
+                            <div>
+                                <label class="block text-sm font-semibold text-gray-700 mb-2">
+                                    <i class="fas fa-key text-purple-500 mr-2"></i>New Password
+                                </label>
+                                <div class="relative">
+                                    <input type="password" id="newPassword" required minlength="6"
+                                        class="w-full px-4 py-3 pr-12 border-2 border-gray-200 rounded-xl focus:border-purple-500 focus:ring-2 focus:ring-purple-200 transition">
+                                    <button type="button" onclick="togglePassword('newPassword')" 
+                                        class="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600">
+                                        <i class="fas fa-eye"></i>
+                                    </button>
+                                </div>
+                                <p class="text-xs text-gray-500 mt-1">Minimum 6 characters</p>
+                            </div>
+                            
+                            <!-- Confirm Password -->
+                            <div>
+                                <label class="block text-sm font-semibold text-gray-700 mb-2">
+                                    <i class="fas fa-key text-purple-500 mr-2"></i>Confirm New Password
+                                </label>
+                                <div class="relative">
+                                    <input type="password" id="confirmPassword" required minlength="6"
+                                        class="w-full px-4 py-3 pr-12 border-2 border-gray-200 rounded-xl focus:border-purple-500 focus:ring-2 focus:ring-purple-200 transition">
+                                    <button type="button" onclick="togglePassword('confirmPassword')" 
+                                        class="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600">
+                                        <i class="fas fa-eye"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            
+                            <!-- Success/Error Messages -->
+                            <div id="passwordSuccess" class="hidden bg-green-50 border-2 border-green-200 rounded-xl p-4 flex items-center gap-3">
+                                <i class="fas fa-check-circle text-green-600 text-xl"></i>
+                                <span class="text-green-700 font-medium">Password changed successfully!</span>
+                            </div>
+                            <div id="passwordError" class="hidden bg-red-50 border-2 border-red-200 rounded-xl p-4">
+                                <div class="flex items-center gap-3">
+                                    <i class="fas fa-exclamation-circle text-red-600 text-xl"></i>
+                                    <span id="passwordErrorText" class="text-red-700 font-medium">Error changing password.</span>
+                                </div>
+                            </div>
+                            
+                            <!-- Submit Button -->
+                            <button type="submit" 
+                                class="w-full bg-gradient-to-r from-purple-600 to-pink-600 text-white px-8 py-4 rounded-xl font-semibold hover:from-purple-700 hover:to-pink-700 transition shadow-lg hover:shadow-xl transform hover:-translate-y-0.5">
+                                <i class="fas fa-shield-alt mr-2"></i>Update Password
                             </button>
                         </form>
                     </div>
                 </div>
+
+                <!-- Account Stats -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div class="bg-gradient-to-br from-blue-500 to-blue-600 rounded-2xl p-6 text-white shadow-lg">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-blue-100 text-sm">Total Orders</p>
+                                <p id="ordersTotal" class="text-3xl font-bold mt-1">0</p>
+                            </div>
+                            <div class="w-14 h-14 bg-white/20 rounded-xl flex items-center justify-center">
+                                <i class="fas fa-shopping-cart text-2xl"></i>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-gradient-to-br from-purple-500 to-purple-600 rounded-2xl p-6 text-white shadow-lg">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-purple-100 text-sm">Wishlist Items</p>
+                                <p id="wishlistCount" class="text-3xl font-bold mt-1">0</p>
+                            </div>
+                            <div class="w-14 h-14 bg-white/20 rounded-xl flex items-center justify-center">
+                                <i class="fas fa-heart text-2xl"></i>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-gradient-to-br from-pink-500 to-pink-600 rounded-2xl p-6 text-white shadow-lg">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-pink-100 text-sm">Member Since</p>
+                                <p id="memberSince" class="text-xl font-bold mt-1">2024</p>
+                            </div>
+                            <div class="w-14 h-14 bg-white/20 rounded-xl flex items-center justify-center">
+                                <i class="fas fa-calendar text-2xl"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Orders & Cart Summary -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="bg-white rounded-2xl shadow-lg p-6">
+                        <div class="flex items-center justify-between mb-4">
+                            <div>
+                                <h3 class="text-lg font-bold text-gray-900">Orders Summary</h3>
+                                <p class="text-gray-500 text-sm">Quick view of your orders</p>
+                            </div>
+                            <a href="orders.html" class="text-indigo-600 text-sm font-semibold hover:underline">View all</a>
+                        </div>
+                        <div class="grid grid-cols-2 gap-3" id="ordersSummary">
+                            <div class="p-4 rounded-xl bg-indigo-50">
+                                <p class="text-xs text-gray-500">Pending</p>
+                                <p id="ordersPending" class="text-2xl font-bold text-indigo-700">0</p>
+                            </div>
+                            <div class="p-4 rounded-xl bg-green-50">
+                                <p class="text-xs text-gray-500">Completed</p>
+                                <p id="ordersCompleted" class="text-2xl font-bold text-green-700">0</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-white rounded-2xl shadow-lg p-6">
+                        <div class="flex items-center justify-between mb-4">
+                            <div>
+                                <h3 class="text-lg font-bold text-gray-900">Cart Summary</h3>
+                                <p class="text-gray-500 text-sm">Items currently in your cart</p>
+                            </div>
+                            <a href="cart.html" class="text-indigo-600 text-sm font-semibold hover:underline">View cart</a>
+                        </div>
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-xs text-gray-500">Items</p>
+                                <p id="cartCount" class="text-2xl font-bold text-gray-900">0</p>
+                            </div>
+                            <div class="text-right">
+                                <p class="text-xs text-gray-500">Estimated total</p>
+                                <p id="cartTotal" class="text-2xl font-bold text-gray-900">$0.00</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Addresses -->
+                <div class="bg-white rounded-2xl shadow-lg p-6">
+                    <div class="flex items-center justify-between mb-4">
+                        <div>
+                            <h3 class="text-lg font-bold text-gray-900">Saved Addresses</h3>
+                            <p class="text-gray-500 text-sm">Manage your delivery locations</p>
+                        </div>
+                        <a href="addresses.html" class="text-indigo-600 text-sm font-semibold hover:underline">Manage</a>
+                    </div>
+                    <div id="addressesList" class="grid grid-cols-1 md:grid-cols-2 gap-4 text-gray-700">
+                        <p class="text-gray-500">No addresses added yet.</p>
+                    </div>
+                </div>
+
+                <!-- Wishlist Items -->
+                <div class="bg-white rounded-2xl shadow-lg p-6">
+                    <div class="flex items-center justify-between mb-4">
+                        <div>
+                            <h3 class="text-lg font-bold text-gray-900">Wishlist Items</h3>
+                            <p class="text-gray-500 text-sm">Items you’ve saved</p>
+                        </div>
+                        <a href="wishlist.html" class="text-indigo-600 text-sm font-semibold hover:underline">View wishlist</a>
+                    </div>
+                    <div id="wishlistItems" class="grid grid-cols-1 md:grid-cols-2 gap-4 text-gray-700">
+                        <p class="text-gray-500">No items in wishlist.</p>
+                    </div>
+                </div>
+
             </div>
         </div>
     </main>
+
     <custom-footer></custom-footer>
 
     <script src="components/navbar.js"></script>
     <script src="components/footer.js"></script>
+    <script>
+        // Check authentication
+        function getAuthToken() {
+            return localStorage.getItem('userToken');
+        }
+
+        function isLoggedIn() {
+            return !!getAuthToken();
+        }
+
+        function logout() {
+            localStorage.removeItem('userToken');
+            localStorage.removeItem('userData');
+            window.location.href = 'index.html';
+        }
+
+        // Avatar upload
+        function triggerAvatarSelect() {
+            const input = document.getElementById('avatarInput');
+            if (input) input.click();
+        }
+
+        async function handleAvatarSelected(event) {
+            const file = event.target.files?.[0];
+            if (!file) return;
+            const token = getAuthToken();
+            if (!token) return logout();
+            try {
+                const formData = new FormData();
+                formData.append('avatar', file);
+                const res = await fetch('/api/users/avatar', {
+                    method: 'POST',
+                    headers: { 'Authorization': `Bearer ${token}` },
+                    body: formData
+                });
+                const data = await res.json();
+                if (data.success && data.data?.avatar) {
+                    document.getElementById('sidebarAvatar').src = data.data.avatar;
+                    // update cached user data
+                    const userData = JSON.parse(localStorage.getItem('userData') || '{}');
+                    userData.avatar = data.data.avatar;
+                    localStorage.setItem('userData', JSON.stringify(userData));
+                    showSuccess('profileSuccess');
+                } else {
+                    throw new Error(data.error || 'Upload failed');
+                }
+            } catch (err) {
+                showError('profileError', err.message);
+            } finally {
+                event.target.value = '';
+            }
+        }
+
+        // Toggle password visibility
+        function togglePassword(inputId) {
+            const input = document.getElementById(inputId);
+            const icon = event.target.closest('button').querySelector('i');
+            if (input.type === 'password') {
+                input.type = 'text';
+                icon.classList.remove('fa-eye');
+                icon.classList.add('fa-eye-slash');
+            } else {
+                input.type = 'password';
+                icon.classList.remove('fa-eye-slash');
+                icon.classList.add('fa-eye');
+            }
+        }
+
+        // Load user profile
+        async function loadProfile() {
+            try {
+                const token = getAuthToken();
+                const res = await fetch('/api/users/profile', {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+                
+                const data = await res.json();
+                
+                if (data.success) {
+                    const user = data.data;
+                    
+                    // Populate form fields
+                    document.getElementById('firstName').value = user.firstName || '';
+                    document.getElementById('lastName').value = user.lastName || '';
+                    document.getElementById('email').value = user.email || '';
+                    document.getElementById('phone').value = user.phone || '';
+                    document.getElementById('dateOfBirth').value = user.dateOfBirth ? user.dateOfBirth.split('T')[0] : '';
+                    document.getElementById('gender').value = user.gender || 'Prefer not to say';
+                    
+                    // Update sidebar
+                    const fullName = `${user.firstName} ${user.lastName}`;
+                    document.getElementById('sidebarName').textContent = fullName;
+                    document.getElementById('sidebarTier').innerHTML = `
+                        <i class="fas fa-crown"></i>
+                        <span>${user.membershipTier} Member</span>
+                    `;
+                    
+                    // Update avatar
+                    const avatarUrl = user.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(fullName)}&size=200&background=4f46e5&color=fff`;
+                    document.getElementById('sidebarAvatar').src = avatarUrl;
+                    
+                    // Load wishlist count
+                    loadWishlistCount();
+                    
+                    // Update member since
+                    const joinDate = new Date(user.createdAt);
+                    document.getElementById('memberSince').textContent = joinDate.toLocaleDateString('en-US', { year: 'numeric', month: 'short' });
+                } else {
+                    throw new Error(data.error);
+                }
+            } catch (err) {
+                console.error('Error loading profile:', err);
+                showError('profileError', 'Failed to load profile data');
+            }
+        }
+
+        // Load wishlist count
+        async function loadWishlistCount() {
+            try {
+                const token = getAuthToken();
+                const res = await fetch('/api/users/wishlist', {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const data = await res.json();
+                if (data.success) {
+                    document.getElementById('wishlistCount').textContent = data.data.length;
+                    renderWishlistItems(data.data);
+                }
+            } catch (err) {
+                console.error('Error loading wishlist:', err);
+            }
+        }
+
+        // Load wishlist items into grid
+        function renderWishlistItems(items) {
+            const container = document.getElementById('wishlistItems');
+            if (!items || items.length === 0) {
+                container.innerHTML = '<p class="text-gray-500">No items in wishlist.</p>';
+                return;
+            }
+            container.innerHTML = items.map(item => {
+                const name = item.name || item.title || 'Wishlist Item';
+                const price = item.price ? `$${item.price}` : '';
+                return `
+                    <div class="border border-gray-100 rounded-xl p-4 flex items-center gap-3">
+                        <div class="w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center text-gray-500">
+                            <i class="fas fa-heart"></i>
+                        </div>
+                        <div class="flex-1">
+                            <p class="font-semibold text-gray-900">${name}</p>
+                            <p class="text-sm text-gray-500">${price}</p>
+                        </div>
+                    </div>`;
+            }).join('');
+        }
+
+        // Load addresses
+        async function loadAddresses() {
+            try {
+                const token = getAuthToken();
+                const res = await fetch('/api/users/addresses', {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const data = await res.json();
+                if (data.success) {
+                    renderAddresses(data.data || []);
+                }
+            } catch (err) {
+                console.error('Error loading addresses:', err);
+            }
+        }
+
+        function renderAddresses(addresses) {
+            const container = document.getElementById('addressesList');
+            if (!addresses || addresses.length === 0) {
+                container.innerHTML = '<p class="text-gray-500">No addresses added yet.</p>';
+                return;
+            }
+            container.innerHTML = addresses.map(addr => {
+                const title = addr.type || 'Address';
+                const lines = [addr.addressLine1, addr.addressLine2, addr.city, addr.state, addr.zipCode, addr.country]
+                    .filter(Boolean).join(', ');
+                const phone = addr.phone ? `<p class="text-sm text-gray-500">${addr.phone}</p>` : '';
+                const badge = addr.isDefault ? '<span class="ml-2 text-xs font-semibold text-green-700 bg-green-100 px-2 py-1 rounded-full">Default</span>' : '';
+                return `
+                    <div class="border border-gray-100 rounded-xl p-4">
+                        <p class="font-semibold text-gray-900">${title}${badge}</p>
+                        <p class="text-sm text-gray-600 mt-1">${lines || 'No address details'}</p>
+                        ${phone}
+                    </div>`;
+            }).join('');
+        }
+
+        // Load orders summary (placeholder data from backend)
+        async function loadOrdersSummary() {
+            try {
+                const token = getAuthToken();
+                const res = await fetch('/api/users/orders/summary', {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const data = await res.json();
+                if (data.success) {
+                    const summary = data.data;
+                    document.getElementById('ordersTotal').textContent = summary.total;
+                    document.getElementById('ordersPending').textContent = summary.pending;
+                    document.getElementById('ordersCompleted').textContent = summary.completed;
+                }
+            } catch (err) {
+                console.error('Error loading orders summary:', err);
+            }
+        }
+
+        // Load cart summary (placeholder data from backend)
+        async function loadCartSummary() {
+            try {
+                const token = getAuthToken();
+                const res = await fetch('/api/users/cart/summary', {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const data = await res.json();
+                if (data.success) {
+                    const cart = data.data;
+                    document.getElementById('cartCount').textContent = cart.count;
+                    document.getElementById('cartTotal').textContent = `$${cart.total.toFixed(2)}`;
+                }
+            } catch (err) {
+                console.error('Error loading cart summary:', err);
+            }
+        }
+
+        // Update profile
+        document.getElementById('profileForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            hideMessage('profileSuccess');
+            hideMessage('profileError');
+            
+            try {
+                const token = getAuthToken();
+                const formData = {
+                    firstName: document.getElementById('firstName').value,
+                    lastName: document.getElementById('lastName').value,
+                    phone: document.getElementById('phone').value,
+                    dateOfBirth: document.getElementById('dateOfBirth').value || null,
+                    gender: document.getElementById('gender').value
+                };
+                
+                const res = await fetch('/api/users/profile', {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify(formData)
+                });
+                
+                const data = await res.json();
+                
+                if (data.success) {
+                    showSuccess('profileSuccess');
+                    loadProfile(); // Reload to update sidebar
+                } else {
+                    throw new Error(data.error);
+                }
+            } catch (err) {
+                showError('profileError', err.message);
+            }
+        });
+
+        // Change password
+        document.getElementById('passwordForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            hideMessage('passwordSuccess');
+            hideMessage('passwordError');
+            
+            const newPassword = document.getElementById('newPassword').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+            
+            if (newPassword !== confirmPassword) {
+                document.getElementById('passwordErrorText').textContent = 'Passwords do not match';
+                showError('passwordError');
+                return;
+            }
+            
+            try {
+                const token = getAuthToken();
+                const res = await fetch('/api/users/change-password', {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify({
+                        currentPassword: document.getElementById('currentPassword').value,
+                        newPassword: newPassword
+                    })
+                });
+                
+                const data = await res.json();
+                
+                if (data.success) {
+                    showSuccess('passwordSuccess');
+                    document.getElementById('passwordForm').reset();
+                } else {
+                    document.getElementById('passwordErrorText').textContent = data.error;
+                    showError('passwordError');
+                }
+            } catch (err) {
+                document.getElementById('passwordErrorText').textContent = err.message;
+                showError('passwordError');
+            }
+        });
+
+        // Helper functions for messages
+        function showSuccess(elementId) {
+            document.getElementById(elementId).classList.remove('hidden');
+            setTimeout(() => hideMessage(elementId), 5000);
+        }
+
+        function showError(elementId, message) {
+            const element = document.getElementById(elementId);
+            if (message && elementId === 'profileError') {
+                element.querySelector('span').textContent = message;
+            }
+            element.classList.remove('hidden');
+            setTimeout(() => hideMessage(elementId), 5000);
+        }
+
+        function hideMessage(elementId) {
+            document.getElementById(elementId).classList.add('hidden');
+        }
+
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            const loadingState = document.getElementById('loadingState');
+            const notLoggedInState = document.getElementById('notLoggedInState');
+            const profileContent = document.getElementById('profileContent');
+            const avatarInput = document.getElementById('avatarInput');
+            if (avatarInput) {
+                avatarInput.addEventListener('change', handleAvatarSelected);
+            }
+            
+            if (!isLoggedIn()) {
+                loadingState.classList.add('hidden');
+                notLoggedInState.classList.remove('hidden');
+            } else {
+                loadProfile().then(() => {
+                    loadAddresses();
+                    loadOrdersSummary();
+                    loadCartSummary();
+                    loadingState.classList.add('hidden');
+                    profileContent.classList.remove('hidden');
+                });
+            }
+        });
+    </script>
 </body>
 </html>

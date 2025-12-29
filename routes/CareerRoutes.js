@@ -42,6 +42,7 @@ const applicationSchema = new mongoose.Schema({
   email: String,
   phone: String,
   resumeFileName: String,
+  resumeMimeType: String,
   resumeData: Buffer,
   coverLetter: String,
   status: { type: String, enum: ['submitted', 'reviewing', 'shortlisted', 'rejected', 'hired'], default: 'submitted' },
@@ -128,6 +129,7 @@ router.post('/:id/apply', upload.single('resume'), async (req, res) => {
       email: req.body.email,
       phone: req.body.phone,
       resumeFileName: req.file.originalname,
+      resumeMimeType: req.file.mimetype,
       resumeData: req.file.buffer,
       coverLetter: req.body.coverLetter || '',
       status: 'submitted'
@@ -155,6 +157,25 @@ router.get('/:id/applications', requireAdmin, async (req, res) => {
   try {
     const applications = await Application.find({ jobId: req.params.id });
     res.json({ success: true, count: applications.length, data: applications });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+// Download resume for an application (admin)
+router.get('/:jobId/applications/:appId/resume', requireAdmin, async (req, res) => {
+  try {
+    const application = await Application.findOne({ _id: req.params.appId, jobId: req.params.jobId });
+    if (!application || !application.resumeData) {
+      return res.status(404).json({ success: false, error: 'Resume not found' });
+    }
+
+    const mime = application.resumeMimeType || 'application/octet-stream';
+    const filename = application.resumeFileName || 'resume';
+
+    res.setHeader('Content-Type', mime);
+    res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
+    res.send(application.resumeData);
   } catch (error) {
     res.status(500).json({ success: false, error: error.message });
   }

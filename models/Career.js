@@ -51,6 +51,7 @@ const applicationSchema = new mongoose.Schema({
   email: String,
   phone: String,
   resumeFileName: String,
+  resumeMimeType: String,
   resumeData: Buffer,
   coverLetter: String,
   status: {

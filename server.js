@@ -1,6 +1,8 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
+const path = require('path');
+const helmet = require('helmet');
 require('dotenv').config();
 
 // Basic env checks
@@ -18,24 +20,29 @@ const Product = require('./models/Product');
 
 const app = express();
 
-// Middleware
-app.use(cors());
-app.use(express.json());
-const helmet = require('helmet');
-// Configure CSP to allow CDN scripts for development and E2E tests (tailwind, quill)
+// Middleware - IMPORTANT ORDER: Security first, then body parsing, then auth
 app.use(helmet({
   contentSecurityPolicy: {
     directives: {
       defaultSrc: ["'self'"],
       scriptSrc: ["'self'", "'unsafe-inline'", "https://cdn.quilljs.com", "https://cdn.tailwindcss.com", "https://cdn.jsdelivr.net"],
-      styleSrc: ["'self'", "'unsafe-inline'", "https://cdn.quilljs.com", "https://cdn.tailwindcss.com", "https://fonts.googleapis.com"],
-      imgSrc: ["'self'", "data:", "https://images.unsplash.com"],
+      styleSrc: ["'self'", "'unsafe-inline'", "https://cdn.quilljs.com", "https://cdn.tailwindcss.com", "https://fonts.googleapis.com", "https://cdnjs.cloudflare.com"],
+      imgSrc: ["'self'", "data:", "https://images.unsplash.com", "https://ui-avatars.com"],
       connectSrc: ["'self'"],
-      fontSrc: ["'self'", "https://fonts.gstatic.com"],
+      fontSrc: ["'self'", "https://fonts.gstatic.com", "https://cdnjs.cloudflare.com"],
       objectSrc: ["'none'"]
     }
   }
 }));
+
+app.use(cors());
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
+// Initialize Passport for OAuth routes only (JWT auth doesn't need sessions)
+const passport = require('passport');
+require('./config/passport'); // Load passport strategies
+// Note: passport.initialize() and session setup moved to AuthRoutes to avoid interference with JWT routes
 
 // Basic rate limiting
 const rateLimit = require('express-rate-limit');
@@ -179,18 +186,30 @@ async function addSampleComponents() {
 addSampleComponents();
 // ========== END SAMPLE COMPONENTS ==========
 
-const path = require('path');
 // Mount route modules
 const productRoutes = require('./routes/ProductRoutes');
 const adminRoutes = require('./routes/AdminRoutes');
 const pageRoutes = require('./routes/PageRoutes');
 const componentRoutes = require('./routes/ComponentRoutes');
 const careerRoutes = require('./routes/CareerRoutes');
+const subscriberRoutes = require('./routes/SubscriberRoutes');
+const heroRoutes = require('./routes/HeroRoutes');
+const userRoutes = require('./routes/UserRoutes');
+const authRoutes = require('./routes/AuthRoutes');
+console.log('📋 Mounting routes...');
 app.use('/api/products', productRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/pages', pageRoutes);
 app.use('/api/components', componentRoutes);
 app.use('/api/careers', careerRoutes);
+app.use('/api/subscribers', subscriberRoutes);
+app.use('/api/hero', heroRoutes);
+app.use('/api/users', userRoutes);
+app.use('/api/auth', authRoutes);
+console.log('✅ All routes mounted including OAuth authentication');
+
+// Serve uploaded product images
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // API info route
 app.get('/api', (req, res) => {
@@ -216,6 +235,15 @@ app.get('/api/test', (req, res) => {
     status: 'Working Perfectly!',
     database: 'MongoDB Connected'
   });
+});
+
+// Global error handler
+app.use((err, req, res, next) => {
+  console.error('❌ Error caught by global handler:', err.message);
+  if (err.stack) {
+    console.error('Stack:', err.stack);
+  }
+  res.status(500).json({ success: false, error: err.message || 'Internal Server Error' });
 });
 
 // Note: product routes are already mounted above

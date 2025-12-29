@@ -4,3 +4,7 @@ tmp/
 .DS_Store
 npm-debug.log
 playwright-report/
+
+# Keep db-backup folder for git tracking
+# (database seed scripts for easy setup on new machines)
+!db-backup/
