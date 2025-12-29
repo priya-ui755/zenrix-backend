@@ -19,6 +19,10 @@ const productSchema = new mongoose.Schema({
     type: String,
     default: 'https://via.placeholder.com/400x300?text=Zenrix+Product'
   },
+  images: {
+    type: [String],
+    default: []
+  },
   category: {
     type: String,
     required: [true, 'Category is required'],
