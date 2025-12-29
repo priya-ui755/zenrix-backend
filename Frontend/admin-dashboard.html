@@ -104,13 +104,13 @@
         <div class="bg-white rounded-xl shadow-md mb-8">
             <div class="border-b">
                 <div class="flex space-x-8 px-6">
-                    <button onclick="switchTab('products')" id="tab-products" class="py-4 px-2 border-b-2 border-blue-600 text-blue-600 font-medium">
+                    <button data-tab="products" id="tab-products" class="py-4 px-2 border-b-2 border-blue-600 text-blue-600 font-medium">
                         Products
                     </button>
-                    <button onclick="switchTab('pages')" id="tab-pages" class="py-4 px-2 border-b-2 border-transparent text-gray-500 hover:text-gray-700 font-medium">
+                    <button data-tab="pages" id="tab-pages" class="py-4 px-2 border-b-2 border-transparent text-gray-500 hover:text-gray-700 font-medium">
                         Pages
                     </button>
-                    <button onclick="switchTab('components')" id="tab-components" class="py-4 px-2 border-b-2 border-transparent text-gray-500 hover:text-gray-700 font-medium">
+                    <button data-tab="components" id="tab-components" class="py-4 px-2 border-b-2 border-transparent text-gray-500 hover:text-gray-700 font-medium">
                         Components
                     </button>
                 </div>
@@ -267,7 +267,7 @@
                     <button type="submit" class="flex-1 bg-blue-600 text-white px-6 py-3 rounded-lg font-medium hover:bg-blue-700 transition">
                         Login
                     </button>
-                    <button type="button" onclick="closeLoginModal()" class="flex-1 bg-gray-200 text-gray-700 px-6 py-3 rounded-lg font-medium hover:bg-gray-300 transition">
+                    <button type="button" id="closLoginModalBtn" class="flex-1 bg-gray-200 text-gray-700 px-6 py-3 rounded-lg font-medium hover:bg-gray-300 transition">
                         Cancel
                     </button>
                 </div>
@@ -329,7 +329,7 @@
                     <button type="submit" class="flex-1 bg-blue-600 text-white px-6 py-3 rounded-lg font-medium hover:bg-blue-700 transition">
                         Update Product
                     </button>
-                    <button type="button" onclick="closeEditProductModal()" class="flex-1 bg-gray-200 text-gray-700 px-6 py-3 rounded-lg font-medium hover:bg-gray-300 transition">
+                    <button type="button" id="closeEditModalBtn" class="flex-1 bg-gray-200 text-gray-700 px-6 py-3 rounded-lg font-medium hover:bg-gray-300 transition">
                         Cancel
                     </button>
                 </div>
@@ -381,12 +381,10 @@
                 statusEl.classList.add('bg-green-500');
                 statusEl.classList.remove('bg-white', 'bg-opacity-20');
                 btnEl.textContent = 'Logged In ✓';
-                btnEl.onclick = logout;
             } else {
                 statusEl.classList.remove('bg-green-500');
                 statusEl.classList.add('bg-white', 'bg-opacity-20');
                 btnEl.textContent = 'Click to Login';
-                btnEl.onclick = openLoginModal;
             }
         }
 
@@ -484,16 +482,19 @@
                                     </div>
                                 </div>
                                 <div class="flex flex-col space-y-2 ml-4">
-                                    <button onclick="editProduct('${p._id}')" class="px-4 py-2 bg-blue-100 text-blue-600 rounded-lg hover:bg-blue-200 transition whitespace-nowrap">
+                                    <button data-edit-product="${p._id}" class="px-4 py-2 bg-blue-100 text-blue-600 rounded-lg hover:bg-blue-200 transition whitespace-nowrap">
                                         Edit
                                     </button>
-                                    <button onclick="deleteProduct('${p._id}')" class="px-4 py-2 bg-red-100 text-red-600 rounded-lg hover:bg-red-200 transition whitespace-nowrap">
+                                    <button data-delete-product="${p._id}" class="px-4 py-2 bg-red-100 text-red-600 rounded-lg hover:bg-red-200 transition whitespace-nowrap">
                                         Delete
                                     </button>
                                 </div>
                             </div>
                         </div>
                     `}).join('');
+                    
+                    // Attach event listeners
+                    attachProductEventListeners();
                 }
             } catch (err) {
                 showToast('error', 'Failed to load products: ' + err.message);
@@ -547,6 +548,24 @@
                 showToast('error', '❌ Network error: ' + err.message);
             }
         });
+
+        function attachProductEventListeners() {
+            // Edit buttons
+            document.querySelectorAll('[data-edit-product]').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const id = this.getAttribute('data-edit-product');
+                    editProduct(id);
+                });
+            });
+            
+            // Delete buttons
+            document.querySelectorAll('[data-delete-product]').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const id = this.getAttribute('data-delete-product');
+                    deleteProduct(id);
+                });
+            });
+        }
 
         window.editProduct = function(id) {
             console.log('Edit product clicked:', id);
@@ -904,6 +923,38 @@
             updateAdminUI();
             loadAllData();
             setTimeout(initQuill, 100);
+            
+            // Attach tab switchers
+            document.querySelectorAll('[data-tab]').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const tab = this.getAttribute('data-tab');
+                    switchTab(tab);
+                });
+            });
+            
+            // Attach modal close buttons
+            const closeLoginBtn = document.getElementById('closLoginModalBtn');
+            if (closeLoginBtn) {
+                closeLoginBtn.addEventListener('click', closeLoginModal);
+            }
+            
+            const closeEditBtn = document.getElementById('closeEditModalBtn');
+            if (closeEditBtn) {
+                closeEditBtn.addEventListener('click', closeEditProductModal);
+            }
+            
+            // Attach admin login button
+            const adminLoginBtn = document.getElementById('adminLoginBtn');
+            if (adminLoginBtn) {
+                adminLoginBtn.addEventListener('click', function() {
+                    const token = getAdminToken();
+                    if (token) {
+                        logout();
+                    } else {
+                        openLoginModal();
+                    }
+                });
+            }
         });
     </script>
 </body>
