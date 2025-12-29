@@ -79,6 +79,7 @@
             try {
                 const response = await fetch(`${API_URL}/careers`);
                 const data = await response.json();
+                console.log('Careers loaded:', data);
                 
                 if (data.success && data.data.length > 0) {
                     const container = document.getElementById('careersContainer');
@@ -127,11 +128,14 @@
                                 </div>
                             ` : ''}
                             
-                            <button onclick="applyForJob('${job._id}', '${job.title}')" class="mt-6 bg-blue-600 text-white px-8 py-3 rounded-lg font-semibold hover:bg-blue-700 transition">
+                            <button class="apply-btn mt-6 bg-blue-600 text-white px-8 py-3 rounded-lg font-semibold hover:bg-blue-700 transition" data-job-id="${job._id}" data-job-title="${job.title}">
                                 Apply Now
                             </button>
                         </div>
                     `).join('');
+                    
+                    // Attach event listeners to apply buttons
+                    attachApplyButtonListeners();
                 } else {
                     document.getElementById('careersContainer').innerHTML = `
                         <div class="bg-white rounded-lg shadow-md p-12 text-center">
@@ -149,25 +153,64 @@
             }
         }
 
-        function applyForJob(jobId, jobTitle) {
-            document.getElementById('jobTitleInModal').textContent = jobTitle;
-            document.getElementById('applicationForm').dataset.jobId = jobId;
-            document.getElementById('applicationModal').classList.remove('hidden');
+        function attachApplyButtonListeners() {
+            document.querySelectorAll('.apply-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    console.log('Apply button clicked');
+                    const jobId = this.getAttribute('data-job-id');
+                    const jobTitle = this.getAttribute('data-job-title');
+                    console.log('Job ID:', jobId, 'Title:', jobTitle);
+                    applyForJob(jobId, jobTitle);
+                });
+            });
         }
 
+        function applyForJob(jobId, jobTitle) {
+            console.log('Opening application modal for:', jobId, jobTitle);
+            const modal = document.getElementById('applicationModal');
+            const titleElem = document.getElementById('jobTitleInModal');
+            const form = document.getElementById('applicationForm');
+            
+            if (!modal || !titleElem || !form) {
+                console.error('Modal elements not found');
+                alert('Error: Modal elements not found');
+                return;
+            }
+            
+            titleElem.textContent = jobTitle;
+            form.dataset.jobId = jobId;
+            modal.classList.remove('hidden');
+            console.log('Modal opened, jobId stored:', form.dataset.jobId);
+        }
+
+        // Close modal buttons
         document.getElementById('closeApplicationModal')?.addEventListener('click', function() {
+            console.log('Close button clicked');
             document.getElementById('applicationModal').classList.add('hidden');
         });
 
+        // Close modal when clicking outside
         document.getElementById('applicationModal')?.addEventListener('click', function(e) {
             if (e.target === this) {
+                console.log('Background clicked, closing modal');
                 this.classList.add('hidden');
             }
         });
 
+        // Form submission
         document.getElementById('applicationForm')?.addEventListener('submit', async function(e) {
             e.preventDefault();
+            console.log('Form submitted');
+            
             const jobId = this.dataset.jobId;
+            console.log('Submitting for job ID:', jobId);
+            
+            if (!jobId) {
+                alert('Error: Job ID not found. Please try again.');
+                console.error('Job ID is empty');
+                return;
+            }
+            
             const formData = new FormData(this);
             
             const applicationData = {
@@ -176,18 +219,25 @@
                 email: formData.get('email'),
                 phone: formData.get('phone'),
                 resumeUrl: formData.get('resumeUrl'),
-                coverLetter: formData.get('coverLetter'),
+                coverLetter: formData.get('coverLetter') || '',
                 status: 'submitted'
             };
 
+            console.log('Application data:', applicationData);
+
             try {
-                const response = await fetch(`${API_URL}/careers/${jobId}/apply`, {
+                const url = `${API_URL}/careers/${jobId}/apply`;
+                console.log('Sending POST to:', url);
+                
+                const response = await fetch(url, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(applicationData)
                 });
 
+                console.log('Response status:', response.status);
                 const result = await response.json();
+                console.log('Response data:', result);
 
                 if (result.success) {
                     alert('✅ Application submitted successfully!\n\nWe will review your application and get back to you soon.');
@@ -203,7 +253,10 @@
         });
 
         // Load careers on page load
-        document.addEventListener('DOMContentLoaded', loadCareers);
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('Page loaded, loading careers...');
+            loadCareers();
+        });
     </script>
     <style>
         .card-hover {
