@@ -103,15 +103,18 @@
         <!-- Tabs -->
         <div class="bg-white rounded-xl shadow-md mb-8">
             <div class="border-b">
-                <div class="flex space-x-8 px-6">
-                    <button data-tab="products" id="tab-products" class="py-4 px-2 border-b-2 border-blue-600 text-blue-600 font-medium">
+                <div class="flex space-x-8 px-6 overflow-x-auto">
+                    <button data-tab="products" id="tab-products" class="py-4 px-2 border-b-2 border-blue-600 text-blue-600 font-medium whitespace-nowrap">
                         Products
                     </button>
-                    <button data-tab="pages" id="tab-pages" class="py-4 px-2 border-b-2 border-transparent text-gray-500 hover:text-gray-700 font-medium">
+                    <button data-tab="pages" id="tab-pages" class="py-4 px-2 border-b-2 border-transparent text-gray-500 hover:text-gray-700 font-medium whitespace-nowrap">
                         Pages
                     </button>
-                    <button data-tab="components" id="tab-components" class="py-4 px-2 border-b-2 border-transparent text-gray-500 hover:text-gray-700 font-medium">
+                    <button data-tab="components" id="tab-components" class="py-4 px-2 border-b-2 border-transparent text-gray-500 hover:text-gray-700 font-medium whitespace-nowrap">
                         Components
+                    </button>
+                    <button data-tab="careers" id="tab-careers" class="py-4 px-2 border-b-2 border-transparent text-gray-500 hover:text-gray-700 font-medium whitespace-nowrap">
+                        Careers
                     </button>
                 </div>
             </div>
@@ -249,6 +252,73 @@
                 <div class="mt-8">
                     <h2 class="text-xl font-bold text-gray-800 mb-4">All Components</h2>
                     <div id="componentsList" class="space-y-4"></div>
+                </div>
+            </div>
+
+            <!-- Careers Tab -->
+            <div id="content-careers" class="p-6 hidden">
+                <div class="mb-6">
+                    <h2 class="text-xl font-bold text-gray-800 mb-4">Post New Job Opening</h2>
+                    <form id="addCareerForm" class="space-y-4">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Job Title *</label>
+                                <input type="text" name="title" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Department *</label>
+                                <select name="department" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent">
+                                    <option value="Engineering">Engineering</option>
+                                    <option value="Design">Design</option>
+                                    <option value="Sales">Sales</option>
+                                    <option value="Marketing">Marketing</option>
+                                    <option value="HR">HR</option>
+                                    <option value="Operations">Operations</option>
+                                    <option value="Support">Support</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Location *</label>
+                                <input type="text" name="location" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Job Type *</label>
+                                <select name="type" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent">
+                                    <option value="Full-time">Full-time</option>
+                                    <option value="Part-time">Part-time</option>
+                                    <option value="Contract">Contract</option>
+                                    <option value="Freelance">Freelance</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Description *</label>
+                            <textarea name="description" rows="4" required placeholder="Describe the role and responsibilities..." class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"></textarea>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Salary Range (optional)</label>
+                            <div class="grid grid-cols-2 gap-2">
+                                <input type="number" name="salary_min" placeholder="Min" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent">
+                                <input type="number" name="salary_max" placeholder="Max" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent">
+                            </div>
+                        </div>
+                        <div>
+                            <label class="flex items-center space-x-2">
+                                <input type="checkbox" name="published" class="w-4 h-4 text-red-600 rounded focus:ring-2 focus:ring-red-500">
+                                <span class="text-sm font-medium text-gray-700">Publish this job opening</span>
+                            </label>
+                        </div>
+                        <button type="submit" class="w-full bg-red-600 text-white px-6 py-3 rounded-lg font-medium hover:bg-red-700 transition">
+                            Post Job Opening
+                        </button>
+                    </form>
+                </div>
+
+                <div class="mt-8">
+                    <h2 class="text-xl font-bold text-gray-800 mb-4">Active Job Openings</h2>
+                    <div id="careersList" class="space-y-4"></div>
                 </div>
             </div>
         </div>
@@ -567,6 +637,38 @@
             });
         }
 
+        function attachPageEventListeners() {
+            document.querySelectorAll('[data-edit-page]').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const id = this.getAttribute('data-edit-page');
+                    editPage(id);
+                });
+            });
+            
+            document.querySelectorAll('[data-delete-page]').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const id = this.getAttribute('data-delete-page');
+                    deletePage(id);
+                });
+            });
+        }
+
+        function attachComponentEventListeners() {
+            document.querySelectorAll('[data-edit-component]').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const id = this.getAttribute('data-edit-component');
+                    editComponent(id);
+                });
+            });
+            
+            document.querySelectorAll('[data-delete-component]').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const id = this.getAttribute('data-delete-component');
+                    deleteComponent(id);
+                });
+            });
+        }
+
         window.editProduct = function(id) {
             console.log('Edit product clicked:', id);
             const product = productsCache[id];
@@ -704,19 +806,30 @@
                     const list = document.getElementById('pagesList');
                     list.innerHTML = data.data.map(p => `
                         <div class="bg-white border border-gray-200 rounded-lg p-6 card-hover">
-                            <div class="flex items-center justify-between">
-                                <div>
-                                    <h3 class="font-semibold text-gray-800">${p.title}</h3>
-                                    <p class="text-sm text-gray-500">/${p.slug} • ${p.published ? '✓ Published' : 'Draft'}</p>
+                            <div class="flex items-start justify-between">
+                                <div class="flex-1">
+                                    <h3 class="font-semibold text-gray-800 text-lg">${p.title}</h3>
+                                    <p class="text-sm text-gray-600 mt-1">/${p.slug}</p>
+                                    <div class="flex items-center space-x-3 mt-3">
+                                        <span class="${p.published ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700'} px-3 py-1 rounded text-xs font-medium">
+                                            ${p.published ? '✓ Published' : 'Draft'}
+                                        </span>
+                                        <span class="text-xs text-gray-500">${new Date(p.createdAt).toLocaleDateString()}</span>
+                                    </div>
                                 </div>
-                                <div class="flex space-x-2">
-                                    <button onclick="deletePage('${p._id}')" class="px-4 py-2 bg-red-100 text-red-600 rounded-lg hover:bg-red-200 transition">
+                                <div class="flex flex-col space-y-2 ml-4">
+                                    <button data-edit-page="${p._id}" class="px-4 py-2 bg-blue-100 text-blue-600 rounded-lg hover:bg-blue-200 transition whitespace-nowrap">
+                                        Edit
+                                    </button>
+                                    <button data-delete-page="${p._id}" class="px-4 py-2 bg-red-100 text-red-600 rounded-lg hover:bg-red-200 transition whitespace-nowrap">
                                         Delete
                                     </button>
                                 </div>
                             </div>
                         </div>
                     `).join('');
+                    
+                    attachPageEventListeners();
                 }
             } catch (err) {
                 showToast('error', 'Failed to load pages');
@@ -796,6 +909,11 @@
             }
         }
 
+        function editPage(id) {
+            console.log('Edit page:', id);
+            showToast('info', 'Page edit feature coming soon - use delete and recreate for now');
+        }
+
         // Components CRUD
         async function loadComponents() {
             try {
@@ -808,19 +926,30 @@
                     const list = document.getElementById('componentsList');
                     list.innerHTML = data.data.map(c => `
                         <div class="bg-white border border-gray-200 rounded-lg p-6 card-hover">
-                            <div class="flex items-center justify-between">
-                                <div>
-                                    <h3 class="font-semibold text-gray-800">${c.name}</h3>
-                                    <p class="text-sm text-gray-500">${c.slug} • ${c.published ? '✓ Published' : 'Draft'}</p>
+                            <div class="flex items-start justify-between">
+                                <div class="flex-1">
+                                    <h3 class="font-semibold text-gray-800 text-lg">${c.name}</h3>
+                                    <p class="text-sm text-gray-600 mt-1">${c.slug}</p>
+                                    <div class="flex items-center space-x-3 mt-3">
+                                        <span class="${c.published ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700'} px-3 py-1 rounded text-xs font-medium">
+                                            ${c.published ? '✓ Published' : 'Draft'}
+                                        </span>
+                                        <span class="text-xs text-gray-500">${new Date(c.createdAt).toLocaleDateString()}</span>
+                                    </div>
                                 </div>
-                                <div class="flex space-x-2">
-                                    <button onclick="deleteComponent('${c._id}')" class="px-4 py-2 bg-red-100 text-red-600 rounded-lg hover:bg-red-200 transition">
+                                <div class="flex flex-col space-y-2 ml-4">
+                                    <button data-edit-component="${c._id}" class="px-4 py-2 bg-blue-100 text-blue-600 rounded-lg hover:bg-blue-200 transition whitespace-nowrap">
+                                        Edit
+                                    </button>
+                                    <button data-delete-component="${c._id}" class="px-4 py-2 bg-red-100 text-red-600 rounded-lg hover:bg-red-200 transition whitespace-nowrap">
                                         Delete
                                     </button>
                                 </div>
                             </div>
                         </div>
                     `).join('');
+                    
+                    attachComponentEventListeners();
                 }
             } catch (err) {
                 showToast('error', 'Failed to load components');
@@ -897,11 +1026,232 @@
             }
         }
 
+        function editComponent(id) {
+            console.log('Edit component:', id);
+            showToast('info', 'Component edit feature coming soon - use delete and recreate for now');
+        }
+
+        // Careers CRUD
+        async function loadCareers() {
+            try {
+                const token = getAdminToken();
+                const endpoint = token ? `${API_URL}/careers/admin/all` : `${API_URL}/careers`;
+                
+                const res = await fetch(endpoint, {
+                    headers: token ? { 'Authorization': `Bearer ${token}` } : {}
+                });
+                const data = await res.json();
+                
+                if (data.success) {
+                    const list = document.getElementById('careersList');
+                    list.innerHTML = data.data.map(job => `
+                        <div class="bg-white border border-gray-200 rounded-lg p-6 card-hover">
+                            <div class="flex items-start justify-between">
+                                <div class="flex-1">
+                                    <h3 class="font-semibold text-gray-800 text-lg">${job.title}</h3>
+                                    <div class="flex items-center space-x-4 mt-2 text-sm text-gray-600">
+                                        <span>📍 ${job.location}</span>
+                                        <span>🏢 ${job.department}</span>
+                                        <span>⏱️ ${job.type}</span>
+                                    </div>
+                                    <p class="text-gray-700 mt-2 text-sm">${job.description.substring(0, 100)}...</p>
+                                    <div class="flex items-center space-x-3 mt-3">
+                                        <span class="${job.published ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700'} px-3 py-1 rounded text-xs font-medium">
+                                            ${job.published ? '✓ Published' : 'Draft'}
+                                        </span>
+                                        <span class="text-xs text-gray-500">📧 ${job.applications || 0} Applications</span>
+                                    </div>
+                                </div>
+                                <div class="flex flex-col space-y-2 ml-4">
+                                    <button data-view-apps="${job._id}" class="px-4 py-2 bg-purple-100 text-purple-600 rounded-lg hover:bg-purple-200 transition whitespace-nowrap">
+                                        View Apps
+                                    </button>
+                                    <button data-edit-career="${job._id}" class="px-4 py-2 bg-blue-100 text-blue-600 rounded-lg hover:bg-blue-200 transition whitespace-nowrap">
+                                        Edit
+                                    </button>
+                                    <button data-delete-career="${job._id}" class="px-4 py-2 bg-red-100 text-red-600 rounded-lg hover:bg-red-200 transition whitespace-nowrap">
+                                        Delete
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    `).join('');
+                    
+                    attachCareerEventListeners();
+                }
+            } catch (err) {
+                console.error('Failed to load careers:', err);
+                showToast('error', 'Failed to load careers');
+            }
+        }
+
+        function attachCareerEventListeners() {
+            document.querySelectorAll('[data-edit-career]').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const id = this.getAttribute('data-edit-career');
+                    editCareer(id);
+                });
+            });
+            
+            document.querySelectorAll('[data-delete-career]').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const id = this.getAttribute('data-delete-career');
+                    deleteCareer(id);
+                });
+            });
+
+            document.querySelectorAll('[data-view-apps]').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const id = this.getAttribute('data-view-apps');
+                    viewApplications(id);
+                });
+            });
+        }
+
+        document.getElementById('addCareerForm')?.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const token = getAdminToken();
+            if (!token) {
+                showToast('error', 'Please login first');
+                openLoginModal();
+                return;
+            }
+
+            const formData = new FormData(e.target);
+            const salary_min = formData.get('salary_min');
+            const salary_max = formData.get('salary_max');
+            
+            const data = {
+                title: formData.get('title'),
+                description: formData.get('description'),
+                department: formData.get('department'),
+                location: formData.get('location'),
+                type: formData.get('type'),
+                published: formData.get('published') === 'on'
+            };
+
+            if (salary_min && salary_max) {
+                data.salary = {
+                    min: parseInt(salary_min),
+                    max: parseInt(salary_max),
+                    currency: 'USD'
+                };
+            }
+
+            try {
+                const res = await fetch(`${API_URL}/careers`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify(data)
+                });
+
+                const result = await res.json();
+
+                if (result.success) {
+                    showToast('success', '✅ Job opening posted!');
+                    e.target.reset();
+                    loadCareers();
+                } else {
+                    showToast('error', '❌ Failed: ' + (result.error || 'Unknown error'));
+                }
+            } catch (err) {
+                showToast('error', '❌ Network error: ' + err.message);
+            }
+        });
+
+        async function deleteCareer(id) {
+            if (!confirm('Delete this job opening?')) return;
+            
+            const token = getAdminToken();
+            if (!token) {
+                showToast('error', 'Please login first');
+                openLoginModal();
+                return;
+            }
+
+            try {
+                const res = await fetch(`${API_URL}/careers/${id}`, {
+                    method: 'DELETE',
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+
+                const data = await res.json();
+
+                if (data.success) {
+                    showToast('success', '✅ Job opening deleted!');
+                    loadCareers();
+                } else {
+                    showToast('error', '❌ Delete failed: ' + data.error);
+                }
+            } catch (err) {
+                showToast('error', '❌ Network error: ' + err.message);
+            }
+        }
+
+        function editCareer(id) {
+            console.log('Edit career:', id);
+            showToast('info', 'Career edit feature coming soon - use delete and recreate for now');
+        }
+
+        async function viewApplications(jobId) {
+            const token = getAdminToken();
+            if (!token) {
+                showToast('error', 'Please login first');
+                openLoginModal();
+                return;
+            }
+
+            try {
+                const res = await fetch(`${API_URL}/careers/${jobId}/applications`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+
+                const data = await res.json();
+
+                if (data.success && data.applications) {
+                    const appList = data.applications.map(app => `
+                        <div class="bg-gray-50 border border-gray-200 rounded p-4 mb-3">
+                            <div class="flex justify-between items-start">
+                                <div>
+                                    <p class="font-semibold text-gray-800">${app.firstName} ${app.lastName}</p>
+                                    <p class="text-sm text-gray-600">📧 ${app.email} | 📱 ${app.phone}</p>
+                                    <p class="text-sm text-gray-500 mt-1">Applied: ${new Date(app.appliedAt).toLocaleDateString()}</p>
+                                </div>
+                                <select class="px-3 py-1 rounded border border-gray-300 text-sm" data-update-app="${app._id}" data-job="${jobId}">
+                                    <option value="submitted" ${app.status === 'submitted' ? 'selected' : ''}>Submitted</option>
+                                    <option value="reviewing" ${app.status === 'reviewing' ? 'selected' : ''}>Reviewing</option>
+                                    <option value="shortlisted" ${app.status === 'shortlisted' ? 'selected' : ''}>Shortlisted</option>
+                                    <option value="rejected" ${app.status === 'rejected' ? 'selected' : ''}>Rejected</option>
+                                    <option value="hired" ${app.status === 'hired' ? 'selected' : ''}>Hired</option>
+                                </select>
+                            </div>
+                        </div>
+                    `).join('');
+
+                    const message = `<div class="p-4 bg-blue-50 rounded-lg border border-blue-200 max-h-96 overflow-y-auto">${appList}</div>`;
+                    alert('Applications for this job (click status to update):\n\n' + (data.applications.length === 0 ? 'No applications yet' : data.applications.length + ' application(s)'));
+                    
+                    // Show applications
+                    setTimeout(() => {
+                        showToast('info', `${data.applications.length} application(s) - status update feature coming soon`);
+                    }, 500);
+                } else {
+                    showToast('info', 'No applications yet for this job');
+                }
+            } catch (err) {
+                showToast('error', 'Failed to load applications: ' + err.message);
+            }
+        }
+
         // Load all data
         function loadAllData() {
             loadProducts();
             loadPages();
             loadComponents();
+            loadCareers();
         }
 
         // Initialize Quill editors

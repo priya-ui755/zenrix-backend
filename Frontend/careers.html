@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Careers | ShopNest</title>
+    <title>Careers | Zenrix</title>
     <link rel="stylesheet" href="style.css">
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="script.js" defer></script>
@@ -11,13 +11,113 @@
 <body class="bg-gray-50">
     <custom-navbar></custom-navbar>
     <main class="container mx-auto px-4 py-8">
-        <div class="bg-white rounded-lg shadow p-8">
-            <div id="pageContent" class="prose max-w-none"></div>
+        <div class="mb-12">
+            <h1 class="text-4xl font-bold text-gray-800 mb-4">Join Our Team</h1>
+            <p class="text-gray-600 text-lg">We're looking for talented individuals to join our growing company.</p>
+        </div>
+
+        <div id="careersContainer" class="space-y-6">
+            <div class="text-center py-12">
+                <p class="text-gray-500">Loading job openings...</p>
+            </div>
         </div>
     </main>
     <custom-footer></custom-footer>
 
     <script src="components/navbar.js"></script>
     <script src="components/footer.js"></script>
+    <script>
+        const API_URL = '/api';
+
+        async function loadCareers() {
+            try {
+                const response = await fetch(`${API_URL}/careers`);
+                const data = await response.json();
+                
+                if (data.success && data.data.length > 0) {
+                    const container = document.getElementById('careersContainer');
+                    container.innerHTML = data.data.map(job => `
+                        <div class="bg-white rounded-lg shadow-md p-8 card-hover">
+                            <div class="flex justify-between items-start mb-4">
+                                <div>
+                                    <h2 class="text-2xl font-bold text-gray-800">${job.title}</h2>
+                                    <div class="flex flex-wrap gap-3 mt-3">
+                                        <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-blue-100 text-blue-800">
+                                            📍 ${job.location}
+                                        </span>
+                                        <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-purple-100 text-purple-800">
+                                            🏢 ${job.department}
+                                        </span>
+                                        <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-green-100 text-green-800">
+                                            ⏱️ ${job.type}
+                                        </span>
+                                    </div>
+                                </div>
+                                ${job.salary && job.salary.min && job.salary.max ? `
+                                    <div class="text-right">
+                                        <p class="text-2xl font-bold text-green-600">$${job.salary.min.toLocaleString()}</p>
+                                        <p class="text-sm text-gray-500">to $${job.salary.max.toLocaleString()}</p>
+                                    </div>
+                                ` : ''}
+                            </div>
+                            
+                            <p class="text-gray-700 mb-4">${job.description}</p>
+                            
+                            ${job.requirements && job.requirements.length > 0 ? `
+                                <div class="mb-4">
+                                    <h3 class="font-semibold text-gray-800 mb-2">Requirements:</h3>
+                                    <ul class="list-disc list-inside space-y-1 text-gray-600">
+                                        ${job.requirements.map(req => `<li>${req}</li>`).join('')}
+                                    </ul>
+                                </div>
+                            ` : ''}
+                            
+                            ${job.benefits && job.benefits.length > 0 ? `
+                                <div class="mb-4">
+                                    <h3 class="font-semibold text-gray-800 mb-2">Benefits:</h3>
+                                    <ul class="list-disc list-inside space-y-1 text-gray-600">
+                                        ${job.benefits.map(benefit => `<li>${benefit}</li>`).join('')}
+                                    </ul>
+                                </div>
+                            ` : ''}
+                            
+                            <button onclick="applyForJob('${job._id}', '${job.title}')" class="mt-6 bg-blue-600 text-white px-8 py-3 rounded-lg font-semibold hover:bg-blue-700 transition">
+                                Apply Now
+                            </button>
+                        </div>
+                    `).join('');
+                } else {
+                    document.getElementById('careersContainer').innerHTML = `
+                        <div class="bg-white rounded-lg shadow-md p-12 text-center">
+                            <p class="text-gray-600 text-lg">No open positions at the moment. Check back soon!</p>
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                console.error('Failed to load careers:', error);
+                document.getElementById('careersContainer').innerHTML = `
+                    <div class="bg-red-50 border border-red-200 rounded-lg p-8 text-center">
+                        <p class="text-red-600">Failed to load job openings. Please try again later.</p>
+                    </div>
+                `;
+            }
+        }
+
+        function applyForJob(jobId, jobTitle) {
+            alert(`Apply for ${jobTitle} feature coming soon!\n\nYou can submit your application through our careers page soon.`);
+        }
+
+        // Load careers on page load
+        document.addEventListener('DOMContentLoaded', loadCareers);
+    </script>
+    <style>
+        .card-hover {
+            transition: all 0.3s;
+        }
+        .card-hover:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 24px rgba(0,0,0,0.15);
+        }
+    </style>
 </body>
 </html>

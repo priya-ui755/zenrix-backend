@@ -185,10 +185,12 @@ const productRoutes = require('./routes/ProductRoutes');
 const adminRoutes = require('./routes/AdminRoutes');
 const pageRoutes = require('./routes/PageRoutes');
 const componentRoutes = require('./routes/ComponentRoutes');
+const careerRoutes = require('./routes/CareerRoutes');
 app.use('/api/products', productRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/pages', pageRoutes);
 app.use('/api/components', componentRoutes);
+app.use('/api/careers', careerRoutes);
 
 // API info route
 app.get('/api', (req, res) => {
