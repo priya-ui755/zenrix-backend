@@ -179,8 +179,19 @@ async function addSampleComponents() {
 addSampleComponents();
 // ========== END SAMPLE COMPONENTS ==========
 
-// Routes
-app.get('/', (req, res) => {
+const path = require('path');
+// Mount route modules
+const productRoutes = require('./routes/ProductRoutes');
+const adminRoutes = require('./routes/AdminRoutes');
+const pageRoutes = require('./routes/PageRoutes');
+const componentRoutes = require('./routes/ComponentRoutes');
+app.use('/api/products', productRoutes);
+app.use('/api/admin', adminRoutes);
+app.use('/api/pages', pageRoutes);
+app.use('/api/components', componentRoutes);
+
+// API info route
+app.get('/api', (req, res) => {
   res.json({ 
     message: '🚀 Zenrix Backend is Running!',
     endpoints: {
@@ -194,18 +205,7 @@ app.get('/', (req, res) => {
   });
 });
 
-const path = require('path');
-// Mount route modules
-const productRoutes = require('./routes/ProductRoutes');
-const adminRoutes = require('./routes/AdminRoutes');
-const pageRoutes = require('./routes/PageRoutes');
-const componentRoutes = require('./routes/ComponentRoutes');
-app.use('/api/products', productRoutes);
-app.use('/api/admin', adminRoutes);
-app.use('/api/pages', pageRoutes);
-app.use('/api/components', componentRoutes);
-
-// Serve frontend static files (so E2E tests can load /Frontend/*.html)
+// Serve frontend static files (index.html at root, other HTML files accessible)
 app.use('/', express.static(path.join(__dirname, 'Frontend')));
 
 app.get('/api/test', (req, res) => {
