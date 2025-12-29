@@ -1,7 +1,22 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const router = express.Router();
+const multer = require('multer');
 const { requireAdmin } = require('../middleware/auth');
+
+// Configure multer for file uploads (5MB limit)
+const upload = multer({ 
+  storage: multer.memoryStorage(),
+  limits: { fileSize: 5 * 1024 * 1024 }, // 5MB
+  fileFilter: (req, file, cb) => {
+    const allowedMimes = ['application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'];
+    if (allowedMimes.includes(file.mimetype)) {
+      cb(null, true);
+    } else {
+      cb(new Error('Only PDF, DOC, and DOCX files are allowed'), false);
+    }
+  }
+});
 
 // Career model
 const careerSchema = new mongoose.Schema({
@@ -26,7 +41,8 @@ const applicationSchema = new mongoose.Schema({
   lastName: String,
   email: String,
   phone: String,
-  resumeUrl: String,
+  resumeFileName: String,
+  resumeData: Buffer,
   coverLetter: String,
   status: { type: String, enum: ['submitted', 'reviewing', 'shortlisted', 'rejected', 'hired'], default: 'submitted' },
   appliedAt: { type: Date, default: Date.now }
@@ -99,11 +115,36 @@ router.delete('/:id', requireAdmin, async (req, res) => {
 });
 
 // Submit application
-router.post('/:id/apply', async (req, res) => {
+router.post('/:id/apply', upload.single('resume'), async (req, res) => {
   try {
-    const application = new Application({ jobId: req.params.id, ...req.body });
+    if (!req.file) {
+      return res.status(400).json({ success: false, error: 'Resume file is required' });
+    }
+
+    const application = new Application({
+      jobId: req.params.id,
+      firstName: req.body.firstName,
+      lastName: req.body.lastName,
+      email: req.body.email,
+      phone: req.body.phone,
+      resumeFileName: req.file.originalname,
+      resumeData: req.file.buffer,
+      coverLetter: req.body.coverLetter || '',
+      status: 'submitted'
+    });
+    
     await application.save();
-    res.status(201).json({ success: true, data: application });
+    res.status(201).json({ success: true, data: { 
+      _id: application._id,
+      firstName: application.firstName,
+      lastName: application.lastName,
+      email: application.email,
+      phone: application.phone,
+      resumeFileName: application.resumeFileName,
+      coverLetter: application.coverLetter,
+      status: application.status,
+      appliedAt: application.appliedAt
+    }});
   } catch (error) {
     res.status(400).json({ success: false, error: error.message });
   }

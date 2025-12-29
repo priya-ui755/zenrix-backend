@@ -1232,7 +1232,7 @@
                                                 <p class="font-semibold text-lg text-gray-800">${app.firstName} ${app.lastName}</p>
                                                 <p class="text-sm text-gray-600 mt-1">📧 <a href="mailto:${app.email}" class="hover:underline">${app.email}</a></p>
                                                 <p class="text-sm text-gray-600">📱 ${app.phone}</p>
-                                                ${app.resumeUrl ? `<p class="text-sm text-blue-600 mt-1">📄 <a href="${app.resumeUrl}" target="_blank" class="hover:underline">View Resume</a></p>` : ''}
+                                                ${app.resumeFileName ? `<p class="text-sm text-blue-600 mt-1">📄 <span class="font-medium">${app.resumeFileName}</span></p>` : ''}
                                             </div>
                                             <select class="status-select px-4 py-2 rounded-lg border border-gray-300 text-sm font-medium" data-app-id="${app._id}" data-job-id="${jobId}" data-current="${app.status}">
                                                 <option value="submitted" ${app.status === 'submitted' ? 'selected' : ''}>Submitted</option>

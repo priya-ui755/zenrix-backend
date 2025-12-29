@@ -50,7 +50,8 @@ const applicationSchema = new mongoose.Schema({
   lastName: String,
   email: String,
   phone: String,
-  resumeUrl: String,
+  resumeFileName: String,
+  resumeData: Buffer,
   coverLetter: String,
   status: {
     type: String,

@@ -51,8 +51,20 @@
                     </div>
                 </div>
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-2">Resume URL *</label>
-                    <input type="url" name="resumeUrl" required placeholder="https://example.com/resume.pdf" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Resume (PDF, DOC, DOCX) - Max 5MB *</label>
+                    <div class="mt-2 flex items-center justify-center w-full">
+                        <label class="flex flex-col items-center justify-center w-full h-32 border-2 border-blue-300 border-dashed rounded-lg cursor-pointer bg-blue-50 hover:bg-blue-100 transition">
+                            <div class="flex flex-col items-center justify-center pt-5 pb-6">
+                                <svg class="w-8 h-8 text-blue-600 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path>
+                                </svg>
+                                <p class="text-sm text-blue-600"><span class="font-semibold">Click to upload</span> or drag and drop</p>
+                                <p class="text-xs text-gray-600">PDF, DOC, DOCX (Max 5MB)</p>
+                            </div>
+                            <input type="file" name="resume" accept=".pdf,.doc,.docx" required class="hidden" id="resumeFile">
+                        </label>
+                    </div>
+                    <p id="resumeFileName" class="text-sm text-gray-600 mt-2"></p>
                 </div>
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-2">Cover Letter</label>
@@ -197,6 +209,57 @@
             }
         });
 
+        // File upload handling
+        const resumeFileInput = document.getElementById('resumeFile');
+        const resumeFileNameDisplay = document.getElementById('resumeFileName');
+        const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
+
+        if (resumeFileInput) {
+            resumeFileInput.addEventListener('change', function() {
+                const file = this.files[0];
+                if (file) {
+                    console.log('File selected:', file.name, 'Size:', file.size);
+                    
+                    if (file.size > MAX_FILE_SIZE) {
+                        alert(`❌ File size exceeds 5MB limit. Your file is ${(file.size / 1024 / 1024).toFixed(2)}MB`);
+                        this.value = '';
+                        resumeFileNameDisplay.textContent = '';
+                        return;
+                    }
+                    
+                    resumeFileNameDisplay.textContent = `✅ Selected: ${file.name} (${(file.size / 1024).toFixed(2)}KB)`;
+                }
+            });
+
+            // Drag and drop
+            const label = resumeFileInput.parentElement;
+            ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+                label.addEventListener(eventName, preventDefaults, false);
+            });
+
+            function preventDefaults(e) {
+                e.preventDefault();
+                e.stopPropagation();
+            }
+
+            ['dragenter', 'dragover'].forEach(eventName => {
+                label.addEventListener(eventName, () => label.classList.add('bg-blue-200'), false);
+            });
+
+            ['dragleave', 'drop'].forEach(eventName => {
+                label.addEventListener(eventName, () => label.classList.remove('bg-blue-200'), false);
+            });
+
+            label.addEventListener('drop', (e) => {
+                const dt = e.dataTransfer;
+                const files = dt.files;
+                resumeFileInput.files = files;
+                
+                const event = new Event('change', { bubbles: true });
+                resumeFileInput.dispatchEvent(event);
+            }, false);
+        }
+
         // Form submission
         document.getElementById('applicationForm')?.addEventListener('submit', async function(e) {
             e.preventDefault();
@@ -210,20 +273,36 @@
                 console.error('Job ID is empty');
                 return;
             }
-            
-            const formData = new FormData(this);
-            
-            const applicationData = {
+
+            const resumeFile = document.getElementById('resumeFile').files[0];
+            if (!resumeFile) {
+                alert('❌ Please upload a resume file');
+                return;
+            }
+
+            if (resumeFile.size > MAX_FILE_SIZE) {
+                alert(`❌ Resume file is too large. Maximum size is 5MB.`);
+                return;
+            }
+
+            const formData = new FormData();
+            formData.append('firstName', document.querySelector('input[name="firstName"]').value);
+            formData.append('lastName', document.querySelector('input[name="lastName"]').value);
+            formData.append('email', document.querySelector('input[name="email"]').value);
+            formData.append('phone', document.querySelector('input[name="phone"]').value);
+            formData.append('resume', resumeFile);
+            formData.append('coverLetter', document.querySelector('textarea[name="coverLetter"]').value || '');
+            formData.append('status', 'submitted');
+
+            console.log('Application data with file:', {
                 firstName: formData.get('firstName'),
                 lastName: formData.get('lastName'),
                 email: formData.get('email'),
                 phone: formData.get('phone'),
-                resumeUrl: formData.get('resumeUrl'),
-                coverLetter: formData.get('coverLetter') || '',
-                status: 'submitted'
-            };
-
-            console.log('Application data:', applicationData);
+                resumeFileName: resumeFile.name,
+                resumeFileSize: resumeFile.size,
+                coverLetter: formData.get('coverLetter')
+            });
 
             try {
                 const url = `${API_URL}/careers/${jobId}/apply`;
@@ -231,8 +310,7 @@
                 
                 const response = await fetch(url, {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(applicationData)
+                    body: formData
                 });
 
                 console.log('Response status:', response.status);
@@ -243,6 +321,7 @@
                     alert('✅ Application submitted successfully!\n\nWe will review your application and get back to you soon.');
                     document.getElementById('applicationModal').classList.add('hidden');
                     this.reset();
+                    resumeFileNameDisplay.textContent = '';
                 } else {
                     alert('❌ Failed to submit application: ' + (result.error || 'Unknown error'));
                 }
