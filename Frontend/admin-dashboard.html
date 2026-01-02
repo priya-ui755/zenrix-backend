@@ -5,9 +5,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Zenrix Admin Dashboard</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="/admin.css">
     <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
+    <!-- admin styles and chart library -->
+    <link rel="stylesheet" href="/admin.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <!-- favicon to avoid 404 and small site id -->
     <link rel="icon" href="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><text y='28' font-size='28' font-family='Poppins' fill='%236674ee'>Z</text></svg>">
+    <script src="/js/admin-dashboard.js" defer></script>
     <style>
         @keyframes slideIn {
             from { transform: translateY(-10px); opacity: 0; }
@@ -77,6 +82,9 @@
         </div>
     </div>
 
+    <div class="admin-app">
+
+
     <!-- Main Content -->
     <div id="authOverlay" class="fixed inset-0 bg-white z-50 hidden">
         <div class="w-full h-full flex flex-col items-center justify-center space-y-4 text-center px-6">
@@ -90,7 +98,27 @@
             </button>
         </div>
     </div>
-    <div id="adminContent" class="container mx-auto px-6 py-8 hidden">
+    <div class="admin-layout">
+      <aside class="admin-sidebar">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:0.5rem">
+            <div style="display:flex;gap:.5rem;align-items:center">
+                <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="width:24px;height:24px;color:var(--accent)"><path d="M12 2L2 7l10 5 10-5-10-5z" fill="currentColor"/></svg>
+                <strong>Admin</strong>
+            </div>
+            <button id="sidebarToggle" class="px-2 py-1" style="background:transparent;border:0;color:var(--muted);cursor:pointer">☰</button>
+        </div>
+        <nav>
+            <a href="#" data-jump-tab="products">Products</a>
+            <a href="#" data-jump-tab="orders">Orders</a>
+            <a href="#" data-jump-tab="payments">Payments</a>
+            <a href="#" data-jump-tab="pages">Pages</a>
+            <a href="#" data-jump-tab="components">Components</a>
+            <a href="#" data-jump-tab="subscribers">Subscribers</a>
+        </nav>
+      </aside>
+
+      <main id="adminContent" class="container mx-auto px-6 py-8 hidden admin-main">
+
         <!-- Quick shortcuts / sticky toolbar -->
         <div class="sticky top-2 z-30 mb-6">
             <div class="bg-white/80 backdrop-blur border border-gray-200 rounded-2xl shadow-sm px-4 py-3 flex flex-wrap items-center gap-3">
@@ -129,73 +157,71 @@
         </div>
 
         <!-- Stats Cards -->
-        <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-            <div class="bg-white rounded-xl shadow-md p-6 card-hover">
-                <div class="flex items-center justify-between">
-                    <div>
-                        <p class="text-gray-500 text-sm font-medium">Total Products</p>
-                        <p id="totalProducts" class="text-3xl font-bold text-gray-800 mt-2">0</p>
-                    </div>
-                    <div class="bg-blue-100 p-4 rounded-full">
-                        <svg class="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>
-                        </svg>
-                    </div>
-                </div>
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8 admin-cards">
+            <div class="card">
+                <div class="label">Total Products</div>
+                <div id="totalProducts" class="value">0</div>
             </div>
-            
-            <!-- Knowledge Card -->
-            <div id="knowledgeCard" class="bg-white rounded-xl shadow-md p-6 card-hover">
-                <div class="flex items-start justify-between">
-                    <div>
-                        <p class="text-gray-500 text-sm font-medium">Knowledge (TF‑IDF)</p>
-                        <p class="text-2xl font-bold text-gray-800 mt-2">Docs: <span id="knowledgeDocs">0</span></p>
-                        <p class="text-sm text-gray-500 mt-1">Vocab: <span id="knowledgeVocab">0</span> • Vectors: <span id="knowledgeVectorCount">0</span></p>
-                        <p class="text-xs text-gray-500 mt-2">HF: <span id="knowledgeHF">Unknown</span></p>
-                    </div>
-                    <div class="flex flex-col items-end gap-2">
-                        <button id="knowledgeRefreshBtn" class="px-3 py-2 rounded-lg bg-gray-100 text-gray-700 text-sm hover:bg-gray-200">Refresh</button>
-                        <button id="knowledgeReindexBtn" class="px-3 py-2 rounded-lg bg-blue-600 text-white text-sm hover:bg-blue-700">Reindex</button>
-                        <button id="knowledgeClearVectorsBtn" class="px-3 py-2 rounded-lg bg-rose-600 text-white text-sm hover:bg-rose-700">Clear Vectors</button>
-                    </div>
-                </div>
-                <div id="knowledgeProgress" class="mt-4 hidden">
-                    <div class="w-full bg-gray-100 rounded-full h-3 overflow-hidden">
-                        <div id="knowledgeProgressBar" class="bg-blue-600 h-3 w-0" style="transition: width 0.3s;"></div>
-                    </div>
-                    <div class="mt-2 text-xs text-gray-500">Status: <span id="knowledgeProgressText">Idle</span></div>
-                    <div class="mt-3 text-xs text-gray-500">
-                        <button id="knowledgeViewLogsBtn" class="px-2 py-1 bg-white border border-gray-200 rounded text-xs">View Logs</button>
-                    </div>
-                    <div id="knowledgeLogs" class="mt-3 max-h-48 overflow-auto text-xs bg-white border border-gray-100 p-3 rounded hidden"></div>
-                </div>
+
+            <div id="knowledgeCard" class="card">
+                <div class="label">Knowledge (TF‑IDF)</div>
+                <div class="value">Docs: <span id="knowledgeDocs">0</span></div>
+                <div class="label" style="margin-top:.5rem">Vocab: <span id="knowledgeVocab">0</span> • Vectors: <span id="knowledgeVectorCount">0</span></div>
             </div>
-            <div class="bg-white rounded-xl shadow-md p-6 card-hover">
-                <div class="flex items-center justify-between">
-                    <div>
-                        <p class="text-gray-500 text-sm font-medium">In Stock</p>
-                        <p id="inStock" class="text-3xl font-bold text-green-600 mt-2">0</p>
-                    </div>
-                    <div class="bg-green-100 p-4 rounded-full">
-                        <svg class="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                        </svg>
-                    </div>
-                </div>
+
+            <div class="card">
+                <div class="label">Revenue</div>
+                <div id="revenueTotal" class="value" style="color:#059669">NPR 0</div>
             </div>
-            <div class="bg-white rounded-xl shadow-md p-6 card-hover">
-                <div class="flex items-center justify-between">
-                    <div>
-                        <p class="text-gray-500 text-sm font-medium">Total Pages</p>
-                        <p id="totalPages" class="text-3xl font-bold text-purple-600 mt-2">0</p>
-                    </div>
-                    <div class="bg-purple-100 p-4 rounded-full">
-                        <svg class="w-8 h-8 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"/>
-                        </svg>
-                    </div>
-                </div>
+
+            <div class="card">
+                <div class="label">Conversion</div>
+                <div id="conversionRate" class="value" style="color:#7c3aed">0%</div>
             </div>
+
+            <div class="card">
+                <div class="label">Refunds</div>
+                <div id="refundsTotal" class="value" style="color:#ef4444">NPR 0</div>
+            </div>
+
+            <div class="card">
+                <div class="label">Total Pages</div>
+                <div id="totalPages" class="value" style="color:#7c3aed">0</div>
+            </div>
+        </div>
+
+        <!-- Analytics -->
+        <div class="analytics-grid mb-8">
+            <div class="card">
+                <div class="label">Orders (last 7 days)</div>
+                <canvas id="chartOrders" width="600" height="250"></canvas>
+            </div>
+            <div class="card">
+                <div class="label">Products by Category</div>
+                <canvas id="chartProducts" width="300" height="250"></canvas>
+            </div>
+        </div>
+
+        <!-- Recent Orders -->
+        <div class="card">
+            <div class="label">Recent Orders</div>
+            <div style="overflow:auto;margin-top:.5rem">
+                <table style="width:100%;border-collapse:collapse">
+                    <thead>
+                        <tr style="text-align:left;color:var(--muted);font-size:.85rem">
+                            <th style="padding:.5rem .75rem">Order</th>
+                            <th style="padding:.5rem .75rem">Customer</th>
+                            <th style="padding:.5rem .75rem">Total</th>
+                            <th style="padding:.5rem .75rem">Status</th>
+                            <th style="padding:.5rem .75rem">Date</th>
+                        </tr>
+                    </thead>
+                    <tbody id="recentOrdersBody">
+                        <tr><td colspan="5" style="padding:.75rem">Loading...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
             <div class="bg-white rounded-xl shadow-md p-6 card-hover">
                 <div class="flex items-center justify-between">
                     <div>
@@ -4389,5 +4415,8 @@
             });
         });
     </script>
+      </main>
+    </div> <!-- .admin-layout -->
+    </div> <!-- .admin-app -->
 </body>
 </html>

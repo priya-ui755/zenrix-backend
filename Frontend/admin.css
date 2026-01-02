@@ -1,0 +1,31 @@
+/* Scoped admin dashboard styles (safe, non-invasive) */
+:root{--accent:#667eea;--accent-dark:#4f46e5;--muted:#6b7280;--bg:#f7f8fb}
+.admin-app{font-family:Poppins,system-ui,-apple-system,Segoe UI,Roboto,'Helvetica Neue',Arial;}
+.admin-topbar{display:flex;justify-content:space-between;align-items:center;padding:1rem 1.25rem;background:linear-gradient(90deg,var(--accent),var(--accent-dark));color:white}
+.admin-topbar .brand{display:flex;gap:.75rem;align-items:center;font-weight:700}
+.admin-layout{display:grid;grid-template-columns:240px 1fr;gap:1.25rem;padding:1.25rem;margin-top:1rem}
+.admin-main{background:transparent;padding:0}
+.admin-sidebar{background:white;border-radius:12px;padding:1rem;border:1px solid rgba(15,23,42,0.04);height:calc(100vh - 120px);position:sticky;top:20px}
+.admin-sidebar nav a{display:flex;gap:.75rem;align-items:center;padding:.6rem .6rem;border-radius:8px;color:#0f172a;font-weight:600;text-decoration:none}
+.admin-sidebar nav a:hover{background:linear-gradient(90deg, rgba(79,70,229,0.06), rgba(102,126,234,0.06))}
+.admin-main{min-height:80vh}
+.admin-cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:1rem;margin-bottom:1rem}
+.card{background:white;padding:1rem;border-radius:12px;border:1px solid rgba(15,23,42,0.04);box-shadow:0 6px 24px rgba(2,6,23,0.04);min-height:72px}
+.card .label{font-size:.85rem;color:var(--muted);}
+.card .value{font-size:1.6rem;font-weight:700;color:#0f172a;margin-top:.35rem}
+.analytics-grid{display:grid;grid-template-columns:2fr 1fr;gap:1rem}
+.kpi-row{display:flex;gap:1rem;align-items:center}
+@media (max-width:900px){ .admin-layout{grid-template-columns:1fr} .admin-sidebar{position:relative;height:auto;display:flex;flex-direction:row;gap:1rem;padding:0.75rem} .analytics-grid{grid-template-columns:1fr} .admin-sidebar nav{flex-direction:row;gap:.6rem} .admin-sidebar{position:static;width:auto} }
+/* small helpers */
+.kpi-small{display:flex;flex-direction:column}
+.kpi-small .sub{color:var(--muted);font-size:.85rem}
+.kpi-small .num{font-size:1.25rem;font-weight:700}
+/* keep admin css scoped to avoid affecting main site */
+html body:not(.admin) .admin-app{display:none}
+
+/* Sidebar tweaks inside admin page */
+.admin-sidebar{width:220px}
+.admin-sidebar nav{display:flex;flex-direction:column;gap:.35rem;margin-top:.5rem}
+.admin-sidebar nav a{color:var(--muted);}
+.admin-main{padding:1rem}
+
