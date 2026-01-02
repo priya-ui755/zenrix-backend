@@ -54,3 +54,32 @@ html body:not(.admin) .admin-app{display:none}
 .skeleton::after{content:'';display:block;animation:shimmer 1.2s linear infinite;background:linear-gradient(90deg, rgba(255,255,255,0), rgba(255,255,255,0.18), rgba(255,255,255,0)); width:100%; height:100%; position:absolute; left:0; top:0; border-radius:6px}
 @keyframes shimmer{0%{transform:translateX(-100%)}100%{transform:translateX(100%)}}
 
+/* button system */
+.btn{display:inline-flex;align-items:center;gap:.5rem;padding:.5rem .75rem;border-radius:.6rem;border:1px solid rgba(15,23,42,0.06);background:white;color:#0f172a;font-weight:600;cursor:pointer}
+.btn:focus{outline:none;box-shadow:0 0 0 4px rgba(79,70,229,0.06)}
+.btn-primary{background:linear-gradient(90deg,var(--accent),var(--accent-dark));color:white;border:none}
+.btn-ghost{background:transparent;border:1px solid rgba(15,23,42,0.06)}
+
+/* error banner (bottom toast) */
+.error-banner{position:fixed;bottom:22px;left:50%;transform:translateX(-50%);z-index:120;display:flex;justify-content:center;padding:.25rem 1rem;pointer-events:auto}
+.error-banner.hidden{display:none}
+.error-banner.show{opacity:1;transition:transform .18s ease-out,opacity .18s ease-out;transform:translateX(-50%) translateY(0)}
+.error-banner-inner{background:#fff4f4;border:1px solid #fecaca;color:#7f1d1d;padding:.6rem 1rem;border-radius:8px;display:flex;align-items:center;gap:1rem;box-shadow:0 8px 28px rgba(15,23,42,0.08)}
+.trend-up{color:#059669;font-weight:700}
+.trend-down{color:#ef4444;font-weight:700}
+.trend-neutral{color:#6b7280;font-weight:600}
+
+/* logged-out / auth overlay */
+.auth-overlay{padding:2rem}
+.auth-card{max-width:520px}
+.auth-card p{line-height:1.4}
+.auth-card code{background:rgba(0,0,0,0.03);padding:.12rem .35rem;border-radius:4px;font-family:ui-monospace, SFMono-Regular, Menlo, Monaco, 'Roboto Mono', monospace}
+@media (max-width:640px){ .auth-card{padding:1.25rem;margin:0 0.5rem} .auth-card h2{font-size:1.05rem} }
+
+/* auth visual polish */
+.auth-illustration{width:120px;height:120px;border-radius:12px;display:flex;align-items:center;justify-content:center}
+.auth-card{animation:fadeInUp .28s ease-out both}
+@keyframes fadeInUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+.auth-body .btn{min-width:110px}
+.auth-illustration svg{transform:translateY(3px)}
+
