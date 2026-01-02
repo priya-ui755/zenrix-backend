@@ -5,7 +5,8 @@
   "scripts": {
     "start": "node server.js",
     "reindex:knowledge": "node scripts/reindex_knowledge.js",
-    "test:ui": "node scripts/headless_ui_check.js"
+    "test:ui": "node scripts/headless_ui_check.js",
+    "test:a11y": "node scripts/a11y_check.js"
   },
   "keywords": [],
   "author": "",
@@ -30,6 +31,7 @@
     "xlsx": "^0.18.5"
   },
   "devDependencies": {
+    "axe-core": "^4.11.0",
     "puppeteer": "^24.34.0"
   }
 }

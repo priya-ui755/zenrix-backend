@@ -92,6 +92,13 @@
       const productsData = await fetchProductsByCategory();
 
       if (ordersCtx) createChart(ordersCtx,'line',{labels:ordersData.labels,datasets:[{label:'Orders',data:ordersData.data,backgroundColor:'rgba(79,70,229,0.12)',borderColor:'#4f46e5',fill:true,tension:0.3}]}, {scales:{y:{beginAtZero:true}}});
+
+      // small sparkline in AOV area (tiny chart)
+      const aovSparkCtx = document.getElementById('aovSpark')?.getContext('2d');
+      try{
+        const aov = await fetchAOVSpark();
+        if (aovSparkCtx) createChart(aovSparkCtx,'line',{labels:aov.labels,datasets:[{data:aov.data,borderColor:'#7c3aed',borderWidth:1,pointRadius:0,fill:false}]} , {plugins:{legend:{display:false}},scales:{x:{display:false},y:{display:false}}});
+      }catch(e){}
       if (productsCtx) createChart(productsCtx,'doughnut',{labels:productsData.labels,datasets:[{label:'Products by category',data:productsData.data,backgroundColor:['#667eea','#a78bfa','#7dd3fc','#f472b6','#fbbf24']}]});
 
       // revenue chart and payments chart
@@ -131,6 +138,13 @@
 
     // revenue, conversion, refunds
     async function fetchRevenueConversion(){
+      // added Average Order Value computation helper
+      function computeAOV(orders){
+        if (!orders || !orders.length) return 0;
+        const total = orders.reduce((s,o)=>s + (o.total||0),0);
+        return Math.round(total / orders.length);
+      }
+
       try{
         const token = localStorage.getItem('adminToken');
         const headers = token ? { 'Authorization': 'Bearer ' + token } : {};
@@ -166,10 +180,11 @@
           const completed = orders.filter(o=>o.status === 'Completed').length;
           const total = orders.length || 1;
           const refunds = orders.filter(o=>o.status === 'Canceled').reduce((s,o)=>s + (o.total||0), 0);
-          return { revenue: totalRevenue, conversion: Math.round((completed/total)*100), refunds };
+          const aov = computeAOV(orders);
+      return { revenue: totalRevenue, conversion: Math.round((completed/total)*100), refunds, aov };
         }
       }catch(e){}
-      return { revenue: 0, conversion: 0, refunds: 0 };
+      return { revenue: 0, conversion: 0, refunds: 0, aov: 0 };
     }
 
     try{
@@ -177,6 +192,7 @@
       const revEl = document.getElementById('revenueTotal'); if (revEl) revEl.textContent = 'NPR ' + (m.revenue || 0).toLocaleString();
       const convEl = document.getElementById('conversionRate'); if (convEl) convEl.textContent = (m.conversion || 0) + '%';
       const refEl = document.getElementById('refundsTotal'); if (refEl) refEl.textContent = 'NPR ' + (m.refunds || 0).toLocaleString();
+      const aovEl = document.getElementById('aovValue'); if (aovEl) aovEl.textContent = 'NPR ' + (m.aov || 0).toLocaleString();
     }catch(e){/* ignore */}
 
     // ensure admin body class so admin css is active
