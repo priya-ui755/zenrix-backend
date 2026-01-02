@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Support | Zenrix</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="script.js" defer></script>
+</head>
+<body class="bg-slate-950 text-slate-100" style="font-family: 'Space Grotesk', 'Poppins', sans-serif;">
+    <custom-navbar></custom-navbar>
+
+    <main class="px-4 py-12">
+        <section class="max-w-6xl mx-auto">
+            <div class="bg-gradient-to-br from-slate-900 via-slate-950 to-[#071521] rounded-3xl border border-white/10 p-8 shadow-2xl mb-8">
+                <h1 class="text-3xl font-bold text-white mb-2">Support Center</h1>
+                <p class="text-slate-300">Get help with your orders, products, or account</p>
+            </div>
+
+            <div id="authNotice" class="bg-yellow-500/10 border border-yellow-500/30 rounded-2xl p-6 mb-8 hidden">
+                <p class="text-yellow-400">Please <a href="login.html" class="underline hover:text-yellow-300">login</a> to create and view support tickets.</p>
+            </div>
+
+            <div id="ticketsSection">
+                <!-- Create New Ticket -->
+                <div class="bg-slate-900/70 border border-white/8 rounded-3xl p-8 shadow-xl mb-8">
+                    <h2 class="text-2xl font-semibold mb-6 text-white">Create New Ticket</h2>
+                    <form id="createTicketForm" class="space-y-4">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-slate-300 mb-2">Subject *</label>
+                                <input type="text" name="subject" required maxlength="200" 
+                                    class="w-full px-4 py-3 rounded-lg border border-white/10 bg-slate-800 text-white focus:ring-2 focus:ring-emerald-500 focus:border-transparent">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-slate-300 mb-2">Category *</label>
+                                <select name="category" required
+                                    class="w-full px-4 py-3 rounded-lg border border-white/10 bg-slate-800 text-white focus:ring-2 focus:ring-emerald-500 focus:border-transparent">
+                                    <option value="order">Order Issue</option>
+                                    <option value="product">Product Question</option>
+                                    <option value="payment">Payment Issue</option>
+                                    <option value="technical">Technical Problem</option>
+                                    <option value="other">Other</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-slate-300 mb-2">Priority</label>
+                            <select name="priority"
+                                class="w-full px-4 py-3 rounded-lg border border-white/10 bg-slate-800 text-white focus:ring-2 focus:ring-emerald-500 focus:border-transparent">
+                                <option value="low">Low</option>
+                                <option value="medium" selected>Medium</option>
+                                <option value="high">High</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-slate-300 mb-2">Description *</label>
+                            <textarea name="description" required rows="5" maxlength="2000"
+                                class="w-full px-4 py-3 rounded-lg border border-white/10 bg-slate-800 text-white focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+                                placeholder="Describe your issue in detail..."></textarea>
+                        </div>
+                        <button type="submit" 
+                            class="w-full md:w-auto px-6 py-3 bg-gradient-to-r from-emerald-500 to-cyan-500 text-white rounded-lg font-semibold shadow-lg shadow-emerald-500/30 transition hover:scale-[1.02]">
+                            Submit Ticket
+                        </button>
+                    </form>
+                </div>
+
+                <!-- My Tickets -->
+                <div class="bg-slate-900/70 border border-white/8 rounded-3xl p-8 shadow-xl">
+                    <div class="flex items-center justify-between mb-6">
+                        <h2 class="text-2xl font-semibold text-white">My Tickets</h2>
+                        <button id="refreshTickets" 
+                            class="px-4 py-2 bg-slate-800 text-white rounded-lg border border-white/10 hover:bg-slate-700 transition">
+                            Refresh
+                        </button>
+                    </div>
+                    <div id="ticketsList" class="space-y-4"></div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Ticket Details Modal -->
+    <div id="ticketModal" class="fixed inset-0 bg-black/80 modal-backdrop hidden flex items-center justify-center z-50 p-4">
+        <div class="bg-slate-900 rounded-2xl shadow-2xl w-full max-w-3xl max-h-[90vh] overflow-y-auto border border-white/10">
+            <div class="sticky top-0 bg-slate-900 border-b border-white/10 p-6 flex items-center justify-between">
+                <div>
+                    <p class="text-xs uppercase tracking-wider text-slate-400">Support Ticket</p>
+                    <h2 class="text-2xl font-bold text-white" id="modalTicketTitle">#0000</h2>
+                </div>
+                <button id="closeTicketModal" class="text-slate-400 hover:text-white text-2xl leading-none">&times;</button>
+            </div>
+            <div id="ticketModalBody" class="p-6 space-y-6"></div>
+        </div>
+    </div>
+
+    <custom-footer></custom-footer>
+    <script src="components/navbar.js"></script>
+    <script src="components/footer.js"></script>
+
+    <script>
+
+
+        // Check if user is logged in
+        function checkAuth() {
+            const token = localStorage.getItem('userToken');
+            if (!token) {
+                document.getElementById('authNotice').classList.remove('hidden');
+                document.getElementById('ticketsSection').classList.add('hidden');
+                return false;
+            }
+            return true;
+        }
+
+        // Create ticket
+        document.getElementById('createTicketForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            if (!checkAuth()) {
+                alert('Please login to create a ticket');
+                return;
+            }
+
+            const token = localStorage.getItem('userToken');
+            const formData = new FormData(e.target);
+
+            // Frontend validation for required fields
+            const subject = formData.get('subject')?.trim();
+            const description = formData.get('description')?.trim();
+            const category = formData.get('category');
+            const priority = formData.get('priority');
+
+            if (!subject) {
+                alert('Please enter a subject.');
+                return;
+            }
+            if (!description) {
+                alert('Please enter a description.');
+                return;
+            }
+
+            const data = {
+                subject,
+                description,
+                category,
+                priority
+            };
+
+            try {
+                console.log('Submitting ticket data:', data);
+                const res = await fetch(`${API_URL}/tickets`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify(data)
+                });
+
+                const result = await res.json();
+                console.log('Backend response:', result);
+                if (result.success) {
+                    alert('✅ Ticket created successfully!');
+                    e.target.reset();
+                    loadMyTickets();
+                } else {
+                    alert('❌ Failed: ' + (result.error || 'Unknown error'));
+                }
+            } catch (err) {
+                alert('❌ Network error: ' + err.message);
+            }
+        });
+
+        // Load user's tickets
+        async function loadMyTickets() {
+            if (!checkAuth()) return;
+
+            const token = localStorage.getItem('userToken');
+            try {
+                const res = await fetch(`${API_URL}/tickets/my-tickets`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const data = await res.json();
+
+                if (data.success) {
+                    renderTicketsList(data.data);
+                } else {
+                    document.getElementById('ticketsList').innerHTML = 
+                        '<div class="text-center text-slate-400 py-8">Failed to load tickets</div>';
+                }
+            } catch (err) {
+                document.getElementById('ticketsList').innerHTML = 
+                    '<div class="text-center text-slate-400 py-8">Error loading tickets</div>';
+            }
+        }
+
+        function renderTicketsList(tickets) {
+            const container = document.getElementById('ticketsList');
+            if (!tickets || tickets.length === 0) {
+                container.innerHTML = '<div class="text-center text-slate-400 py-8">No tickets yet. Create one above to get help!</div>';
+                return;
+            }
+
+            const statusColors = {
+                'open': 'bg-blue-500/20 text-blue-400 border-blue-500/30',
+                'in-progress': 'bg-yellow-500/20 text-yellow-400 border-yellow-500/30',
+                'solved': 'bg-green-500/20 text-green-400 border-green-500/30',
+                'closed': 'bg-slate-500/20 text-slate-400 border-slate-500/30'
+            };
+
+            container.innerHTML = tickets.map(ticket => {
+                const messageCount = ticket.messages?.length || 0;
+                const lastMessage = ticket.messages?.[messageCount - 1];
+                const hasAdminReply = lastMessage?.sender === 'admin';
+
+                return `
+                <div class="bg-slate-800/50 border border-white/10 rounded-xl p-6 hover:bg-slate-800 transition cursor-pointer" onclick="openTicketModal('${ticket._id}')">
+                    <div class="flex items-start justify-between mb-3">
+                        <div class="flex-1">
+                            <div class="flex items-center gap-2 mb-2">
+                                <span class="text-xs font-semibold text-slate-400">#${ticket._id.slice(-6).toUpperCase()}</span>
+                                <span class="px-2 py-1 text-xs font-semibold rounded-full border ${statusColors[ticket.status] || 'bg-slate-500/20 text-slate-400'}">${ticket.status}</span>
+                                ${hasAdminReply ? '<span class="text-xs text-emerald-400">✉️ New Reply</span>' : ''}
+                            </div>
+                            <h3 class="text-lg font-semibold text-white mb-1">${ticket.subject}</h3>
+                            <p class="text-sm text-slate-400 mb-2">${ticket.description.slice(0, 120)}${ticket.description.length > 120 ? '...' : ''}</p>
+                            <div class="flex items-center gap-4 text-xs text-slate-500">
+                                <span>💬 ${messageCount} messages</span>
+                                <span>🏷️ ${ticket.category}</span>
+                                <span>${new Date(ticket.createdAt).toLocaleDateString()}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                `;
+            }).join('');
+        }
+
+        // Open ticket details modal
+        async function openTicketModal(ticketId) {
+            const token = localStorage.getItem('userToken');
+            try {
+                const res = await fetch(`${API_URL}/tickets/${ticketId}`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const data = await res.json();
+
+                if (data.success) {
+                    showTicketDetails(data.data);
+                } else {
+                    alert('Failed to load ticket details');
+                }
+            } catch (err) {
+                alert('Error loading ticket: ' + err.message);
+            }
+        }
+
+        function showTicketDetails(ticket) {
+            const modal = document.getElementById('ticketModal');
+            const title = document.getElementById('modalTicketTitle');
+            const body = document.getElementById('ticketModalBody');
+
+            title.textContent = `#${ticket._id.slice(-6).toUpperCase()} - ${ticket.subject}`;
+
+            const statusColors = {
+                'open': 'bg-blue-500/20 text-blue-400 border-blue-500/30',
+                'in-progress': 'bg-yellow-500/20 text-yellow-400 border-yellow-500/30',
+                'solved': 'bg-green-500/20 text-green-400 border-green-500/30',
+                'closed': 'bg-slate-500/20 text-slate-400 border-slate-500/30'
+            };
+
+            const messagesHtml = (ticket.messages || []).map(msg => {
+                const isAdmin = msg.sender === 'admin';
+                return `
+                <div class="${isAdmin ? 'bg-blue-500/10 border-l-4 border-blue-500' : 'bg-slate-800/50 border-l-4 border-slate-600'} p-4 rounded-lg">
+                    <div class="flex items-center gap-2 mb-2">
+                        <span class="text-sm font-semibold ${isAdmin ? 'text-blue-400' : 'text-slate-300'}">${msg.senderName || (isAdmin ? 'Support Team' : 'You')}</span>
+                        <span class="text-xs text-slate-500">${new Date(msg.timestamp).toLocaleString()}</span>
+                    </div>
+                    <p class="text-sm text-slate-200 whitespace-pre-wrap">${msg.message}</p>
+                </div>
+                `;
+            }).join('');
+
+            body.innerHTML = `
+                <div class="bg-slate-800/50 rounded-xl border border-white/10 p-4 space-y-3">
+                    <div class="flex items-center justify-between">
+                        <span class="px-3 py-1 text-sm font-semibold rounded-full border ${statusColors[ticket.status]}">${ticket.status}</span>
+                        <div class="text-xs text-slate-400">
+                            <span>Category: ${ticket.category}</span> • 
+                            <span>Priority: ${ticket.priority}</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="space-y-3">
+                    <p class="text-xs uppercase tracking-wider text-slate-400">Messages</p>
+                    ${messagesHtml}
+                </div>
+
+                ${ticket.status !== 'solved' && ticket.status !== 'closed' ? `
+                <div class="bg-slate-800/50 rounded-xl border border-white/10 p-4">
+                    <p class="text-xs uppercase tracking-wider text-slate-400 mb-3">Add Reply</p>
+                    <textarea id="replyMessage" rows="3" 
+                        class="w-full px-4 py-3 rounded-lg border border-white/10 bg-slate-900 text-white focus:ring-2 focus:ring-emerald-500 focus:border-transparent mb-3"
+                        placeholder="Type your message..."></textarea>
+                    <div class="flex items-center gap-3">
+                        <button id="sendReplyBtn" onclick="sendReply('${ticket._id}')" 
+                            class="px-4 py-2 bg-gradient-to-r from-emerald-500 to-cyan-500 text-white rounded-lg font-semibold hover:scale-[1.02] transition">
+                            Send Reply
+                        </button>
+                        ${(() => {
+                            try {
+                                const currentUser = JSON.parse(localStorage.getItem('userData') || 'null');
+                                const isOwner = currentUser && ticket.user && ((ticket.user._id && ticket.user._id === currentUser._id) || (ticket.user === currentUser._id));
+                                return isOwner ? `<button id="markSolvedBtn" onclick="markTicketSolved('${ticket._id}')" class="px-4 py-2 bg-emerald-600 text-white rounded-lg font-semibold hover:scale-[1.02] transition">Mark as Solved</button>` : '';
+                            } catch (e) { return ''; }
+                        })()}
+                    </div>
+                </div>
+                ` : '<div class="text-center text-slate-400 text-sm py-4 bg-slate-800/50 rounded-xl">This ticket has been closed.</div>'}
+            `;
+
+            modal.classList.remove('hidden');
+        }
+
+        async function sendReply(ticketId) {
+            const token = localStorage.getItem('userToken');
+            const message = document.getElementById('replyMessage')?.value?.trim();
+            
+            if (!message) {
+                alert('Please enter a message');
+                return;
+            }
+
+            try {
+                const res = await fetch(`${API_URL}/tickets/${ticketId}/reply`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify({ message })
+                });
+
+                const data = await res.json();
+                if (data.success) {
+                    alert('✅ Reply sent successfully!');
+                    closeTicketModal();
+                    loadMyTickets();
+                } else {
+                    alert('❌ Failed: ' + (data.error || 'Unknown error'));
+                }
+            } catch (err) {
+                alert('❌ Network error: ' + err.message);
+            }
+        }
+
+        async function markTicketSolved(ticketId) {
+            const token = localStorage.getItem('userToken');
+            if (!confirm('Mark this ticket as solved?')) return;
+            try {
+                const res = await fetch(`${API_URL}/tickets/${ticketId}/status`, {
+                    method: 'PATCH',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify({ status: 'solved' })
+                });
+                const data = await res.json();
+                if (data.success) {
+                    alert('✅ Ticket marked as solved');
+                    closeTicketModal();
+                    loadMyTickets();
+                } else {
+                    alert('❌ Failed: ' + (data.error || 'Unknown error'));
+                }
+            } catch (err) {
+                alert('❌ Network error: ' + err.message);
+            }
+        }
+
+        function closeTicketModal() {
+            document.getElementById('ticketModal').classList.add('hidden');
+        }
+
+        window.openTicketModal = openTicketModal;
+        window.sendReply = sendReply;
+
+        // Event listeners
+        document.getElementById('closeTicketModal').addEventListener('click', closeTicketModal);
+        document.getElementById('ticketModal').addEventListener('click', (e) => {
+            if (e.target.id === 'ticketModal') closeTicketModal();
+        });
+        document.getElementById('refreshTickets').addEventListener('click', loadMyTickets);
+
+        // Load tickets on page load
+        if (checkAuth()) {
+            loadMyTickets();
+        }
+    </script>
+</body>
+</html>

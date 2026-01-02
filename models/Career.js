@@ -1,3 +1,5 @@
+const mongoose = require('mongoose');
+
 // Models for Careers
 const careerSchema = new mongoose.Schema({
   title: {
@@ -26,13 +28,13 @@ const careerSchema = new mongoose.Schema({
   salary: {
     min: Number,
     max: Number,
-    currency: { type: String, default: 'USD' }
+    currency: { type: String, default: 'NPR' }
   },
   requirements: [String],
   benefits: [String],
   published: {
     type: Boolean,
-    default: false
+    default: true
   },
   createdAt: {
     type: Date,
@@ -64,3 +66,5 @@ const applicationSchema = new mongoose.Schema({
     default: Date.now
   }
 });
+
+module.exports = mongoose.model('Career', careerSchema);

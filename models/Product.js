@@ -38,6 +38,21 @@ const productSchema = new mongoose.Schema({
     type: Boolean,
     default: false
   },
+  onSale: {
+    type: Boolean,
+    default: false
+  },
+  salePrice: {
+    type: Number,
+    min: [0, 'Sale price must be positive']
+  },
+  saleLabel: {
+    type: String,
+    default: 'On Sale'
+  },
+  saleEnd: {
+    type: Date
+  },
   rating: {
     type: Number,
     default: 4.5,

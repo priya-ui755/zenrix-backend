@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const User = require('../models/User');
 const Order = require('../models/Order');
+const Product = require('../models/Product');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const path = require('path');
@@ -25,6 +26,28 @@ const upload = multer({
   limits: { fileSize: 2 * 1024 * 1024 }, // 2MB
   fileFilter: (_req, file, cb) => {
     if (!file.mimetype.startsWith('image/')) {
+      return cb(new Error('Only image uploads are allowed'));
+    }
+    cb(null, true);
+  }
+});
+
+const paymentProofsDir = path.join(__dirname, '..', 'uploads', 'payment-proofs');
+fs.mkdirSync(paymentProofsDir, { recursive: true });
+const proofStorage = multer.diskStorage({
+  destination: (_req, _file, cb) => cb(null, paymentProofsDir),
+  filename: (_req, file, cb) => {
+    const parsed = path.parse(file.originalname || 'proof');
+    const extension = (parsed.ext || '.png').toLowerCase();
+    const safeBase = (parsed.name || 'proof').replace(/[^a-zA-Z0-9\-_]/g, '_');
+    cb(null, `${Date.now()}-${safeBase}${extension}`);
+  }
+});
+const proofUpload = multer({
+  storage: proofStorage,
+  limits: { fileSize: 2 * 1024 * 1024 },
+  fileFilter: (_req, file, cb) => {
+    if (!file.mimetype || !file.mimetype.startsWith('image/')) {
       return cb(new Error('Only image uploads are allowed'));
     }
     cb(null, true);
@@ -385,36 +408,116 @@ router.get('/orders', authenticateUser, async (req, res) => {
   }
 });
 
-// Checkout: create order from cart and clear cart
+// Checkout: accept local cart payload, capture shipping + payment metadata
 router.post('/orders/checkout', authenticateUser, async (req, res) => {
   try {
-    const user = await User.findById(req.userId).populate('cart.product');
-    if (!user) return res.status(404).json({ success: false, error: 'User not found' });
-    if (!user.cart || user.cart.length === 0) {
+    const { cartItems = [], shipping = {}, payment = {} } = req.body;
+
+    if (!Array.isArray(cartItems) || cartItems.length === 0) {
       return res.status(400).json({ success: false, error: 'Cart is empty' });
     }
 
-    const items = user.cart.map(item => {
-      const price = item.product?.price || 0;
+    const user = await User.findById(req.userId);
+    if (!user) {
+      return res.status(404).json({ success: false, error: 'User not found' });
+    }
+
+    const requiredShipping = ['fullName', 'phone', 'address1', 'city'];
+    const missingFields = requiredShipping.filter(key => !shipping[key]);
+    if (missingFields.length) {
+      return res.status(400).json({ success: false, error: `Missing shipping fields: ${missingFields.join(', ')}` });
+    }
+
+    const method = (payment.method || 'cod').toLowerCase();
+    const allowedMethods = ['cod', 'bank-transfer', 'esewa', 'khalti', 'imepay'];
+    if (!allowedMethods.includes(method)) {
+      return res.status(400).json({ success: false, error: 'Invalid payment method' });
+    }
+
+    const productIds = [...new Set(
+      cartItems
+        .map(item => item.productId)
+        .filter(Boolean)
+    )];
+    if (productIds.length === 0) {
+      return res.status(400).json({ success: false, error: 'Missing product references' });
+    }
+
+    const products = await Product.find({ _id: { $in: productIds } });
+    const productMap = new Map(products.map(p => [p._id.toString(), p]));
+
+    const items = cartItems.map(item => {
+      const product = productMap.get(item.productId);
+      if (!product) {
+        throw new Error('One or more products are no longer available. Refresh your cart and try again.');
+      }
+      const quantity = Math.max(1, Number(item.quantity) || 1);
       return {
-        product: item.product?._id,
-        name: item.product?.name || 'Item',
-        price,
-        quantity: item.quantity
+        product: product._id,
+        name: product.name,
+        price: product.price,
+        quantity,
+        variant: {
+          color: item.color || '',
+          size: item.size || '',
+          notes: item.variantNotes || ''
+        }
       };
     });
-    const total = items.reduce((sum, i) => sum + i.price * i.quantity, 0);
 
-    const order = new Order({ user: req.userId, items, total, status: 'Pending' });
-    await order.save();
+    const total = items.reduce((sum, orderItem) => sum + orderItem.price * orderItem.quantity, 0);
+    if (total <= 0) {
+      return res.status(400).json({ success: false, error: 'Unable to calculate total. Please refresh and try again.' });
+    }
 
-    user.cart = [];
-    await user.save();
+    const paymentStatus = method === 'cod'
+      ? 'pending'
+      : (payment.referenceId || payment.proofUrl ? 'submitted' : 'pending');
+
+    const order = await Order.create({
+      user: req.userId,
+      items,
+      total,
+      shipping: {
+        fullName: shipping.fullName,
+        phone: shipping.phone,
+        email: shipping.email || '',
+        address1: shipping.address1,
+        address2: shipping.address2 || '',
+        city: shipping.city,
+        province: shipping.province || '',
+        postalCode: shipping.postalCode || '',
+        notes: shipping.notes || ''
+      },
+      payment: {
+        method,
+        status: paymentStatus,
+        referenceId: payment.referenceId || '',
+        proofUrl: payment.proofUrl || '',
+        instructionsAck: Boolean(payment.instructionsAck)
+      },
+      status: 'Pending'
+    });
+
+    await User.findByIdAndUpdate(req.userId, { cart: [] });
 
     res.json({ success: true, data: order });
   } catch (err) {
     res.status(500).json({ success: false, error: err.message });
   }
+});
+
+router.post('/orders/upload-proof', authenticateUser, (req, res) => {
+  proofUpload.single('proof')(req, res, err => {
+    if (err) {
+      return res.status(400).json({ success: false, error: err.message });
+    }
+    if (!req.file) {
+      return res.status(400).json({ success: false, error: 'No file uploaded' });
+    }
+    const relativePath = path.join('uploads', 'payment-proofs', req.file.filename).replace(/\\/g, '/');
+    res.json({ success: true, url: `/${relativePath}` });
+  });
 });
 
 // Cart summary

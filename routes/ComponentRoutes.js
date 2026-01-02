@@ -18,18 +18,22 @@ router.get('/slug/:slug', async (req, res) => {
   try {
     const comp = await Component.findOne({ slug: req.params.slug });
     if (!comp) return res.status(404).json({ success: false, error: 'Component not found' });
-    res.json({ success: true, data: comp });
-  } catch (err) {
-    res.status(500).json({ success: false, error: err.message });
-  }
-});
-
-// GET by id
-router.get('/:id', async (req, res) => {
-  try {
-    const comp = await Component.findById(req.params.id);
-    if (!comp) return res.status(404).json({ success: false, error: 'Component not found' });
-    res.json({ success: true, data: comp });
+    // Robust sanitization: remove anchors that link to /about.html specifically
+    // when they appear inside the element with id="aboutDropdown".
+    try {
+      const safe = comp.toObject();
+      if (safe.html && typeof safe.html === 'string') {
+        safe.html = safe.html.replace(/(<div[^>]*id=["']aboutDropdown["'][^>]*>)([\s\S]*?)(<\/div>)/i,
+          (m, open, inner, close) => {
+            const cleanedInner = inner.replace(/<a[^>]*href=(['"])\/about.html\1[^>]*>.*?<\/a>\s*/ig, '');
+            return open + cleanedInner + close;
+          }
+        );
+      }
+      return res.json({ success: true, data: safe });
+    } catch (e) {
+      return res.json({ success: true, data: comp });
+    }
   } catch (err) {
     res.status(500).json({ success: false, error: err.message });
   }

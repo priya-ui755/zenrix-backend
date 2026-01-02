@@ -56,6 +56,7 @@ const userSchema = new mongoose.Schema({
     },
     fullName: String,
     phone: String,
+    landline: String,
     addressLine1: String,
     addressLine2: String,
     city: String,

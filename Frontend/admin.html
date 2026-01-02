@@ -3,6 +3,7 @@
 <head>
     <title>Zenrix Admin</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="icon" href="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><text y='28' font-size='28' font-family='Poppins' fill='%236674ee'>Z</text></svg>">
 </head>
 <body class="p-4">
     <h1 class="text-2xl font-bold mb-6">Zenrix Admin</h1>
@@ -20,7 +21,8 @@
     <div id="productList">Loading...</div>
     
     <script>
-        const API = 'http://localhost:3000/api';
+        // Support overriding API during tests via window.__API__ (keeps same-origin in headless tests)
+        const API = (window.__API__ && window.__API__) ? window.__API__ : 'http://localhost:3000/api';
         
         // Load products
         async function loadProducts() {

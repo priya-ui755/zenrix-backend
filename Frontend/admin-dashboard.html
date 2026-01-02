@@ -6,6 +6,8 @@
     <title>Zenrix Admin Dashboard</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
+    <!-- favicon to avoid 404 and small site id -->
+    <link rel="icon" href="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><text y='28' font-size='28' font-family='Poppins' fill='%236674ee'>Z</text></svg>">
     <style>
         @keyframes slideIn {
             from { transform: translateY(-10px); opacity: 0; }
@@ -17,6 +19,34 @@
         .card-hover { transition: all 0.3s; }
         .card-hover:hover { transform: translateY(-2px); box-shadow: 0 10px 25px rgba(0,0,0,0.1); }
         .image-preview { max-width: 100px; max-height: 100px; object-fit: cover; }
+        [data-toggle-slider] {
+            position: relative;
+            cursor: pointer;
+            padding: 0.1rem;
+            transition: background-color 0.2s ease, opacity 0.2s ease;
+            background-color: rgba(148, 163, 184, 0.6);
+        }
+        [data-toggle-slider] > span {
+            display: block;
+            transition: transform 0.2s ease;
+            transform: translateX(0);
+        }
+        [data-toggle-slider].is-active > span {
+            transform: translateX(1.1rem);
+        }
+        [data-toggle-slider].accent-indigo { background-color: rgba(99, 102, 241, 0.35); }
+        [data-toggle-slider].accent-indigo.is-active { background-color: #4f46e5; }
+        [data-toggle-slider].accent-emerald { background-color: rgba(16, 185, 129, 0.35); }
+        [data-toggle-slider].accent-emerald.is-active { background-color: #10b981; }
+        [data-toggle-slider].accent-fuchsia { background-color: rgba(217, 70, 239, 0.35); }
+        [data-toggle-slider].accent-fuchsia.is-active { background-color: #c026d3; }
+        [data-toggle-slider].accent-amber { background-color: rgba(245, 158, 11, 0.35); }
+        [data-toggle-slider].accent-amber.is-active { background-color: #d97706; }
+        [data-toggle-slider].is-active { opacity: 1; }
+        [data-toggle-slider]:not(.is-active) { opacity: 0.55; }
+        .field-disabled {
+            opacity: 0.5;
+        }
     </style>
 </head>
 <body class="bg-gray-50 min-h-screen">
@@ -31,6 +61,11 @@
                     <div>
                         <h1 class="text-2xl font-bold">Zenrix</h1>
                         <p class="text-xs opacity-90">Admin Dashboard</p>
+                            <div class="flex items-center gap-3 mt-3">
+                                <input type="file" id="uploadHeroBgInput" accept="image/*" class="hidden">
+                                <button type="button" id="uploadHeroBgBtn" class="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition">Upload Image</button>
+                                <span id="uploadHeroBgStatus" class="text-xs text-gray-500"></span>
+                            </div>
                     </div>
                 </div>
                 <div class="flex items-center space-x-4">
@@ -43,7 +78,56 @@
     </div>
 
     <!-- Main Content -->
-    <div class="container mx-auto px-6 py-8">
+    <div id="authOverlay" class="fixed inset-0 bg-white z-50 hidden">
+        <div class="w-full h-full flex flex-col items-center justify-center space-y-4 text-center px-6">
+            <div class="w-12 h-12 rounded-full border-4 border-gray-200 border-t-blue-600 animate-spin"></div>
+            <div>
+                <p class="text-2xl font-semibold text-gray-800">Admin login required</p>
+                <p class="text-gray-500 mt-1">Please sign in to access the dashboard.</p>
+            </div>
+            <button id="authOverlayLogin" class="px-5 py-3 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-700 transition">
+                Login to Continue
+            </button>
+        </div>
+    </div>
+    <div id="adminContent" class="container mx-auto px-6 py-8 hidden">
+        <!-- Quick shortcuts / sticky toolbar -->
+        <div class="sticky top-2 z-30 mb-6">
+            <div class="bg-white/80 backdrop-blur border border-gray-200 rounded-2xl shadow-sm px-4 py-3 flex flex-wrap items-center gap-3">
+                <div class="flex items-center gap-2 text-xs font-semibold uppercase tracking-wide text-gray-500">
+                    <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    Dashboard shortcuts
+                </div>
+                <div class="flex flex-wrap items-center gap-2">
+                    <button id="refreshAllBtn" class="inline-flex items-center gap-2 px-3 py-2 rounded-xl bg-slate-900 text-white text-sm font-semibold hover:bg-black transition">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9M20 20v-5h-.581m-15.357-2a8.003 8.003 0 0015.357 2" />
+                        </svg>
+                        Refresh data
+                    </button>
+                    <button data-jump-tab="orders" class="inline-flex items-center gap-2 px-3 py-2 rounded-xl border border-gray-200 text-sm font-semibold text-gray-700 hover:border-gray-300 hover:bg-gray-50 transition">Orders</button>
+                    <button data-jump-tab="payments" class="inline-flex items-center gap-2 px-3 py-2 rounded-xl border border-gray-200 text-sm font-semibold text-gray-700 hover:border-gray-300 hover:bg-gray-50 transition">Payments</button>
+                    <button data-jump-tab="products" class="inline-flex items-center gap-2 px-3 py-2 rounded-xl border border-gray-200 text-sm font-semibold text-gray-700 hover:border-gray-300 hover:bg-gray-50 transition">Products</button>
+                    <button data-jump-tab="subscribers" class="inline-flex items-center gap-2 px-3 py-2 rounded-xl border border-gray-200 text-sm font-semibold text-gray-700 hover:border-gray-300 hover:bg-gray-50 transition">Subscribers</button>
+                    <button id="scrollTopBtn" class="inline-flex items-center gap-2 px-3 py-2 rounded-xl border border-gray-200 text-sm font-semibold text-gray-700 hover:border-gray-300 hover:bg-gray-50 transition">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7" />
+                        </svg>
+                        Top
+                    </button>
+                    <a href="/index.html" target="_blank" rel="noopener" class="inline-flex items-center gap-2 px-3 py-2 rounded-xl bg-blue-50 text-blue-700 text-sm font-semibold hover:bg-blue-100 transition">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4" />
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 4h6m0 0v6m0-6L10 14" />
+                        </svg>
+                        View store
+                    </a>
+                </div>
+            </div>
+        </div>
+
         <!-- Stats Cards -->
         <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
             <div class="bg-white rounded-xl shadow-md p-6 card-hover">
@@ -57,6 +141,33 @@
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>
                         </svg>
                     </div>
+                </div>
+            </div>
+            
+            <!-- Knowledge Card -->
+            <div id="knowledgeCard" class="bg-white rounded-xl shadow-md p-6 card-hover">
+                <div class="flex items-start justify-between">
+                    <div>
+                        <p class="text-gray-500 text-sm font-medium">Knowledge (TF‑IDF)</p>
+                        <p class="text-2xl font-bold text-gray-800 mt-2">Docs: <span id="knowledgeDocs">0</span></p>
+                        <p class="text-sm text-gray-500 mt-1">Vocab: <span id="knowledgeVocab">0</span> • Vectors: <span id="knowledgeVectorCount">0</span></p>
+                        <p class="text-xs text-gray-500 mt-2">HF: <span id="knowledgeHF">Unknown</span></p>
+                    </div>
+                    <div class="flex flex-col items-end gap-2">
+                        <button id="knowledgeRefreshBtn" class="px-3 py-2 rounded-lg bg-gray-100 text-gray-700 text-sm hover:bg-gray-200">Refresh</button>
+                        <button id="knowledgeReindexBtn" class="px-3 py-2 rounded-lg bg-blue-600 text-white text-sm hover:bg-blue-700">Reindex</button>
+                        <button id="knowledgeClearVectorsBtn" class="px-3 py-2 rounded-lg bg-rose-600 text-white text-sm hover:bg-rose-700">Clear Vectors</button>
+                    </div>
+                </div>
+                <div id="knowledgeProgress" class="mt-4 hidden">
+                    <div class="w-full bg-gray-100 rounded-full h-3 overflow-hidden">
+                        <div id="knowledgeProgressBar" class="bg-blue-600 h-3 w-0" style="transition: width 0.3s;"></div>
+                    </div>
+                    <div class="mt-2 text-xs text-gray-500">Status: <span id="knowledgeProgressText">Idle</span></div>
+                    <div class="mt-3 text-xs text-gray-500">
+                        <button id="knowledgeViewLogsBtn" class="px-2 py-1 bg-white border border-gray-200 rounded text-xs">View Logs</button>
+                    </div>
+                    <div id="knowledgeLogs" class="mt-3 max-h-48 overflow-auto text-xs bg-white border border-gray-100 p-3 rounded hidden"></div>
                 </div>
             </div>
             <div class="bg-white rounded-xl shadow-md p-6 card-hover">
@@ -116,11 +227,20 @@
                     <button data-tab="hero" id="tab-hero" class="py-4 px-2 border-b-2 border-transparent text-gray-500 hover:text-gray-700 font-medium whitespace-nowrap">
                         Hero Settings
                     </button>
+                    <button data-tab="payments" id="tab-payments" class="py-4 px-2 border-b-2 border-transparent text-gray-500 hover:text-gray-700 font-medium whitespace-nowrap">
+                        Payments
+                    </button>
+                    <button data-tab="orders" id="tab-orders" class="py-4 px-2 border-b-2 border-transparent text-gray-500 hover:text-gray-700 font-medium whitespace-nowrap">
+                        Orders
+                    </button>
                     <button data-tab="careers" id="tab-careers" class="py-4 px-2 border-b-2 border-transparent text-gray-500 hover:text-gray-700 font-medium whitespace-nowrap">
                         Careers
                     </button>
                     <button data-tab="subscribers" id="tab-subscribers" class="py-4 px-2 border-b-2 border-transparent text-gray-500 hover:text-gray-700 font-medium whitespace-nowrap">
                         Subscribers
+                    </button>
+                    <button data-tab="tickets" id="tab-tickets" class="py-4 px-2 border-b-2 border-transparent text-gray-500 hover:text-gray-700 font-medium whitespace-nowrap">
+                        Support Tickets
                     </button>
                 </div>
             </div>
@@ -136,8 +256,17 @@
                                 <input type="text" name="name" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
                             </div>
                             <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-2">Price ($) *</label>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Price (रु) *</label>
                                 <input type="number" step="0.01" name="price" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                            </div>
+                            <div class="grid grid-cols-1 gap-2 bg-white p-3 rounded-lg border border-gray-200">
+                                <label class="flex items-center space-x-2">
+                                    <input type="checkbox" name="onSale" class="w-4 h-4 text-emerald-600 rounded focus:ring-2 focus:ring-emerald-500">
+                                    <span class="text-sm font-medium text-gray-700">Mark as On Sale</span>
+                                </label>
+                                <input type="number" step="0.01" name="salePrice" placeholder="Sale price" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent">
+                                <input type="datetime-local" name="saleEnd" placeholder="Sale ends at" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent">
+                                <input type="text" name="saleLabel" placeholder="Sale badge (e.g. Limited Offer)" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent">
                             </div>
                         </div>
                         <div>
@@ -243,7 +372,10 @@
                 <div class="mt-8">
                     <div class="flex items-center justify-between mb-4">
                         <h2 class="text-xl font-bold text-gray-800">All Pages</h2>
-                        <span id="pagesCount" class="text-sm text-gray-500">0 pages</span>
+                        <div class="flex items-center space-x-2">
+                            <button id="saveOrderBtn" data-action="saveOrder" class="px-3 py-2 bg-yellow-500 text-white rounded-lg hover:bg-yellow-600 transition text-sm font-medium">Save Order</button>
+                            <span id="pagesCount" class="text-sm text-gray-500">0 pages</span>
+                        </div>
                     </div>
                     <div id="pagesList" class="grid grid-cols-1 lg:grid-cols-2 gap-4"></div>
                 </div>
@@ -332,6 +464,11 @@
                             <input type="url" name="backgroundImage" required placeholder="https://images.unsplash.com/photo-..." class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
                             <p class="text-xs text-gray-500 mt-1">Recommended: 1920x1080px or larger</p>
                         </div>
+                            <div class="bg-white p-4 rounded-lg border border-gray-200">
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Hero Badge Text</label>
+                                <input type="text" name="badgeText" placeholder="Zenrix Spotlight • Weekend" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                                <p class="text-xs text-gray-500 mt-1">Appears above the hero headline.</p>
+                            </div>
                         
                         <div class="bg-white p-4 rounded-lg border border-gray-200">
                             <label class="flex items-center space-x-3 cursor-pointer">
@@ -352,6 +489,73 @@
                             </span>
                         </button>
                     </form>
+                    </div>
+
+                    <!-- Spotlight Bundle -->
+                    <div class="bg-white rounded-xl shadow-md p-6 border border-gray-100 mt-6">
+                        <div class="flex items-center justify-between mb-4">
+                            <div>
+                                <h3 class="text-xl font-bold text-gray-800">Spotlight Weekend Bundle</h3>
+                                <p class="text-sm text-gray-500">Manage the bundle card shown in the hero right column.</p>
+                            </div>
+                        </div>
+
+                        <form id="spotlightForm" class="space-y-4">
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Bundle Title</label>
+                                    <input type="text" name="spotlightTitle" placeholder="Curated Weekend Kit" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent">
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Bundle Image</label>
+                                    <input type="url" name="spotlightImage" placeholder="https://.../bundle.jpg" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent">
+                                    <div class="flex items-center gap-3 mt-2">
+                                        <input type="file" id="uploadSpotlightImgInput" accept="image/*" class="hidden">
+                                        <button type="button" id="uploadSpotlightImgBtn" class="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition">Upload Image</button>
+                                        <span id="uploadSpotlightImgStatus" class="text-xs text-gray-500"></span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">CTA Text</label>
+                                    <input type="text" name="spotlightCtaText" placeholder="Shop bundle" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent">
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">CTA Link</label>
+                                    <input type="text" name="spotlightCtaLink" placeholder="/products.html" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent">
+                                </div>
+                            </div>
+
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Bundle Meta</label>
+                                    <input type="text" name="spotlightMeta" placeholder="Bundle & save • Ships free" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent">
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Bundle Price (NPR)</label>
+                                    <input type="number" name="spotlightPrice" min="0" step="1" placeholder="32999" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent">
+                                </div>
+                            </div>
+
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Bundle Description</label>
+                                <textarea name="spotlightCopy" rows="3" placeholder="Desk-ready audio, wearable, and carry picks — matched to look and perform together." class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"></textarea>
+                            </div>
+
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Bundle Items (one per line)</label>
+                                <textarea name="spotlightItems" rows="4" placeholder="Audio — Studio ANC — रु 13,299
+    Wearable — Pulse S5 — रु 26,599
+    Carry — Urban Explorer — रु 8,899" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"></textarea>
+                                <p class="text-xs text-gray-500 mt-1">If empty, bundle items fall back to featured products.</p>
+                            </div>
+
+                            <button type="submit" class="w-full bg-indigo-600 text-white px-6 py-3 rounded-lg font-medium hover:bg-indigo-700 transition shadow-md">
+                                Save Spotlight Bundle
+                            </button>
+                        </form>
                 </div>
 
                 <!-- Preview Section -->
@@ -367,6 +571,285 @@
                     </div>
                 </div>
             </div>
+
+            <!-- Payments Tab -->
+            <div id="content-payments" class="p-6 hidden">
+                <div class="grid grid-cols-1 xl:grid-cols-3 gap-6">
+                    <div class="xl:col-span-2 bg-white rounded-2xl shadow-md border border-gray-100 p-6">
+                        <div class="flex items-center justify-between mb-6">
+                            <div>
+                                <p class="text-sm text-indigo-500 font-semibold uppercase tracking-wide">Checkout Controls</p>
+                                <h2 class="text-2xl font-bold text-gray-900">Nepali Payment Settings</h2>
+                                <p class="text-sm text-gray-500">Manage COD, bank transfer, eSewa, Khalti, and IME Pay instructions</p>
+                            </div>
+                            <button id="refreshPayments" class="px-4 py-2 rounded-xl bg-indigo-50 text-indigo-700 font-semibold hover:bg-indigo-100 transition">
+                                Refresh
+                            </button>
+                        </div>
+
+                        <form id="paymentSettingsForm" class="space-y-8">
+                            <section id="bankDetailsFields" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div class="p-4 rounded-2xl border border-gray-200 bg-white">
+                                    <div class="flex items-start justify-between">
+                                        <div>
+                                            <p class="font-semibold text-gray-900">Cash on Delivery</p>
+                                            <p class="text-sm text-gray-500">Allow COD at checkout</p>
+                                        </div>
+                                        <label class="inline-flex items-center cursor-pointer">
+                                            <input type="checkbox" name="codEnabled" class="sr-only" checked>
+                                            <span class="w-10 h-6 rounded-full shadow-inner flex items-center transition accent-indigo" data-toggle-slider>
+                                                <span class="w-4 h-4 bg-white rounded-full shadow transform transition"></span>
+                                            </span>
+                                        </label>
+                                    </div>
+                                </div>
+                                <div class="p-4 rounded-2xl border border-gray-200 bg-white">
+                                    <div class="flex items-start justify-between">
+                                        <div>
+                                            <p class="font-semibold text-gray-900">Bank Transfer</p>
+                                            <p class="text-sm text-gray-500">Manual transfer to Nepali bank</p>
+                                        </div>
+                                        <label class="inline-flex items-center cursor-pointer">
+                                            <input type="checkbox" name="bankEnabled" class="sr-only" checked>
+                                            <span class="w-10 h-6 rounded-full shadow-inner flex items-center transition accent-indigo" data-toggle-slider>
+                                                <span class="w-4 h-4 bg-white rounded-full shadow transform transition"></span>
+                                            </span>
+                                        </label>
+                                    </div>
+                                </div>
+                            </section>
+
+                            <section class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div class="space-y-3">
+                                    <label class="block text-sm font-semibold text-gray-700">Account Name</label>
+                                    <input type="text" name="bankAccountName" class="w-full border border-gray-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-indigo-500" placeholder="Zenrix Pvt. Ltd.">
+                                </div>
+                                <div class="space-y-3">
+                                    <label class="block text-sm font-semibold text-gray-700">Account Number</label>
+                                    <input type="text" name="bankAccountNumber" class="w-full border border-gray-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-indigo-500" placeholder="1234567890">
+                                </div>
+                                <div class="space-y-3">
+                                    <label class="block text-sm font-semibold text-gray-700">Bank Name</label>
+                                    <input type="text" name="bankName" class="w-full border border-gray-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-indigo-500" placeholder="NMB Bank">
+                                </div>
+                                <div class="space-y-3">
+                                    <label class="block text-sm font-semibold text-gray-700">Branch</label>
+                                    <input type="text" name="bankBranch" class="w-full border border-gray-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-indigo-500" placeholder="Kathmandu">
+                                </div>
+                                <div class="space-y-3">
+                                    <label class="block text-sm font-semibold text-gray-700">SWIFT / Routing</label>
+                                    <input type="text" name="bankSwift" class="w-full border border-gray-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-indigo-500" placeholder="NMBLNPKA">
+                                </div>
+                            </section>
+
+                            <section class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div class="space-y-3">
+                                    <label class="block text-sm font-semibold text-gray-700">Checkout Instructions</label>
+                                    <textarea name="instructions" rows="3" class="w-full border border-gray-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-indigo-500" placeholder="Upload the payment receipt to support@zenrix.com.np"></textarea>
+                                </div>
+                                <div class="space-y-3">
+                                    <label class="block text-sm font-semibold text-gray-700">Fallback QR Image URL</label>
+                                    <div class="flex flex-col sm:flex-row sm:items-center gap-3">
+                                        <input type="text" name="qrImageUrl" inputmode="url" autocomplete="off" spellcheck="false" class="flex-1 border border-gray-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-indigo-500" placeholder="https://... or /uploads/qr.png">
+                                        <div class="flex items-center gap-2">
+                                            <button type="button" class="px-4 py-2 bg-indigo-100 text-indigo-700 rounded-lg hover:bg-indigo-200 transition" data-upload-btn="qrImageUrl">Upload</button>
+                                            <input type="file" accept="image/*" class="hidden" data-upload-input="qrImageUrl">
+                                        </div>
+                                    </div>
+                                    <p class="text-xs text-gray-500">
+                                        Drop in any secure link, local /uploads path, or tap Upload to host the QR on Zenrix.
+                                        <span class="ml-1 text-indigo-500" data-upload-status="qrImageUrl"></span>
+                                    </p>
+                                </div>
+                            </section>
+
+                            <section class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div id="esewaFields" class="rounded-2xl border border-emerald-200 bg-emerald-50 p-5 space-y-4">
+                                    <div class="flex items-center justify-between">
+                                        <div>
+                                            <p class="font-semibold text-emerald-900">eSewa Wallet</p>
+                                            <p class="text-sm text-emerald-600">Quick wallet transfer</p>
+                                        </div>
+                                        <label class="inline-flex items-center cursor-pointer">
+                                            <input type="checkbox" name="esewaEnabled" class="sr-only" checked>
+                                            <span class="w-10 h-6 rounded-full shadow-inner flex items-center transition accent-emerald" data-toggle-slider>
+                                                <span class="w-4 h-4 bg-white rounded-full shadow transform transition"></span>
+                                            </span>
+                                        </label>
+                                    </div>
+                                    <input type="text" name="esewaWalletNumber" class="w-full border border-emerald-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-emerald-500" placeholder="98XXXXXXXXX">
+                                    <textarea name="esewaInstructions" rows="2" class="w-full border border-emerald-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-emerald-500" placeholder="Send payment screenshot via email"></textarea>
+                                    <div class="space-y-2">
+                                        <div class="flex flex-col sm:flex-row sm:items-center gap-3">
+                                            <input type="text" name="esewaQr" inputmode="url" autocomplete="off" spellcheck="false" class="flex-1 border border-emerald-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-emerald-500" placeholder="QR image URL or /uploads/esewa.png">
+                                            <div class="flex items-center gap-2">
+                                                <button type="button" class="px-4 py-2 bg-emerald-100 text-emerald-700 rounded-lg hover:bg-emerald-200 transition" data-upload-btn="esewaQr">Upload</button>
+                                                <input type="file" accept="image/*" class="hidden" data-upload-input="esewaQr">
+                                            </div>
+                                        </div>
+                                        <p class="text-xs text-emerald-700">
+                                            Keep your best eSewa QR handy—use Upload for instant hosting.
+                                            <span class="ml-1" data-upload-status="esewaQr"></span>
+                                        </p>
+                                    </div>
+                                </div>
+
+                                <div id="khaltiFields" class="rounded-2xl border border-fuchsia-200 bg-fuchsia-50 p-5 space-y-4">
+                                    <div class="flex items-center justify-between">
+                                        <div>
+                                            <p class="font-semibold text-fuchsia-900">Khalti Wallet</p>
+                                            <p class="text-sm text-fuchsia-600">Preferred for quick scan pay</p>
+                                        </div>
+                                        <label class="inline-flex items-center cursor-pointer">
+                                            <input type="checkbox" name="khaltiEnabled" class="sr-only" checked>
+                                            <span class="w-10 h-6 rounded-full shadow-inner flex items-center transition accent-fuchsia" data-toggle-slider>
+                                                <span class="w-4 h-4 bg-white rounded-full shadow transform transition"></span>
+                                            </span>
+                                        </label>
+                                    </div>
+                                    <input type="text" name="khaltiWalletNumber" class="w-full border border-fuchsia-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-fuchsia-500" placeholder="98XXXXXXXXX">
+                                    <textarea name="khaltiInstructions" rows="2" class="w-full border border-fuchsia-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-fuchsia-500" placeholder="Reference message customers should use"></textarea>
+                                    <div class="space-y-2">
+                                        <div class="flex flex-col sm:flex-row sm:items-center gap-3">
+                                            <input type="text" name="khaltiQr" inputmode="url" autocomplete="off" spellcheck="false" class="flex-1 border border-fuchsia-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-fuchsia-500" placeholder="QR image URL or /uploads/khalti.png">
+                                            <div class="flex items-center gap-2">
+                                                <button type="button" class="px-4 py-2 bg-fuchsia-100 text-fuchsia-700 rounded-lg hover:bg-fuchsia-200 transition" data-upload-btn="khaltiQr">Upload</button>
+                                                <input type="file" accept="image/*" class="hidden" data-upload-input="khaltiQr">
+                                            </div>
+                                        </div>
+                                        <p class="text-xs text-fuchsia-700">
+                                            Khalti shoppers scan faster when the QR lives here; hit Upload to replace it.
+                                            <span class="ml-1" data-upload-status="khaltiQr"></span>
+                                        </p>
+                                    </div>
+                                </div>
+
+                                <div id="imeFields" class="rounded-2xl border border-amber-200 bg-amber-50 p-5 space-y-4">
+                                    <div class="flex items-center justify-between">
+                                        <div>
+                                            <p class="font-semibold text-amber-900">IME Pay</p>
+                                            <p class="text-sm text-amber-600">Popular for retail wallets</p>
+                                        </div>
+                                        <label class="inline-flex items-center cursor-pointer">
+                                            <input type="checkbox" name="imeEnabled" class="sr-only" checked>
+                                            <span class="w-10 h-6 rounded-full shadow-inner flex items-center transition accent-amber" data-toggle-slider>
+                                                <span class="w-4 h-4 bg-white rounded-full shadow transform transition"></span>
+                                            </span>
+                                        </label>
+                                    </div>
+                                    <input type="text" name="imeWalletNumber" class="w-full border border-amber-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-amber-500" placeholder="98XXXXXXXXX">
+                                    <textarea name="imeInstructions" rows="2" class="w-full border border-amber-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-amber-500" placeholder="Mention your IME Pay reference note"></textarea>
+                                    <div class="space-y-2">
+                                        <div class="flex flex-col sm:flex-row sm:items-center gap-3">
+                                            <input type="text" name="imeQr" inputmode="url" autocomplete="off" spellcheck="false" class="flex-1 border border-amber-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-amber-500" placeholder="QR image URL or /uploads/imepay.png">
+                                            <div class="flex items-center gap-2">
+                                                <button type="button" class="px-4 py-2 bg-amber-100 text-amber-800 rounded-lg hover:bg-amber-200 transition" data-upload-btn="imeQr">Upload</button>
+                                                <input type="file" accept="image/*" class="hidden" data-upload-input="imeQr">
+                                            </div>
+                                        </div>
+                                        <p class="text-xs text-amber-700">
+                                            Boost trust for IME Pay shoppers by uploading the official QR here.
+                                            <span class="ml-1" data-upload-status="imeQr"></span>
+                                        </p>
+                                    </div>
+                                </div>
+                            </section>
+
+                            <button type="submit" class="w-full md:w-auto inline-flex items-center justify-center bg-indigo-600 text-white px-8 py-3 rounded-xl font-semibold hover:bg-indigo-700 transition">
+                                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                                </svg>
+                                Save Payment Settings
+                            </button>
+                        </form>
+                    </div>
+
+                    <div class="space-y-6">
+                        <div class="bg-indigo-600 text-white rounded-2xl p-6 shadow-lg space-y-4" id="paymentPreviewCard">
+                            <p class="text-sm uppercase tracking-[0.2em] text-indigo-200">Customer View</p>
+                            <h3 class="text-2xl font-bold mt-3" id="previewPaymentMethod">COD + Wallets</h3>
+                            <p class="text-indigo-100 text-sm" id="previewInstructions">Payments are verified within 2 business hours.</p>
+                            <div class="mt-6 bg-white bg-opacity-10 rounded-xl p-4 space-y-2 text-sm">
+                                <div class="flex items-center justify-between">
+                                    <span class="text-indigo-100">Bank</span>
+                                    <span class="font-semibold" id="previewBankName">NMB Bank</span>
+                                </div>
+                                <div class="flex items-center justify-between">
+                                    <span class="text-indigo-100">Account</span>
+                                    <span class="font-mono" id="previewAccountNumber">1234567890</span>
+                                </div>
+                                <div class="flex items-center justify-between">
+                                    <span class="text-indigo-100">eSewa</span>
+                                    <span class="font-semibold" id="previewEsewa">98XXXXXXXXX</span>
+                                </div>
+                                <div class="flex items-center justify-between">
+                                    <span class="text-indigo-100">Khalti</span>
+                                    <span class="font-semibold" id="previewKhalti">98XXXXXXXXX</span>
+                                </div>
+                                <div class="flex items-center justify-between">
+                                    <span class="text-indigo-100">IME Pay</span>
+                                    <span class="font-semibold" id="previewIme">98XXXXXXXXX</span>
+                                </div>
+                            </div>
+                            <img id="previewQrImage" src="" alt="QR" class="hidden rounded-xl border border-white border-opacity-30">
+                        </div>
+                        <div class="bg-white rounded-2xl border border-gray-100 p-6 shadow-sm">
+                            <h4 class="text-lg font-semibold text-gray-900 mb-2">Tips</h4>
+                            <ul class="text-sm text-gray-600 space-y-2 list-disc list-inside">
+                                <li>Toggle methods to activate/deactivate instantly.</li>
+                                <li>Share QR images using any public CDN or Cloudinary link.</li>
+                                <li>Add clear instructions so customers know where to upload slips.</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+                <!-- Orders Tab -->
+                <div id="content-orders" class="p-6 hidden">
+                    <div class="bg-white rounded-2xl shadow-md border border-gray-100 p-6">
+                        <div class="flex flex-wrap gap-4 items-start justify-between">
+                            <div>
+                                <p class="text-xs uppercase tracking-[0.35em] text-gray-400">Operations</p>
+                                <h2 class="text-2xl font-bold text-gray-900">Orders &amp; Proofs</h2>
+                                <p class="text-sm text-gray-500" id="ordersCounter">No orders yet</p>
+                                <p class="text-xs text-gray-400 mt-1">Payment screenshots uploaded during checkout are linked here.</p>
+                            </div>
+                            <div class="flex flex-wrap gap-3 items-center">
+                                <select id="ordersStatusFilter" class="px-4 py-2 rounded-xl border border-gray-200 text-sm text-gray-700 focus:ring-2 focus:ring-indigo-500">
+                                    <option value="all">All fulfillment states</option>
+                                    <option value="Pending">Pending</option>
+                                    <option value="Completed">Completed</option>
+                                    <option value="Canceled">Canceled</option>
+                                </select>
+                                <select id="ordersPaymentFilter" class="px-4 py-2 rounded-xl border border-gray-200 text-sm text-gray-700 focus:ring-2 focus:ring-indigo-500">
+                                    <option value="all">All payment statuses</option>
+                                    <option value="pending">Payment Pending</option>
+                                    <option value="submitted">Submitted</option>
+                                    <option value="verified">Verified</option>
+                                    <option value="failed">Failed</option>
+                                </select>
+                                <button id="refreshOrdersBtn" class="px-4 py-2 rounded-xl bg-indigo-600 text-white font-semibold hover:bg-indigo-700 transition">
+                                    Refresh
+                                </button>
+                            </div>
+                        </div>
+                        <div class="mt-4 flex flex-wrap gap-4 text-xs text-gray-500">
+                            <span class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-slate-100 text-slate-600">📸 Uploaded proofs open in a new tab.</span>
+                            <span class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-slate-100 text-slate-600">🧾 Payment status is independent of order status.</span>
+                            <span class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-slate-100 text-slate-600">⏱ Last refresh: <span id="ordersLastRefresh" class="font-semibold">—</span></span>
+                        </div>
+                    </div>
+
+                    <div class="mt-6 space-y-4">
+                        <div id="ordersLoader" class="text-sm text-gray-500 hidden">Loading orders...</div>
+                        <div id="ordersEmptyState" class="hidden rounded-2xl border border-dashed border-gray-300 bg-gray-50 p-8 text-center text-gray-500">
+                            <p class="font-semibold text-gray-700 mb-1">No orders yet</p>
+                            <p class="text-sm text-gray-500">Once shoppers place paid orders, they will appear here with the screenshots they uploaded.</p>
+                        </div>
+                        <div id="ordersList" class="space-y-4"></div>
+                    </div>
+                </div>
 
             <!-- Careers Tab -->
             <div id="content-careers" class="p-6 hidden">
@@ -419,7 +902,7 @@
                         </div>
                         <div>
                             <label class="flex items-center space-x-2">
-                                <input type="checkbox" name="published" class="w-4 h-4 text-red-600 rounded focus:ring-2 focus:ring-red-500">
+                                <input type="checkbox" name="published" class="w-4 h-4 text-red-600 rounded focus:ring-2 focus:ring-red-500" checked>
                                 <span class="text-sm font-medium text-gray-700">Publish this job opening</span>
                             </label>
                         </div>
@@ -466,6 +949,34 @@
                     </table>
                 </div>
             </div>
+
+            <!-- Support Tickets Tab -->
+            <div id="content-tickets" class="p-6 hidden">
+                <div class="flex items-center justify-between mb-4">
+                    <div>
+                        <h2 class="text-xl font-bold text-gray-800">Support Tickets</h2>
+                        <p class="text-sm text-gray-500">Customer support requests</p>
+                    </div>
+                    <div class="flex space-x-2 items-center">
+                        <select id="ticketStatusFilter" class="px-3 py-2 border border-gray-300 rounded-lg text-sm">
+                            <option value="all">All Status</option>
+                            <option value="open">Open</option>
+                            <option value="in-progress">In Progress</option>
+                            <option value="solved">Solved</option>
+                            <option value="closed">Closed</option>
+                        </select>
+                        <button id="filterGuestBtn" class="px-3 py-2 bg-indigo-50 text-indigo-700 rounded-lg text-sm border border-indigo-100 hover:bg-indigo-100">Guest</button>
+                        <button id="groupGuestBtn" class="px-3 py-2 bg-white text-indigo-700 rounded-lg text-sm border border-indigo-100 hover:bg-indigo-50">Group Guests</button>
+                        <button id="filterUnseenBtn" class="px-3 py-2 bg-rose-50 text-rose-700 rounded-lg text-sm border border-rose-100 hover:bg-rose-100">Unseen</button>
+                        <button id="refreshTickets" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition">Refresh</button>
+                        <button id="ticketsUnseenBadge" class="ml-2 inline-flex items-center gap-2 px-3 py-2 bg-white border border-gray-200 rounded-full text-sm text-gray-700" title="Unseen tickets">
+                            <svg class="w-4 h-4 text-rose-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6 6 0 10-12 0v3.159c0 .538-.214 1.055-.595 1.436L4 17h5"/></svg>
+                            <span id="ticketsUnseenCount" class="text-sm font-semibold">0</span>
+                        </button>
+                    </div>
+                </div>
+                <div id="ticketsList" class="space-y-4"></div>
+            </div>
         </div>
     </div>
 
@@ -482,7 +993,7 @@
                     <button type="submit" class="flex-1 bg-blue-600 text-white px-6 py-3 rounded-lg font-medium hover:bg-blue-700 transition">
                         Login
                     </button>
-                    <button type="button" id="closLoginModalBtn" class="flex-1 bg-gray-200 text-gray-700 px-6 py-3 rounded-lg font-medium hover:bg-gray-300 transition">
+                    <button type="button" id="closeLoginModalBtn" class="flex-1 bg-gray-200 text-gray-700 px-6 py-3 rounded-lg font-medium hover:bg-gray-300 transition">
                         Cancel
                     </button>
                 </div>
@@ -502,8 +1013,21 @@
                         <input type="text" name="name" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
                     </div>
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">Price ($) *</label>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Price (रु) *</label>
                         <input type="number" step="0.01" name="price" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                    </div>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="bg-white p-3 rounded-lg border border-gray-200">
+                        <label class="flex items-center space-x-2">
+                            <input type="checkbox" name="onSale" class="w-4 h-4 text-emerald-600 rounded focus:ring-2 focus:ring-emerald-500">
+                            <span class="text-sm font-medium text-gray-700">On Sale</span>
+                        </label>
+                    </div>
+                    <div class="grid grid-cols-1 gap-2">
+                        <input type="number" step="0.01" name="salePrice" placeholder="Sale price" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent">
+                        <input type="datetime-local" name="saleEnd" placeholder="Sale ends at" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent">
+                        <input type="text" name="saleLabel" placeholder="Sale badge (e.g. Limited Offer)" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent">
                     </div>
                 </div>
                 <div>
@@ -638,6 +1162,112 @@
         </div>
     </div>
 
+    <!-- Edit Career Modal -->
+    <div id="editCareerModal" class="fixed inset-0 bg-black bg-opacity-50 modal-backdrop hidden flex items-center justify-center z-50">
+        <div class="bg-white rounded-2xl shadow-2xl p-8 w-full max-w-2xl max-h-[90vh] overflow-y-auto slide-in">
+            <h2 class="text-2xl font-bold text-gray-800 mb-6">Edit Job Opening</h2>
+            <form id="editCareerForm" class="space-y-4">
+                <input type="hidden" name="id">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Job Title *</label>
+                        <input type="text" name="title" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Department *</label>
+                        <select name="department" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent">
+                            <option value="Engineering">Engineering</option>
+                            <option value="Design">Design</option>
+                            <option value="Sales">Sales</option>
+                            <option value="Marketing">Marketing</option>
+                            <option value="HR">HR</option>
+                            <option value="Operations">Operations</option>
+                            <option value="Support">Support</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Location *</label>
+                        <input type="text" name="location" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Job Type *</label>
+                        <select name="type" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent">
+                            <option value="Full-time">Full-time</option>
+                            <option value="Part-time">Part-time</option>
+                            <option value="Contract">Contract</option>
+                            <option value="Freelance">Freelance</option>
+                        </select>
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Description *</label>
+                    <textarea name="description" rows="4" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"></textarea>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Salary Range (optional)</label>
+                    <div class="grid grid-cols-2 gap-2">
+                        <input type="number" name="salary_min" placeholder="Min" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent">
+                        <input type="number" name="salary_max" placeholder="Max" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent">
+                    </div>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Requirements (comma separated)</label>
+                        <textarea name="requirements" rows="2" placeholder="3+ years experience, React, REST APIs" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"></textarea>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Benefits (comma separated)</label>
+                        <textarea name="benefits" rows="2" placeholder="Medical, Paid leave, Lunch" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"></textarea>
+                    </div>
+                </div>
+                <div>
+                    <label class="flex items-center space-x-2">
+                        <input type="checkbox" name="published" class="w-4 h-4 text-red-600 rounded focus:ring-2 focus:ring-red-500">
+                        <span class="text-sm font-medium text-gray-700">Visible on website</span>
+                    </label>
+                </div>
+                <div class="flex space-x-3 pt-4">
+                    <button type="submit" class="flex-1 bg-red-600 text-white px-6 py-3 rounded-lg font-medium hover:bg-red-700 transition">
+                        Save Changes
+                    </button>
+                    <button type="button" id="closeEditCareerModalBtn" class="flex-1 bg-gray-200 text-gray-700 px-6 py-3 rounded-lg font-medium hover:bg-gray-300 transition">
+                        Cancel
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Order Details Modal -->
+    <div id="orderDetailsModal" class="fixed inset-0 bg-black bg-opacity-50 modal-backdrop hidden flex items-center justify-center z-50">
+        <div class="bg-white rounded-2xl shadow-2xl p-8 w-full max-w-3xl max-h-[90vh] overflow-y-auto slide-in">
+            <div class="flex items-start justify-between mb-6">
+                <div>
+                    <p class="text-xs uppercase tracking-[0.4em] text-gray-400">Order Detail</p>
+                    <h2 class="text-2xl font-bold text-gray-900" id="orderDetailsTitle">Order</h2>
+                </div>
+                <button id="closeOrderDetailsBtn" class="text-gray-500 hover:text-gray-700 text-2xl leading-none">&times;</button>
+            </div>
+            <div id="orderDetailsBody" class="space-y-6"></div>
+        </div>
+    </div>
+
+    <!-- Ticket Details Modal -->
+    <div id="ticketDetailsModal" class="fixed inset-0 bg-black bg-opacity-50 modal-backdrop hidden flex items-center justify-center z-50">
+        <div class="bg-white rounded-2xl shadow-2xl p-8 w-full max-w-3xl max-h-[90vh] overflow-y-auto slide-in">
+            <div class="flex items-start justify-between mb-6">
+                <div>
+                    <p class="text-xs uppercase tracking-[0.4em] text-gray-400">Support Ticket</p>
+                    <h2 class="text-2xl font-bold text-gray-900" id="ticketDetailsTitle">#0000</h2>
+                </div>
+                <button id="closeTicketDetailsBtn" class="text-gray-500 hover:text-gray-700 text-2xl leading-none">&times;</button>
+            </div>
+            <div id="ticketDetailsBody" class="space-y-6"></div>
+        </div>
+    </div>
+
     <!-- Toast Container -->
     <div id="toastContainer" class="fixed top-6 right-6 z-50 space-y-2"></div>
 
@@ -649,6 +1279,13 @@
         let productsCache = {};
         let pagesCache = {};
         let componentsCache = {};
+        let careersCache = {};
+        let ordersCache = [];
+        let ordersLastFetchedAt = null;
+        const ordersFilters = { status: 'all', paymentStatus: 'all' };
+        let ticketsCache = [];
+        const NPR_FORMATTER = new Intl.NumberFormat('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        let productSaleCountdownInterval = null;
 
         // Toast notification
         function showToast(type, message) {
@@ -661,6 +1298,45 @@
             setTimeout(() => toast.remove(), 4000);
         }
 
+        function formatNpr(value) {
+            const amount = Number(value) || 0;
+            return `रु ${NPR_FORMATTER.format(amount)}`;
+        }
+
+        function toLocalDatetimeInput(value) {
+            if (!value) return '';
+            const date = new Date(value);
+            if (isNaN(date)) return '';
+            const pad = (num) => String(num).padStart(2, '0');
+            return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}T${pad(date.getHours())}:${pad(date.getMinutes())}`;
+        }
+
+        function orderStatusBadge(status = 'Pending') {
+            const palette = {
+                Pending: 'bg-amber-100 text-amber-700',
+                Completed: 'bg-emerald-100 text-emerald-700',
+                Canceled: 'bg-rose-100 text-rose-700'
+            };
+            const label = status || 'Pending';
+            return `<span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold ${palette[label] || 'bg-slate-100 text-slate-600'}">${label}</span>`;
+        }
+
+        function paymentStatusBadge(status = 'pending') {
+            const palette = {
+                pending: 'bg-amber-100 text-amber-700',
+                submitted: 'bg-indigo-100 text-indigo-700',
+                verified: 'bg-emerald-100 text-emerald-700',
+                failed: 'bg-rose-100 text-rose-700'
+            };
+            const key = (status || 'pending').toLowerCase();
+            const label = key.charAt(0).toUpperCase() + key.slice(1);
+            return `<span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold ${palette[key] || 'bg-slate-100 text-slate-600'}">${label}</span>`;
+        }
+
+        function formatPaymentMethod(method = 'cod') {
+            return method.split('-').map(part => part.charAt(0).toUpperCase() + part.slice(1)).join(' ') || 'COD';
+        }
+
         // Token management
         function getAdminToken() {
             return localStorage.getItem('adminToken');
@@ -669,11 +1345,21 @@
         function setAdminToken(token) {
             localStorage.setItem('adminToken', token);
             updateAdminUI();
+            setAuthGuard(true);
         }
 
         function clearAdminToken() {
             localStorage.removeItem('adminToken');
             updateAdminUI();
+            setAuthGuard(false);
+        }
+
+        function setAuthGuard(isAuthed) {
+            const overlay = document.getElementById('authOverlay');
+            const app = document.getElementById('adminContent');
+            if (!overlay || !app) return;
+            overlay.classList.toggle('hidden', isAuthed);
+            app.classList.toggle('hidden', !isAuthed);
         }
 
         function updateAdminUI() {
@@ -685,6 +1371,8 @@
                 statusEl.classList.add('bg-green-500');
                 statusEl.classList.remove('bg-white', 'bg-opacity-20');
                 btnEl.textContent = 'Logged In ✓';
+                // refresh knowledge panel when admin logs in
+                setTimeout(() => updateKnowledgeStatus(), 200);
             } else {
                 statusEl.classList.remove('bg-green-500');
                 statusEl.classList.add('bg-white', 'bg-opacity-20');
@@ -737,7 +1425,7 @@
 
         // Tab switching
         function switchTab(tab) {
-            ['products', 'pages', 'components', 'hero', 'careers', 'subscribers'].forEach(t => {
+            ['products', 'pages', 'components', 'hero', 'payments', 'orders', 'careers', 'subscribers', 'tickets'].forEach(t => {
                 document.getElementById(`tab-${t}`).classList.remove('border-blue-600', 'text-blue-600');
                 document.getElementById(`tab-${t}`).classList.add('border-transparent', 'text-gray-500');
                 document.getElementById(`content-${t}`).classList.add('hidden');
@@ -746,9 +1434,391 @@
             document.getElementById(`tab-${tab}`).classList.add('border-blue-600', 'text-blue-600');
             document.getElementById(`tab-${tab}`).classList.remove('border-transparent', 'text-gray-500');
             document.getElementById(`content-${tab}`).classList.remove('hidden');
+
+            if (tab === 'subscribers') {
+                loadSubscribers();
+            }
+            if (tab === 'tickets') {
+                loadTickets();
+            }
+        }
+
+        function setOrdersLoading(isLoading) {
+            const loader = document.getElementById('ordersLoader');
+            if (loader) {
+                loader.classList.toggle('hidden', !isLoading);
+                loader.textContent = isLoading ? 'Loading orders...' : '';
+            }
+            const refreshBtn = document.getElementById('refreshOrdersBtn');
+            if (refreshBtn) {
+                if (!refreshBtn.dataset.defaultLabel) {
+                    refreshBtn.dataset.defaultLabel = refreshBtn.textContent.trim();
+                }
+                refreshBtn.disabled = isLoading;
+                refreshBtn.classList.toggle('opacity-60', isLoading);
+                refreshBtn.textContent = isLoading ? 'Refreshing...' : refreshBtn.dataset.defaultLabel;
+            }
+        }
+
+        function renderOrdersList() {
+            const listEl = document.getElementById('ordersList');
+            if (!listEl) return;
+            const emptyState = document.getElementById('ordersEmptyState');
+            const counter = document.getElementById('ordersCounter');
+            const data = Array.isArray(ordersCache) ? ordersCache : [];
+            const filtered = data.filter(order => {
+                const matchesStatus = ordersFilters.status === 'all' || order.status === ordersFilters.status;
+                const paymentState = (order.payment?.status || 'pending').toLowerCase();
+                const matchesPayment = ordersFilters.paymentStatus === 'all' || paymentState === ordersFilters.paymentStatus;
+                return matchesStatus && matchesPayment;
+            });
+
+            if (counter) {
+                counter.textContent = filtered.length ? `${filtered.length} order${filtered.length === 1 ? '' : 's'}` : 'No orders yet';
+            }
+
+            if (!filtered.length) {
+                listEl.innerHTML = '';
+                emptyState?.classList.remove('hidden');
+                return;
+            }
+
+            emptyState?.classList.add('hidden');
+
+            listEl.innerHTML = filtered.map(order => {
+                const payment = order.payment || {};
+                const shipping = order.shipping || {};
+                const customerName = shipping.fullName || [order.user?.firstName, order.user?.lastName].filter(Boolean).join(' ') || 'Customer';
+                const paymentStatus = payment.status || 'pending';
+                const proofCta = payment.proofUrl
+                    ? `<a href="${payment.proofUrl}" target="_blank" rel="noopener" class="inline-flex items-center gap-2 px-3 py-2 rounded-xl bg-slate-900 text-white text-xs font-semibold hover:bg-black">View Proof</a>`
+                    : '<span class="text-xs text-gray-400">No proof uploaded</span>';
+                const createdAt = order.createdAt ? new Date(order.createdAt).toLocaleString() : '—';
+                return `
+                    <article class="bg-white border border-gray-200 rounded-2xl p-5 shadow-sm">
+                        <div class="flex flex-wrap items-start justify-between gap-3">
+                            <div>
+                                <p class="text-xs text-gray-500">Order ID</p>
+                                <p class="font-mono text-sm text-gray-900">${order._id || 'N/A'}</p>
+                                <p class="text-xs text-gray-400 mt-1">${createdAt}</p>
+                            </div>
+                            <div class="flex flex-wrap gap-2">
+                                ${orderStatusBadge(order.status)}
+                                ${paymentStatusBadge(paymentStatus)}
+                            </div>
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4 text-sm text-gray-600">
+                            <div>
+                                <p class="text-xs uppercase tracking-wide text-gray-400">Customer</p>
+                                <p class="font-semibold text-gray-900">${customerName}</p>
+                                <p>${shipping.phone || '—'}</p>
+                            </div>
+                            <div>
+                                <p class="text-xs uppercase tracking-wide text-gray-400">Payment</p>
+                                <p class="font-semibold text-gray-900">${formatPaymentMethod(payment.method || 'cod')}</p>
+                                <p>Reference: ${payment.referenceId || '—'}</p>
+                            </div>
+                            <div>
+                                <p class="text-xs uppercase tracking-wide text-gray-400">Total</p>
+                                <p class="font-semibold text-gray-900">${formatNpr(order.total)}</p>
+                            </div>
+                        </div>
+                        <div class="mt-4 flex flex-wrap items-center gap-3">
+                            ${proofCta}
+                            <button class="px-3 py-2 rounded-xl border border-gray-300 text-sm font-semibold text-gray-700 hover:bg-gray-50" data-order-details="${order._id}">View Details</button>
+                        </div>
+                    </article>
+                `;
+            }).join('');
+
+            listEl.querySelectorAll('[data-order-details]').forEach(btn => {
+                btn.addEventListener('click', () => openOrderDetailsModal(btn.getAttribute('data-order-details')));
+            });
+        }
+
+        async function loadOrders(options = {}) {
+            const silent = options.silent === true;
+            const manual = options.manual === true;
+            const token = getAdminToken();
+            if (!token) {
+                if (!silent) {
+                    showToast('error', 'Please login to view orders');
+                    openLoginModal();
+                }
+                return;
+            }
+
+            try {
+                setOrdersLoading(true);
+                const res = await fetch(`${API_URL}/admin/orders`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const data = await res.json();
+                if (!data.success) {
+                    throw new Error(data.error || 'Unable to load orders');
+                }
+                ordersCache = Array.isArray(data.data) ? data.data : [];
+                ordersLastFetchedAt = Date.now();
+                const lastRefresh = document.getElementById('ordersLastRefresh');
+                if (lastRefresh) {
+                    lastRefresh.textContent = new Date(ordersLastFetchedAt).toLocaleString();
+                }
+                renderOrdersList();
+                if (manual) {
+                    showToast('success', 'Orders refreshed');
+                }
+            } catch (err) {
+                console.error('Failed to load orders:', err);
+                if (!silent) {
+                    showToast('error', 'Failed to load orders: ' + err.message);
+                }
+            } finally {
+                setOrdersLoading(false);
+            }
+        }
+
+        function renderOrderTimeline(history = []) {
+            if (!history.length) {
+                return '<p class="text-sm text-gray-500">No timeline entries yet.</p>';
+            }
+            const sorted = [...history].sort((a, b) => new Date(b.createdAt || 0) - new Date(a.createdAt || 0));
+            return `<div class="space-y-3">${sorted.map(entry => {
+                const when = entry.createdAt ? new Date(entry.createdAt).toLocaleString() : '';
+                const status = entry.status || 'Pending';
+                const pay = entry.paymentStatus || '';
+                const note = entry.note || '';
+                const admin = entry.admin || 'Admin';
+                return `
+                    <div class="rounded-lg border border-gray-100 bg-gray-50 p-3">
+                        <div class="flex items-center justify-between text-sm">
+                            <div class="flex items-center gap-2">
+                                <span class="px-2 py-1 rounded-full bg-slate-900 text-white text-xs font-semibold">${status}</span>
+                                ${pay ? `<span class="px-2 py-1 rounded-full bg-emerald-100 text-emerald-700 text-xs font-semibold">${pay}</span>` : ''}
+                            </div>
+                            <span class="text-xs text-gray-500">${when}</span>
+                        </div>
+                        <div class="mt-2 text-xs text-gray-600 flex flex-wrap gap-2 items-center">
+                            <span class="font-semibold text-gray-700">${admin}</span>
+                            ${note ? `<span class="text-gray-600">• ${note}</span>` : ''}
+                        </div>
+                    </div>
+                `;
+            }).join('')}</div>`;
+        }
+
+        function openOrderDetailsModal(orderId, orderOverride = null) {
+            const order = orderOverride || (ordersCache || []).find(o => o._id === orderId);
+            if (!order) {
+                showToast('error', 'Order not found');
+                return;
+            }
+            const body = document.getElementById('orderDetailsBody');
+            const title = document.getElementById('orderDetailsTitle');
+            const modal = document.getElementById('orderDetailsModal');
+            if (!body || !modal) return;
+
+            if (title) {
+                title.textContent = `Order ${orderId}`;
+            }
+
+            const shipping = order.shipping || {};
+            const payment = order.payment || {};
+            const items = Array.isArray(order.items) ? order.items : [];
+            const itemsMarkup = items.length
+                ? items.map(item => {
+                    const variantBits = [item.variant?.color, item.variant?.size, item.variant?.notes].filter(Boolean).join(' · ');
+                    const lineTotal = (item.price || 0) * (item.quantity || 0);
+                    return `
+                        <div class="flex items-center justify-between py-2 border-b border-gray-100 last:border-none">
+                            <div>
+                                <p class="font-semibold text-gray-900">${item.name || item.product?.name || 'Item'}</p>
+                                <p class="text-sm text-gray-500">${item.quantity || 1} × ${formatNpr(item.price || 0)}</p>
+                                ${variantBits ? `<p class="text-xs text-gray-400">${variantBits}</p>` : ''}
+                            </div>
+                            <p class="font-semibold text-gray-900">${formatNpr(lineTotal)}</p>
+                        </div>
+                    `;
+                }).join('')
+                : '<p class="text-sm text-gray-500">No line items found.</p>';
+
+            const proofMarkup = payment.proofUrl
+                ? `<a href="${payment.proofUrl}" target="_blank" rel="noopener" class="inline-flex items-center gap-2 px-3 py-2 rounded-lg bg-slate-900 text-white text-xs font-semibold">Open Proof</a>
+                   <img src="${payment.proofUrl}" alt="Payment proof" class="mt-3 rounded-xl border border-gray-200 max-h-72 w-full object-contain" loading="lazy">`
+                : '<p class="text-xs text-gray-400">No proof uploaded for this payment.</p>';
+
+            body.innerHTML = `
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="bg-gray-50 rounded-xl p-4">
+                        <p class="text-xs uppercase tracking-wide text-gray-400">Shipping</p>
+                        <p class="font-semibold text-gray-900 mt-1">${shipping.fullName || '—'}</p>
+                        <p class="text-sm text-gray-600">${shipping.address1 || ''} ${shipping.address2 || ''}</p>
+                        <p class="text-sm text-gray-600">${shipping.city || ''} ${shipping.province || ''} ${shipping.postalCode || ''}</p>
+                        <p class="text-sm text-gray-600 mt-2">Phone: ${shipping.phone || '—'}</p>
+                        ${shipping.notes ? `<p class="text-xs text-gray-500 mt-2">Notes: ${shipping.notes}</p>` : ''}
+                    </div>
+                    <div class="bg-gray-50 rounded-xl p-4">
+                        <p class="text-xs uppercase tracking-wide text-gray-400">Payment</p>
+                        <p class="font-semibold text-gray-900 mt-1">${formatPaymentMethod(payment.method || 'cod')}</p>
+                        <p class="text-sm text-gray-600 flex items-center gap-2">Status: ${paymentStatusBadge(payment.status || 'pending')}</p>
+                        <p class="text-sm text-gray-600">Reference: ${payment.referenceId || '—'}</p>
+                        <p class="text-sm text-gray-600">Instructions Ack: ${payment.instructionsAck ? 'Yes' : 'No'}</p>
+                        <div class="mt-3 space-y-3">
+                            ${proofMarkup}
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-white rounded-xl border border-gray-100 p-4">
+                    <p class="text-xs uppercase tracking-wide text-gray-400 mb-2">Items</p>
+                    ${itemsMarkup}
+                </div>
+                <div class="bg-white rounded-xl border border-gray-100 p-4 space-y-3">
+                    <p class="text-xs uppercase tracking-wide text-gray-400">Update order</p>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                        <label class="text-sm text-gray-700">Order status
+                            <select id="orderStatusSelect" class="mt-1 w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500">
+                                <option value="Pending">Pending</option>
+                                <option value="Completed">Completed</option>
+                                <option value="Canceled">Canceled</option>
+                            </select>
+                        </label>
+                        <label class="text-sm text-gray-700">Payment status
+                            <select id="paymentStatusSelect" class="mt-1 w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500">
+                                <option value="pending">Pending</option>
+                                <option value="submitted">Submitted</option>
+                                <option value="verified">Verified</option>
+                                <option value="failed">Failed</option>
+                            </select>
+                        </label>
+                    </div>
+                    <label class="text-sm text-gray-700">Note (optional)
+                        <textarea id="orderUpdateNote" rows="2" class="mt-1 w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500" placeholder="e.g., Payment proof verified"></textarea>
+                    </label>
+                    <button id="saveOrderUpdateBtn" data-order-id="${order._id}" class="inline-flex items-center justify-center gap-2 px-4 py-2 rounded-lg bg-blue-600 text-white text-sm font-semibold hover:bg-blue-700 w-full md:w-auto">Save update</button>
+                </div>
+                <div class="bg-white rounded-xl border border-gray-100 p-4">
+                    <p class="text-xs uppercase tracking-wide text-gray-400 mb-2">Timeline</p>
+                    <div id="orderTimeline">${renderOrderTimeline(order.statusHistory || [])}</div>
+                </div>
+                <div class="flex flex-wrap items-center justify-between gap-3 p-4 rounded-xl border border-gray-100 bg-white">
+                    <div>
+                        <p class="text-xs uppercase tracking-wide text-gray-400">Total</p>
+                        <p class="text-2xl font-bold text-gray-900">${formatNpr(order.total)}</p>
+                    </div>
+                    <div class="text-right text-sm text-gray-500">
+                        <p>Created: ${order.createdAt ? new Date(order.createdAt).toLocaleString() : '—'}</p>
+                        <p>Updated: ${order.updatedAt ? new Date(order.updatedAt).toLocaleString() : '—'}</p>
+                    </div>
+                </div>
+            `;
+
+            const orderStatusSelect = document.getElementById('orderStatusSelect');
+            const paymentStatusSelect = document.getElementById('paymentStatusSelect');
+            if (orderStatusSelect) orderStatusSelect.value = order.status || 'Pending';
+            if (paymentStatusSelect) paymentStatusSelect.value = (payment.status || 'pending');
+
+            const saveBtn = document.getElementById('saveOrderUpdateBtn');
+            if (saveBtn) {
+                saveBtn.addEventListener('click', () => updateOrderStatus(order._id));
+            }
+
+            modal.classList.remove('hidden');
+        }
+
+        function closeOrderDetailsModal() {
+            const modal = document.getElementById('orderDetailsModal');
+            if (!modal) return;
+            modal.classList.add('hidden');
+            const body = document.getElementById('orderDetailsBody');
+            if (body) {
+                body.innerHTML = '';
+            }
+        }
+
+        async function updateOrderStatus(orderId) {
+            const token = getAdminToken();
+            if (!token) {
+                showToast('error', 'Please login first');
+                openLoginModal();
+                return;
+            }
+
+            const status = document.getElementById('orderStatusSelect')?.value;
+            const paymentStatus = document.getElementById('paymentStatusSelect')?.value;
+            const note = document.getElementById('orderUpdateNote')?.value?.trim();
+
+            try {
+                const res = await fetch(`${API_URL}/admin/orders/${orderId}/status`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify({ status, paymentStatus, note, adminName: 'Admin Dashboard' })
+                });
+
+                const data = await res.json();
+                if (!data.success) {
+                    throw new Error(data.error || 'Failed to update order');
+                }
+
+                const updated = data.data;
+                ordersCache = (ordersCache || []).map(o => o._id === orderId ? updated : o);
+                renderOrdersList();
+                openOrderDetailsModal(orderId, updated);
+                showToast('success', 'Order updated');
+            } catch (err) {
+                console.error('Order update failed:', err);
+                showToast('error', 'Order update failed: ' + err.message);
+            }
         }
 
         // Products CRUD
+        function startProductSaleCountdowns(products = []) {
+            if (productSaleCountdownInterval) {
+                clearInterval(productSaleCountdownInterval);
+                productSaleCountdownInterval = null;
+            }
+
+            const lookup = {};
+            products.forEach(p => {
+                const key = p?._id;
+                const endDate = p?.saleEnd ? new Date(p.saleEnd).getTime() : null;
+                if (key && endDate && !isNaN(endDate)) {
+                    lookup[key] = endDate;
+                }
+            });
+
+            const elements = Array.from(document.querySelectorAll('[data-sale-countdown]'));
+            if (!elements.length) return;
+
+            const render = () => {
+                elements.forEach(el => {
+                    const id = el.getAttribute('data-sale-countdown');
+                    const end = lookup[id];
+                    if (!end) {
+                        el.textContent = '';
+                        return;
+                    }
+                    const diff = end - Date.now();
+                    if (diff <= 0) {
+                        el.textContent = 'Sale ended';
+                        el.classList.add('text-rose-600');
+                        return;
+                    }
+                    const totalSeconds = Math.floor(diff / 1000);
+                    const days = Math.floor(totalSeconds / 86400);
+                    const hours = Math.floor((totalSeconds % 86400) / 3600);
+                    const minutes = Math.floor((totalSeconds % 3600) / 60);
+                    const seconds = totalSeconds % 60;
+                    const dayPrefix = days > 0 ? `${days}d ` : '';
+                    el.textContent = `Ends in ${dayPrefix}${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+                });
+            };
+
+            render();
+            productSaleCountdownInterval = setInterval(render, 1000);
+        }
+
         async function loadProducts() {
             try {
                 const res = await fetch(`${API_URL}/products`);
@@ -764,6 +1834,9 @@
                     const list = document.getElementById('productsList');
                     list.innerHTML = data.data.map(p => {
                         const images = p.images && p.images.length > 0 ? p.images : [p.image];
+                        const saleEndTs = p?.saleEnd ? new Date(p.saleEnd).getTime() : null;
+                        const saleActive = p.onSale && Number(p.salePrice) > 0 && (!saleEndTs || saleEndTs > Date.now());
+                        const displayPrice = saleActive ? `${formatNpr(p.salePrice)} (was ${formatNpr(p.price)})` : formatNpr(p.price);
                         return `
                         <div class="bg-white border border-gray-200 rounded-lg p-6 card-hover">
                             <div class="flex items-start justify-between">
@@ -773,10 +1846,12 @@
                                         <h3 class="font-semibold text-gray-800 text-lg">${p.name}</h3>
                                         <p class="text-sm text-gray-600 mt-1">${p.description || ''}</p>
                                         <div class="flex items-center space-x-4 mt-2 text-sm">
-                                            <span class="text-blue-600 font-semibold">$${p.price}</span>
+                                            <span class="text-blue-600 font-semibold">${displayPrice}</span>
                                             <span class="text-gray-500">${p.category}</span>
                                             <span class="${p.stock > 0 ? 'text-green-600' : 'text-red-600'}">Stock: ${p.stock}</span>
                                             ${p.featured ? '<span class="bg-yellow-100 text-yellow-700 px-2 py-1 rounded text-xs">Featured</span>' : ''}
+                                            ${saleActive ? `<span class="bg-emerald-100 text-emerald-700 px-2 py-1 rounded text-xs">${p.saleLabel || 'On Sale'}</span>` : ''}
+                                            ${(saleActive && saleEndTs) ? `<span class="text-xs text-emerald-700" data-sale-countdown="${p._id}"></span>` : ''}
                                         </div>
                                         ${images.length > 1 ? `
                                         <div class="flex space-x-2 mt-3">
@@ -799,6 +1874,7 @@
                     
                     // Attach event listeners
                     attachProductEventListeners();
+                    startProductSaleCountdowns(data.data);
                 }
             } catch (err) {
                 showToast('error', 'Failed to load products: ' + err.message);
@@ -895,6 +1971,123 @@
                     deletePage(id);
                 });
             });
+
+            // Page ordering event listeners
+            document.querySelectorAll('[data-action="movePageUp"]').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const id = this.getAttribute('data-arg');
+                    movePageUp(id);
+                });
+            });
+
+            document.querySelectorAll('[data-action="movePageDown"]').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const id = this.getAttribute('data-arg');
+                    movePageDown(id);
+                });
+            });
+
+            document.getElementById('saveOrderBtn')?.addEventListener('click', saveOrder);
+        }
+
+        // Page ordering functions
+        function movePageUp(id) {
+            const pages = Object.values(pagesCache || {}).sort((a, b) => (a.order || 0) - (b.order || 0));
+            const i = pages.findIndex(p => p._id === id);
+            if (i > 0) {
+                const tmp = pages[i - 1].order || 0;
+                pages[i - 1].order = pages[i].order || 0;
+                pages[i].order = tmp;
+                pages.forEach(p => pagesCache[p._id] = p);
+                renderPagesListFromCache();
+            }
+        }
+
+        function movePageDown(id) {
+            const pages = Object.values(pagesCache || {}).sort((a, b) => (a.order || 0) - (b.order || 0));
+            const i = pages.findIndex(p => p._id === id);
+            if (i < pages.length - 1 && i !== -1) {
+                const tmp = pages[i + 1].order || 0;
+                pages[i + 1].order = pages[i].order || 0;
+                pages[i].order = tmp;
+                pages.forEach(p => pagesCache[p._id] = p);
+                renderPagesListFromCache();
+            }
+        }
+
+        function renderPagesListFromCache() {
+            const list = document.getElementById('pagesList');
+            const pages = Object.values(pagesCache || {}).sort((a, b) => (a.order || 0) - (b.order || 0));
+            if (!pages.length) {
+                list.innerHTML = '<p class="text-gray-600">No pages yet. Create one using the form.</p>';
+                return;
+            }
+            list.innerHTML = pages.map(p => `
+                <div class="bg-white border-2 border-gray-100 rounded-xl p-6 hover:border-purple-300 hover:shadow-lg transition-all duration-200">
+                    <div class="flex items-start justify-between mb-3">
+                        <div class="flex-1">
+                            <h3 class="font-bold text-gray-800 text-lg mb-1">${p.title}</h3>
+                            <p class="text-sm text-purple-600 font-medium">/${p.slug}</p>
+                            <p class="text-xs text-gray-500 mt-1">Order: <span id="order-${p._id}">${p.order || 0}</span></p>
+                        </div>
+                        <span class="${p.published ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700'} px-3 py-1 rounded-full text-xs font-semibold">
+                            ${p.published ? '✓ Live' : 'Draft'}
+                        </span>
+                    </div>
+                    ${p.content ? `<div class="text-sm text-gray-600 line-clamp-2 mb-3">${p.content.replace(/<[^>]*>/g, '').substring(0, 100)}...</div>` : ''}
+                    ${p.meta && p.meta.description ? `<p class="text-xs text-gray-500 italic mb-3">"${p.meta.description.substring(0, 80)}..."</p>` : ''}
+                    <div class="flex items-center justify-between pt-3 border-t border-gray-100">
+                        <div class="flex space-x-1">
+                            <button data-action="movePageUp" data-arg="${p._id}" class="px-2 py-1 border rounded text-xs hover:bg-gray-50">↑</button>
+                            <button data-action="movePageDown" data-arg="${p._id}" class="px-2 py-1 border rounded text-xs hover:bg-gray-50">↓</button>
+                        </div>
+                        <span class="text-xs text-gray-500">
+                            <svg class="w-4 h-4 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                            </svg>
+                            ${new Date(p.createdAt).toLocaleDateString()}
+                        </span>
+                        <div class="flex space-x-2">
+                            <button data-edit-page="${p._id}" class="px-3 py-1.5 bg-purple-100 text-purple-700 rounded-lg hover:bg-purple-200 transition text-sm font-medium">
+                                Edit
+                            </button>
+                            <button data-delete-page="${p._id}" class="px-3 py-1.5 bg-red-100 text-red-600 rounded-lg hover:bg-red-200 transition text-sm font-medium">
+                                Delete
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+            attachPageEventListeners();
+        }
+
+        async function saveOrder() {
+            const orders = Object.values(pagesCache || {}).map(p => ({ id: p._id, order: p.order || 0 }));
+            const token = getAdminToken();
+            if (!token) {
+                showToast('error', 'Admin login required');
+                openLoginModal();
+                return;
+            }
+            try {
+                const res = await fetch(`${API_URL}/pages/order`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Bearer ' + token
+                    },
+                    body: JSON.stringify({ orders })
+                });
+                const json = await res.json();
+                if (json.success) {
+                    showToast('success', '✅ Order saved');
+                    loadPages();
+                } else {
+                    showToast('error', '❌ Save failed');
+                }
+            } catch (err) {
+                showToast('error', '❌ Network error: ' + err.message);
+            }
         }
 
         function attachComponentEventListeners() {
@@ -934,6 +2127,10 @@
             form.elements['id'].value = product._id;
             form.elements['name'].value = product.name;
             form.elements['price'].value = product.price;
+            form.elements['onSale'].checked = !!product.onSale;
+            form.elements['salePrice'].value = typeof product.salePrice === 'number' ? product.salePrice : '';
+            form.elements['saleLabel'].value = product.saleLabel || '';
+            form.elements['saleEnd'].value = toLocalDatetimeInput(product.saleEnd);
             form.elements['description'].value = product.description || '';
             form.elements['category'].value = product.category;
             form.elements['stock'].value = product.stock;
@@ -967,10 +2164,16 @@
             const id = formData.get('id');
             const imagesText = formData.get('images') || '';
             const imagesArray = imagesText.split('\n').map(s => s.trim()).filter(s => s.length > 0);
+            const salePriceRaw = formData.get('salePrice');
+            const saleEndRaw = formData.get('saleEnd');
             
             const data = {
                 name: formData.get('name'),
                 price: parseFloat(formData.get('price')),
+                onSale: formData.get('onSale') === 'on',
+                salePrice: salePriceRaw === '' ? undefined : parseFloat(salePriceRaw),
+                saleLabel: formData.get('saleLabel'),
+                saleEnd: saleEndRaw || undefined,
                 description: formData.get('description'),
                 category: formData.get('category'),
                 stock: parseInt(formData.get('stock')),
@@ -1070,6 +2273,7 @@
                                 <div class="flex-1">
                                     <h3 class="font-bold text-gray-800 text-lg mb-1">${p.title}</h3>
                                     <p class="text-sm text-purple-600 font-medium">/${p.slug}</p>
+                                    <p class="text-xs text-gray-500 mt-1">Order: <span id="order-${p._id}">${p.order || 0}</span></p>
                                 </div>
                                 <span class="${p.published ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700'} px-3 py-1 rounded-full text-xs font-semibold">
                                     ${p.published ? '✓ Live' : 'Draft'}
@@ -1078,6 +2282,10 @@
                             ${p.content ? `<div class="text-sm text-gray-600 line-clamp-2 mb-3">${p.content.replace(/<[^>]*>/g, '').substring(0, 100)}...</div>` : ''}
                             ${p.meta && p.meta.description ? `<p class="text-xs text-gray-500 italic mb-3">"${p.meta.description.substring(0, 80)}..."</p>` : ''}
                             <div class="flex items-center justify-between pt-3 border-t border-gray-100">
+                                <div class="flex space-x-1">
+                                    <button data-action="movePageUp" data-arg="${p._id}" class="px-2 py-1 border rounded text-xs hover:bg-gray-50">↑</button>
+                                    <button data-action="movePageDown" data-arg="${p._id}" class="px-2 py-1 border rounded text-xs hover:bg-gray-50">↓</button>
+                                </div>
                                 <span class="text-xs text-gray-500">
                                     <svg class="w-4 h-4 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
@@ -1456,6 +2664,77 @@
             }
         });
 
+        document.getElementById('closeEditCareerModalBtn')?.addEventListener('click', closeEditCareerModal);
+
+        document.getElementById('editCareerForm')?.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const token = getAdminToken();
+            if (!token) {
+                showToast('error', 'Please login first');
+                openLoginModal();
+                return;
+            }
+
+            const formData = new FormData(e.target);
+            const id = formData.get('id');
+            if (!id) {
+                showToast('error', 'Job id missing. Please reopen the editor.');
+                return;
+            }
+
+            const parseList = (value) => value
+                .split(',')
+                .map(entry => entry.trim())
+                .filter(Boolean);
+
+            const salaryMin = formData.get('salary_min');
+            const salaryMax = formData.get('salary_max');
+
+            const payload = {
+                title: formData.get('title'),
+                description: formData.get('description'),
+                department: formData.get('department'),
+                location: formData.get('location'),
+                type: formData.get('type'),
+                published: formData.get('published') === 'on',
+                requirements: formData.get('requirements') ? parseList(formData.get('requirements')) : [],
+                benefits: formData.get('benefits') ? parseList(formData.get('benefits')) : []
+            };
+
+            if (salaryMin || salaryMax) {
+                payload.salary = {
+                    min: salaryMin ? parseInt(salaryMin, 10) : undefined,
+                    max: salaryMax ? parseInt(salaryMax, 10) : undefined,
+                    currency: 'NPR'
+                };
+            } else {
+                payload.salary = null;
+            }
+
+            try {
+                const res = await fetch(`${API_URL}/careers/${id}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify(payload)
+                });
+
+                const result = await res.json();
+
+                if (result.success) {
+                    showToast('success', '✅ Job updated!');
+                    closeEditCareerModal();
+                    loadCareers();
+                } else {
+                    showToast('error', '❌ Failed: ' + (result.error || 'Unknown error'));
+                }
+            } catch (err) {
+                showToast('error', '❌ Network error: ' + err.message);
+            }
+        });
+
         // Careers CRUD
         async function loadCareers() {
             try {
@@ -1468,8 +2747,23 @@
                 const data = await res.json();
                 
                 if (data.success) {
+                    const jobs = Array.isArray(data.data) ? data.data : [];
+                    careersCache = {};
+                    jobs.forEach(job => {
+                        careersCache[job._id] = job;
+                    });
+
                     const list = document.getElementById('careersList');
-                    list.innerHTML = data.data.map(job => `
+                    if (!jobs.length) {
+                        list.innerHTML = `
+                            <div class="bg-white border border-dashed border-gray-300 rounded-lg p-8 text-center text-gray-500">
+                                <p>No job postings yet. Use the form above to add one.</p>
+                            </div>
+                        `;
+                        return;
+                    }
+
+                    list.innerHTML = jobs.map(job => `
                         <div class="bg-white border border-gray-200 rounded-lg p-6 card-hover">
                             <div class="flex items-start justify-between">
                                 <div class="flex-1">
@@ -1479,7 +2773,7 @@
                                         <span>🏢 ${job.department}</span>
                                         <span>⏱️ ${job.type}</span>
                                     </div>
-                                    <p class="text-gray-700 mt-2 text-sm">${job.description.substring(0, 100)}...</p>
+                                    <p class="text-gray-700 mt-2 text-sm">${(job.description || '').substring(0, 120)}${job.description && job.description.length > 120 ? '...' : ''}</p>
                                     <div class="flex items-center space-x-3 mt-3">
                                         <span class="${job.published ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700'} px-3 py-1 rounded text-xs font-medium">
                                             ${job.published ? '✓ Published' : 'Draft'}
@@ -1511,22 +2805,46 @@
         }
 
         // Subscribers
-        async function loadSubscribers() {
+        let subscribersLoading = false;
+
+        function setSubscribersLoading(isLoading) {
+            subscribersLoading = isLoading;
+            const btn = document.getElementById('refreshSubscribers');
+            if (btn) {
+                btn.disabled = isLoading;
+                btn.classList.toggle('opacity-60', isLoading);
+                btn.textContent = isLoading ? 'Refreshing...' : 'Refresh';
+            }
+        }
+
+        async function loadSubscribers(options = {}) {
             const token = getAdminToken();
+            const silent = options.silent === true;
+            const manual = options.manual === true;
+            console.log('loadSubscribers called - token:', token ? 'exists' : 'none', 'silent:', silent);
+            
             if (!token) {
-                showToast('error', 'Please login to view subscribers');
-                openLoginModal();
+                if (!silent) {
+                    showToast('error', 'Please login to view subscribers');
+                    openLoginModal();
+                }
                 return;
             }
 
             try {
+                setSubscribersLoading(true);
+                console.log('Fetching subscribers from API...');
                 const res = await fetch(`${API_URL}/subscribers/admin/all`, {
                     headers: { 'Authorization': `Bearer ${token}` }
                 });
                 const data = await res.json();
+                console.log('Subscribers API response:', data);
 
                 if (data.success) {
                     const tbody = document.getElementById('subscribersTable');
+                    console.log('Table element found:', !!tbody);
+                    console.log('Number of subscribers:', data.data.length);
+                    
                     if (!data.data.length) {
                         tbody.innerHTML = `
                             <tr>
@@ -1545,13 +2863,20 @@
                             </tr>
                         `).join('');
                     }
+                    console.log('Table updated successfully');
                     attachSubscriberEventListeners();
+                    if (manual) {
+                        showToast('success', 'Subscribers refreshed');
+                    }
                 } else {
+                    console.error('API returned success=false:', data);
                     showToast('error', 'Failed to load subscribers');
                 }
             } catch (err) {
                 console.error('Failed to load subscribers:', err);
                 showToast('error', 'Failed to load subscribers: ' + err.message);
+            } finally {
+                setSubscribersLoading(false);
             }
         }
 
@@ -1627,6 +2952,312 @@
             }
         }
 
+        // ========== SUPPORT TICKETS ==========
+        async function loadTickets() {
+            const token = getAdminToken();
+            if (!token) {
+                openLoginModal();
+                return;
+            }
+
+            try {
+                const statusFilter = document.getElementById('ticketStatusFilter')?.value || 'all';
+                const res = await fetch(`${API_URL}/tickets/admin/all?status=${statusFilter}`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const data = await res.json();
+
+                if (data.success) {
+                    ticketsCache = data.data;
+                    renderTicketsList(data.data);
+                } else {
+                    showToast('error', 'Failed to load tickets');
+                }
+            } catch (err) {
+                console.error('Failed to load tickets:', err);
+                showToast('error', 'Failed to load tickets: ' + err.message);
+            }
+        }
+
+        function renderTicketsList(tickets) {
+            const container = document.getElementById('ticketsList');
+            if (!container) return;
+
+            if (!tickets || tickets.length === 0) {
+                container.innerHTML = '<div class="text-center text-gray-500 py-12 bg-white rounded-lg border border-gray-200">No support tickets found</div>';
+                return;
+            }
+
+            container.innerHTML = tickets.map(ticket => {
+                const statusColors = {
+                    'open': 'bg-blue-100 text-blue-700',
+                    'in-progress': 'bg-yellow-100 text-yellow-700',
+                    'solved': 'bg-green-100 text-green-700',
+                    'closed': 'bg-gray-100 text-gray-700'
+                };
+                const priorityColors = {
+                    'low': 'text-gray-600',
+                    'medium': 'text-yellow-600',
+                    'high': 'text-red-600'
+                };
+                const userName = ticket.user ? `${ticket.user.firstName} ${ticket.user.lastName}` : (ticket.guestName || 'Guest');
+                const userEmail = ticket.user?.email || (ticket.guestEmail || '');
+                const messageCount = ticket.messages?.length || 0;
+                const lastMessage = ticket.messages?.[messageCount - 1];
+                const lastMessageTime = lastMessage ? new Date(lastMessage.timestamp).toLocaleString() : '';
+
+                const guestBadge = (ticket.guestName || ticket.source === 'chatbot') ? `<span class="px-2 py-1 text-xs font-semibold rounded-full bg-indigo-100 text-indigo-700">💬 Guest</span>` : '';
+                const unseenBadge = (ticket.seen === false) ? `<span class="px-2 py-1 text-xs font-semibold rounded-full bg-rose-100 text-rose-700">⚠️ Unseen</span>` : '';
+                const highlightClass = (ticket.seen === false) ? 'ring-2 ring-rose-100' : '';
+                const guestClass = (ticket.guestName || ticket.source === 'chatbot') ? 'bg-indigo-50' : '';
+
+                return `
+                <div class="bg-white border ${highlightClass} border-gray-200 rounded-lg p-6 hover:shadow-md transition cursor-pointer ${guestClass}" onclick="openTicketDetails('${ticket._id}')">
+                    <div class="flex items-start justify-between mb-3">
+                        <div class="flex-1">
+                            <div class="flex items-center gap-2 mb-2">
+                                <span class="text-xs font-semibold text-gray-500">#${ticket._id.slice(-6).toUpperCase()}</span>
+                                <span class="px-2 py-1 text-xs font-semibold rounded-full ${statusColors[ticket.status] || 'bg-gray-100 text-gray-700'}">${ticket.status}</span>
+                                <span class="text-xs ${priorityColors[ticket.priority] || 'text-gray-600'} font-semibold">${ticket.priority} priority</span>
+                                ${guestBadge}
+                                ${unseenBadge}
+                            </div>
+                            <h3 class="text-lg font-semibold text-gray-800 mb-1">${ticket.subject}</h3>
+                            <p class="text-sm text-gray-600 mb-2">${ticket.description.slice(0, 120)}${ticket.description.length > 120 ? '...' : ''}</p>
+                            <div class="flex items-center gap-4 text-xs text-gray-500">
+                                <span>👤 ${userName}</span>
+                                <span>📧 ${userEmail}</span>
+                                <span>💬 ${messageCount} messages</span>
+                                <span>🏷️ ${ticket.category}</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="text-xs text-gray-500 mt-3 pt-3 border-t border-gray-100">
+                        Created: ${new Date(ticket.createdAt).toLocaleString()} • Last update: ${lastMessageTime}
+                    </div>
+                </div>
+                `;
+            }).join('');
+        }
+
+        function renderGroupedTicketsList(tickets){
+            const container = document.getElementById('ticketsList');
+            if (!container) return;
+            if (!tickets || tickets.length === 0) {
+                container.innerHTML = '<div class="text-center text-gray-500 py-12 bg-white rounded-lg border border-gray-200">No support tickets found</div>';
+                return;
+            }
+
+            // Group guest tickets by email/name
+            const guestGroups = {};
+            const others = [];
+            tickets.forEach(t => {
+                const isGuest = (t.guestName || t.source === 'chatbot');
+                if (!isGuest) { others.push(t); return; }
+                const key = t.guestEmail || t.guestName || 'Guest';
+                if (!guestGroups[key]) guestGroups[key] = [];
+                guestGroups[key].push(t);
+            });
+
+            let html = '';
+            // Render guest groups first
+            Object.keys(guestGroups).forEach((gKey, idx)=>{
+                const group = guestGroups[gKey];
+                html += `
+                <div class="bg-white border border-gray-200 rounded-lg p-4 mb-4">
+                    <div class="flex items-center justify-between mb-3">
+                        <div class="flex items-center gap-3">
+                            <div class="rounded-full bg-indigo-50 w-10 h-10 flex items-center justify-center text-indigo-600 font-semibold">${(gKey[0]||'G').toUpperCase()}</div>
+                            <div>
+                                <div class="text-sm font-semibold text-gray-800">${escapeHtml(gKey)} <span class="text-xs text-gray-500">(${group.length} tickets)</span></div>
+                                <div class="text-xs text-gray-500">${group[0].guestEmail || ''}</div>
+                            </div>
+                        </div>
+                        <div class="text-sm text-gray-500">Group</div>
+                    </div>
+                    <div class="grid gap-3">
+                        ${group.map(t => `
+                            <div class="p-3 bg-gray-50 rounded cursor-pointer" onclick="openTicketDetails('${t._id}')">
+                                <div class="flex items-center justify-between">
+                                    <div>
+                                        <div class="text-sm font-medium text-gray-900">${escapeHtml(t.subject || '(no subject)')} ${t.seen === false ? '<span class="ml-2 inline-flex items-center rounded-full bg-rose-100 px-2 py-0.5 text-xs font-medium text-rose-800">⚠️ Unseen</span>' : ''}</div>
+                                        <div class="text-xs text-gray-500">${escapeHtml((t.message||'').slice(0, 120))}${(t.message||'').length > 120 ? '...' : ''}</div>
+                                    </div>
+                                    <div class="text-xs text-gray-500">${new Date(t.createdAt).toLocaleString()}</div>
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+                `;
+            });
+
+            // Then render others (non-guest)
+            others.forEach(t => {
+                html += `
+                <div class="bg-white border border-gray-200 rounded-lg p-4 mb-4 cursor-pointer" onclick="openTicketDetails('${t._id}')">
+                    <div class="flex items-start justify-between mb-2">
+                        <div>
+                            <div class="text-sm font-medium text-gray-900">${escapeHtml(t.subject || '(no subject)')}</div>
+                            <div class="text-xs text-gray-500">From: ${escapeHtml(t.user ? (t.user.firstName + ' ' + t.user.lastName) : (t.user ? t.user.email : 'Unknown'))}</div>
+                        </div>
+                        <div class="text-xs text-gray-500">${new Date(t.createdAt).toLocaleString()}</div>
+                    </div>
+                    <div class="text-sm text-gray-600">${escapeHtml((t.description||'').slice(0, 120))}${(t.description||'').length > 120 ? '...' : ''}</div>
+                </div>
+                `;
+            });
+
+            container.innerHTML = html;
+        }
+
+        function openTicketDetails(ticketId) {
+            const ticket = ticketsCache.find(t => t._id === ticketId);
+            if (!ticket) {
+                showToast('error', 'Ticket not found');
+                return;
+            }
+
+            const modal = document.getElementById('ticketDetailsModal');
+            if (!modal) return;
+
+            const title = document.getElementById('ticketDetailsTitle');
+            if (title) title.textContent = `#${ticket._id.slice(-6).toUpperCase()}`;
+
+            const body = document.getElementById('ticketDetailsBody');
+            if (!body) return;
+
+            const statusColors = {
+                'open': 'bg-blue-100 text-blue-700',
+                'in-progress': 'bg-yellow-100 text-yellow-700',
+                'solved': 'bg-green-100 text-green-700',
+                'closed': 'bg-gray-100 text-gray-700'
+            };
+            const userName = ticket.user ? `${ticket.user.firstName} ${ticket.user.lastName}` : 'Unknown';
+            const userEmail = ticket.user?.email || '';
+
+            const messagesHtml = (ticket.messages || []).map(msg => {
+                const isAdmin = msg.sender === 'admin';
+                return `
+                <div class="${isAdmin ? 'bg-blue-50 border-l-4 border-blue-500' : 'bg-gray-50 border-l-4 border-gray-300'} p-4 rounded-lg">
+                    <div class="flex items-center gap-2 mb-2">
+                        <span class="text-sm font-semibold ${isAdmin ? 'text-blue-700' : 'text-gray-700'}">${msg.senderName || (isAdmin ? 'Admin' : 'User')}</span>
+                        <span class="text-xs text-gray-500">${new Date(msg.timestamp).toLocaleString()}</span>
+                    </div>
+                    <p class="text-sm text-gray-800 whitespace-pre-wrap">${msg.message}</p>
+                </div>
+                `;
+            }).join('');
+
+            body.innerHTML = `
+                <div class="bg-white rounded-xl border border-gray-100 p-4 space-y-4">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <h3 class="font-semibold text-gray-800 text-lg">${ticket.subject}</h3>
+                            <p class="text-sm text-gray-600 mt-1">From: ${userName} (${userEmail})</p>
+                        </div>
+                        <span class="px-3 py-1 text-sm font-semibold rounded-full ${statusColors[ticket.status] || 'bg-gray-100 text-gray-700'}">${ticket.status}</span>
+                    </div>
+                    <div class="flex gap-4 text-xs text-gray-500">
+                        <span>Category: ${ticket.category}</span>
+                        <span>Priority: ${ticket.priority}</span>
+                        <span>Created: ${new Date(ticket.createdAt).toLocaleString()}</span>
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-xl border border-gray-100 p-4">
+                    <p class="text-xs uppercase tracking-wide text-gray-400 mb-3">Messages</p>
+                    <div class="space-y-3">
+                        ${messagesHtml}
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-xl border border-gray-100 p-4">
+                    <p class="text-xs uppercase tracking-wide text-gray-400 mb-3">Reply to ticket</p>
+                    <textarea id="ticketReplyMessage" rows="3" class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500" placeholder="Type your response..."></textarea>
+                    <div class="flex items-center justify-between mt-3">
+                        <select id="ticketReplyStatus" class="border border-gray-300 rounded-lg px-3 py-2 text-sm">
+                            <option value="">Keep status (${ticket.status})</option>
+                            <option value="open">Open</option>
+                            <option value="in-progress">In Progress</option>
+                            <option value="solved">Mark as Solved</option>
+                            <option value="closed">Close Ticket</option>
+                        </select>
+                        <button onclick="sendTicketReply('${ticket._id}')" class="px-4 py-2 bg-blue-600 text-white text-sm rounded-lg hover:bg-blue-700">Send Reply</button>
+                    </div>
+                </div>
+            `;
+
+            // Mark as seen when admin opens details
+            if (ticket.seen === false){ markTicketSeen(ticket._id, true); }
+            modal.classList.remove('hidden');
+        }
+
+        function closeTicketDetails() {
+            const modal = document.getElementById('ticketDetailsModal');
+            if (modal) modal.classList.add('hidden');
+        }
+
+        // Mark ticket as seen (admin action)
+        async function markTicketSeen(ticketId, seen=true){
+            const token = getAdminToken();
+            if (!token) return;
+            try{
+                await fetch(`${API_URL}/tickets/admin/${ticketId}/seen`, { method: 'PATCH', headers: { 'Content-Type':'application/json', 'Authorization': `Bearer ${token}` }, body: JSON.stringify({ seen }) });
+                // update cache
+                const idx = ticketsCache.findIndex(t => t._id === ticketId);
+                if (idx !== -1) ticketsCache[idx].seen = seen;
+                updateUnseenCount();
+            }catch(e){ console.warn('Failed to mark ticket seen', e.message); }
+        }
+
+        async function sendTicketReply(ticketId) {
+            const token = getAdminToken();
+            if (!token) {
+                openLoginModal();
+                return;
+            }
+
+            const message = document.getElementById('ticketReplyMessage')?.value?.trim();
+            if (!message) {
+                showToast('error', 'Please enter a message');
+                return;
+            }
+
+            const status = document.getElementById('ticketReplyStatus')?.value;
+
+            try {
+                const res = await fetch(`${API_URL}/tickets/admin/${ticketId}/reply`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify({ message, status: status || undefined })
+                });
+
+                const data = await res.json();
+                if (data.success) {
+                    showToast('success', 'Reply sent successfully');
+                    // Update cache
+                    const index = ticketsCache.findIndex(t => t._id === ticketId);
+                    if (index !== -1) {
+                        ticketsCache[index] = data.data;
+                    }
+                    closeTicketDetails();
+                    loadTickets();
+                } else {
+                    showToast('error', data.error || 'Failed to send reply');
+                }
+            } catch (err) {
+                console.error('Failed to send reply:', err);
+                showToast('error', 'Failed to send reply: ' + err.message);
+            }
+        }
+
+        window.openTicketDetails = openTicketDetails;
+        window.sendTicketReply = sendTicketReply;
+
         function attachCareerEventListeners() {
             document.querySelectorAll('[data-edit-career]').forEach(btn => {
                 btn.addEventListener('click', function() {
@@ -1649,6 +3280,43 @@
                 });
             });
         }
+
+        // Tickets: filters and unseen count
+        let showOnlyGuestTickets = false;
+        let showOnlyUnseenTickets = false;
+        let showGroupGuests = false;
+
+        async function updateUnseenCount(){
+            const token = getAdminToken();
+            if (!token) return;
+            try{
+                const res = await fetch(`${API_URL}/tickets/admin/unseen-count`, { headers: { 'Authorization': `Bearer ${token}` } });
+                const data = await res.json();
+                if (data.success) document.getElementById('ticketsUnseenCount').textContent = data.count || 0;
+            }catch(e){ console.warn('Failed to update unseen count', e.message); }
+        }
+
+        document.getElementById('filterGuestBtn')?.addEventListener('click', ()=>{ showOnlyGuestTickets = !showOnlyGuestTickets; document.getElementById('filterGuestBtn').classList.toggle('bg-indigo-700'); document.getElementById('filterGuestBtn').classList.toggle('text-white'); loadTickets(); });
+        document.getElementById('groupGuestBtn')?.addEventListener('click', ()=>{ showGroupGuests = !showGroupGuests; const el = document.getElementById('groupGuestBtn'); el.classList.toggle('bg-indigo-700'); el.classList.toggle('text-white'); loadTickets(); });
+        document.getElementById('filterUnseenBtn')?.addEventListener('click', ()=>{ showOnlyUnseenTickets = !showOnlyUnseenTickets; document.getElementById('filterUnseenBtn').classList.toggle('bg-rose-700'); document.getElementById('filterUnseenBtn').classList.toggle('text-white'); loadTickets(); });
+        document.getElementById('ticketsUnseenBadge')?.addEventListener('click', ()=>{ document.querySelector('[data-tab="tickets"]').click(); showOnlyUnseenTickets = true; document.getElementById('filterUnseenBtn').classList.add('bg-rose-700'); document.getElementById('filterUnseenBtn').classList.add('text-white'); loadTickets(); });
+
+        // Periodically refresh unseen count
+        setInterval(updateUnseenCount, 60 * 1000);
+        updateUnseenCount();
+
+        // Adjust loadTickets to apply client-side guest/unseen filters and grouping
+        const _origLoadTickets = loadTickets;
+        loadTickets = async function(){
+            await _origLoadTickets();
+            if (ticketsCache && ticketsCache.length){
+                let filtered = ticketsCache;
+                if (showOnlyGuestTickets) filtered = filtered.filter(t => t.guestName || t.source === 'chatbot');
+                if (showOnlyUnseenTickets) filtered = filtered.filter(t => t.seen === false);
+                if (showGroupGuests) return renderGroupedTicketsList(filtered);
+                renderTicketsList(filtered);
+            }
+        };
 
         document.getElementById('addCareerForm')?.addEventListener('submit', async (e) => {
             e.preventDefault();
@@ -1676,7 +3344,7 @@
                 data.salary = {
                     min: parseInt(salary_min),
                     max: parseInt(salary_max),
-                    currency: 'USD'
+                    currency: 'NPR'
                 };
             }
 
@@ -1734,8 +3402,34 @@
         }
 
         function editCareer(id) {
-            console.log('Edit career:', id);
-            showToast('info', 'Career edit feature coming soon - use delete and recreate for now');
+            const job = careersCache[id];
+            if (!job) {
+                showToast('error', 'Job not found in cache. Please refresh.');
+                return;
+            }
+
+            const form = document.getElementById('editCareerForm');
+            if (!form) return;
+
+            form.reset();
+            form.querySelector('[name="id"]').value = job._id;
+            form.querySelector('[name="title"]').value = job.title || '';
+            form.querySelector('[name="department"]').value = job.department || 'Engineering';
+            form.querySelector('[name="location"]').value = job.location || '';
+            form.querySelector('[name="type"]').value = job.type || 'Full-time';
+            form.querySelector('[name="description"]').value = job.description || '';
+            form.querySelector('[name="salary_min"]').value = job.salary?.min ?? '';
+            form.querySelector('[name="salary_max"]').value = job.salary?.max ?? '';
+            form.querySelector('[name="requirements"]').value = Array.isArray(job.requirements) ? job.requirements.join(', ') : '';
+            form.querySelector('[name="benefits"]').value = Array.isArray(job.benefits) ? job.benefits.join(', ') : '';
+            form.querySelector('[name="published"]').checked = job.published !== false;
+
+            document.getElementById('editCareerModal').classList.remove('hidden');
+        }
+
+        function closeEditCareerModal() {
+            document.getElementById('editCareerModal').classList.add('hidden');
+            document.getElementById('editCareerForm')?.reset();
         }
 
         async function viewApplications(jobId) {
@@ -1896,13 +3590,30 @@
                 if (data.success && data.data) {
                     const hero = data.data;
                     const form = document.getElementById('heroForm');
-                    
-                    form.querySelector('[name="title"]').value = hero.title || '';
-                    form.querySelector('[name="subtitle"]').value = hero.subtitle || '';
-                    form.querySelector('[name="ctaText"]').value = hero.ctaText || '';
-                    form.querySelector('[name="ctaLink"]').value = hero.ctaLink || '';
-                    form.querySelector('[name="backgroundImage"]').value = hero.backgroundImage || '';
-                    form.querySelector('[name="enabled"]').checked = hero.enabled !== false;
+                    if (form) {
+                        form.querySelector('[name="title"]').value = hero.title || '';
+                        form.querySelector('[name="subtitle"]').value = hero.subtitle || '';
+                        form.querySelector('[name="ctaText"]').value = hero.ctaText || '';
+                        form.querySelector('[name="ctaLink"]').value = hero.ctaLink || '';
+                        form.querySelector('[name="backgroundImage"]').value = hero.backgroundImage || '';
+                        const badgeField = form.querySelector('[name="badgeText"]');
+                        if (badgeField) badgeField.value = hero.badgeText || '';
+                        form.querySelector('[name="enabled"]').checked = hero.enabled !== false;
+                    }
+
+                    const spotlightForm = document.getElementById('spotlightForm');
+                    if (spotlightForm) {
+                        spotlightForm.querySelector('[name="spotlightTitle"]').value = hero.spotlightTitle || '';
+                        spotlightForm.querySelector('[name="spotlightCopy"]').value = hero.spotlightCopy || '';
+                        spotlightForm.querySelector('[name="spotlightMeta"]').value = hero.spotlightMeta || '';
+                        spotlightForm.querySelector('[name="spotlightPrice"]').value = hero.spotlightPrice ?? '';
+                        spotlightForm.querySelector('[name="spotlightCtaText"]').value = hero.spotlightCtaText || '';
+                        spotlightForm.querySelector('[name="spotlightCtaLink"]').value = hero.spotlightCtaLink || '';
+                        spotlightForm.querySelector('[name="spotlightImage"]').value = hero.spotlightImage || '';
+                        spotlightForm.querySelector('[name="spotlightItems"]').value = Array.isArray(hero.spotlightItems)
+                            ? hero.spotlightItems.join('\n')
+                            : (hero.spotlightItems || '');
+                    }
                     
                     // Update preview
                     updateHeroPreview(hero);
@@ -1926,24 +3637,44 @@
             }
         }
 
-        document.getElementById('heroForm')?.addEventListener('submit', async (e) => {
-            e.preventDefault();
+        function getHeroPayload() {
+            const heroForm = document.getElementById('heroForm');
+            const spotlightForm = document.getElementById('spotlightForm');
+            if (!heroForm) return {};
+
+            const formData = new FormData(heroForm);
+            const payload = {
+                title: formData.get('title'),
+                subtitle: formData.get('subtitle'),
+                ctaText: formData.get('ctaText'),
+                ctaLink: formData.get('ctaLink'),
+                backgroundImage: formData.get('backgroundImage'),
+                badgeText: formData.get('badgeText'),
+                enabled: formData.get('enabled') === 'on'
+            };
+
+            if (spotlightForm) {
+                const spotlightData = new FormData(spotlightForm);
+                payload.spotlightTitle = spotlightData.get('spotlightTitle');
+                payload.spotlightCopy = spotlightData.get('spotlightCopy');
+                payload.spotlightMeta = spotlightData.get('spotlightMeta');
+                payload.spotlightPrice = spotlightData.get('spotlightPrice');
+                payload.spotlightCtaText = spotlightData.get('spotlightCtaText');
+                payload.spotlightCtaLink = spotlightData.get('spotlightCtaLink');
+                payload.spotlightImage = spotlightData.get('spotlightImage');
+                payload.spotlightItems = spotlightData.get('spotlightItems');
+            }
+
+            return payload;
+        }
+
+        async function saveHero(payload, successMessage = '✅ Saved!') {
             const token = getAdminToken();
             if (!token) {
                 showToast('error', 'Please login first');
                 openLoginModal();
                 return;
             }
-
-            const formData = new FormData(e.target);
-            const data = {
-                title: formData.get('title'),
-                subtitle: formData.get('subtitle'),
-                ctaText: formData.get('ctaText'),
-                ctaLink: formData.get('ctaLink'),
-                backgroundImage: formData.get('backgroundImage'),
-                enabled: formData.get('enabled') === 'on'
-            };
 
             try {
                 const res = await fetch(`${API_URL}/hero`, {
@@ -1952,13 +3683,13 @@
                         'Content-Type': 'application/json',
                         'Authorization': `Bearer ${token}`
                     },
-                    body: JSON.stringify(data)
+                    body: JSON.stringify(payload)
                 });
 
                 const result = await res.json();
 
                 if (result.success) {
-                    showToast('success', '✅ Hero settings saved!');
+                    showToast('success', successMessage);
                     updateHeroPreview(result.data);
                 } else {
                     showToast('error', '❌ Failed: ' + (result.error || 'Unknown error'));
@@ -1966,6 +3697,84 @@
             } catch (err) {
                 showToast('error', '❌ Network error: ' + err.message);
             }
+        }
+
+        document.getElementById('heroForm')?.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const payload = getHeroPayload();
+            saveHero(payload, '✅ Hero settings saved!');
+        });
+
+        document.getElementById('spotlightForm')?.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const payload = getHeroPayload();
+            saveHero(payload, '✅ Spotlight bundle saved!');
+        });
+
+        async function uploadHeroAsset(file, statusEl) {
+            const token = getAdminToken();
+            if (!token) {
+                showToast('error', 'Please login first');
+                openLoginModal();
+                return null;
+            }
+            if (!file) return null;
+            try {
+                statusEl && (statusEl.textContent = 'Uploading...');
+                const formData = new FormData();
+                formData.append('image', file);
+                const res = await fetch(`${API_URL}/hero/upload`, {
+                    method: 'POST',
+                    headers: { 'Authorization': `Bearer ${token}` },
+                    body: formData
+                });
+                const data = await res.json();
+                if (data.success && data.url) {
+                    statusEl && (statusEl.textContent = 'Uploaded');
+                    return data.url;
+                }
+                throw new Error(data.error || 'Upload failed');
+            } catch (err) {
+                console.error('Upload failed', err);
+                statusEl && (statusEl.textContent = 'Failed');
+                showToast('error', 'Upload failed: ' + err.message);
+                return null;
+            }
+        }
+
+        const heroBgInput = document.getElementById('uploadHeroBgInput');
+        const heroBgBtn = document.getElementById('uploadHeroBgBtn');
+        const heroBgStatus = document.getElementById('uploadHeroBgStatus');
+        heroBgBtn?.addEventListener('click', () => heroBgInput?.click());
+        heroBgInput?.addEventListener('change', async (e) => {
+            const file = e.target.files?.[0];
+            const url = await uploadHeroAsset(file, heroBgStatus);
+            if (url) {
+                const bgField = document.querySelector('[name="backgroundImage"]');
+                if (bgField) bgField.value = url;
+                updateHeroPreview({
+                    title: document.querySelector('[name="title"]').value,
+                    subtitle: document.querySelector('[name="subtitle"]').value,
+                    ctaText: document.querySelector('[name="ctaText"]').value,
+                    backgroundImage: url
+                });
+            }
+            if (heroBgInput) heroBgInput.value = '';
+        });
+
+        const spotlightImgInput = document.getElementById('uploadSpotlightImgInput');
+        const spotlightImgBtn = document.getElementById('uploadSpotlightImgBtn');
+        const spotlightImgStatus = document.getElementById('uploadSpotlightImgStatus');
+        spotlightImgBtn?.addEventListener('click', () => spotlightImgInput?.click());
+        spotlightImgInput?.addEventListener('change', async (e) => {
+            const file = e.target.files?.[0];
+            const url = await uploadHeroAsset(file, spotlightImgStatus);
+            if (url) {
+                const field = document.querySelector('[name="spotlightImage"]');
+                if (field) field.value = url;
+                showToast('success', 'Spotlight image ready to save');
+            }
+            if (spotlightImgInput) spotlightImgInput.value = '';
         });
 
         // Live preview updates
@@ -1985,13 +3794,347 @@
         document.getElementById('refreshHero')?.addEventListener('click', loadHero);
 
         // Load all data
-        function loadAllData() {
-            loadProducts();
-            loadPages();
-            loadComponents();
-            loadHero();
-            loadCareers();
-            loadSubscribers();
+        async function loadPaymentSettings(options = {}) {
+            const manual = options.manual === true;
+            if (manual) {
+                setPaymentRefreshState(true);
+            }
+            try {
+                const res = await fetch(`${API_URL}/payment-settings`);
+                const data = await res.json();
+                if (!data.success || !data.data) throw new Error('Unable to load payment settings');
+                const settings = data.data;
+                const form = document.getElementById('paymentSettingsForm');
+                if (!form) return;
+
+                form.codEnabled.checked = settings.codEnabled !== false;
+                form.bankEnabled.checked = settings.bankEnabled !== false;
+                form.bankAccountName.value = settings.bankDetails?.accountName || '';
+                form.bankAccountNumber.value = settings.bankDetails?.accountNumber || '';
+                form.bankName.value = settings.bankDetails?.bankName || '';
+                form.bankBranch.value = settings.bankDetails?.branch || '';
+                form.bankSwift.value = settings.bankDetails?.swiftCode || '';
+                form.instructions.value = settings.instructions || '';
+                form.qrImageUrl.value = settings.qrImageUrl || '';
+
+                const esewa = settings.nepaliWallets?.esewa || {};
+                form.esewaEnabled.checked = esewa.enabled !== false;
+                form.esewaWalletNumber.value = esewa.walletNumber || '';
+                form.esewaInstructions.value = esewa.instructions || '';
+                form.esewaQr.value = esewa.qrImageUrl || '';
+
+                const khalti = settings.nepaliWallets?.khalti || {};
+                form.khaltiEnabled.checked = khalti.enabled !== false;
+                form.khaltiWalletNumber.value = khalti.walletNumber || '';
+                form.khaltiInstructions.value = khalti.instructions || '';
+                form.khaltiQr.value = khalti.qrImageUrl || '';
+
+                const imepay = settings.nepaliWallets?.imepay || {};
+                form.imeEnabled.checked = imepay.enabled !== false;
+                form.imeWalletNumber.value = imepay.walletNumber || '';
+                form.imeInstructions.value = imepay.instructions || '';
+                form.imeQr.value = imepay.qrImageUrl || '';
+
+                syncPaymentPreviewFromForm();
+                refreshAllToggleStates();
+                updatePaymentFieldLocks();
+                if (manual) {
+                    showToast('success', 'Payment settings refreshed');
+                }
+            } catch (err) {
+                console.error('Failed to load payment settings:', err);
+                showToast('error', 'Failed to load payment settings: ' + err.message);
+            } finally {
+                if (manual) {
+                    setPaymentRefreshState(false);
+                }
+            }
+        }
+
+        function updatePaymentPreview(settings) {
+            const preview = document.getElementById('paymentPreviewCard');
+            if (!preview) return;
+            document.getElementById('previewPaymentMethod').textContent = [
+                settings.codEnabled ? 'COD' : null,
+                settings.bankEnabled ? 'Bank' : null,
+                settings.nepaliWallets?.esewa?.enabled ? 'eSewa' : null,
+                settings.nepaliWallets?.khalti?.enabled ? 'Khalti' : null,
+                settings.nepaliWallets?.imepay?.enabled ? 'IME Pay' : null
+            ].filter(Boolean).join(' + ') || 'No methods enabled';
+            document.getElementById('previewInstructions').textContent = settings.instructions || 'Customers will see instructions here';
+            document.getElementById('previewBankName').textContent = settings.bankDetails?.bankName || '-';
+            document.getElementById('previewAccountNumber').textContent = settings.bankDetails?.accountNumber || '-';
+            document.getElementById('previewEsewa').textContent = settings.nepaliWallets?.esewa?.walletNumber || '-';
+            document.getElementById('previewKhalti').textContent = settings.nepaliWallets?.khalti?.walletNumber || '-';
+            const imeLabel = document.getElementById('previewIme');
+            if (imeLabel) {
+                imeLabel.textContent = settings.nepaliWallets?.imepay?.walletNumber || '-';
+            }
+            const qr = document.getElementById('previewQrImage');
+            if (settings.qrImageUrl) {
+                qr.src = settings.qrImageUrl;
+                qr.classList.remove('hidden');
+            } else {
+                qr.src = '';
+                qr.classList.add('hidden');
+            }
+        }
+
+        function setPaymentRefreshState(isBusy) {
+            const refreshBtn = document.getElementById('refreshPayments');
+            if (!refreshBtn) return;
+            if (!refreshBtn.dataset.defaultLabel) {
+                refreshBtn.dataset.defaultLabel = refreshBtn.textContent.trim();
+            }
+            refreshBtn.disabled = isBusy;
+            refreshBtn.classList.toggle('opacity-60', isBusy);
+            refreshBtn.textContent = isBusy ? 'Refreshing...' : refreshBtn.dataset.defaultLabel;
+        }
+
+        function setPaymentSaveState(isSaving) {
+            const saveBtn = document.querySelector('#paymentSettingsForm button[type="submit"]');
+            if (!saveBtn) return;
+            saveBtn.disabled = isSaving;
+            saveBtn.classList.toggle('opacity-60', isSaving);
+            saveBtn.setAttribute('aria-busy', isSaving ? 'true' : 'false');
+        }
+
+        const PAYMENT_QR_FIELDS = ['qrImageUrl', 'esewaQr', 'khaltiQr', 'imeQr'];
+        const PAYMENT_QR_MAX_SIZE = 2 * 1024 * 1024; // 2MB
+
+        function buildPaymentPayloadFromForm(form) {
+            if (!form) return null;
+            const norm = (value) => (value || '').trim();
+            return {
+                codEnabled: form.codEnabled.checked,
+                bankEnabled: form.bankEnabled.checked,
+                bankDetails: {
+                    accountName: norm(form.bankAccountName.value),
+                    accountNumber: norm(form.bankAccountNumber.value),
+                    bankName: norm(form.bankName.value),
+                    branch: norm(form.bankBranch.value),
+                    swiftCode: norm(form.bankSwift.value)
+                },
+                instructions: norm(form.instructions.value),
+                qrImageUrl: norm(form.qrImageUrl.value),
+                nepaliWallets: {
+                    esewa: {
+                        enabled: form.esewaEnabled.checked,
+                        walletNumber: norm(form.esewaWalletNumber.value),
+                        instructions: norm(form.esewaInstructions.value),
+                        qrImageUrl: norm(form.esewaQr.value)
+                    },
+                    khalti: {
+                        enabled: form.khaltiEnabled.checked,
+                        walletNumber: norm(form.khaltiWalletNumber.value),
+                        instructions: norm(form.khaltiInstructions.value),
+                        qrImageUrl: norm(form.khaltiQr.value)
+                    },
+                    imepay: {
+                        enabled: form.imeEnabled.checked,
+                        walletNumber: norm(form.imeWalletNumber.value),
+                        instructions: norm(form.imeInstructions.value),
+                        qrImageUrl: norm(form.imeQr.value)
+                    }
+                }
+            };
+        }
+
+        function syncPaymentPreviewFromForm() {
+            const form = document.getElementById('paymentSettingsForm');
+            const snapshot = buildPaymentPayloadFromForm(form);
+            if (snapshot) {
+                updatePaymentPreview(snapshot);
+            }
+        }
+
+        function updateSliderVisual(slider, input) {
+            if (!slider || !input) return;
+            slider.classList.toggle('is-active', !!input.checked);
+            if (!slider.dataset.accentApplied) {
+                if (slider.classList.contains('accent-emerald')) slider.dataset.accentApplied = 'emerald';
+                if (slider.classList.contains('accent-fuchsia')) slider.dataset.accentApplied = 'fuchsia';
+                if (slider.classList.contains('accent-indigo')) slider.dataset.accentApplied = 'indigo';
+            }
+            // Force repaint by toggling a CSS variable if needed (placeholder for future customizations)
+        }
+
+        function initToggleSliders() {
+            document.querySelectorAll('[data-toggle-slider]').forEach(slider => {
+                const input = slider.previousElementSibling;
+                if (!input) return;
+                const sync = () => updateSliderVisual(slider, input);
+                sync();
+                slider.addEventListener('click', (event) => {
+                    event.preventDefault();
+                    input.checked = !input.checked;
+                    input.dispatchEvent(new Event('change', { bubbles: true }));
+                });
+                input.addEventListener('change', sync);
+            });
+        }
+
+        function refreshAllToggleStates() {
+            document.querySelectorAll('[data-toggle-slider]').forEach(slider => {
+                const input = slider.previousElementSibling;
+                updateSliderVisual(slider, input);
+            });
+        }
+
+        function setFieldGroupState(containerId, enabled, excludeNames = []) {
+            const container = document.getElementById(containerId);
+            if (!container) return;
+            container.classList.toggle('field-disabled', !enabled);
+            container.querySelectorAll('input, textarea, select').forEach(el => {
+                if (excludeNames.includes(el.name)) return;
+                el.disabled = !enabled;
+            });
+        }
+
+        function updatePaymentFieldLocks() {
+            const form = document.getElementById('paymentSettingsForm');
+            if (!form) return;
+            setFieldGroupState('bankDetailsFields', form.bankEnabled.checked);
+            setFieldGroupState('esewaFields', form.esewaEnabled.checked, ['esewaEnabled']);
+            setFieldGroupState('khaltiFields', form.khaltiEnabled.checked, ['khaltiEnabled']);
+            setFieldGroupState('imeFields', form.imeEnabled.checked, ['imeEnabled']);
+        }
+
+        function setUploadButtonState(field, isUploading) {
+            const btn = document.querySelector(`[data-upload-btn="${field}"]`);
+            const status = document.querySelector(`[data-upload-status="${field}"]`);
+            if (btn) {
+                btn.disabled = isUploading;
+                btn.classList.toggle('opacity-60', isUploading);
+                btn.textContent = isUploading ? 'Uploading...' : 'Upload';
+            }
+            if (status) {
+                status.textContent = isUploading ? 'Uploading...' : '';
+            }
+        }
+
+        async function uploadPaymentQr(field, file) {
+            if (!file) return;
+            if (file.size > PAYMENT_QR_MAX_SIZE) {
+                showToast('error', 'QR image must be under 2MB');
+                return;
+            }
+
+            const token = getAdminToken();
+            if (!token) {
+                showToast('error', 'Please login first');
+                openLoginModal();
+                return;
+            }
+
+            const formData = new FormData();
+            formData.append('qr', file);
+            formData.append('field', field);
+
+            try {
+                setUploadButtonState(field, true);
+                const res = await fetch(`${API_URL}/payment-settings/upload`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: formData
+                });
+
+                const data = await res.json();
+                if (!res.ok || !data.success) {
+                    throw new Error(data.error || 'Upload failed');
+                }
+
+                const target = document.querySelector(`[name="${field}"]`);
+                if (target) {
+                    target.value = data.url;
+                    target.dispatchEvent(new Event('input', { bubbles: true }));
+                }
+                syncPaymentPreviewFromForm();
+                showToast('success', 'QR uploaded successfully');
+            } catch (err) {
+                console.error('QR upload failed:', err);
+                showToast('error', 'QR upload failed: ' + err.message);
+            } finally {
+                setUploadButtonState(field, false);
+                const input = document.querySelector(`[data-upload-input="${field}"]`);
+                if (input) {
+                    input.value = '';
+                }
+            }
+        }
+
+        function initPaymentUploaders() {
+            PAYMENT_QR_FIELDS.forEach(field => {
+                const btn = document.querySelector(`[data-upload-btn="${field}"]`);
+                const input = document.querySelector(`[data-upload-input="${field}"]`);
+                if (!btn || !input) return;
+                btn.addEventListener('click', () => input.click());
+                input.addEventListener('change', () => {
+                    const file = input.files && input.files[0];
+                    if (file) {
+                        uploadPaymentQr(field, file);
+                    }
+                });
+            });
+        }
+
+        async function savePaymentSettings(event) {
+            event.preventDefault();
+            const token = getAdminToken();
+            if (!token) {
+                showToast('error', 'Please login first');
+                openLoginModal();
+                return;
+            }
+
+            const form = event.target;
+            const payload = buildPaymentPayloadFromForm(form);
+            if (!payload) {
+                showToast('error', 'Payment form is not ready');
+                return;
+            }
+            payload.updatedBy = 'Admin Dashboard';
+
+            try {
+                setPaymentSaveState(true);
+                const res = await fetch(`${API_URL}/payment-settings`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify(payload)
+                });
+                const data = await res.json();
+                if (data.success) {
+                    showToast('success', 'Payment settings saved');
+                    updatePaymentPreview(data.data);
+                } else {
+                    throw new Error(data.error || 'Failed to save settings');
+                }
+            } catch (err) {
+                console.error('Payment save failed:', err);
+                showToast('error', 'Failed to save payment settings: ' + err.message);
+            } finally {
+                setPaymentSaveState(false);
+            }
+        }
+
+        async function loadAllData() {
+            await Promise.all([
+                loadProducts(),
+                loadPages(),
+                loadComponents(),
+                loadHero(),
+                loadPaymentSettings(),
+                loadOrders({ silent: true }),
+                loadCareers(),
+                loadSubscribers({ silent: true })
+            ]);
+            // refresh knowledge status after other data loads
+            try{ updateKnowledgeStatus(); }catch(e){}
         }
 
         // Initialize Quill editors
@@ -2008,11 +4151,127 @@
             }
         }
 
+        // Knowledge helpers
+        async function updateKnowledgeStatus(){
+            const token = getAdminToken();
+            if (!token) return;
+            try{
+                const res = await fetch(`${API_URL}/knowledge/status`, { headers: { 'Authorization': `Bearer ${token}` } });
+                const data = await res.json();
+                if (data.success){
+                    document.getElementById('knowledgeHF').textContent = data.hfAvailable ? 'Enabled' : 'Disabled';
+                    document.getElementById('knowledgeDocs').textContent = data.tfidf?.docCount || 0;
+                    document.getElementById('knowledgeVocab').textContent = data.tfidf?.vocabSize || 0;
+                    document.getElementById('knowledgeVectorCount').textContent = data.vectorCount || 0;
+                }
+            }catch(e){ console.warn('Failed to update knowledge status', e.message); }
+        }
+
         // Initialize on load
         document.addEventListener('DOMContentLoaded', () => {
+            const token = getAdminToken();
             updateAdminUI();
-            loadAllData();
+            setAuthGuard(!!token);
+            if (token) {
+                loadAllData();
+            } else {
+                openLoginModal();
+            }
             setTimeout(initQuill, 100);
+            initToggleSliders();
+            initPaymentUploaders();
+
+            // Knowledge panel controls
+            document.getElementById('knowledgeRefreshBtn')?.addEventListener('click', () => updateKnowledgeStatus());
+            document.getElementById('knowledgeViewLogsBtn')?.addEventListener('click', async () => {
+                const token = getAdminToken(); if (!token){ openLoginModal(); return; }
+                const btn = document.getElementById('knowledgeViewLogsBtn'); btn.disabled = true; btn.textContent = 'Loading...';
+                try{
+                    const res = await fetch(`${API_URL}/knowledge/reindex/logs`, { headers: { 'Authorization': `Bearer ${token}` } });
+                    const data = await res.json();
+                    if (data.success){
+                        const logsEl = document.getElementById('knowledgeLogs');
+                        logsEl.classList.toggle('hidden');
+                        logsEl.innerHTML = (data.jobs || []).map(j => `
+                            <div class="mb-2 border-b pb-2">
+                                <div class="text-xs text-gray-500">${j.id} • ${j.status} • ${j.createdAt}</div>
+                                <div class="text-sm">${j.logs ? j.logs.slice().reverse().slice(0,10).map(l=>`<div>${l}</div>`).join('') : ''}</div>
+                            </div>
+                        `).join('');
+                    }
+                }catch(e){ showToast('error','Failed to fetch logs: '+e.message); }
+                finally{ btn.disabled = false; btn.textContent = 'View Logs'; }
+            });
+            document.getElementById('knowledgeReindexBtn')?.addEventListener('click', async () => {
+                if (!confirm('Reindex knowledge? This will rebuild TF‑IDF and re-attempt HF embeddings if configured.')) return;
+                const token = getAdminToken(); if (!token){ openLoginModal(); return; }
+                const btn = document.getElementById('knowledgeReindexBtn'); btn.disabled = true; btn.textContent = 'Starting...';
+                try{
+                    const res = await fetch(`${API_URL}/knowledge/reindex`, { method: 'POST', headers: { 'Authorization': `Bearer ${token}` } });
+                    const data = await res.json();
+                    if (!data.success && data.error){
+                        showToast('error', data.error || 'Failed to start reindex');
+                        return;
+                    }
+                    const jobId = data.jobId;
+                    showToast('info', 'Reindex started (job: ' + jobId + '). Polling progress...');
+                    // show progress UI
+                    document.getElementById('knowledgeProgress').classList.remove('hidden');
+                    document.getElementById('knowledgeLogs').classList.add('hidden');
+                    document.getElementById('knowledgeProgressText').textContent = 'Starting';
+
+                    // poll job
+                    const poll = setInterval(async ()=>{
+                        try{
+                            const st = await (await fetch(`${API_URL}/knowledge/reindex/${jobId}`, { headers: { 'Authorization': `Bearer ${token}` } })).json();
+                            if (st.success){
+                                const job = st.job;
+                                const pct = job.total ? Math.round((job.processed/job.total)*100) : (job.status === 'running' ? 1 : 100);
+                                document.getElementById('knowledgeProgressBar').style.width = pct + '%';
+                                document.getElementById('knowledgeProgressText').textContent = `${job.status} — ${job.processed}/${job.total}`;
+                                const logsEl = document.getElementById('knowledgeLogs');
+                                logsEl.innerHTML = (job.logs || []).slice().reverse().map(l => `<div>${l}</div>`).join('');
+                                if (job.status === 'completed' || job.status === 'failed'){
+                                    clearInterval(poll);
+                                    btn.disabled = false; btn.textContent = 'Reindex';
+                                    document.getElementById('knowledgeProgressText').textContent = job.status === 'completed' ? 'Completed' : 'Failed: ' + (job.error || '');
+                                    showToast('success', 'Reindex ' + job.status);
+                                    updateKnowledgeStatus();
+                                }
+                            }
+                        }catch(err){ console.warn('poll failed', err.message); }
+                    }, 1500);
+
+                }catch(e){ showToast('error', 'Reindex failed: ' + e.message); btn.disabled = false; btn.textContent = 'Reindex'; }
+            });
+
+            document.getElementById('knowledgeClearVectorsBtn')?.addEventListener('click', async () => {
+                if (!confirm('Clear vector store? This will remove all embeddings.')) return;
+                const token = getAdminToken(); if (!token){ openLoginModal(); return; }
+                const btn = document.getElementById('knowledgeClearVectorsBtn'); btn.disabled = true; btn.textContent = 'Clearing...';
+                try{
+                    const res = await fetch(`${API_URL}/knowledge/clear-vectors`, { method: 'POST', headers: { 'Authorization': `Bearer ${token}` } });
+                    const data = await res.json();
+                    if (data.success) showToast('success', 'Vector store cleared');
+                    else showToast('error', 'Clear failed');
+                }catch(e){ showToast('error', 'Clear failed: ' + e.message); }
+                finally{ btn.disabled = false; btn.textContent = 'Clear Vectors'; updateKnowledgeStatus(); }
+            });
+
+            // Refresh knowledge when clicking Refresh data
+            document.getElementById('refreshAllBtn')?.addEventListener('click', () => updateKnowledgeStatus());
+
+            document.querySelectorAll('[data-jump-tab]').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const tab = btn.getAttribute('data-jump-tab');
+                    if (!tab) return;
+                    switchTab(tab);
+                    document.getElementById(`content-${tab}`)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                });
+            });
+
+            const scrollTopBtn = document.getElementById('scrollTopBtn');
+            scrollTopBtn?.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
             
             // Attach tab switchers
             document.querySelectorAll('[data-tab]').forEach(btn => {
@@ -2023,7 +4282,7 @@
             });
             
             // Attach modal close buttons
-            const closeLoginBtn = document.getElementById('closLoginModalBtn');
+            const closeLoginBtn = document.getElementById('closeLoginModalBtn');
             if (closeLoginBtn) {
                 closeLoginBtn.addEventListener('click', closeLoginModal);
             }
@@ -2032,6 +4291,13 @@
             if (closeEditBtn) {
                 closeEditBtn.addEventListener('click', closeEditProductModal);
             }
+
+            const editCareerModal = document.getElementById('editCareerModal');
+            editCareerModal?.addEventListener('click', (e) => {
+                if (e.target === editCareerModal) {
+                    closeEditCareerModal();
+                }
+            });
             
             // Attach admin login button
             const adminLoginBtn = document.getElementById('adminLoginBtn');
@@ -2046,15 +4312,81 @@
                 });
             }
 
+            const overlayLoginBtn = document.getElementById('authOverlayLogin');
+            if (overlayLoginBtn) {
+                overlayLoginBtn.addEventListener('click', openLoginModal);
+            }
+
             const refreshSubscribersBtn = document.getElementById('refreshSubscribers');
             if (refreshSubscribersBtn) {
-                refreshSubscribersBtn.addEventListener('click', loadSubscribers);
+                refreshSubscribersBtn.addEventListener('click', () => loadSubscribers({ manual: true }));
             }
 
             const exportSubscribersBtn = document.getElementById('exportSubscribers');
             if (exportSubscribersBtn) {
                 exportSubscribersBtn.addEventListener('click', exportSubscribers);
             }
+
+            const refreshTicketsBtn = document.getElementById('refreshTickets');
+            if (refreshTicketsBtn) {
+                refreshTicketsBtn.addEventListener('click', loadTickets);
+            }
+
+            const ticketStatusFilter = document.getElementById('ticketStatusFilter');
+            if (ticketStatusFilter) {
+                ticketStatusFilter.addEventListener('change', loadTickets);
+            }
+
+            document.getElementById('closeTicketDetailsBtn')?.addEventListener('click', closeTicketDetails);
+            const ticketModal = document.getElementById('ticketDetailsModal');
+            if (ticketModal) {
+                ticketModal.addEventListener('click', (e) => {
+                    if (e.target === ticketModal) closeTicketDetails();
+                });
+            }
+
+            const paymentForm = document.getElementById('paymentSettingsForm');
+            if (paymentForm) {
+                paymentForm.setAttribute('novalidate', 'novalidate');
+                paymentForm.addEventListener('submit', savePaymentSettings);
+                paymentForm.addEventListener('input', () => syncPaymentPreviewFromForm());
+
+                ['codEnabled', 'bankEnabled', 'esewaEnabled', 'khaltiEnabled', 'imeEnabled'].forEach(name => {
+                    const input = paymentForm[name];
+                    if (!input) return;
+                    input.addEventListener('change', () => {
+                        syncPaymentPreviewFromForm();
+                        if (name !== 'codEnabled') {
+                            updatePaymentFieldLocks();
+                        }
+                    });
+                });
+
+                updatePaymentFieldLocks();
+            }
+
+            document.getElementById('refreshPayments')?.addEventListener('click', () => loadPaymentSettings({ manual: true }));
+
+            const ordersStatusFilter = document.getElementById('ordersStatusFilter');
+            ordersStatusFilter?.addEventListener('change', (event) => {
+                ordersFilters.status = event.target.value;
+                renderOrdersList();
+            });
+
+            const ordersPaymentFilter = document.getElementById('ordersPaymentFilter');
+            ordersPaymentFilter?.addEventListener('change', (event) => {
+                ordersFilters.paymentStatus = event.target.value;
+                renderOrdersList();
+            });
+
+            document.getElementById('refreshOrdersBtn')?.addEventListener('click', () => loadOrders({ manual: true }));
+            document.getElementById('closeOrderDetailsBtn')?.addEventListener('click', closeOrderDetailsModal);
+            const orderModal = document.getElementById('orderDetailsModal');
+            orderModal?.addEventListener('click', (event) => {
+                if (event.target === orderModal) {
+                    closeOrderDetailsModal();
+                }
+            });
         });
     </script>
 </body>

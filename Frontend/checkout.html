@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Checkout | Zenrix</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="style.css">
+    <script src="script.js" defer></script>
+    <style>
+        body { font-family: 'Space Grotesk', 'Poppins', sans-serif; }
+        .panel {
+            border-radius: 1.5rem;
+            border: 1px solid rgba(15, 23, 42, 0.08);
+            background: white;
+            box-shadow: 0 20px 60px rgba(15, 23, 42, 0.06);
+        }
+        .input-field {
+            border-radius: 1rem;
+            border: 1px solid rgba(15, 23, 42, 0.15);
+            padding: 0.85rem 1.1rem;
+            width: 100%;
+            transition: box-shadow 0.2s ease, border-color 0.2s ease, background-color 0.2s ease;
+            background: rgba(255, 255, 255, 0.95);
+            color: #0f172a;
+            caret-color: #6366f1;
+        }
+        .input-field:focus {
+            outline: none;
+            border-color: #6366f1;
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);
+            background: #ffffff;
+        }
+        .input-field::placeholder {
+            color: #94a3b8;
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-slate-900 via-slate-950 to-black text-slate-100 min-h-screen">
+    <custom-navbar></custom-navbar>
+
+    <main class="relative z-10">
+        <div class="max-w-6xl mx-auto px-4 py-16 space-y-10">
+            <header class="text-center space-y-3">
+                <p class="text-sm uppercase tracking-[0.4em] text-indigo-300">Secure Checkout</p>
+                <h1 class="text-4xl md:text-5xl font-semibold text-white">Wrap up your order</h1>
+                <p class="text-slate-400 max-w-2xl mx-auto">Confirm shipping, pick your preferred Nepali payment flow, and we will start preparing your delivery immediately.</p>
+            </header>
+
+            <section id="checkoutLoginState" class="hidden">
+                <div class="panel p-10 text-center space-y-4">
+                    <div class="w-16 h-16 mx-auto rounded-2xl bg-indigo-600/10 flex items-center justify-center">
+                        <svg class="w-7 h-7 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 11c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-3.866 0-7 3.134-7 7h14c0-3.866-3.134-7-7-7z" />
+                        </svg>
+                    </div>
+                    <h2 class="text-2xl font-semibold text-white">Sign in to continue</h2>
+                    <p class="text-slate-400">Checkout requires a Zenrix account so we can send order updates and payment confirmations.</p>
+                    <div class="flex flex-wrap gap-4 justify-center">
+                        <a href="login.html" class="px-6 py-3 rounded-full bg-white text-slate-900 font-semibold">Log In</a>
+                        <a href="register.html" class="px-6 py-3 rounded-full border border-white/40 text-white font-semibold">Create account</a>
+                    </div>
+                </div>
+            </section>
+
+            <section id="checkoutEmptyState" class="hidden">
+                <div class="panel p-10 text-center space-y-4">
+                    <h2 class="text-2xl font-semibold text-white">Your cart is empty</h2>
+                    <p class="text-slate-400">Add a few obsessions, then swing back here to finalize payment.</p>
+                    <a href="products.html" class="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-indigo-500 text-white font-semibold">
+                        Browse Products
+                        <span aria-hidden="true">→</span>
+                    </a>
+                </div>
+            </section>
+
+            <section id="checkoutSuccessState" class="hidden">
+                <div class="panel p-10 text-center space-y-4">
+                    <div class="w-20 h-20 mx-auto rounded-full bg-emerald-500/10 flex items-center justify-center">
+                        <svg class="w-10 h-10 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                        </svg>
+                    </div>
+                    <h2 class="text-3xl font-semibold text-white">Order received!</h2>
+                    <p class="text-slate-400">We are validating the payment reference. You'll get a confirmation email shortly.</p>
+                    <div class="flex flex-wrap gap-4 justify-center">
+                        <a href="orders.html" class="px-6 py-3 rounded-full bg-white text-slate-900 font-semibold">View orders</a>
+                        <a href="index.html" class="px-6 py-3 rounded-full border border-white/40 text-white font-semibold">Continue shopping</a>
+                    </div>
+                </div>
+            </section>
+
+            <section id="checkoutFormContainer" class="grid grid-cols-1 lg:grid-cols-[1.35fr_0.65fr] gap-8">
+                <form id="checkoutForm" class="space-y-8">
+                    <div class="panel p-8 space-y-6">
+                        <div>
+                            <p class="text-sm uppercase tracking-[0.3em] text-indigo-300">Shipping</p>
+                            <h2 class="text-2xl font-semibold text-white">Where should we deliver?</h2>
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                            <div>
+                                <label class="text-sm text-slate-400" for="fullName">Full Name *</label>
+                                <input id="fullName" name="fullName" class="input-field mt-1" placeholder="Aarav Shrestha" required>
+                            </div>
+                            <div>
+                                <label class="text-sm text-slate-400" for="email">Email</label>
+                                <input id="email" name="email" type="email" class="input-field mt-1" placeholder="you@zenrix.com.np">
+                            </div>
+                            <div>
+                                <label class="text-sm text-slate-400" for="phone">Phone *</label>
+                                <input id="phone" name="phone" class="input-field mt-1" placeholder="98XXXXXXXX" required>
+                            </div>
+                            <div>
+                                <label class="text-sm text-slate-400" for="province">Province</label>
+                                <input id="province" name="province" class="input-field mt-1" placeholder="Bagmati">
+                            </div>
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                            <div>
+                                <label class="text-sm text-slate-400" for="address1">Street Address *</label>
+                                <input id="address1" name="address1" class="input-field mt-1" placeholder="House 12, Road 4" required>
+                            </div>
+                            <div>
+                                <label class="text-sm text-slate-400" for="address2">Apartment / Landmark</label>
+                                <input id="address2" name="address2" class="input-field mt-1" placeholder="Opp. Bhatbhateni">
+                            </div>
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                            <div>
+                                <label class="text-sm text-slate-400" for="city">City *</label>
+                                <input id="city" name="city" class="input-field mt-1" placeholder="Kathmandu" required>
+                            </div>
+                            <div>
+                                <label class="text-sm text-slate-400" for="postalCode">Postal Code</label>
+                                <input id="postalCode" name="postalCode" class="input-field mt-1" placeholder="44600">
+                            </div>
+                        </div>
+                        <div>
+                            <label class="text-sm text-slate-400" for="notes">Delivery Notes</label>
+                            <textarea id="notes" name="notes" rows="3" class="input-field mt-1" placeholder="Ring the bell twice, friendly dog inside."></textarea>
+                        </div>
+                    </div>
+
+                    <div class="panel p-8 space-y-6">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-sm uppercase tracking-[0.3em] text-indigo-300">Payment</p>
+                                <h2 class="text-2xl font-semibold text-white">Choose a method</h2>
+                            </div>
+                            <span class="text-xs font-semibold tracking-[0.3em] text-slate-500">NRs PAYMENT</span>
+                        </div>
+                        <div id="paymentMethods" class="space-y-3"></div>
+                        <div id="paymentMethodDetails" class="rounded-2xl border border-slate-800 bg-slate-900/60 p-5 text-sm text-slate-200">
+                            Select a payment option to view instructions.
+                        </div>
+                        <div id="paymentExtras" class="rounded-2xl border border-white/10 bg-white/5 p-5 space-y-4 hidden">
+                            <div>
+                                <label class="text-sm text-slate-300" for="paymentReference">Transaction / Reference ID *</label>
+                                <input id="paymentReference" name="paymentReference" class="input-field mt-1" placeholder="eSewa TXN ID" />
+                            </div>
+                            <div>
+                                <label class="text-sm text-slate-300" for="paymentProof">Payment screenshot (optional)</label>
+                                <input id="paymentProof" name="paymentProof" type="file" accept="image/*" class="input-field mt-1" />
+                                <p id="paymentProofStatus" class="text-xs text-slate-400 mt-1" data-default-text="Attach a JPG or PNG up to 2MB. We will upload it securely during checkout.">Attach a JPG or PNG up to 2MB. We will upload it securely during checkout.</p>
+                            </div>
+                            <label class="flex items-start gap-3 text-sm text-slate-300">
+                                <input type="checkbox" id="instructionsAck" name="instructionsAck" class="mt-1">
+                                <span>I have followed the payment instructions and provided the correct reference.</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="flex flex-wrap gap-4 items-center">
+                        <button id="orderSubmitBtn" type="submit" class="flex-1 bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 text-white font-semibold py-4 rounded-full shadow-xl shadow-indigo-500/30">
+                            Place Order
+                        </button>
+                        <a href="cart.html" class="px-6 py-4 rounded-full border border-white/20 text-white font-semibold">Back to cart</a>
+                    </div>
+                    <p id="checkoutStatus" class="text-sm text-rose-300"></p>
+                </form>
+
+                <aside class="panel p-8 space-y-6 bg-white/95 text-slate-900">
+                    <div>
+                        <p class="text-xs uppercase tracking-[0.4em] text-slate-400">Order summary</p>
+                        <h2 class="text-2xl font-semibold text-slate-900">Review & confirm</h2>
+                    </div>
+                    <div id="checkoutSummaryList" class="space-y-4"></div>
+                    <div class="border-t border-slate-200 pt-4 space-y-2 text-sm">
+                        <div class="flex items-center justify-between text-slate-500">
+                            <span>Items</span>
+                            <span id="checkoutSummaryCount">0 items</span>
+                        </div>
+                        <div class="flex items-center justify-between text-slate-500">
+                            <span>Subtotal</span>
+                            <span id="checkoutSummarySubtotal">रु 0.00</span>
+                        </div>
+                        <div class="flex items-center justify-between text-slate-500">
+                            <span>Shipping</span>
+                            <span class="text-emerald-500 font-semibold">Free in Nepal</span>
+                        </div>
+                        <div class="flex items-center justify-between text-lg font-semibold text-slate-900">
+                            <span>Total</span>
+                            <span id="checkoutSummaryTotal">रु 0.00</span>
+                        </div>
+                    </div>
+                    <div class="rounded-2xl border border-slate-200 p-4 text-sm space-y-2">
+                        <p class="font-semibold text-slate-900">Nepali Payments Supported</p>
+                        <ul class="text-slate-600 list-disc list-inside space-y-1">
+                            <li>Cash on Delivery across Valley (up to रु20,000)</li>
+                            <li>Direct bank transfer (NPR)</li>
+                            <li>Instant wallets: eSewa, Khalti</li>
+                        </ul>
+                    </div>
+                </aside>
+            </section>
+        </div>
+    </main>
+
+    <custom-footer></custom-footer>
+    <script src="components/navbar.js"></script>
+    <script src="components/footer.js"></script>
+</body>
+</html>

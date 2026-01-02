@@ -5,32 +5,34 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Cart | Zenrix</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="script.js" defer></script>
 </head>
-<body class="bg-gradient-to-br from-gray-50 to-gray-100 min-h-screen">
+<body class="bg-slate-950 text-slate-100 min-h-screen">
     <custom-navbar></custom-navbar>
 
     <!-- Loading -->
-    <div id="loadingState" class="flex items-center justify-center min-h-screen">
+    <div id="loadingState" class="flex items-center justify-center min-h-screen bg-gradient-to-br from-slate-900 via-indigo-900 to-purple-900">
         <div class="text-center">
-            <div class="animate-spin rounded-full h-16 w-16 border-b-4 border-indigo-600 mx-auto mb-4"></div>
-            <p class="text-gray-600">Loading your cart...</p>
+            <div class="animate-spin rounded-full h-16 w-16 border-b-4 border-indigo-400 mx-auto mb-4"></div>
+            <p class="text-slate-200">Loading your cart...</p>
         </div>
     </div>
 
     <!-- Not logged in -->
     <div id="notLoggedInState" class="hidden container mx-auto px-4 py-16">
-        <div class="max-w-md mx-auto bg-white rounded-2xl shadow-xl p-8 text-center">
-            <div class="w-20 h-20 bg-indigo-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <i class="fas fa-user-lock text-3xl text-indigo-600"></i>
+        <div class="max-w-md mx-auto bg-white/5 border border-white/10 rounded-2xl shadow-xl p-8 text-center backdrop-blur">
+            <div class="w-20 h-20 bg-indigo-500/20 border border-indigo-400/40 rounded-full flex items-center justify-center mx-auto mb-4">
+                <i class="fas fa-user-lock text-3xl text-indigo-100"></i>
             </div>
-            <h2 class="text-2xl font-bold text-gray-900 mb-2">Please log in</h2>
-            <p class="text-gray-600 mb-6">Sign in to see and manage your cart</p>
+            <h2 class="text-2xl font-bold text-white mb-2">Please log in</h2>
+            <p class="text-slate-300 mb-6">Sign in to see and manage your cart.</p>
             <div class="space-y-3">
-                <a href="login.html" class="block w-full bg-indigo-600 text-white px-6 py-3 rounded-xl font-semibold hover:bg-indigo-700 transition">
+                <a href="login.html" class="block w-full bg-white text-slate-900 px-6 py-3 rounded-xl font-semibold shadow hover:-translate-y-0.5 transition">
                     <i class="fas fa-sign-in-alt mr-2"></i> Log In
                 </a>
-                <a href="register.html" class="block w-full bg-gray-100 text-gray-700 px-6 py-3 rounded-xl font-semibold hover:bg-gray-200 transition">
+                <a href="register.html" class="block w-full bg-white/10 border border-white/20 text-white px-6 py-3 rounded-xl font-semibold hover:bg-white/15 transition">
                     <i class="fas fa-user-plus mr-2"></i> Create Account
                 </a>
             </div>
@@ -38,68 +40,108 @@
     </div>
 
     <!-- Cart content -->
-    <main id="cartContent" class="hidden container mx-auto px-4 py-10 space-y-6">
-        <header class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-            <div>
-                <p class="text-sm text-indigo-600 font-semibold uppercase tracking-wide">Your cart</p>
-                <h1 class="text-3xl font-bold text-gray-900 mt-1">Ready to checkout?</h1>
-                <p class="text-gray-600">Review items, adjust quantities, and place your order</p>
-            </div>
-            <div class="flex items-center gap-3">
-                <a href="products.html" class="px-4 py-2 rounded-xl border border-gray-200 bg-white text-gray-800 font-semibold hover:border-indigo-200 hover:text-indigo-600 transition">
-                    <i class="fas fa-arrow-left mr-2"></i>Continue shopping
-                </a>
-                <a href="orders.html" class="px-4 py-2 rounded-xl bg-indigo-600 text-white font-semibold hover:bg-indigo-700 transition">
-                    <i class="fas fa-box mr-2"></i>View orders
-                </a>
-            </div>
-        </header>
-
-        <section class="grid grid-cols-1 xl:grid-cols-3 gap-6">
-            <div class="xl:col-span-2 space-y-4" id="cartItems">
-                <div class="bg-white rounded-2xl shadow p-6 text-center text-gray-500">Your cart is empty.</div>
-            </div>
-
-            <aside class="space-y-4">
-                <div class="bg-white rounded-2xl shadow p-6 sticky top-6">
-                    <h2 class="text-xl font-bold text-gray-900 mb-4">Order summary</h2>
-                    <div class="space-y-3 text-gray-700">
-                        <div class="flex items-center justify-between">
-                            <span>Items</span>
-                            <span id="summaryCount">0</span>
-                        </div>
-                        <div class="flex items-center justify-between">
-                            <span>Subtotal</span>
-                            <span id="summarySubtotal">$0.00</span>
-                        </div>
-                        <div class="flex items-center justify-between">
-                            <span>Shipping</span>
-                            <span class="text-green-600 font-semibold">Free</span>
-                        </div>
-                        <div class="flex items-center justify-between">
-                            <span>Tax (est.)</span>
-                            <span class="text-gray-500">Included</span>
-                        </div>
-                        <div class="border-t pt-4 flex items-center justify-between font-bold text-lg text-gray-900">
-                            <span>Total</span>
-                            <span id="summaryTotal">$0.00</span>
+    <main id="cartContent" class="hidden">
+        <section class="relative overflow-hidden bg-gradient-to-br from-slate-900 via-indigo-900 to-purple-900 py-12">
+            <div class="absolute inset-0 opacity-30 bg-[radial-gradient(circle_at_20%_20%,rgba(99,102,241,0.35),transparent_45%),radial-gradient(circle_at_80%_0%,rgba(236,72,153,0.25),transparent_40%)]"></div>
+            <div class="container mx-auto px-4 relative flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
+                <div class="space-y-3 max-w-2xl">
+                    <p class="text-sm uppercase tracking-[0.35em] text-indigo-100">Your cart</p>
+                    <h1 class="text-3xl md:text-4xl font-bold">Ready to check out?</h1>
+                    <p class="text-slate-200 text-lg">Review items, adjust quantities, and place your order with a secure checkout.</p>
+                    <div class="flex flex-wrap gap-3">
+                        <a href="products.html" class="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-white text-slate-900 font-semibold shadow hover:-translate-y-0.5 transition"><i class="fas fa-arrow-left"></i>Continue shopping</a>
+                        <a href="orders.html" class="inline-flex items-center gap-2 px-4 py-2 rounded-xl border border-white/20 text-white font-semibold hover:bg-white/10 transition"><i class="fas fa-box"></i>View orders</a>
+                    </div>
+                </div>
+                <div class="grid grid-cols-2 gap-4 w-full lg:w-[420px]">
+                    <div class="bg-white/5 border border-white/10 rounded-2xl p-4 shadow">
+                        <p class="text-xs uppercase tracking-[0.2em] text-indigo-100">Items</p>
+                        <p id="heroItemCount" class="text-3xl font-bold mt-2">0</p>
+                        <p class="text-sm text-slate-300">In your cart</p>
+                    </div>
+                    <div class="bg-white/5 border border-white/10 rounded-2xl p-4 shadow">
+                        <p class="text-xs uppercase tracking-[0.2em] text-indigo-100">Total</p>
+                        <p id="heroTotal" class="text-3xl font-bold mt-2">NPR 0.00</p>
+                        <p class="text-sm text-slate-300">Estimated</p>
+                    </div>
+                    <div class="bg-white/5 border border-white/10 rounded-2xl p-4 shadow col-span-2">
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 rounded-lg bg-emerald-500/20 border border-emerald-400/30 flex items-center justify-center text-emerald-100"><i class="fas fa-shield-alt"></i></div>
+                            <div>
+                                <p class="text-sm text-indigo-100">Secure checkout</p>
+                                <p class="text-lg font-semibold text-white">Encrypted payment, free shipping.</p>
+                            </div>
                         </div>
                     </div>
-                    <button id="checkoutBtn" class="mt-6 w-full bg-indigo-600 text-white py-3 rounded-xl font-semibold hover:bg-indigo-700 transition disabled:opacity-60 disabled:cursor-not-allowed">
-                        <i class="fas fa-lock mr-2"></i>Secure checkout
-                    </button>
-                    <p class="text-xs text-gray-500 mt-2 text-center">You can review your order before paying.</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="container mx-auto px-4 py-10 space-y-6">
+            <div class="grid grid-cols-1 xl:grid-cols-3 gap-6">
+                <div class="xl:col-span-2 space-y-4" id="cartItems">
+                    <div class="bg-white/5 border border-white/10 rounded-2xl shadow p-6 text-center text-slate-300">
+                        <div class="w-12 h-12 mx-auto mb-3 rounded-full bg-white/10 border border-white/10 flex items-center justify-center text-indigo-100">
+                            <i class="fas fa-shopping-cart"></i>
+                        </div>
+                        <p class="font-semibold text-white">Your cart is empty</p>
+                        <p class="text-sm text-slate-400 mt-1">Add items to see them here.</p>
+                        <a href="products.html" class="mt-4 inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-indigo-500 text-white font-semibold hover:-translate-y-0.5 transition">
+                            Browse products
+                        </a>
+                    </div>
                 </div>
 
-                <div class="bg-white rounded-2xl shadow p-6">
-                    <h3 class="font-semibold text-gray-900 mb-2">Have a coupon?</h3>
-                    <div class="flex gap-2">
-                        <input id="couponInput" type="text" placeholder="Enter code" class="flex-grow border border-gray-200 rounded-xl px-4 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500">
-                        <button class="px-4 py-2 rounded-xl bg-gray-100 text-gray-700 font-semibold">Apply</button>
+                <aside class="space-y-4">
+                    <div class="bg-white/5 border border-white/10 rounded-2xl shadow p-6">
+                        <div class="flex items-center justify-between mb-4">
+                            <div>
+                                <h2 class="text-xl font-bold text-white">Order summary</h2>
+                                <p class="text-sm text-slate-300">Shipping is free; taxes included.</p>
+                            </div>
+                            <span class="px-3 py-1 rounded-full bg-indigo-500/20 text-indigo-100 text-xs font-semibold">Secure</span>
+                        </div>
+                        <div class="space-y-3 text-slate-200">
+                            <div class="flex items-center justify-between">
+                                <span>Items</span>
+                                <span id="summaryCount">0</span>
+                            </div>
+                            <div class="flex items-center justify-between">
+                                <span>Subtotal</span>
+                                <span id="summarySubtotal">NPR 0.00</span>
+                            </div>
+                            <div class="flex items-center justify-between">
+                                <span>Shipping</span>
+                                <span class="text-emerald-200 font-semibold">Free</span>
+                            </div>
+                            <div class="flex items-center justify-between">
+                                <span>Tax (est.)</span>
+                                <span class="text-slate-400">Included</span>
+                            </div>
+                            <div class="border-t border-white/10 pt-4 flex items-center justify-between font-bold text-lg text-white">
+                                <span>Total</span>
+                                <span id="summaryTotal">NPR 0.00</span>
+                            </div>
+                        </div>
+                        <button id="checkoutBtn" class="mt-6 w-full bg-gradient-to-r from-indigo-500 to-purple-500 text-white py-3 rounded-xl font-semibold shadow hover:-translate-y-0.5 transition disabled:opacity-60 disabled:cursor-not-allowed">
+                            <i class="fas fa-lock mr-2"></i>Secure checkout
+                        </button>
+                        <p class="text-xs text-slate-400 mt-2 text-center">Review your order before paying.</p>
                     </div>
-                    <p class="text-xs text-gray-500 mt-2">Coupons are coming soon.</p>
-                </div>
-            </aside>
+
+                    <div class="bg-white/5 border border-white/10 rounded-2xl shadow p-6">
+                        <div class="flex items-center justify-between mb-2">
+                            <h3 class="font-semibold text-white">Have a coupon?</h3>
+                            <span class="text-xs text-slate-400">Coming soon</span>
+                        </div>
+                        <div class="flex gap-2">
+                            <input id="couponInput" type="text" placeholder="Enter code" class="flex-grow rounded-xl px-4 py-2 bg-white/10 border border-white/15 text-white placeholder:text-slate-400 focus:outline-none focus:border-indigo-400">
+                            <button class="px-4 py-2 rounded-xl bg-white/10 border border-white/15 text-white font-semibold">Apply</button>
+                        </div>
+                        <p class="text-xs text-slate-400 mt-2">We'll notify you when coupons are available.</p>
+                    </div>
+                </aside>
+            </div>
         </section>
     </main>
 
@@ -107,153 +149,5 @@
 
     <script src="components/navbar.js"></script>
     <script src="components/footer.js"></script>
-    <script>
-        function getAuthToken() { return localStorage.getItem('userToken'); }
-        function isLoggedIn() { return !!getAuthToken(); }
-
-        async function fetchJson(url, options = {}) {
-            const res = await fetch(url, options);
-            return res.json();
-        }
-
-        function renderSummary(items) {
-            const count = items.reduce((sum, i) => sum + (i.quantity || 0), 0);
-            const subtotal = items.reduce((sum, i) => sum + (i.subtotal || 0), 0);
-            document.getElementById('summaryCount').textContent = `${count} ${count === 1 ? 'item' : 'items'}`;
-            document.getElementById('summarySubtotal').textContent = `$${subtotal.toFixed(2)}`;
-            document.getElementById('summaryTotal').textContent = `$${subtotal.toFixed(2)}`;
-            const checkoutBtn = document.getElementById('checkoutBtn');
-            checkoutBtn.disabled = items.length === 0;
-        }
-
-        function renderCart(items) {
-            const container = document.getElementById('cartItems');
-            if (!items.length) {
-                container.innerHTML = '<div class="bg-white rounded-2xl shadow p-6 text-center text-gray-500">Your cart is empty.</div>';
-                renderSummary([]);
-                return;
-            }
-
-            container.innerHTML = items.map(item => {
-                const img = item.image || 'https://via.placeholder.com/120x120?text=Product';
-                const price = item.price || 0;
-                const qty = item.quantity || 0;
-                const subtotal = item.subtotal || price * qty;
-                const title = item.name || 'Item';
-                const decClasses = qty <= 1 ? 'px-3 py-2 text-gray-400 cursor-not-allowed' : 'px-3 py-2 text-gray-600 hover:bg-gray-50';
-                const decDisabled = qty <= 1 ? 'disabled' : '';
-                return `
-                    <article class="bg-white rounded-2xl shadow p-4 flex gap-4">
-                        <div class="w-24 h-24 bg-gray-100 rounded-xl flex items-center justify-center overflow-hidden">
-                            <img src="${img}" alt="${title}" class="object-cover w-full h-full">
-                        </div>
-                        <div class="flex-1 space-y-2">
-                            <div class="flex items-start justify-between gap-3">
-                                <div>
-                                    <p class="font-semibold text-gray-900">${title}</p>
-                                    <p class="text-sm text-gray-500">Unit: $${price.toFixed(2)}</p>
-                                </div>
-                                <button class="text-gray-400 hover:text-rose-600" aria-label="Remove" data-remove="${item.id}">
-                                    <i class="fas fa-times"></i>
-                                </button>
-                            </div>
-                            <div class="flex items-center justify-between">
-                                <div class="inline-flex items-center border border-gray-200 rounded-xl overflow-hidden">
-                                    <button class="${decClasses}" ${decDisabled} data-decrement="${item.id}">-</button>
-                                    <span class="px-4 py-2 text-gray-900 font-semibold">${qty}</span>
-                                    <button class="px-3 py-2 text-gray-600 hover:bg-gray-50" data-increment="${item.id}">+</button>
-                                </div>
-                                <p class="text-lg font-bold text-gray-900">$${subtotal.toFixed(2)}</p>
-                            </div>
-                        </div>
-                    </article>
-                `;
-            }).join('');
-
-            renderSummary(items);
-
-            container.querySelectorAll('[data-remove]').forEach(btn => {
-                btn.addEventListener('click', () => removeCartItem(btn.getAttribute('data-remove')));
-            });
-            container.querySelectorAll('[data-increment]').forEach(btn => {
-                btn.addEventListener('click', () => changeQty(btn.getAttribute('data-increment'), 1));
-            });
-            container.querySelectorAll('[data-decrement]').forEach(btn => {
-                btn.addEventListener('click', () => changeQty(btn.getAttribute('data-decrement'), -1));
-            });
-        }
-
-        async function loadCart() {
-            const token = getAuthToken();
-            const headers = { Authorization: `Bearer ${token}` };
-            const res = await fetchJson('/api/users/cart/summary', { headers });
-            if (!res.success) throw new Error(res.error || 'Failed to load cart');
-            window.__cartItems = res.data.items || [];
-            renderCart(window.__cartItems);
-        }
-
-        async function changeQty(itemId, delta) {
-            const item = (window.__cartItems || []).find(i => i.id === itemId);
-            if (!item) return;
-            const next = Math.max(1, (item.quantity || 0) + delta);
-            const token = getAuthToken();
-            const headers = { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` };
-            const res = await fetchJson(`/api/users/cart/${itemId}`, { method: 'PUT', headers, body: JSON.stringify({ quantity: next }) });
-            if (res.success) {
-                await loadCart();
-            }
-        }
-
-        async function removeCartItem(itemId) {
-            const token = getAuthToken();
-            const headers = { Authorization: `Bearer ${token}` };
-            const res = await fetchJson(`/api/users/cart/${itemId}`, { method: 'DELETE', headers });
-            if (res.success) {
-                await loadCart();
-            }
-        }
-
-        async function checkout() {
-            const btn = document.getElementById('checkoutBtn');
-            btn.disabled = true;
-            btn.textContent = 'Placing order...';
-            const token = getAuthToken();
-            const headers = { Authorization: `Bearer ${token}` };
-            const res = await fetchJson('/api/users/orders/checkout', { method: 'POST', headers });
-            if (res.success) {
-                await loadCart();
-                alert('Order placed successfully. You can view it in Orders.');
-                window.location.href = 'orders.html';
-            } else {
-                alert(res.error || 'Could not place order');
-            }
-            btn.disabled = false;
-            btn.textContent = 'Secure checkout';
-        }
-
-        document.addEventListener('DOMContentLoaded', async () => {
-            const loading = document.getElementById('loadingState');
-            const notLogged = document.getElementById('notLoggedInState');
-            const content = document.getElementById('cartContent');
-
-            if (!isLoggedIn()) {
-                loading.classList.add('hidden');
-                notLogged.classList.remove('hidden');
-                return;
-            }
-
-            try {
-                await loadCart();
-                loading.classList.add('hidden');
-                content.classList.remove('hidden');
-            } catch (err) {
-                console.error('Cart load error:', err);
-                loading.classList.add('hidden');
-                notLogged.classList.remove('hidden');
-            }
-
-            document.getElementById('checkoutBtn').addEventListener('click', checkout);
-        });
-    </script>
 </body>
 </html>

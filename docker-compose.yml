@@ -1,0 +1,67 @@
+version: '3.8'
+services:
+  app:
+    build: .
+    ports:
+      - "3000:3000"
+    env_file:
+      - .env
+    environment:
+      PORT: "3000"
+    depends_on:
+      mongo:
+        condition: service_healthy
+    volumes:
+      - ./uploads:/usr/src/app/uploads
+    restart: unless-stopped
+
+  mongo:
+    image: mongo:6.0
+    volumes:
+      - mongo-data:/data/db
+    healthcheck:
+      test: [ "CMD", "mongosh", "--eval", "db.adminCommand({ ping: 1 })" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+  seeder:
+    build: .
+    env_file:
+      - .env
+    command: ["node", "db-backup/seed-data.js"]
+    depends_on:
+      mongo:
+        condition: service_healthy
+    restart: "no"
+
+  minio:
+    image: minio/minio:latest
+    environment:
+      MINIO_ROOT_USER: minioadmin
+      MINIO_ROOT_PASSWORD: minioadmin
+    command: server /data --console-address ":9001"
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    volumes:
+      - minio-data:/data
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/ready"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  minio-client:
+    image: minio/mc:latest
+    entrypoint: ["/bin/sh", "-c"]
+    depends_on:
+      minio:
+        condition: service_healthy
+    restart: "no"
+
+volumes:
+  mongo-data:
+  minio-data:

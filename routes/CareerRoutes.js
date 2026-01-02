@@ -25,10 +25,10 @@ const careerSchema = new mongoose.Schema({
   department: { type: String, required: true, enum: ['Engineering', 'Design', 'Sales', 'Marketing', 'HR', 'Operations', 'Support'] },
   location: { type: String, required: true },
   type: { type: String, enum: ['Full-time', 'Part-time', 'Contract', 'Freelance'], default: 'Full-time' },
-  salary: { min: Number, max: Number, currency: { type: String, default: 'USD' } },
+  salary: { min: Number, max: Number, currency: { type: String, default: 'NPR' } },
   requirements: [String],
   benefits: [String],
-  published: { type: Boolean, default: false },
+  published: { type: Boolean, default: true },
   createdAt: { type: Date, default: Date.now }
 });
 

@@ -77,12 +77,19 @@ router.post('/', requireAdmin,
             const imagePath = mainImage ? `/uploads/products/${mainImage.filename}` : (req.body.image || '');
             const imagesPaths = extraImages.map(f => `/uploads/products/${f.filename}`);
 
+            const saleEnd = req.body.saleEnd ? new Date(req.body.saleEnd) : undefined;
+            const parsedSaleEnd = saleEnd && !isNaN(saleEnd) ? saleEnd : undefined;
+
             const product = new Product({
                 name: req.body.name,
-                price: req.body.price,
+                price: parseFloat(req.body.price),
+                salePrice: req.body.salePrice === '' ? undefined : parseFloat(req.body.salePrice),
+                onSale: req.body.onSale === 'on' || req.body.onSale === true,
+                saleLabel: req.body.saleLabel,
+                saleEnd: parsedSaleEnd,
                 description: req.body.description,
                 category: req.body.category,
-                stock: req.body.stock,
+                stock: parseInt(req.body.stock, 10),
                 featured: req.body.featured === 'on' || req.body.featured === true,
                 image: imagePath || undefined,
                 images: imagesPaths.length ? imagesPaths : []
@@ -127,8 +134,14 @@ router.put('/:id', requireAdmin,
 
             // Coerce boolean/number fields
             if (typeof updates.price !== 'undefined') updates.price = parseFloat(updates.price);
+            if (typeof updates.salePrice !== 'undefined') updates.salePrice = updates.salePrice === '' ? undefined : parseFloat(updates.salePrice);
             if (typeof updates.stock !== 'undefined') updates.stock = parseInt(updates.stock, 10);
             if (typeof updates.featured !== 'undefined') updates.featured = updates.featured === 'on' || updates.featured === 'true' || updates.featured === true;
+            if (typeof updates.onSale !== 'undefined') updates.onSale = updates.onSale === 'on' || updates.onSale === 'true' || updates.onSale === true;
+            if (typeof updates.saleEnd !== 'undefined') {
+                const saleEnd = updates.saleEnd ? new Date(updates.saleEnd) : undefined;
+                updates.saleEnd = saleEnd && !isNaN(saleEnd) ? saleEnd : undefined;
+            }
 
             const product = await Product.findByIdAndUpdate(req.params.id, updates, { new: true, runValidators: true });
             if (!product) return res.status(404).json({ success: false, error: 'Product not found' });

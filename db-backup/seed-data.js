@@ -97,12 +97,22 @@ async function seedDatabase() {
 
     // ========== PRODUCTS ==========
     console.log('📦 Creating products...');
+    
+    // Calculate sale end dates (2 days from now for first product, 5 days for second)
+    const now = new Date();
+    const saleEnd2Days = new Date(now.getTime() + (2 * 24 * 60 * 60 * 1000));
+    const saleEnd5Days = new Date(now.getTime() + (5 * 24 * 60 * 60 * 1000));
+    
     const products = await Product.insertMany([
       {
         name: 'Wireless Bluetooth Headphones',
-        price: 99.99,
+        price: 13299,
+        onSale: true,
+        salePrice: 9999,
+        saleLabel: 'Limited Time Offer',
+        saleEnd: saleEnd2Days,
         description: 'Premium wireless headphones with active noise cancellation. Perfect for music lovers and travelers with 30-hour battery life.',
-        image: 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e',
+        image: 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?auto=format&fit=crop&w=1200&q=80',
         category: 'electronics',
         stock: 50,
         featured: true,
@@ -110,9 +120,13 @@ async function seedDatabase() {
       },
       {
         name: 'Smart Watch Series 5',
-        price: 199.99,
+        price: 26599,
+        onSale: true,
+        salePrice: 19999,
+        saleLabel: 'New Year Sale',
+        saleEnd: saleEnd5Days,
         description: 'Advanced smartwatch with health monitoring, GPS, and 2-day battery life. Track your fitness goals with style.',
-        image: 'https://images.unsplash.com/photo-1523275335684-37898b6baf30',
+        image: 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?auto=format&fit=crop&w=1200&q=80',
         category: 'electronics',
         stock: 30,
         featured: true,
@@ -120,9 +134,9 @@ async function seedDatabase() {
       },
       {
         name: 'Premium Cotton T-Shirt',
-        price: 24.99,
+        price: 3319,
         description: '100% organic cotton premium t-shirt. Comfortable, breathable, and durable for everyday wear.',
-        image: 'https://images.unsplash.com/photo-1521572163474-6864f9cf17ab',
+        image: 'https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?auto=format&fit=crop&w=1200&q=80',
         category: 'fashion',
         stock: 100,
         featured: false,
@@ -130,9 +144,9 @@ async function seedDatabase() {
       },
       {
         name: 'Stainless Steel Water Bottle',
-        price: 29.99,
+        price: 3989,
         description: 'Insulated stainless steel water bottle. Keeps drinks cold for 24 hours and hot for 12 hours.',
-        image: 'https://images.unsplash.com/photo-1523362628745-0c100150b504',
+        image: 'https://images.unsplash.com/photo-1523362628745-0c100150b504?auto=format&fit=crop&w=1200&q=80',
         category: 'home',
         stock: 75,
         featured: false,
@@ -140,16 +154,92 @@ async function seedDatabase() {
       },
       {
         name: 'Leather Laptop Bag',
-        price: 79.99,
+        price: 10659,
         description: 'Genuine leather laptop bag with multiple compartments. Fits up to 15.6" laptops.',
-        image: 'https://images.unsplash.com/photo-1553062407-98eeb64c6a62',
+        image: 'https://images.unsplash.com/photo-1553062407-98eeb64c6a62?auto=format&fit=crop&w=1200&q=80',
         category: 'fashion',
         stock: 40,
         featured: true,
         rating: 4.6
+      },
+      {
+        name: 'Nordic Ceramic Pour-over Set',
+        price: 5499,
+        description: 'Matte ceramic pour-over coffee set with walnut accents and double-walled carafe.',
+        image: 'https://images.unsplash.com/photo-1505253758473-96b7015fcd40?auto=format&fit=crop&w=1200&q=80',
+        category: 'home',
+        stock: 60,
+        featured: false,
+        rating: 4.4
+      },
+      {
+        name: 'Minimal Desk Lamp',
+        price: 7299,
+        description: 'Aluminum desk lamp with wireless charging base and adjustable color temperature.',
+        image: 'https://images.unsplash.com/photo-1505691938895-1758d7feb511?auto=format&fit=crop&w=1200&q=80',
+        category: 'home',
+        stock: 45,
+        featured: true,
+        rating: 4.6
+      },
+      {
+        name: 'Urban Explorer Backpack',
+        price: 8899,
+        description: 'Weatherproof backpack with padded laptop sleeve and modular interior dividers.',
+        image: 'https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=1200&q=80',
+        category: 'fashion',
+        stock: 80,
+        featured: true,
+        rating: 4.8
+      },
+      {
+        name: 'Studio Monitor Speakers',
+        price: 32499,
+        description: 'Pair of 5-inch studio monitors tuned for creators with Bluetooth input support.',
+        image: 'https://images.unsplash.com/photo-1516308288102-48c63601a26b?auto=format&fit=crop&w=1200&q=80',
+        category: 'electronics',
+        stock: 25,
+        featured: true,
+        rating: 4.9
+      },
+      {
+        name: 'Signature Scented Candle Trio',
+        price: 2999,
+        description: 'Hand-poured soy candles with cedar, bergamot, and jasmine blends.',
+        image: 'https://images.unsplash.com/photo-1493663284031-b7e3aefcae8e?auto=format&fit=crop&w=1200&q=80',
+        category: 'home',
+        stock: 120,
+        featured: false,
+        rating: 4.2
+      },
+      {
+        name: 'Performance Running Sneakers',
+        price: 15499,
+        description: 'Lightweight running shoes with knit upper and adaptive cushioning.',
+        image: 'https://images.unsplash.com/photo-1528701800489-20be3c16ef4a?auto=format&fit=crop&w=1200&q=80',
+        category: 'fashion',
+        stock: 70,
+        featured: true,
+        rating: 4.7
+      },
+      {
+        name: 'Compact Action Camera',
+        price: 42999,
+        description: 'Waterproof 4K action camera with horizon lock and instant transfer.',
+        image: 'https://images.unsplash.com/photo-1508896694512-b12267200c7e?auto=format&fit=crop&w=1200&q=80',
+        category: 'electronics',
+        stock: 35,
+        featured: true,
+        rating: 4.8
       }
     ]);
     console.log(`✅ Created ${products.length} products\n`);
+
+    const orderTotals = {
+      first: products[0].price + (products[2].price * 2),
+      second: products[1].price,
+      third: products[3].price * 2
+    };
 
     // ========== SAMPLE ORDERS ==========
     console.log('📋 Creating sample orders...');
@@ -160,7 +250,7 @@ async function seedDatabase() {
           { product: products[0]._id, name: products[0].name, price: products[0].price, quantity: 1 },
           { product: products[2]._id, name: products[2].name, price: products[2].price, quantity: 2 }
         ],
-        total: 149.97,
+        total: orderTotals.first,
         status: 'Completed'
       },
       {
@@ -168,7 +258,7 @@ async function seedDatabase() {
         items: [
           { product: products[1]._id, name: products[1].name, price: products[1].price, quantity: 1 }
         ],
-        total: 199.99,
+        total: orderTotals.second,
         status: 'Pending'
       },
       {
@@ -176,7 +266,7 @@ async function seedDatabase() {
         items: [
           { product: products[3]._id, name: products[3].name, price: products[3].price, quantity: 2 }
         ],
-        total: 59.98,
+        total: orderTotals.third,
         status: 'Completed'
       }
     ]);
@@ -246,7 +336,7 @@ async function seedDatabase() {
         type: 'Full-time',
         description: 'We are looking for a talented full stack developer to join our team.',
         requirements: ['3+ years experience', 'Node.js & React', 'MongoDB'],
-        salary: '$80,000 - $120,000',
+        salary: { min: 80000, max: 120000, currency: 'NPR' },
         active: true
       },
       {
@@ -256,7 +346,7 @@ async function seedDatabase() {
         type: 'Full-time',
         description: 'Lead our marketing efforts and grow our brand.',
         requirements: ['5+ years experience', 'Digital marketing', 'Team leadership'],
-        salary: '$90,000 - $130,000',
+        salary: { min: 90000, max: 130000, currency: 'NPR' },
         active: true
       }
     ]);

@@ -1,0 +1,252 @@
+(function(){
+  // Enhanced chatbot - handles multiple page variants and provides richer canned responses
+  function $(sel){ return document.querySelector(sel); }
+  function $all(sel){ return Array.from(document.querySelectorAll(sel)); }
+
+  function findToggleButtons(){
+    return $all('#chatbotToggle, #chatbot-toggle, .chat-toggle');
+  }
+  function findChatWindow(){
+    return $('#chatbotWindow') || $('#chatbot-window') || $('#chatbotWindow') || $('#chatbot-window') || $('#chatbotWindow');
+  }
+  function findMessagesContainer(){
+    return $('#chatbotMessages') || $('#chatbot-messages') || $('#chatbotMessages') || $('#chatbot-messages');
+  }
+
+  function createBubble(content, from='bot'){
+    const wrap = document.createElement('div');
+    wrap.className = 'bubble ' + (from === 'user' ? 'user' : 'bot');
+    wrap.setAttribute('role','article');
+    wrap.setAttribute('aria-label', from === 'user' ? 'User message' : 'Assistant message');
+
+    if (from === 'bot'){
+      const img = document.createElement('img');
+      img.src = '/uploads/avatars/chat-avatar.png?v=2';
+      img.alt = 'Zenrix Assistant';
+      img.onerror = function(){ this.onerror = null; this.src = '/uploads/avatars/chat-avatar.png?v=2'; };
+      img.width = 48; img.height = 48;
+      const text = document.createElement('div');
+      text.innerHTML = content;
+      wrap.appendChild(img);
+      wrap.appendChild(text);
+    } else {
+      wrap.textContent = content;
+    }
+
+    return wrap;
+  }
+
+  function appendMessage(text, from='bot'){
+    const messages = findMessagesContainer();
+    if (!messages) return;
+    const bubble = createBubble(text, from);
+    messages.appendChild(bubble);
+    messages.scrollTop = messages.scrollHeight;
+  }
+
+  // Richer responses
+  const canned = [
+    {p:/\b(order status|track order|where is my order)\b/i, r: "To check an order, go to <a href=\"/orders.html\">Orders</a> or tell me your order ID and I'll guide you through the status."},
+    {p:/\b(return|refund|how to return|returns|exchange)\b/i, r: "🔄 We have a 30-day return window from delivery for most items. To start a return: visit <a href=\"/orders.html\">Orders</a> → select the item → 'Return'. Pack the item securely and follow the instructions. Refunds are processed within 5–7 business days after we receive the return."},
+    {p:/\b(shipping|delivery|ship|delivery time)\b/i, r: "🚚 Standard delivery across Nepal typically takes 3–5 business days; remote areas may take longer. Free shipping applies for orders over रु 7,500. For exact delivery times, check the shipping options at checkout or your order's tracking page."},
+    {p:/\b(product|products|catalog|category)\b/i, r: "Browse our full catalog at <a href=\"/products.html\">Products</a>. You can also ask about a specific product id (e.g. 'product id 69554ce7b4f651f29d9ea369') and I'll try to fetch details displayed on the product page."},
+    {p:/\b(price|cost|how much|price of)\b/i, r: "Prices are shown on each product page and may include ongoing discounts. For bulk or wholesale pricing, contact support@zenrix.com.np with your requirements."},
+    {p:/\b(payment|pay|payment methods|card|upi|esewa|khalti)\b/i, r: "We accept major credit/debit cards and local wallets like eSewa and Khalti. For payment issues, email support@zenrix.com.np with your order id and payment reference and we'll investigate."},
+    {p:/\b(account|profile|login|register|password)\b/i, r: "Manage your account at <a href=\"/account.html\">Account</a>. If you forgot your password, use 'Forgot password' or contact support for help."},
+    {p:/\b(contact|support|help|agent|human)\b/i, r: "You can reach support at <a href=\"mailto:support@zenrix.com.np\">support@zenrix.com.np</a>. For urgent assistance, say 'connect to agent' and I'll provide next steps for escalation."},
+    {p:/\b(cancel order|cancel)\b/i, r: "To cancel an order, visit Orders and tap 'Cancel' as early as possible. If your order is already dispatched, please use the return process after delivery."},
+    {p:/\b(warranty|guarantee|defective|broken)\b/i, r: "Warranty terms vary by product—electronics usually have 1-year manufacturer warranty. Please check the product page under 'Warranty' or contact support for claims."},
+    {p:/\b(career|jobs|work with|hiring)\b/i, r: "For careers at Zenrix, visit our Careers page or email hr@zenrix.com.np with your CV and the position you're interested in."},
+    {p:/\b(privacy|data|gdpr|personal)\b/i, r: "Your privacy matters to us. You can read our privacy policies on the Privacy page. For data requests, contact privacy@zenrix.com.np."},
+    {p:/\b(hello|hi|hey|namaste)\b/i, r: "Namaste! 🙏 I'm Zenrix Assistant. I can help with orders, products, delivery, returns, or connecting you to support."}
+  ];
+
+  function handleUserMessage(msg){
+    const text = String(msg || '').trim();
+    if (!text) return appendMessage('Please type a short message so I can help.', 'bot');
+
+    // Product id detection (Mongo ObjectId-like 24 hex chars)
+    const idMatch = text.match(/\b[0-9a-fA-F]{24}\b/);
+    if (idMatch){
+      const id = idMatch[0];
+      appendMessage('Let me fetch that product for you...', 'bot');
+      fetch('/api/products/' + id)
+        .then(r => r.json())
+        .then(data => {
+          if (data && data.success && data.data){
+            const p = data.data;
+            const sale = p.onSale && p.salePrice ? ` <strong>Sale: ₹${p.salePrice}</strong>` : '';
+            appendMessage(`<strong>${escapeHtml(p.name)}</strong><br>Price: ₹${p.price}${sale}<br><a href="/product.html?id=${p._id}">View product</a>`, 'bot');
+          } else {
+            appendMessage('I could not find a product with that id. Please check the id and try again.', 'bot');
+          }
+        })
+        .catch(()=> appendMessage('There was an error fetching product details. Try again later or visit the Products page.', 'bot'));
+      return;
+    }
+
+    // Basic intent matching
+    for (const item of canned){
+      if (item.p.test(text)){
+        return appendMessage(item.r, 'bot');
+      }
+    }
+
+    // Fallback: consult knowledge index (Hugging Face powered)
+    appendMessage('Let me check our knowledge base for that...', 'bot');
+    fetch('/api/knowledge/query', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ q: text, topK: 3, useLLM: true })
+    }).then(r => r.json()).then(data => {
+      if (!data || !data.success) return appendMessage('I could not find a helpful answer. Please try rephrasing or contact support@zenrix.com.np', 'bot');
+      if (data.answer){
+        appendMessage(data.answer, 'bot');
+      } else if (data.snippets && data.snippets.length){
+        const s = data.snippets.map((sn,i)=> `<strong>Source ${i+1} (${sn.source})</strong>: ${sn.text.slice(0,500)}${sn.text.length>500? '...':''}`).join('<br><br>');
+        appendMessage('I found some related information:<br><br>' + s + '<br><br>If this does not answer your question, try contacting support@zenrix.com.np', 'bot');
+      } else {
+        appendMessage('No relevant documents were found. Try contacting support@zenrix.com.np for detailed help.', 'bot');
+      }
+    }).catch(()=> {
+      appendMessage('Sorry, I had trouble contacting the knowledge service. Please try again later or contact support@zenrix.com.np', 'bot');
+      // Offer ticket creation
+      showTicketOffer(text);
+    });
+  }
+
+  // Show a quick offer to create a support ticket
+  function showTicketOffer(originalQuestion){
+    const messages = findMessagesContainer();
+    if (!messages) return;
+    const wrap = document.createElement('div');
+    wrap.className = 'bubble bot';
+    wrap.innerHTML = `<div>Would you like me to open a support ticket so our team can follow up?</div>
+      <div style="margin-top:8px;display:flex;gap:8px;">
+        <button id="_open_ticket_btn" class="quick-btn" style="padding:6px 10px;">Yes, open ticket</button>
+        <button id="_no_ticket_btn" class="quick-btn" style="padding:6px 10px;">No, thanks</button>
+      </div>`;
+    messages.appendChild(wrap);
+    messages.scrollTop = messages.scrollHeight;
+
+    // Attach handlers (use small timeout to ensure element is present)
+    setTimeout(()=>{
+      const yes = document.getElementById('_open_ticket_btn');
+      const no = document.getElementById('_no_ticket_btn');
+      if (yes) yes.addEventListener('click', ()=> showTicketForm(originalQuestion));
+      if (no) no.addEventListener('click', ()=> {
+        appendMessage('No problem — if you need anything else, let me know.', 'bot');
+      });
+    }, 50);
+  }
+
+  // Render an inline ticket form inside chat
+  function showTicketForm(originalQuestion){
+    const messages = findMessagesContainer();
+    if (!messages) return;
+    const wrap = document.createElement('div');
+    wrap.className = 'bubble bot';
+    wrap.innerHTML = `
+      <div style="display:flex;flex-direction:column;gap:8px;">
+        <input id="_ticket_name" placeholder="Your name" style="padding:8px;border:1px solid #e6eef0;border-radius:6px;">
+        <input id="_ticket_email" placeholder="Your email" style="padding:8px;border:1px solid #e6eef0;border-radius:6px;">
+        <input id="_ticket_subject" placeholder="Subject" style="padding:8px;border:1px solid #e6eef0;border-radius:6px;" value="Support request: ${escapeHtml(originalQuestion.slice(0,60))}">
+        <textarea id="_ticket_desc" placeholder="Describe the issue" rows="4" style="padding:8px;border:1px solid #e6eef0;border-radius:6px;">${escapeHtml(originalQuestion)}</textarea>
+        <div style="display:flex;gap:8px;">
+          <button id="_ticket_submit" class="quick-btn">Submit Ticket</button>
+          <button id="_ticket_cancel" class="quick-btn">Cancel</button>
+        </div>
+      </div>`;
+    messages.appendChild(wrap);
+    messages.scrollTop = messages.scrollHeight;
+
+    setTimeout(()=>{
+      const submit = document.getElementById('_ticket_submit');
+      const cancel = document.getElementById('_ticket_cancel');
+      if (cancel) cancel.addEventListener('click', ()=> appendMessage('Ticket creation cancelled. Let me know if you need anything else.', 'bot'));
+      if (submit) submit.addEventListener('click', async ()=>{
+        const name = document.getElementById('_ticket_name').value.trim();
+        const email = document.getElementById('_ticket_email').value.trim();
+        const subject = document.getElementById('_ticket_subject').value.trim();
+        const desc = document.getElementById('_ticket_desc').value.trim();
+        if (!name || !email || !subject || !desc) return appendMessage('Please fill all fields before submitting the ticket.', 'bot');
+        appendMessage('Submitting your ticket — please wait...', 'bot');
+        try{
+          const res = await fetch('/api/tickets/guest', {
+            method: 'POST', headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ name, email, subject, description: desc, category: 'support', source: 'chatbot', ref: originalQuestion })
+          });
+          const data = await res.json();
+          if (res.ok && data && data.success && data.data){
+            appendMessage(`Thank you! Your ticket has been created (ID: ${data.data._id}). Our support team will reach out to ${escapeHtml(email)}.` , 'bot');
+          } else {
+            appendMessage('There was an issue creating your ticket. Please try again later or email support@zenrix.com.np', 'bot');
+          }
+        }catch(e){
+          appendMessage('Failed to submit ticket. Please try again later or contact support@zenrix.com.np', 'bot');
+        }
+      });
+    }, 50);
+  }
+
+  // small helper to avoid HTML injection
+  function escapeHtml(str){
+    return String(str).replace(/[&<>\"']/g, function (s) { return ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[s]; });
+  }
+
+  function init(){
+    const toggles = findToggleButtons();
+    const chatWindow = findChatWindow();
+    const messages = findMessagesContainer();
+    const sendBtn = document.getElementById('chatbot-send') || document.getElementById('chatbotSend');
+    const inputEl = document.getElementById('chatbot-input') || document.getElementById('chatbotInput');
+
+    // set accessible colors if needed (added class-based adjustments can be in CSS)
+
+    // Attach toggles
+    toggles.forEach(btn => {
+      btn.addEventListener('click', () => {
+        if (!chatWindow) return;
+        chatWindow.classList.toggle('hidden');
+        if (!chatWindow.classList.contains('hidden') && messages && messages.children.length === 0){
+          setTimeout(() => appendMessage('Hi there 👋 I can help with orders, products, delivery, returns, and account issues. Try: "order status"', 'bot'), 250);
+        }
+      });
+    });
+
+    // Quick buttons support
+    $all('.quick-btn').forEach(q => q.addEventListener('click', (e)=>{
+      const msg = e.currentTarget.dataset.msg || e.currentTarget.textContent;
+      if (inputEl) inputEl.value = msg;
+      if (sendBtn) sendBtn.click();
+    }));
+
+    if (sendBtn && inputEl){
+      sendBtn.addEventListener('click', ()=>{
+        const txt = inputEl.value && inputEl.value.trim();
+        if (!txt) return;
+        appendMessage(txt, 'user');
+        inputEl.value = '';
+        setTimeout(()=> handleUserMessage(txt), 500);
+      });
+
+      inputEl.addEventListener('keypress',(e)=>{
+        if (e.key === 'Enter') sendBtn.click();
+      });
+    }
+
+    // Make links inside bot responses open in new tab safely
+    const observer = new MutationObserver((mutations)=>{
+      for (const m of mutations){
+        for (const node of m.addedNodes){
+          if (!(node instanceof HTMLElement)) continue;
+          node.querySelectorAll && node.querySelectorAll('a').forEach(a=>{ a.target='_blank'; a.rel='noopener noreferrer'; });
+        }
+      }
+    });
+    if (messages) observer.observe(messages, { childList: true, subtree: true });
+  }
+
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init); else init();
+
+})();

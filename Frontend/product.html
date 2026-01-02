@@ -3,365 +3,724 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Product | ShopNest</title>
+    <title>Product | Zenrix</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="script.js" defer></script>
 </head>
-<body class="bg-gray-50">
+<body class="bg-slate-950 text-slate-100" style="font-family: 'Space Grotesk', 'Poppins', sans-serif;">
     <custom-navbar></custom-navbar>
-    <main class="container mx-auto px-4 py-8">
-        <div class="bg-white rounded-lg shadow-sm p-6">
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                <div>
-                    <div class="mb-4">
-                        <img src="http://static.photos/technology/640x360/1" alt="Product" id="mainProductImage" class="w-full h-auto rounded-lg">
-                    </div>
-                    <div class="grid grid-cols-4 gap-2">
-                        <div class="thumbnail cursor-pointer">
-                            <img src="http://static.photos/technology/200x200/1" alt="Thumbnail 1" class="w-full h-auto rounded border">
-                        </div>
-                        <div class="thumbnail cursor-pointer">
-                            <img src="http://static.photos/technology/200x200/2" alt="Thumbnail 2" class="w-full h-auto rounded border">
-                        </div>
-                        <div class="thumbnail cursor-pointer">
-                            <img src="http://static.photos/technology/200x200/3" alt="Thumbnail 3" class="w-full h-auto rounded border">
-                        </div>
-                        <div class="thumbnail cursor-pointer">
-                            <img src="http://static.photos/technology/200x200/4" alt="Thumbnail 4" class="w-full h-auto rounded border">
-                        </div>
-                    </div>
+
+    <main class="px-4 py-12">
+        <section class="max-w-6xl mx-auto space-y-10">
+            <div class="product-shell relative overflow-hidden rounded-[32px] border border-white/10 bg-gradient-to-br from-slate-900 via-slate-950 to-[#071521] shadow-[0_25px_120px_rgba(7,14,30,0.85)] px-6 lg:px-10 py-10">
+                <div class="absolute inset-0 opacity-[0.28] pointer-events-none">
+                    <div class="absolute -top-24 -right-10 w-80 h-80 bg-gradient-to-br from-emerald-400/40 to-cyan-500/30 blur-3xl"></div>
+                    <div class="absolute -bottom-32 -left-20 w-96 h-96 bg-gradient-to-tr from-blue-500/30 via-teal-400/20 to-transparent blur-3xl"></div>
                 </div>
 
-                <div>
-                    <h1 class="text-3xl font-bold mb-2">Wireless Headphones</h1>
-                    <div class="flex items-center mb-4">
-                        <div class="flex text-yellow-400 mr-2">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-yellow-400" viewBox="0 0 20 20" fill="currentColor"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.286 3.955a1 1 0 00.95.69h4.162c.969 0 1.371 1.24.588 1.81l-3.37 2.455a1 1 0 00-.364 1.118l1.287 3.955c.3.921-.755 1.688-1.54 1.118L10 13.347l-3.448 2.441c-.784.57-1.838-.197-1.539-1.118l1.287-3.955a1 1 0 00-.364-1.118L2.568 9.382c-.783-.57-.38-1.81.588-1.81h4.162a1 1 0 00.95-.69L9.049 2.927z"/></svg>
-                            <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-yellow-400" viewBox="0 0 20 20" fill="currentColor"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.286 3.955a1 1 0 00.95.69h4.162c.969 0 1.371 1.24.588 1.81l-3.37 2.455a1 1 0 00-.364 1.118l1.287 3.955c.3.921-.755 1.688-1.54 1.118L10 13.347l-3.448 2.441c-.784.57-1.838-.197-1.539-1.118l1.287-3.955a1 1 0 00-.364-1.118L2.568 9.382c-.783-.57-.38-1.81.588-1.81h4.162a1 1 0 00.95-.69L9.049 2.927z"/></svg>
-                            <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-yellow-400" viewBox="0 0 20 20" fill="currentColor"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.286 3.955a1 1 0 00.95.69h4.162c.969 0 1.371 1.24.588 1.81l-3.37 2.455a1 1 0 00-.364 1.118l1.287 3.955c.3.921-.755 1.688-1.54 1.118L10 13.347l-3.448 2.441c-.784.57-1.838-.197-1.539-1.118l1.287-3.955a1 1 0 00-.364-1.118L2.568 9.382c-.783-.57-.38-1.81.588-1.81h4.162a1 1 0 00.95-.69L9.049 2.927z"/></svg>
-                            <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-yellow-400" viewBox="0 0 20 20" fill="currentColor"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.286 3.955a1 1 0 00.95.69h4.162c.969 0 1.371 1.24.588 1.81l-3.37 2.455a1 1 0 00-.364 1.118l1.287 3.955c.3.921-.755 1.688-1.54 1.118L10 13.347l-3.448 2.441c-.784.57-1.838-.197-1.539-1.118l1.287-3.955a1 1 0 00-.364-1.118L2.568 9.382c-.783-.57-.38-1.81.588-1.81h4.162a1 1 0 00.95-.69L9.049 2.927z"/></svg>
-                            <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-yellow-400" viewBox="0 0 20 20" fill="currentColor"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.286 3.955a1 1 0 00.95.69h4.162c.969 0 1.371 1.24.588 1.81l-3.37 2.455a1 1 0 00-.364 1.118l1.287 3.955c.3.921-.755 1.688-1.54 1.118L10 13.347l-3.448 2.441c-.784.57-1.838-.197-1.539-1.118l1.287-3.955a1 1 0 00-.364-1.118L2.568 9.382c-.783-.57-.38-1.81.588-1.81h4.162a1 1 0 00.95-.69L9.049 2.927z"/></svg>
-                        <span class="text-gray-600">(42 reviews)</span>
+                <div class="flex flex-wrap items-center justify-between gap-3 mb-8 relative z-10">
+                    <div class="flex flex-wrap items-center gap-3">
+                        <span class="stat-pill">Spotlight drop</span>
+                        <span class="stat-pill ghost">Ships within 24h</span>
+                        <span class="stat-pill ghost">Easy returns</span>
                     </div>
-
-                    <div class="text-2xl font-bold text-blue-600 mb-4">$99.99</div>
-
-                    <div id="pageContent" class="prose max-w-none">Loading product marketing…</div>
-
-                    <div class="mb-6">
-                        <h3 class="font-semibold mb-2">Color</h3>
-                        <div class="flex gap-2">
-                            <button class="w-8 h-8 rounded-full bg-black border-2 border-gray-300"></button>
-                            <button class="w-8 h-8 rounded-full bg-blue-600 border-2 border-gray-300"></button>
-                            <button class="w-8 h-8 rounded-full bg-gray-400 border-2 border-gray-300"></button>
-                        </div>
-                    </div>
-
-                    <div class="flex items-center mb-6">
-                        <div class="flex items-center border rounded mr-4">
-                            <button class="px-3 py-1 text-xl">-</button>
-                            <span class="px-4 py-1">1</span>
-                            <button class="px-3 py-1 text-xl">+</button>
-                        </div>
-                        <button id="addToCart" class="bg-blue-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-blue-700 transition">Add to Cart</button>
-                        <script>
-                            document.getElementById('addToCart').addEventListener('click', () => {
-                                const product = {
-                                    id: 1,
-                                    name: document.querySelector('h1').textContent,
-                                    price: parseFloat(document.querySelector('.text-blue-600').textContent.replace('</div>') )
-
-                    <div class="border-t pt-4">
-                        <div class="flex items-center mb-2">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 inline-block mr-2 text-green-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M20 6L9 17l-5-5"/></svg>
-                            <span>In Stock (Ready to ship)</span>
-                        </div>
-                        <div class="flex items-center mb-2">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 inline-block mr-2 text-blue-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 7h18l-3 9H6L3 7z"/><path d="M16 3l-1 4M9 3l1 4"/></svg>
-                            <span>Free shipping on orders over $50</span>
-                        </div>
-                        <div class="flex items-center">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 inline-block mr-2 text-purple-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><path d="M21 7v6h-6"/><path d="M3 17a8 8 0 0 0 11 0l1-1"/></svg>
-                            <span>30-day return policy</span>
-                        </div>
-                    </div>
+                    <span class="stat-pill ghost">Zenrix Studio curation</span>
                 </div>
-            </div>
 
-            <div class="mt-12">
-                <h2 class="text-2xl font-bold mb-4">Product Details</h2>
-                <div class="bg-gray-50 p-4 rounded-lg">
-                    <h3 class="font-semibold mb-2">Features</h3>
-                    <ul class="list-disc pl-5 space-y-1">
-                        <li>Active Noise Cancellation (ANC) technology</li>
-                        <li>30-hour battery life with quick charge (5 min charge = 3 hours playback)</li>
-                        <li>Built-in microphone for calls</li>
-                        <li>Bluetooth 5.0 with 30ft range</li>
-                        <li>Comfortable over-ear cushions with memory foam</li>
-                    </ul>
-                </div>
-            </div>
-
-            <div class="mt-8">
-                <h2 class="text-2xl font-bold mb-4">Customer Reviews</h2>
-                <div class="space-y-6">
-                    <div class="bg-gray-50 p-4 rounded-lg">
-                        <div class="flex items-center justify-between mb-2">
-                            <h3 class="font-semibold">John D.</h3>
-                            <div class="flex text-yellow-400">
-                                <i class="fas fa-star"></i>
-                                <i class="fas fa-star"></i>
-                                <i class="fas fa-star"></i>
-                                <i class="fas fa-star"></i>
-                                <i class="fas fa-star"></i>
+                <div class="grid gap-10 lg:grid-cols-[1.15fr_0.85fr] items-start relative z-10">
+                    <article class="space-y-6">
+                        <div class="media-frame">
+                            <div class="media-glow"></div>
+                            <img id="mainProductImage" src="https://via.placeholder.com/1000x1000?text=Zenrix" alt="Product photo" class="relative z-10 object-contain h-full w-full" />
+                            <div class="media-frost"></div>
+                        </div>
+                        <div id="productThumbnails" class="media-rail"></div>
+                        <div class="grid grid-cols-2 gap-4 text-sm text-slate-200">
+                            <div class="rounded-2xl border border-white/10 bg-white/5 p-4">
+                                <p class="text-xs uppercase tracking-[0.3em] text-slate-400">Battery Life</p>
+                                <p class="mt-2 text-2xl font-semibold">30h</p>
+                            </div>
+                            <div class="rounded-2xl border border-white/10 bg-white/5 p-4">
+                                <p class="text-xs uppercase tracking-[0.3em] text-slate-400">Warranty</p>
+                                <p class="mt-2 text-2xl font-semibold">24 mo</p>
+                            </div>
+                            <div class="rounded-2xl border border-white/10 bg-white/5 p-4">
+                                <p class="text-xs uppercase tracking-[0.3em] text-slate-400">Shipping</p>
+                                <p class="mt-2 text-2xl font-semibold">Free</p>
+                            </div>
+                            <div class="rounded-2xl border border-white/10 bg-white/5 p-4">
+                                <p class="text-xs uppercase tracking-[0.3em] text-slate-400">Stock</p>
+                                <p id="stockBadge" class="mt-2 text-2xl font-semibold">In stock</p>
                             </div>
                         </div>
-                        <p class="text-gray-700">These headphones are amazing! The noise cancellation works perfectly on my daily commute.</p>
+                    </article>
+
+                    <article class="glass-card space-y-6">
+                        <header class="space-y-3">
+                            <p class="text-sm uppercase tracking-[0.4em] text-slate-400">Zenrix Studio</p>
+                            <h1 id="productTitle" class="text-4xl lg:text-5xl font-semibold leading-tight text-white">Wireless Headphones</h1>
+                            <div class="flex items-center gap-3 text-sm text-slate-300">
+                                <div class="flex items-center gap-1 text-amber-300" id="ratingStars">
+                                    <span>★★★★★</span>
+                                </div>
+                                <span>•</span>
+                                <span id="reviewCount">42 reviews</span>
+                            </div>
+                        </header>
+
+                        <div class="bg-white/5 border border-white/10 rounded-3xl p-6 space-y-6 shadow-[0_10px_50px_rgba(0,0,0,0.25)]">
+                            <div>
+                                <p class="text-slate-400 text-sm">Starting at</p>
+                                <p id="productPrice" class="text-4xl font-semibold text-white tracking-tight">रु 99.99</p>
+                            </div>
+
+                            <div id="pageContent" class="prose prose-invert max-w-none text-slate-200">
+                                Loading product story…
+                            </div>
+
+                            <div class="space-y-3">
+                                <p class="font-semibold">Colorways</p>
+                                <div id="colorOptions" class="flex flex-wrap gap-3"></div>
+                            </div>
+
+                            <div class="flex flex-wrap items-center gap-4">
+                                <div class="flex items-center border border-white/15 rounded-full px-2 py-1 bg-white/5">
+                                    <button id="qtyDecrease" class="w-10 h-10 text-xl rounded-full hover:bg-white/10">−</button>
+                                    <div id="qtyValue" class="w-12 text-center text-lg font-semibold">1</div>
+                                    <button id="qtyIncrease" class="w-10 h-10 text-xl rounded-full hover:bg-white/10">+</button>
+                                </div>
+                                <button id="addToCart" class="flex-1 bg-gradient-to-r from-emerald-500 to-cyan-500 text-white rounded-full py-3 font-semibold shadow-lg shadow-emerald-500/30 transition hover:scale-[1.01]">
+                                    Add to Cart
+                                </button>
+                                <button id="buyNow" class="flex-1 border border-white/20 rounded-full py-3 font-semibold hover:bg-white/10 transition bg-white/5">
+                                    Buy Now
+                                </button>
+                            </div>
+
+                            <div class="flex flex-col gap-3 text-sm text-slate-200">
+                                <div class="flex items-center gap-3">
+                                    <span class="h-2 w-2 rounded-full bg-emerald-400"></span>
+                                    Ships within 24h • Free worldwide delivery
+                                </div>
+                                <div class="flex items-center gap-3">
+                                    <span class="h-2 w-2 rounded-full bg-cyan-400"></span>
+                                    30-day returns • 2-year warranty
+                                </div>
+                            </div>
+                        </div>
+                    </article>
+                </div>
+            </div>
+        </section>
+
+        <section class="max-w-6xl mx-auto grid gap-10 lg:grid-cols-2">
+            <div class="bg-slate-900/70 border border-white/8 rounded-3xl p-8 shadow-[0_18px_90px_rgba(7,14,30,0.55)]">
+                <h2 class="text-2xl font-semibold mb-6">Highlights</h2>
+                <ul id="productHighlights" class="space-y-4 text-slate-200">
+                    <li class="flex items-start gap-3">
+                        <span class="mt-1 h-2 w-2 rounded-full bg-emerald-400"></span>
+                        Active noise cancellation with adaptive transparency.
+                    </li>
+                    <li class="flex items-start gap-3">
+                        <span class="mt-1 h-2 w-2 rounded-full bg-cyan-400"></span>
+                        30-hour battery plus 10-minute fast charge for 3 hours playback.
+                    </li>
+                    <li class="flex items-start gap-3">
+                        <span class="mt-1 h-2 w-2 rounded-full bg-blue-400"></span>
+                        Dual-device pairing and low-latency gaming mode.
+                    </li>
+                </ul>
+            </div>
+
+            <div class="bg-slate-900/70 border border-white/8 rounded-3xl p-8 shadow-[0_18px_90px_rgba(7,14,30,0.55)]">
+                <h2 class="text-2xl font-semibold mb-6">Customer Reviews</h2>
+                <div class="space-y-6" id="customerReviews">
+                    <article class="bg-slate-950/50 border border-white/10 rounded-2xl p-5">
+                        <div class="flex justify-between items-center mb-3">
+                            <p class="font-semibold">John D.</p>
+                            <p class="text-amber-300 text-sm">★★★★★</p>
+                        </div>
+                        <p class="text-slate-200">“Noise cancellation is unreal and the comfort is next-level. Easily my favorite daily headset.”</p>
+                    </article>
+                </div>
+            </div>
+        </section>
+    </main>
+
+        <custom-footer></custom-footer>
+        <script src="components/navbar.js"></script>
+        <script src="components/footer.js"></script>
+        <script src="js/chatbot-enhanced.js" defer></script>
+
+        <!-- ========== ZENRIX CHATBOT ========== -->
+        <div id="chatbot-container">
+            <button id="chatbot-toggle" class="fixed bottom-6 right-6 bg-blue-600 text-white w-14 h-14 rounded-full shadow-lg hover:bg-blue-700 transition-all z-50 flex items-center justify-center" aria-label="Open chat">
+                <img src="/uploads/avatars/chat-avatar.png?v=2" alt="Chatbot Avatar" style="width:56px;height:56px;display:block;border-radius:50%;object-fit:cover;" />
+            </button>
+
+            <div id="chatbot-window" class="chat-panel hidden">
+                <div class="chat-header">
+                    <div class="assistant-meta">
+                        <div class="namaste-badge" aria-hidden="true">
+                            <img src="/uploads/avatars/chat-avatar.png?v=2" alt="Zenrix Assistant" style="width:32px;height:32px;border-radius:50%;object-fit:cover;" />
+                        </div>
+                        <div>
+                            <p class="assistant-name">Zenrix Assistant</p>
+                            <p class="assistant-status">नमस्ते! Online • Nepali buddy</p>
+                        </div>
                     </div>
+                    <div class="header-actions">
+                        <span class="status-pill"><span class="dot"></span>Live</span>
+                        <button id="chatbot-close" aria-label="Close chat" class="icon-btn">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="chat-hero-card">
+                    <div>
+                        <p class="hero-eyebrow">Friendly Nepali guide</p>
+                        <p class="hero-title">Smarter help in seconds</p>
+                        <p class="hero-sub">Ask in English or Nepali about products, delivery, or returns. I can greet you with a Namaste too.</p>
+                        <div class="hero-tags">
+                            <span>Namaste ready</span>
+                            <span>24/7 support</span>
+                            <span>Deals scout</span>
+                        </div>
+                    </div>
+                    <div class="hero-figure" aria-hidden="true">
+                        <div class="hero-figure-shell">
+                        <svg class="namaste-anim" viewBox="0 0 160 180" role="presentation" aria-hidden="true" focusable="false">
+                            <defs>
+                                <linearGradient id="skin" x1="0%" x2="100%" y1="0%" y2="100%">
+                                    <stop offset="0%" stop-color="#f5c89c" />
+                                    <stop offset="100%" stop-color="#e4ad79" />
+                                </linearGradient>
+                                <linearGradient id="robe" x1="0%" x2="100%" y1="0%" y2="100%">
+                                    <stop offset="0%" stop-color="#111827" />
+                                    <stop offset="100%" stop-color="#1f2937" />
+                                </linearGradient>
+                                <linearGradient id="glow" x1="0%" x2="100%" y1="0%" y2="0%">
+                                    <stop offset="0%" stop-color="rgba(99,102,241,0.55)" />
+                                    <stop offset="100%" stop-color="rgba(34,211,238,0.55)" />
+                                </linearGradient>
+                            </defs>
+                            <circle cx="80" cy="90" r="74" fill="url(#glow)" opacity="0.3" />
+                            <circle cx="80" cy="70" r="42" fill="url(#skin)" stroke="#0f172a" stroke-width="3" />
+                            <rect x="50" y="92" width="60" height="60" rx="24" fill="url(#robe)" stroke="rgba(255,255,255,0.25)" stroke-width="3" />
+                            <rect class="hand hand-left" x="46" y="82" width="18" height="52" rx="12" fill="url(#skin)" />
+                            <rect class="hand hand-right" x="96" y="82" width="18" height="52" rx="12" fill="url(#skin)" />
+                            <rect x="62" y="112" width="36" height="38" rx="12" fill="rgba(255,255,255,0.16)" />
+                            <circle cx="66" cy="66" r="6" fill="#0f172a" />
+                            <circle cx="94" cy="66" r="6" fill="#0f172a" />
+                            <path d="M68 82q12 10 24 0" stroke="#0f172a" stroke-width="5" stroke-linecap="round" fill="none" />
+                        </svg>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="chatbot-messages" class="chat-messages">
+                    <div class="chat-greeting">
+                        <div class="hero-figure-shell">
+                            <svg class="namaste-anim" viewBox="0 0 160 180" role="presentation" aria-hidden="true" focusable="false">
+                                <defs>
+                                    <linearGradient id="skin-greet" x1="0%" x2="100%" y1="0%" y2="100%">
+                                        <stop offset="0%" stop-color="#f5c89c" />
+                                        <stop offset="100%" stop-color="#e4ad79" />
+                                    </linearGradient>
+                                    <linearGradient id="robe-greet" x1="0%" x2="100%" y1="0%" y2="100%">
+                                        <stop offset="0%" stop-color="#111827" />
+                                        <stop offset="100%" stop-color="#1f2937" />
+                                    </linearGradient>
+                                    <linearGradient id="glow-greet" x1="0%" x2="100%" y1="0%" y2="0%">
+                                        <stop offset="0%" stop-color="rgba(99,102,241,0.55)" />
+                                        <stop offset="100%" stop-color="rgba(34,211,238,0.55)" />
+                                    </linearGradient>
+                                </defs>
+                                <circle cx="80" cy="90" r="74" fill="url(#glow-greet)" opacity="0.3" />
+                                <circle cx="80" cy="70" r="42" fill="url(#skin-greet)" stroke="#0f172a" stroke-width="3" />
+                                <rect x="50" y="92" width="60" height="60" rx="24" fill="url(#robe-greet)" stroke="rgba(255,255,255,0.25)" stroke-width="3" />
+                                <rect class="hand hand-left" x="46" y="82" width="18" height="52" rx="12" fill="url(#skin-greet)" />
+                                <rect class="hand hand-right" x="96" y="82" width="18" height="52" rx="12" fill="url(#skin-greet)" />
+                                <rect x="62" y="112" width="36" height="38" rx="12" fill="rgba(255,255,255,0.16)" />
+                                <circle cx="66" cy="66" r="6" fill="#0f172a" />
+                                <circle cx="94" cy="66" r="6" fill="#0f172a" />
+                                <path d="M68 82q12 10 24 0" stroke="#0f172a" stroke-width="5" stroke-linecap="round" fill="none" />
+                            </svg>
+                        </div>
+                        <p class="greet-text">नमस्ते! Tap a quick question or type to start.</p>
+                    </div>
+                </div>
+
+                <div class="chat-input-shell">
+                    <div class="input-wrapper">
+                        <input type="text" id="chatbot-input" placeholder="Ask anything about products, delivery, returns..." aria-label="Chat message" />
+                    </div>
+                    <button id="chatbot-send" class="send-btn" aria-label="Send message">
+                        <span>Send</span>
+                        <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M22 2L11 13" />
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M22 2l-7 20-4-9-9-4 20-7z" />
+                        </svg>
+                    </button>
+                </div>
+                <div class="chips-row">
+                    <button class="quick-btn" data-msg="Show me today's best deals">Best deals</button>
+                    <button class="quick-btn" data-msg="What is delivery time?">Delivery</button>
+                    <button class="quick-btn" data-msg="How to return a product?">Returns</button>
+                    <button class="quick-btn" data-msg="Recommend me a gift">Gift ideas</button>
                 </div>
             </div>
         </div>
-    </main>
-    <custom-footer></custom-footer>
 
-    <script src="components/navbar.js"></script>
-    <script src="components/footer.js"></script>
+        <script src="js/chatbot-enhanced.js" defer></script>
 
-                        });
-                    </script>
-                        <div class="flex items-center mb-2">
-                            <i class="fas fa-check-circle text-green-500 mr-2"></i>
-                            <span>In Stock (Ready to ship)</span>
-                        </div>
-                        <div class="flex items-center mb-2">
-                            <i class="fas fa-shipping-fast text-blue-500 mr-2"></i>
-                            <span>Free shipping on orders over $50</span>
-                        </div>
-                        <div class="flex items-center">
-                            <i class="fas fa-undo-alt text-purple-500 mr-2"></i>
-                            <span>30-day return policy</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
+        <style>
+            :root {
+                --chat-gradient: linear-gradient(135deg, #111827, #0b1224 60%, #1e1b4b);
+                --chat-accent: linear-gradient(135deg, #6366f1, #22d3ee);
+                --chat-card: rgba(255, 255, 255, 0.06);
+                --chat-border: rgba(255, 255, 255, 0.1);
+                --chat-blur: blur(12px);
+            }
 
-            <!-- Product details & reviews are managed via CMS -->
-        </div>
-    </main>
-    <custom-footer></custom-footer>
+            #chatbot-container {
+                position: relative;
+                z-index: 60;
+            }
 
-    <script src="components/navbar.js"></script>
-    <script src="components/footer.js"></script>
-<!-- ========== ZENRIX CHATBOT ========== -->
-<div id="chatbot-container">
-  <!-- Chat Button -->
-<button id="chatbot-toggle" class="fixed bottom-6 right-6 bg-blue-600 text-white w-14 h-14 rounded-full shadow-lg hover:bg-blue-700 transition-all z-50 flex items-center justify-center" aria-label="Open chat">
-      <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-        <path stroke-linecap="round" stroke-linejoin="round" d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
-      </svg>
-    </button>
+            .chat-fab {
+                position: fixed;
+                bottom: 1.5rem;
+                right: 1.5rem;
+                background: var(--chat-accent);
+                color: #fff;
+                border: none;
+                width: 3.75rem;
+                height: 3.75rem;
+                border-radius: 9999px;
+                box-shadow: 0 10px 30px rgba(99, 102, 241, 0.4);
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                gap: 0;
+                font-weight: 700;
+                letter-spacing: 0.01em;
+                overflow: hidden;
+                transition: all 0.25s ease;
+                z-index: 1050;
+            }
 
-  <!-- Chat Window -->
-  <div id="chatbot-window" class="fixed bottom-24 right-6 w-80 h-96 bg-white rounded-lg shadow-xl hidden flex flex-col z-50 border">
-    <!-- Header -->
-    <div class="bg-gradient-to-r from-blue-500 to-purple-600 text-white p-4 rounded-t-lg flex justify-between items-center">
-      <div class="flex items-center">
-        <div class="w-8 h-8 bg-white rounded-full flex items-center justify-center mr-3">
-          <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-blue-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="7" width="18" height="11" rx="2" ry="2"/><path d="M7 7V5a5 5 0 0 1 10 0v2"/><circle cx="8.5" cy="12" r="1"/><circle cx="15.5" cy="12" r="1"/></svg>
-        </div>
-        <div>
-          <h3 class="font-bold">Zenrix Assistant</h3>
-          <p class="text-xs opacity-80">Online • 24/7 Support</p>
-        </div>
-      </div>
-      <button id="chatbot-close" aria-label="Close chat" class="text-white hover:text-gray-200">
-        <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
-        </svg>
-      </button>
-    </div>
+            .chat-fab:hover {
+                transform: translateY(-2px) scale(1.03);
+                box-shadow: 0 12px 34px rgba(99, 102, 241, 0.5);
+            }
 
-    <!-- Messages -->
-    <div id="chatbot-messages" class="flex-grow p-4 overflow-y-auto space-y-3">
-      <div class="flex">
-        <div class="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center mr-2 flex-shrink-0">
-          <i class="fas fa-robot text-blue-600 text-sm"></i>
-        </div>
-        <div class="bg-gray-100 rounded-lg p-3 max-w-[80%]">
-          <p class="text-sm">Hello! 👋 I'm Zenrix Assistant. How can I help you today?</p>
-          <p class="text-xs text-gray-500 mt-2">Try asking about: products, delivery, or returns</p>
-        </div>
-      </div>
-    </div>
+            .fab-text {
+                font-size: 0.85rem;
+            }
 
-    <!-- Input -->
-    <div class="border-t p-4">
-      <div class="flex space-x-2">
-        <input type="text" id="chatbot-input" placeholder="Type your message..." 
-               class="flex-grow border rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
-        <button id="chatbot-send" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700" aria-label="Send message">
-          <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M22 2L11 13" />
-            <path stroke-linecap="round" stroke-linejoin="round" d="M22 2l-7 20  -4-9-9-4 20-7z" />
-          </svg>
-        </button>
-      </div>
-      <div class="flex flex-wrap gap-2 mt-3">
-        <button class="quick-btn" data-msg="What products do you have?">Products</button>
-        <button class="quick-btn" data-msg="What is delivery time?">Delivery</button>
-        <button class="quick-btn" data-msg="How to return product?">Returns</button>
-        <button class="quick-btn" data-msg="Contact support">Contact</button>
-      </div>
-    </div>
-  </div>
-</div>
+            .fab-figure {
+                width: 2.5rem;
+                height: 2.5rem;
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+            }
 
-<!-- Chatbot JavaScript -->
-<script>
-// Chatbot functionality
-document.addEventListener('DOMContentLoaded', function() {
-  const toggleBtn = document.getElementById('chatbot-toggle');
-  const closeBtn = document.getElementById('chatbot-close');
-  const chatWindow = document.getElementById('chatbot-window');
-  const chatInput = document.getElementById('chatbot-input');
-  const sendBtn = document.getElementById('chatbot-send');
-  const messagesDiv = document.getElementById('chatbot-messages');
-  const quickBtns = document.querySelectorAll('.quick-btn');
+            .fab-anim {
+                width: 54px;
+                height: 54px;
+            }
 
-  // Toggle chat window
-  toggleBtn.addEventListener('click', () => {
-    chatWindow.classList.toggle('hidden');
-    if (!chatWindow.classList.contains('hidden')) {
-      chatInput.focus();
-    }
-  });
+            .fab-pulse {
+                position: absolute;
+                inset: -8px;
+                border-radius: 9999px;
+                background: radial-gradient(circle, rgba(99, 102, 241, 0.25), transparent 55%);
+                animation: pulse 2.4s infinite;
+                z-index: 1;
+            }
 
-  closeBtn.addEventListener('click', () => {
-    chatWindow.classList.add('hidden');
-  });
+            .fab-icon,
+            .fab-text {
+                position: relative;
+                z-index: 2;
+            }
 
-  // Send message
-  function sendMessage() {
-    const message = chatInput.value.trim();
-    if (message) {
-      addMessage('user', message);
-      chatInput.value = '';
-      getBotResponse(message);
-    }
-  }
+            .chat-panel { position: fixed; bottom: 6.5rem; right: 1.5rem; width: 22.5rem; max-height: 34rem; background: #fff; border-radius: 12px; border: 1px solid #e6eef0; box-shadow: 0 25px 50px rgba(0,0,0,0.08); overflow:hidden; display:flex; flex-direction:column; z-index:1050; }
 
-  sendBtn.addEventListener('click', sendMessage);
-  chatInput.addEventListener('keypress', (e) => {
-    if (e.key === 'Enter') sendMessage();
-  });
+            .chat-header { padding:0.9rem 1rem; display:flex; align-items:center; justify-content:space-between; gap:0.75rem; background:linear-gradient(120deg, rgba(99,102,241,0.12), rgba(34,211,238,0.06)); color:#0f172a; }
 
-  // Quick buttons
-  quickBtns.forEach(btn => {
-    btn.addEventListener('click', () => {
-      const msg = btn.getAttribute('data-msg');
-      addMessage('user', msg);
-      getBotResponse(msg);
-    });
-  });
+            .assistant-meta {
+                display: flex;
+                align-items: center;
+                gap: 0.65rem;
+            }
 
-  // Add message to chat
-  function addMessage(sender, text) {
-    const messageDiv = document.createElement('div');
-    messageDiv.className = `flex ${sender === 'user' ? 'justify-end' : ''}`;
-    
-    messageDiv.innerHTML = `
-      ${sender === 'bot' ? `
-        <div class="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center mr-2 flex-shrink-0">
-          <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-blue-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="7" width="18" height="11" rx="2" ry="2"/><path d="M7 7V5a5 5 0 0 1 10 0v2"/><circle cx="8.5" cy="12" r="1"/><circle cx="15.5" cy="12" r="1"/></svg>
-        </div>
-      ` : ''}
-      <div class="${sender === 'user' ? 'bg-blue-600 text-white' : 'bg-gray-100'} rounded-lg p-3 max-w-[80%]">
-        <p class="text-sm">${text}</p>
-        <p class="text-xs ${sender === 'user' ? 'text-blue-200' : 'text-gray-500'} mt-1">${new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</p>
-      </div>
-      ${sender === 'user' ? `
-        <div class="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center ml-2 flex-shrink-0">
-          <i class="fas fa-user text-blue-600 text-sm"></i>
-        </div>
-      ` : ''}
-    `;
-    
-    messagesDiv.appendChild(messageDiv);
-    messagesDiv.scrollTop = messagesDiv.scrollHeight;
-  }
+            .assistant-name {
+                color: #e5e7eb;
+                font-weight: 700;
+                margin: 0;
+            }
 
-  // Bot responses
-  function getBotResponse(userMessage) {
-    const msg = userMessage.toLowerCase();
-    let response = '';
-    
-    // Simple response logic
-    if (msg.includes('hello') || msg.includes('hi') || msg.includes('hey')) {
-      response = "Hello! Welcome to Zenrix. How can I assist you today?";
-    } else if (msg.includes('product') || msg.includes('item')) {
-      response = "We have electronics, fashion, home goods, and beauty products. Check our Products page for all items!";
-    } else if (msg.includes('price') || msg.includes('cost')) {
-      response = "Products start from $24.99. Check individual product pages for exact prices.";
-    } else if (msg.includes('delivery') || msg.includes('shipping')) {
-      response = "We deliver in 3-5 business days. Free shipping on orders over $50!";
-    } else if (msg.includes('return') || msg.includes('refund')) {
-      response = "We have a 30-day return policy. Contact support@zenrix.com for returns.";
-    } else if (msg.includes('contact') || msg.includes('support')) {
-      response = "Email: support@zenrix.com\nPhone: +977 9801234567\nHours: 9AM-6PM (NPT)";
-    } else if (msg.includes('order') || msg.includes('track')) {
-      response = "Check your Orders page for order status. Need help? Contact our support team.";
-    } else {
-      response = "I'm here to help! For detailed questions, please contact our support team at support@zenrix.com";
-    }
-    
-    // Simulate typing delay
-    setTimeout(() => {
-      addMessage('bot', response);
-    }, 1000);
-  }
-});
-</script>
+            .assistant-status {
+                color: #cbd5e1;
+                font-size: 0.8rem;
+                margin: 0.1rem 0 0;
+            }
 
-<!-- Chatbot CSS -->
-<style>
-#chatbot-window {
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
-  border: 1px solid #e5e7eb;
-}
+            .header-actions {
+                display: flex;
+                align-items: center;
+                gap: 0.35rem;
+            }
 
-#chatbot-messages {
-  scroll-behavior: smooth;
-}
+            .status-pill {
+                display: inline-flex;
+                align-items: center;
+                gap: 0.35rem;
+                background: rgba(34, 197, 94, 0.12);
+                color: #bbf7d0;
+                border: 1px solid rgba(34, 197, 94, 0.2);
+                border-radius: 9999px;
+                padding: 0.25rem 0.6rem;
+                font-size: 0.75rem;
+                font-weight: 600;
+            }
 
-.quick-btn {
-  background: #f3f4f6;
-  border: 1px solid #e5e7eb;
-  padding: 6px 12px;
-  border-radius: 20px;
-  font-size: 12px;
-  cursor: pointer;
-  transition: all 0.2s;
-}
+            .dot {
+                width: 0.5rem;
+                height: 0.5rem;
+                border-radius: 9999px;
+                background: #22c55e;
+                box-shadow: 0 0 0 6px rgba(34, 197, 94, 0.15);
+            }
 
-.quick-btn:hover {
-  background: #e5e7eb;
-  transform: translateY(-1px);
-}
+            .icon-btn {
+                background: rgba(255, 255, 255, 0.08);
+                border: 1px solid var(--chat-border);
+                color: #e2e8f0;
+                width: 2rem;
+                height: 2rem;
+                border-radius: 0.7rem;
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                transition: all 0.2s ease;
+            }
 
-.hidden {
-  display: none !important;
-}
+            .icon-btn:hover {
+                background: rgba(255, 255, 255, 0.12);
+                transform: translateY(-1px);
+            }
 
-/* Smooth animations */
-#chatbot-toggle, #chatbot-window {
-  transition: all 0.3s ease;
-}
+            .chat-hero-card {
+                display: grid;
+                grid-template-columns: 1.3fr 0.7fr;
+                gap: 0.9rem;
+                padding: 1rem;
+                background: rgba(255, 255, 255, 0.04);
+                border-bottom: 1px solid var(--chat-border);
+            }
 
-#chatbot-toggle:hover {
-  transform: scale(1.1);
-}
-</style>
-<!-- ========== END CHATBOT ========== -->
+            .hero-eyebrow {
+                color: #a5b4fc;
+                font-size: 0.78rem;
+                letter-spacing: 0.02em;
+                margin: 0 0 0.2rem;
+            }
+
+            .hero-title {
+                color: #f8fafc;
+                font-weight: 800;
+                margin: 0 0 0.3rem;
+                font-size: 1.25rem;
+            }
+
+            .hero-sub {
+                color: #cbd5e1;
+                font-size: 0.9rem;
+                margin: 0 0 0.6rem;
+                line-height: 1.4;
+            }
+
+            .hero-tags {
+                display: flex;
+                flex-wrap: wrap;
+                gap: 0.4rem;
+            }
+
+            .hero-tags span {
+                background: rgba(255, 255, 255, 0.06);
+                border: 1px solid var(--chat-border);
+                color: #e5e7eb;
+                font-size: 0.75rem;
+                padding: 0.25rem 0.55rem;
+                border-radius: 9999px;
+            }
+
+            .hero-figure {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+
+            .hero-figure-shell {
+                padding: 0.35rem;
+                border-radius: 1rem;
+                background: rgba(255, 255, 255, 0.06);
+                border: 1px solid var(--chat-border);
+                box-shadow: 0 12px 30px rgba(0, 0, 0, 0.2);
+            }
+
+            .namaste-anim {
+                width: 140px;
+                height: 140px;
+                filter: drop-shadow(0 10px 30px rgba(0, 0, 0, 0.25));
+            }
+
+            .namaste-anim .hand {
+                transform-origin: center 20px;
+                animation: bow 2.2s ease-in-out infinite;
+            }
+
+            .namaste-anim .hand-right { animation-delay: 0.2s; }
+
+            .chat-messages { padding:12px; height:320px; overflow-y:auto; background:#f8fafc; display:flex; flex-direction:column; gap:10px; scroll-behavior:smooth; }
+
+            .chat-greeting {
+                width: 100%;
+                display: grid;
+                place-items: center;
+                gap: 0.5rem;
+                padding: 0.5rem 0;
+                color: #e2e8f0;
+                text-align: center;
+            }
+
+            .greet-text {
+                margin: 0;
+                font-size: 0.95rem;
+                color: #cbd5e1;
+            }
+
+            .chat-line {
+                display: flex;
+                align-items: flex-end;
+                gap: 0.6rem;
+            }
+
+            .chat-line.from-user {
+                justify-content: flex-end;
+            }
+
+            .avatar {
+                width: 2.2rem;
+                height: 2.2rem;
+                border-radius: 0.8rem;
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                border: 1px solid var(--chat-border);
+                background: rgba(255, 255, 255, 0.05);
+                flex-shrink: 0;
+            }
+
+            .avatar.bot {
+                background: rgba(99, 102, 241, 0.1);
+                border-color: rgba(99, 102, 241, 0.2);
+            }
+
+            .avatar.user {
+                background: rgba(255, 255, 255, 0.08);
+            }
+
+            .bubble { padding:10px 12px; border-radius:12px; max-width:78%; line-height:1.3; word-break:break-word; }
+
+            .bot-bubble { background:#f3f4f6; color:#0f172a; align-self:flex-start; }
+            .user-bubble { background:linear-gradient(90deg,#0f172a,#111827); color:#fff; align-self:flex-end; }
+
+            .caption { color:#6b7280; font-size:12px; margin-top:6px; }
+            }
+
+            .chat-input-shell {
+                padding: 0.9rem;
+                display: flex;
+                gap: 0.55rem;
+                align-items: center;
+                border-top: 1px solid var(--chat-border);
+                background: rgba(12, 17, 31, 0.85);
+            }
+
+            .input-wrapper {
+                flex: 1;
+                background: rgba(255, 255, 255, 0.04);
+                border: 1px solid var(--chat-border);
+                border-radius: 0.85rem;
+                padding: 0.55rem 0.7rem;
+            }
+
+            #chatbot-input {
+                width: 100%;
+                background: transparent;
+                border: none;
+                color: #e5e7eb;
+                outline: none;
+                font-size: 0.95rem;
+            }
+
+            #chatbot-input::placeholder {
+                color: #94a3b8;
+            }
+
+            .send-btn {
+                display: inline-flex;
+                align-items: center;
+                gap: 0.4rem;
+                background: var(--chat-accent);
+                color: #fff;
+                border: none;
+                padding: 0.65rem 0.9rem;
+                border-radius: 0.9rem;
+                font-weight: 700;
+                box-shadow: 0 10px 30px rgba(99, 102, 241, 0.35);
+                transition: all 0.2s ease;
+            }
+
+            .send-btn:hover {
+                transform: translateY(-1px);
+            }
+
+            .chips-row {
+                display: flex;
+                flex-wrap: wrap;
+                gap: 0.5rem;
+                padding: 0 0.9rem 1rem;
+                background: rgba(12, 17, 31, 0.85);
+            }
+
+            .quick-btn {
+                background: rgba(255, 255, 255, 0.06);
+                border: 1px solid var(--chat-border);
+                color: #e5e7eb;
+                padding: 0.45rem 0.9rem;
+                border-radius: 9999px;
+                font-size: 0.82rem;
+                cursor: pointer;
+                transition: all 0.2s ease;
+            }
+
+            .quick-btn:hover {
+                transform: translateY(-1px);
+                background: rgba(255, 255, 255, 0.1);
+            }
+
+            .hidden {
+                display: none !important;
+            }
+
+            /* Namaste figure (Nepali boy) */
+            .namaste-figure {
+                position: relative;
+                width: 56px;
+                height: 64px;
+                filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.25));
+            }
+
+            .namaste-figure.mini { transform: scale(0.8); }
+            .namaste-figure.tiny { transform: scale(0.65); }
+
+            .namaste-figure .halo {
+                position: absolute;
+                inset: 6px;
+                background: radial-gradient(circle, rgba(99, 102, 241, 0.22), transparent 60%);
+                border-radius: 50%;
+                animation: float 3s ease-in-out infinite;
+            }
+
+            .namaste-figure .head {
+                position: absolute;
+                top: 4px;
+                left: 14px;
+                width: 28px;
+                height: 28px;
+                background: linear-gradient(135deg, #f1c27d, #e0ac69);
+                border-radius: 50%;
+                box-shadow: inset 0 -2px 0 rgba(0, 0, 0, 0.08);
+            }
+
+            .namaste-figure .body {
+                position: absolute;
+                top: 26px;
+                left: 10px;
+                width: 36px;
+                height: 28px;
+                background: linear-gradient(135deg, #111827, #1f2937);
+                border-radius: 14px;
+                border: 2px solid rgba(255, 255, 255, 0.08);
+            }
+
+            .namaste-figure .arm {
+                position: absolute;
+                top: 24px;
+                width: 16px;
+                height: 30px;
+                background: linear-gradient(135deg, #f1c27d, #e0ac69);
+                border-radius: 12px;
+                transform-origin: top;
+            }
+
+            .namaste-figure .arm.left {
+                left: 6px;
+                animation: namaste-left 2.2s ease-in-out infinite;
+            }
+
+            .namaste-figure .arm.right {
+                right: 6px;
+                animation: namaste-right 2.2s ease-in-out infinite;
+            }
+
+            @keyframes namaste-left {
+                0%, 100% { transform: rotate(10deg) translate(4px, 4px); }
+                50% { transform: rotate(-14deg) translate(12px, -2px); }
+            }
+
+            @keyframes namaste-right {
+                0%, 100% { transform: rotate(-10deg) translate(-4px, 4px); }
+                50% { transform: rotate(14deg) translate(-12px, -2px); }
+            }
+
+            @keyframes pulse {
+                0% { opacity: 0.9; transform: scale(0.98); }
+                50% { opacity: 0.3; transform: scale(1.08); }
+                100% { opacity: 0.9; transform: scale(0.98); }
+            }
+
+            @keyframes float {
+                0%, 100% { transform: translateY(0); }
+                50% { transform: translateY(-2px); }
+            }
+
+            @keyframes bow {
+                0%, 100% { transform: rotate(8deg) translateY(0); }
+                50% { transform: rotate(-18deg) translateY(-6px); }
+            }
+
+            @media (prefers-reduced-motion: reduce) {
+                .fab-pulse,
+                .namaste-figure .halo,
+                .namaste-figure .arm,
+                .namaste-anim .hand,
+                .dot { animation: none !important; }
+            }
+        </style>
+        <!-- ========== END CHATBOT ========== -->
 </body>
 </html>

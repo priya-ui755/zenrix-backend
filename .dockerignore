@@ -1,0 +1,16 @@
+node_modules
+npm-debug.log
+.env
+.env.*
+.git
+.gitignore
+uploads
+tmp
+test
+tests
+test-results
+db-backup
+playwright.config.js
+debug.log
+Dockerfile
+.dockerignore

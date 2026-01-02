@@ -3,86 +3,227 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Wishlist | ShopNest</title>
+    <title>Wishlist | Zenrix</title>
     <link rel="stylesheet" href="style.css">
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="script.js" defer></script>
 </head>
-<body class="bg-gray-50">
+<body class="bg-slate-950 text-slate-100">
     <custom-navbar></custom-navbar>
-    <main class="container mx-auto px-4 py-8">
-        <div class="bg-white rounded-lg shadow p-8">
-            <div id="pageContent" class="prose max-w-none"></div>
-        </div>
-            <aside class="w-full md:w-64 flex-shrink-0">
-                <div class="bg-white p-6 rounded-lg shadow-sm">
-                    <div class="flex items-center mb-6">
-                        <img src="http://static.photos/people/200x200/5" alt="User" class="w-12 h-12 rounded-full mr-4">
-                        <div>
-                            <h3 class="font-semibold">John Doe</h3>
-                            <span class="text-sm text-gray-500">Gold Member</span>
+    <main class="relative">
+        <section class="relative overflow-hidden bg-gradient-to-br from-indigo-900 via-slate-900 to-slate-950 py-14">
+            <div class="absolute inset-0 opacity-30 bg-[radial-gradient(circle_at_20%_20%,rgba(99,102,241,0.35),transparent_40%),radial-gradient(circle_at_80%_0%,rgba(236,72,153,0.25),transparent_35%)]"></div>
+            <div class="container mx-auto px-4 relative">
+                <div class="flex flex-wrap items-center justify-between gap-6">
+                    <div class="space-y-4 max-w-2xl">
+                        <p class="text-xs uppercase tracking-[0.4em] text-indigo-200">Wishlist</p>
+                        <h1 class="text-4xl md:text-5xl font-black leading-tight">Save now, check out later.</h1>
+                        <p class="text-slate-200/80 max-w-xl">Your saved picks live here. Move them to cart when you are ready, or keep an eye on price drops.</p>
+                        <div class="flex flex-wrap gap-3 text-sm">
+                            <span class="px-4 py-2 rounded-full bg-white/10 border border-white/10" id="wishlistCountBadge">0 items saved</span>
+                            <a href="products.html" class="px-4 py-2 rounded-full bg-white text-slate-900 font-semibold shadow">Browse products</a>
                         </div>
                     </div>
-                    <ul class="space-y-2">
-                        <li><a href="/account.html" class="flex items-center p-2 rounded-lg hover:bg-gray-100">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 inline-block mr-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><circle cx="12" cy="8" r="3"/><path d="M4 20a8 8 0 0 1 16 0"/></svg> My Profile</a></li>
-                        <li><a href="/orders.html" class="flex items-center p-2 rounded-lg hover:bg-gray-100">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 inline-block mr-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><path d="M21 16V8l-9-5-9 5v8l9 5 9-5z"/></svg> My Orders</a></li>
-                        <li><a href="/wishlist.html" class="flex items-center p-2 rounded-lg bg-blue-50 text-blue-600">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 inline-block mr-3 text-red-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><path d="M20.8 4.6c-1.4-1.6-3.9-1.8-5.6-.4l-.7.6-.7-.6C11.1 2 9 2.2 7.6 3.8c-2.1 2.4-2 6 0 8.5L12 21l4.4-9.7c2-2.5 2.1-6.1 0-8.7z"/></svg> Wishlist</a></li>
-                        <li><a href="/addresses.html" class="flex items-center p-2 rounded-lg hover:bg-gray-100">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 inline-block mr-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><path d="M12 2C8 2 5 5 5 9c0 5 7 13 7 13s7-8 7-13c0-4-3-7-7-7z"/><circle cx="12" cy="9" r="2"/></svg> Addresses</a></li>
-                        <li><a href="/settings.html" class="flex items-center p-2 rounded-lg hover:bg-gray-100">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 inline-block mr-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><path d="M12 15.5A3.5 3.5 0 1 0 12 8.5a3.5 3.5 0 0 0 0 7z"/><path d="M19.4 15a1.6 1.6 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.6 1.6 0 0 0-1.82-.33 1.6 1.6 0 0 0-1 1.5V21a2 2 0 0 1-4 0v-.06a1.6 1.6 0 0 0-1-1.5 1.6 1.6 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06a1.6 1.6 0 0 0 .33-1.82 1.6 1.6 0 0 0-1.5-1H3a2 2 0 0 1 0-4h.06a1.6 1.6 0 0 0 1.5-1 1.6 1.6 0 0 0-.33-1.82l-.06-.06A2 2 0 0 1 7.3 3.7l.06.06a1.6 1.6 0 0 0 1.82.33H9.7a1.6 1.6 0 0 0 1-1.5V3a2 2 0 0 1 4 0v.06a1.6 1.6 0 0 0 1 1.5h.06a1.6 1.6 0 0 0 1.82-.33l.06-.06A2 2 0 0 1 20.6 6.7z"/></svg> Settings</a></li>
-                        <li><a href="/logout.html" class="flex items-center p-2 rounded-lg hover:bg-gray-100 text-red-500">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 inline-block mr-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><path d="M17 16l4-4-4-4"/><path d="M7 12h14"/><path d="M7 20H4a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h3"/></svg> Logout</a></li>
-                    </ul>
-                </div>
-            </aside>
-
-            <div class="flex-grow">
-                <h1 class="text-3xl font-bold mb-6">My Wishlist</h1>
-                
-                <div class="bg-white rounded-lg shadow-sm p-6">
-                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6" id="wishlistItems">
-                        <div class="product-card relative bg-white rounded-lg shadow-sm overflow-hidden hover:shadow-md transition">
-                            <button class="absolute top-2 right-2 text-red-500 hover:text-red-700">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 inline-block" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M6 18L18 6M6 6l12 12"/></svg>
-                            </button>
-                            <a href="/product.html?id=1">
-                                <div class="product-image h-48 bg-gray-100 flex items-center justify-center">
-                                    <img src="http://static.photos/technology/320x240/1" alt="Wireless Headphones" class="h-full object-cover">
-                                </div>
-                                <div class="p-4">
-                                    <h3 class="font-semibold text-lg mb-1">Wireless Headphones</h3>
-                                    <div class="flex items-center mb-2">
-                                        <svg xmlns="http://www.w3.org/2000/svg" class="w-3 h-3 inline-block text-yellow-400" viewBox="0 0 20 20" fill="currentColor"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.286 3.955a1 1 0 00.95.69h4.162c.969 0 1.371 1.24.588 1.81l-3.37 2.455a1 1 0 00-.364 1.118l1.287 3.955c.3.921-.755 1.688-1.54 1.118L10 13.347l-3.448 2.441c-.784.57-1.838-.197-1.539-1.118l1.287-3.955a1 1 0 00-.364-1.118L2.568 9.382c-.783-.57-.38-1.81.588-1.81h4.162a1 1 0 00.95-.69L9.049 2.927z"/></svg>
-                                        <svg xmlns="http://www.w3.org/2000/svg" class="w-3 h-3 inline-block text-yellow-400" viewBox="0 0 20 20" fill="currentColor"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.286 3.955a1 1 0 00.95.69h4.162c.969 0 1.371 1.24.588 1.81l-3.37 2.455a1 1 0 00-.364 1.118l1.287 3.955c.3.921-.755 1.688-1.54 1.118L10 13.347l-3.448 2.441c-.784.57-1.838-.197-1.539-1.118l1.287-3.955a1 1 0 00-.364-1.118L2.568 9.382c-.783-.57-.38-1.81.588-1.81h4.162a1 1 0 00.95-.69L9.049 2.927z"/></svg>
-                                        <svg xmlns="http://www.w3.org/2000/svg" class="w-3 h-3 inline-block text-yellow-400" viewBox="0 0 20 20" fill="currentColor"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.286 3.955a1 1 0 00.95.69h4.162c.969 0 1.371 1.24.588 1.81l-3.37 2.455a1 1 0 00-.364 1.118l1.287 3.955c.3.921-.755 1.688-1.54 1.118L10 13.347l-3.448 2.441c-.784.57-1.838-.197-1.539-1.118l1.287-3.955a1 1 0 00-.364-1.118L2.568 9.382c-.783-.57-.38-1.81.588-1.81h4.162a1 1 0 00.95-.69L9.049 2.927z"/></svg>
-                                        <svg xmlns="http://www.w3.org/2000/svg" class="w-3 h-3 inline-block text-yellow-400" viewBox="0 0 20 20" fill="currentColor"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.286 3.955a1 1 0 00.95.69h4.162c.969 0 1.371 1.24.588 1.81l-3.37 2.455a1 1 0 00-.364 1.118l1.287 3.955c.3.921-.755 1.688-1.54 1.118L10 13.347l-3.448 2.441c-.784.57-1.838-.197-1.539-1.118l1.287-3.955a1 1 0 00-.364-1.118L2.568 9.382c-.783-.57-.38-1.81.588-1.81h4.162a1 1 0 00.95-.69L9.049 2.927z"/></svg>
-                                        <svg xmlns="http://www.w3.org/2000/svg" class="w-3 h-3 inline-block text-yellow-400" viewBox="0 0 20 20" fill="currentColor"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.286 3.955a1 1 0 00.95.69h4.162c.969 0 1.371 1.24.588 1.81l-3.37 2.455a1 1 0 00-.364 1.118l1.287 3.955c.3.921-.755 1.688-1.54 1.118L10 13.347l-3.448 2.441c-.784.57-1.838-.197-1.539-1.118l1.287-3.955a1 1 0 00-.364-1.118L2.568 9.382c-.783-.57-.38-1.81.588-1.81h4.162a1 1 0 00.95-.69L9.049 2.927z"/></svg>
-                                    </div>
-                                    <p class="text-blue-600 font-bold">$99.99</p>
-                                </div>
-                            </a>
-                            <button class="w-full bg-blue-600 text-white py-2 hover:bg-blue-700 transition">Add to Cart</button>
+                    <div class="rounded-[28px] bg-white/5 border border-white/10 p-6 backdrop-blur shadow-2xl min-w-[280px]">
+                        <p class="text-sm uppercase tracking-[0.3em] text-indigo-100">Quick insight</p>
+                        <div class="mt-4 space-y-3 text-sm text-slate-100/90">
+                            <div class="flex items-center justify-between">
+                                <span>Move items to cart</span>
+                                <span class="px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-100 border border-emerald-400/30">1-click</span>
+                            </div>
+                            <div class="flex items-center justify-between">
+                                <span>Price shown in NPR</span>
+                                <span class="text-indigo-100">Live</span>
+                            </div>
+                            <div class="flex items-center justify-between">
+                                <span>Stock changes reflected</span>
+                                <span class="text-indigo-100">Realtime</span>
+                            </div>
                         </div>
-                    </div>
-
-                    <div class="text-center mt-12 py-12" id="emptyWishlist">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="w-12 h-12 inline-block text-gray-300 mb-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><path d="M20.8 4.6c-1.4-1.6-3.9-1.8-5.6-.4l-.7.6-.7-.6C11.1 2 9 2.2 7.6 3.8c-2.1 2.4-2 6 0 8.5L12 21l4.4-9.7c2-2.5 2.1-6.1 0-8.7z"/></svg>
-                        <p class="text-gray-500 text-lg mb-4">Your wishlist is empty</p>
-                        <a href="/products.html" class="inline-block bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition">
-                            Browse Products
-                        </a>
                     </div>
                 </div>
             </div>
-        </div>
+        </section>
+
+        <section class="container mx-auto px-4 py-12">
+            <div id="wishlistShell" class="space-y-8">
+                <div id="wishlistLoading" class="bg-white/5 border border-white/10 rounded-3xl p-10 flex items-center justify-center text-slate-200">
+                    <div class="flex items-center gap-3 text-sm">
+                        <span class="h-2 w-2 rounded-full bg-indigo-400 animate-ping"></span>
+                        Fetching your saved items…
+                    </div>
+                </div>
+
+                <div id="wishlistContent" class="hidden space-y-6">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <h2 class="text-2xl font-bold text-white">Saved items</h2>
+                            <p class="text-slate-300 text-sm">Tap into cart or remove items you no longer want.</p>
+                        </div>
+                        <a href="products.html" class="text-indigo-200 hover:text-white font-semibold text-sm">+ Add more products</a>
+                    </div>
+
+                    <div id="wishlistGrid" class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6"></div>
+                </div>
+
+                <div id="wishlistEmpty" class="hidden bg-white/5 border border-white/10 rounded-3xl p-10 text-center text-slate-100">
+                    <div class="w-14 h-14 mx-auto mb-4 rounded-2xl bg-indigo-500/20 border border-indigo-400/30 flex items-center justify-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 text-indigo-100" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M20.8 4.6c-1.4-1.6-3.9-1.8-5.6-.4l-.7.6-.7-.6C11.1 2 9 2.2 7.6 3.8c-2.1 2.4-2 6 0 8.5L12 21l4.4-9.7c2-2.5 2.1-6.1 0-8.7z"/></svg>
+                    </div>
+                    <h3 class="text-2xl font-semibold mb-2">No favorites yet</h3>
+                    <p class="text-slate-300 mb-6">Heart products to build your shortlist. They’ll show up here.</p>
+                    <a href="products.html" class="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-white text-slate-900 font-semibold shadow hover:-translate-y-0.5 transition">Browse products</a>
+                </div>
+
+                <div id="wishlistAuth" class="hidden bg-white/5 border border-white/10 rounded-3xl p-10 text-center text-slate-100">
+                    <h3 class="text-2xl font-semibold mb-2">Log in to view your wishlist</h3>
+                    <p class="text-slate-300 mb-6">We keep your saved items synced to your account.</p>
+                    <div class="flex flex-wrap justify-center gap-3">
+                        <a href="login.html" class="px-6 py-3 rounded-full bg-white text-slate-900 font-semibold shadow">Log in</a>
+                        <a href="register.html" class="px-6 py-3 rounded-full border border-white/30 text-white font-semibold hover:bg-white/10">Create account</a>
+                    </div>
+                </div>
+            </div>
+        </section>
     </main>
     <custom-footer></custom-footer>
 
     <script src="components/navbar.js"></script>
     <script src="components/footer.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', initWishlistPage);
+
+        function getProductId(item) {
+            return item?.productId || item?._id || item?.id;
+        }
+
+        function buildWishlistCard(item) {
+            const pid = getProductId(item) || '';
+            const image = item.image || (Array.isArray(item.images) && item.images[0]) || 'https://via.placeholder.com/600x600?text=Zenrix';
+            const name = item.name || item.title || 'Saved item';
+            const sale = typeof isSaleActive === 'function' && isSaleActive(item);
+            const effectivePrice = typeof getEffectivePrice === 'function' ? getEffectivePrice(item) : (item.price || 0);
+            const basePrice = item.price || effectivePrice;
+            const priceBlock = sale
+                ? `<div class="flex items-center gap-2"><span class="text-lg font-semibold text-emerald-300">${formatNpr(effectivePrice)}</span><span class="text-sm line-through text-slate-400">${formatNpr(basePrice)}</span><span class="px-2 py-1 text-xs rounded-full bg-rose-500/20 text-rose-100 border border-rose-400/30">${item.saleLabel || 'On Sale'}</span></div>`
+                : `<p class="text-lg font-semibold text-white">${formatNpr(basePrice)}</p>`;
+
+            return `
+                <article class="group relative overflow-hidden rounded-2xl border border-white/10 bg-white/5 backdrop-blur shadow-xl hover:-translate-y-1 transition">
+                    <button class="absolute top-3 right-3 p-2 rounded-full bg-white/10 text-rose-200 hover:bg-white/20" data-remove="${pid}" aria-label="Remove from wishlist">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M6 18L18 6M6 6l12 12"/></svg>
+                    </button>
+                    <a href="product.html?id=${pid}" class="block">
+                        <div class="h-56 bg-slate-900 flex items-center justify-center overflow-hidden">
+                            <img src="${image}" alt="${name}" class="h-full w-full object-cover group-hover:scale-105 transition" loading="lazy">
+                        </div>
+                        <div class="p-5 space-y-3">
+                            <div class="flex items-center justify-between gap-3">
+                                <h3 class="text-lg font-semibold text-white line-clamp-1">${name}</h3>
+                                ${item.category ? `<span class="px-3 py-1 text-xs rounded-full bg-white/10 border border-white/10 text-slate-200">${item.category}</span>` : ''}
+                            </div>
+                            ${priceBlock}
+                        </div>
+                    </a>
+                    <div class="px-5 pb-5 grid grid-cols-2 gap-3">
+                        <button class="w-full rounded-xl bg-indigo-500 text-white font-semibold py-2.5 hover:bg-indigo-400 transition" data-add="${pid}">Add to cart</button>
+                        <button class="w-full rounded-xl border border-white/20 text-white font-semibold py-2.5 hover:bg-white/10 transition" data-remove="${pid}">Remove</button>
+                    </div>
+                </article>
+            `;
+        }
+
+        async function initWishlistPage() {
+            const loading = document.getElementById('wishlistLoading');
+            const content = document.getElementById('wishlistContent');
+            const empty = document.getElementById('wishlistEmpty');
+            const auth = document.getElementById('wishlistAuth');
+            const grid = document.getElementById('wishlistGrid');
+            const badge = document.getElementById('wishlistCountBadge');
+
+            const token = typeof getAuthToken === 'function' ? getAuthToken() : null;
+            if (!token) {
+                loading.classList.add('hidden');
+                auth.classList.remove('hidden');
+                return;
+            }
+
+            try {
+                const res = await fetch('/api/users/wishlist', {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const data = await res.json();
+                const items = data.success && Array.isArray(data.data) ? data.data : [];
+
+                loading.classList.add('hidden');
+
+                if (!items.length) {
+                    empty.classList.remove('hidden');
+                    badge.textContent = '0 items saved';
+                    return;
+                }
+
+                grid.innerHTML = items.map(buildWishlistCard).join('');
+                badge.textContent = `${items.length} item${items.length === 1 ? '' : 's'} saved`;
+                content.classList.remove('hidden');
+
+                grid.querySelectorAll('[data-add]').forEach(btn => {
+                    btn.addEventListener('click', () => {
+                        const pid = btn.getAttribute('data-add');
+                        const item = items.find(i => String(getProductId(i)) === pid);
+                        if (!item) return;
+                        const price = typeof getEffectivePrice === 'function' ? getEffectivePrice(item) : (item.price || 0);
+                        const image = item.image || (Array.isArray(item.images) && item.images[0]);
+                        addToCart({
+                            id: pid,
+                            name: item.name || item.title || 'Product',
+                            price: price,
+                            image: image,
+                            color: (item.colors && item.colors[0]) || (item.colorOptions && item.colorOptions[0]) || undefined
+                        }, 1);
+                    });
+                });
+
+                grid.querySelectorAll('[data-remove]').forEach(btn => {
+                    btn.addEventListener('click', async (e) => {
+                        e.preventDefault();
+                        const pid = btn.getAttribute('data-remove');
+                        await removeWishlistItem(pid);
+                        btn.closest('article')?.remove();
+                        const remaining = grid.querySelectorAll('article').length;
+                        badge.textContent = `${remaining} item${remaining === 1 ? '' : 's'} saved`;
+                        if (remaining === 0) {
+                            content.classList.add('hidden');
+                            empty.classList.remove('hidden');
+                        }
+                    });
+                });
+
+            } catch (err) {
+                console.error('Failed to load wishlist', err);
+                loading.classList.add('hidden');
+                empty.classList.remove('hidden');
+            }
+        }
+
+        async function removeWishlistItem(productId) {
+            if (!productId) return;
+            try {
+                const token = typeof getAuthToken === 'function' ? getAuthToken() : null;
+                await fetch(`/api/users/wishlist/${productId}`, {
+                    method: 'DELETE',
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                if (typeof showToast === 'function') {
+                    showToast('Removed from wishlist');
+                }
+            } catch (err) {
+                console.error('Failed to remove from wishlist', err);
+                if (typeof showToast === 'function') {
+                    showToast('Could not remove item');
+                }
+            }
+        }
+    </script>
 </body>
 </html>

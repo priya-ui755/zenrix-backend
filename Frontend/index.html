@@ -4,193 +4,331 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Zenrix - Nepali Digital Marketplace</title>
-<link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Clash+Display:wght@500;600;700&family=Space+Grotesk:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="script.js" defer></script>
+    <style>
+      :root {
+        --zenrix-bg: linear-gradient(135deg, #060b1a 0%, #0f172a 35%, #1e1b4b 65%, #312e81 100%);
+        --zenrix-card: rgba(255,255,255,0.04);
+      }
+      body {
+        font-family: 'Space Grotesk', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+        background: #0f172a;
+        color: #0f172a;
+      }
+      h1, h2, h3, h4, .display-font {
+        font-family: 'Clash Display', 'Space Grotesk', sans-serif;
+      }
+    </style>
 </head>
-<body class="bg-gray-50">
+<body class="bg-[#060a16] relative">
+    <div class="absolute inset-0 opacity-70" aria-hidden="true" style="background-image: radial-gradient(circle at 20% 20%, rgba(99,102,241,0.25), transparent 45%), radial-gradient(circle at 80% 0%, rgba(8,145,178,0.25), transparent 40%), radial-gradient(circle at 50% 80%, rgba(244,114,182,0.2), transparent 45%);"></div>
+    <div class="relative">
     <custom-navbar></custom-navbar>
-    <main class="container mx-auto px-4 py-8">
+    <main class="container mx-auto px-4 py-12 lg:py-16 text-white">
         <div id="pageContent" class="prose max-w-none">Loading page content…</div>
 
-        <!-- Hero Section (refreshed) -->
-        <section class="relative overflow-hidden rounded-3xl bg-gradient-to-br from-slate-900 via-indigo-800 to-purple-700 text-white shadow-2xl">
-          <div class="absolute -left-24 -top-20 w-80 h-80 bg-white/10 blur-3xl rounded-full"></div>
-          <div class="absolute -right-28 -bottom-28 w-96 h-96 bg-indigo-300/20 blur-3xl rounded-full"></div>
-          <div class="absolute inset-0 bg-[radial-gradient(circle_at_20%_20%,rgba(255,255,255,0.08),transparent_45%),radial-gradient(circle_at_80%_0%,rgba(255,255,255,0.07),transparent_35%),radial-gradient(circle_at_50%_80%,rgba(255,255,255,0.06),transparent_40%)]"></div>
+        <!-- Hero Section (Aurora Edition) -->
+        <section id="heroSection" class="relative overflow-hidden rounded-[40px] bg-gradient-to-br from-slate-900 via-indigo-900 to-purple-800 text-white shadow-[0_25px_80px_rgba(15,23,42,0.4)] home-hero">
+          <div id="heroBackgroundImage" class="absolute inset-0 bg-cover bg-center opacity-50 hidden home-hero-bg" aria-hidden="true"></div>
+          <div class="absolute inset-0 opacity-60 home-hero-overlay" aria-hidden="true">
+            <div class="absolute -left-32 top-10 w-64 h-64 bg-emerald-500/40 blur-[120px] rounded-full"></div>
+            <div class="absolute right-0 -bottom-32 w-80 h-80 bg-indigo-500/30 blur-[140px] rounded-full"></div>
+            <div class="absolute inset-0 bg-[conic-gradient(from_120deg,rgba(255,255,255,0.1),transparent_55%)]"></div>
+          </div>
 
-          <div class="relative grid lg:grid-cols-2 gap-10 p-10 lg:p-14 items-center">
-            <div class="space-y-6">
-              <div class="inline-flex items-center space-x-2 px-4 py-2 bg-white/10 rounded-full text-sm font-semibold backdrop-blur border border-white/20">
-                <span class="w-2 h-2 bg-emerald-300 rounded-full animate-pulse"></span>
-                <span>Fresh drops • Limited picks</span>
+          <div class="relative grid lg:grid-cols-[1.2fr_0.8fr] gap-12 p-10 lg:p-16 items-center">
+            <div class="space-y-8">
+              <div class="inline-flex items-center gap-2 px-5 py-2 border border-white/20 rounded-full bg-white/5 backdrop-blur">
+                <span class="w-2 h-2 rounded-full bg-emerald-300 animate-pulse"></span>
+                <span id="heroBadgeText" class="text-sm font-semibold tracking-wide">Zenrix Spotlight • Winter 2025</span>
               </div>
-              <h1 class="text-4xl lg:text-5xl font-black leading-tight tracking-tight">Design-forward finds for bold everyday living.</h1>
-              <p class="text-lg text-white/85 max-w-2xl">Elevated electronics, sharp fashion, and mindful home essentials. Curated weekly with fast delivery across Nepal.</p>
+              <div class="space-y-4">
+                <h1 id="heroTitle" class="text-4xl lg:text-6xl font-black leading-tight tracking-tight">
+                  Nepal's style lab for <span class="text-transparent bg-clip-text bg-gradient-to-r from-emerald-300 via-sky-300 to-indigo-300">fearless</span> everyday living.
+                </h1>
+                <p id="heroSubtitle" class="text-lg text-white/85 max-w-2xl">
+                  Limited-run electronics, bold fashion capsules, and slow-home objects built with Nepali creators. Same-week delivery nationwide.
+                </p>
+              </div>
               <div class="flex flex-wrap gap-3">
-                <a href="products.html" class="px-6 py-3 rounded-xl bg-white text-slate-900 font-semibold shadow-lg hover:-translate-y-0.5 transition transform">Browse Products</a>
+                <a id="heroPrimaryCta" href="products.html" class="px-7 py-3 rounded-2xl bg-white text-slate-900 font-semibold shadow-xl shadow-slate-900/20 hover:-translate-y-0.5 transition">Browse Collections</a>
+                <a href="products.html?category=sale" class="px-7 py-3 rounded-2xl border border-white/40 text-white font-semibold hover:bg-white/10 transition">On Sale</a>
               </div>
-              <div class="flex flex-col sm:flex-row sm:items-center sm:gap-6 gap-3 pt-1 text-sm text-white/80">
-                <div class="flex -space-x-2">
-                  <span class="w-9 h-9 rounded-full bg-white/90 border border-white/30"></span>
-                  <span class="w-9 h-9 rounded-full bg-white/75 border border-white/30"></span>
-                  <span class="w-9 h-9 rounded-full bg-white/60 border border-white/30"></span>
+              <div class="grid sm:grid-cols-3 gap-4 text-sm text-white/80">
+                <div class="p-4 rounded-2xl bg-white/5 border border-white/10">
+                  <p class="text-3xl font-black text-white">25k+</p>
+                  <p>Members in Kathmandu / Pokhara</p>
                 </div>
-                <p>Trusted by 25k+ shoppers • 48h express shipping</p>
+                <div class="p-4 rounded-2xl bg-white/5 border border-white/10">
+                  <p class="text-3xl font-black text-white">48h</p>
+                  <p>Insured express dispatch</p>
+                </div>
+                <div class="p-4 rounded-2xl bg-white/5 border border-white/10">
+                  <p class="text-3xl font-black text-white">92%</p>
+                  <p>Repeat purchase rate</p>
+                </div>
+              </div>
+              <div class="grid sm:grid-cols-2 gap-4" id="heroProductShowcase">
+                <div class="rounded-2xl bg-white/5 border border-white/10 p-4">
+                  <p class="text-sm text-white/70">Loading hero picks…</p>
+                </div>
               </div>
             </div>
 
             <div class="relative">
-              <div class="absolute -inset-8 bg-white/5 blur-3xl rounded-3xl"></div>
-              <div class="relative bg-white/95 text-gray-900 rounded-3xl p-6 shadow-2xl border border-white/40 backdrop-blur">
-                <div class="flex items-center justify-between mb-4">
-                  <p class="font-semibold text-sm text-gray-600">Spotlight bundle</p>
-                  <span class="text-xs px-3 py-1 bg-indigo-100 text-indigo-700 rounded-full">New</span>
-                </div>
-                <div class="aspect-video rounded-2xl bg-gradient-to-br from-indigo-50 to-white overflow-hidden flex items-center justify-center">
-                  <div class="grid grid-cols-3 gap-3 p-3 text-indigo-500">
-                    <div class="flex items-center justify-center rounded-xl bg-white shadow-inner p-3">
-                      <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.4" d="M9 18l6-6-6-6"/></svg>
-                    </div>
-                    <div class="flex items-center justify-center rounded-xl bg-white shadow-inner p-3">
-                      <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.4" d="M12 6v12m6-6H6"/></svg>
-                    </div>
-                    <div class="flex items-center justify-center rounded-xl bg-white shadow-inner p-3">
-                      <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.4" d="M4 7h16M4 12h10M4 17h7"/></svg>
-                    </div>
-                  </div>
-                </div>
-                <h3 class="mt-4 text-xl font-bold">Curated Weekend Kit</h3>
-                <p class="text-sm text-gray-600 mt-2">Desk-ready audio, wearable, and carry picks — matched to look and perform together.</p>
-                <div class="mt-4 flex items-center justify-between">
+              <div class="absolute -inset-10 bg-gradient-to-b from-white/20 via-white/5 to-transparent blur-3xl" aria-hidden="true"></div>
+              <div class="relative bg-white text-slate-900 rounded-[32px] p-6 shadow-2xl border border-white/70 backdrop-blur">
+                <div class="flex items-center justify-between mb-6">
                   <div>
-                    <p class="text-2xl font-extrabold text-indigo-600">$249</p>
-                    <p class="text-xs text-gray-500">Bundle & save • Ships free</p>
+                    <p class="text-xs uppercase tracking-[0.3em] text-gray-400">Spotlight bundle</p>
+                    <h3 id="spotlightBundleTitle" class="text-2xl font-bold text-gray-900">Curated Weekend Kit</h3>
                   </div>
-                  <a href="product.html" class="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition font-semibold">Shop bundle</a>
+                  <span class="text-xs px-3 py-1 bg-gray-900 text-white rounded-full">New</span>
+                </div>
+                <div class="relative rounded-3xl bg-gradient-to-br from-indigo-50 to-white border border-gray-100 overflow-hidden">
+                  <div id="spotlightBundleImage" class="hidden absolute inset-0 bg-cover bg-center opacity-70"></div>
+                  <div class="absolute inset-0 opacity-40 bg-[radial-gradient(circle_at_30%_20%,#6366f1,transparent_55%)]"></div>
+                  <div class="relative grid grid-cols-2 gap-3 p-5">
+                    <div class="rounded-2xl bg-white/90 p-4 shadow-lg shadow-indigo-200">
+                      <p class="text-xs tracking-wide text-gray-500">Audio</p>
+                      <p class="text-lg font-semibold text-gray-900">Studio ANC</p>
+                      <p class="text-xs text-gray-500 mt-1">रु 13,299</p>
+                    </div>
+                    <div class="rounded-2xl bg-white/70 p-4 border border-white/60">
+                      <p class="text-xs tracking-wide text-gray-500">Wearable</p>
+                      <p class="text-lg font-semibold text-gray-900">Pulse S5</p>
+                      <p class="text-xs text-gray-500 mt-1">रु 26,599</p>
+                    </div>
+                    <div class="col-span-2 rounded-2xl bg-white/70 p-4 border border-white/60 flex items-center justify-between">
+                      <div>
+                        <p class="text-xs tracking-wide text-gray-500">Carry</p>
+                        <p class="text-lg font-semibold text-gray-900">Urban Explorer</p>
+                      </div>
+                      <p class="text-sm font-semibold text-gray-800">रु 8,899</p>
+                    </div>
+                  </div>
+                </div>
+                <p id="spotlightBundleCopy" class="text-sm text-gray-600 mt-4">Desk-ready audio, wearable, and carry picks — matched to look and perform together.</p>
+                <ul id="spotlightBundleList" class="mt-4 border border-gray-100 rounded-2xl overflow-hidden">
+                  <li class="flex items-center gap-3 p-3">
+                    <div class="w-12 h-12 rounded-2xl bg-gray-100 animate-pulse"></div>
+                    <div class="flex-1">
+                      <p class="text-sm font-semibold text-gray-800">Loading spotlight bundle…</p>
+                      <p class="text-xs text-gray-500">Curating picks</p>
+                    </div>
+                  </li>
+                </ul>
+                <div class="mt-5 flex items-center justify-between">
+                  <div>
+                    <p id="spotlightBundlePrice" class="text-3xl font-extrabold text-indigo-600">रु 32,999</p>
+                    <p id="spotlightBundleMeta" class="text-xs text-gray-500">Bundle & save • Ships free</p>
+                  </div>
+                  <a id="spotlightBundleCta" href="products.html" class="px-5 py-3 bg-gray-900 text-white rounded-2xl font-semibold hover:bg-gray-800 transition">Shop bundle</a>
                 </div>
               </div>
             </div>
           </div>
         </section>
 
-        <!-- Search Section -->
-        <section class="bg-white rounded-2xl shadow-lg border border-gray-100 p-6 mb-8">
-          <div class="max-w-4xl mx-auto">
-            <div class="text-center mb-6">
-              <h2 class="text-2xl font-bold text-gray-900 mb-2">Find Your Perfect Product</h2>
-              <p class="text-gray-600">Search from our curated collection of electronics, fashion, and home essentials</p>
-            </div>
-            <form id="searchForm" class="relative">
-              <div class="relative flex items-center">
-                <div class="absolute left-4 text-gray-400">
-                  <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
-                  </svg>
+        <!-- Search & Discovery -->
+        <section class="relative overflow-hidden rounded-[32px] bg-white/10 backdrop-blur-xl border border-white/10 shadow-[0_20px_70px_rgba(15,23,42,0.45)] mt-16">
+          <div class="absolute inset-0 opacity-40 bg-[radial-gradient(circle_at_10%_20%,rgba(14,165,233,0.4),transparent_45%),radial-gradient(circle_at_80%_0%,rgba(236,72,153,0.35),transparent_40%)]"></div>
+          <div class="relative grid lg:grid-cols-[1.1fr_0.9fr] gap-10 p-8 lg:p-12">
+            <div class="space-y-6">
+              <div>
+                <p class="text-sm uppercase tracking-[0.4em] text-slate-200 mb-2">Discover</p>
+                <h2 class="text-3xl font-semibold text-white">Find the next piece that feels like you.</h2>
+                <p class="text-white/80">Search across tech, fashion, slow home, and creator collaborations—all localized to Nepali rupees.</p>
+              </div>
+              <form id="searchForm" class="relative">
+                <div class="relative flex items-center bg-white/95 rounded-3xl border border-white/40 shadow-xl">
+                  <div class="absolute left-5 text-gray-400">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                    </svg>
+                  </div>
+                  <input type="text" id="searchInput" placeholder="Search products, drop codes, or collections" class="w-full pl-14 pr-36 py-5 text-base text-slate-900 bg-transparent rounded-3xl focus:ring-0 focus:outline-none">
+                  <button type="submit" class="absolute right-2 px-6 py-2.5 bg-slate-900 text-white rounded-2xl font-semibold hover:bg-slate-800 transition">Search</button>
                 </div>
-                <input 
-                  type="text" 
-                  id="searchInput" 
-                  placeholder="Search for products, categories, or brands..." 
-                  class="w-full pl-12 pr-32 py-4 text-lg border-2 border-gray-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition"
-                >
-                <button 
-                  type="submit" 
-                  class="absolute right-2 px-6 py-2.5 bg-indigo-600 text-white rounded-lg font-semibold hover:bg-indigo-700 transition shadow-md"
-                >
-                  Search
-                </button>
-              </div>
-            </form>
-            
-            <!-- Search Results -->
-            <div id="searchResults" class="mt-6 hidden">
-              <div class="flex items-center justify-between mb-4">
-                <h3 class="text-lg font-semibold text-gray-900">Search Results</h3>
-                <button id="clearSearch" class="text-sm text-indigo-600 hover:text-indigo-700 font-medium">Clear</button>
-              </div>
-              <div id="searchResultsGrid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-                <!-- Results will be loaded here -->
-              </div>
-              <div id="noResults" class="hidden text-center py-8 text-gray-500">
-                <svg class="w-16 h-16 mx-auto mb-4 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                </svg>
-                <p class="text-lg font-medium">No products found</p>
-                <p class="text-sm mt-2">Try different keywords or browse all products</p>
-              </div>
-            </div>
-
-            <!-- Popular Categories -->
-            <div class="mt-6 pt-6 border-t border-gray-200">
-              <p class="text-sm text-gray-500 mb-3">Popular searches:</p>
+              </form>
               <div class="flex flex-wrap gap-2">
-                <button class="search-tag px-4 py-2 bg-gray-100 hover:bg-indigo-100 text-gray-700 hover:text-indigo-700 rounded-full text-sm font-medium transition">Electronics</button>
-                <button class="search-tag px-4 py-2 bg-gray-100 hover:bg-indigo-100 text-gray-700 hover:text-indigo-700 rounded-full text-sm font-medium transition">Fashion</button>
-                <button class="search-tag px-4 py-2 bg-gray-100 hover:bg-indigo-100 text-gray-700 hover:text-indigo-700 rounded-full text-sm font-medium transition">Home & Kitchen</button>
-                <button class="search-tag px-4 py-2 bg-gray-100 hover:bg-indigo-100 text-gray-700 hover:text-indigo-700 rounded-full text-sm font-medium transition">Beauty</button>
-                <button class="search-tag px-4 py-2 bg-gray-100 hover:bg-indigo-100 text-gray-700 hover:text-indigo-700 rounded-full text-sm font-medium transition">Sports</button>
+                <span class="text-xs uppercase tracking-[0.4em] text-slate-300">Trending</span>
+                <div class="flex flex-wrap gap-2">
+                  <button class="search-tag px-4 py-2 rounded-full bg-white/15 border border-white/20 text-sm font-medium text-white hover:bg-white/25 transition">Electronics</button>
+                  <button class="search-tag px-4 py-2 rounded-full bg-white/15 border border-white/20 text-sm font-medium text-white hover:bg-white/25 transition">Fashion</button>
+                  <button class="search-tag px-4 py-2 rounded-full bg-white/15 border border-white/20 text-sm font-medium text-white hover:bg-white/25 transition">Home & Kitchen</button>
+                  <button class="search-tag px-4 py-2 rounded-full bg-white/15 border border-white/20 text-sm font-medium text-white hover:bg-white/25 transition">Beauty</button>
+                  <button class="search-tag px-4 py-2 rounded-full bg-white/15 border border-white/20 text-sm font-medium text-white hover:bg-white/25 transition">Sports</button>
+                </div>
+              </div>
+
+              <div id="searchResults" class="hidden bg-white/10 rounded-3xl border border-white/20 p-6">
+                <div class="flex items-center justify-between mb-4">
+                  <h3 class="text-lg font-semibold text-white">Search Results</h3>
+                  <button id="clearSearch" class="text-sm text-emerald-200 hover:text-white font-medium">Clear</button>
+                </div>
+                <div id="searchResultsGrid" class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                </div>
+                <div id="noResults" class="hidden text-center py-6 text-white/70">
+                  <svg class="w-12 h-12 mx-auto mb-3 text-white/40" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                  </svg>
+                  <p class="text-base font-medium">No products found</p>
+                  <p class="text-sm text-white/60">Try different keywords or browse all products</p>
+                </div>
+              </div>
+            </div>
+            <div class="space-y-6">
+              <div class="rounded-[28px] bg-white/95 text-slate-900 p-6 shadow-2xl border border-white/80">
+                <p class="text-xs uppercase tracking-[0.3em] text-gray-400">Live stats</p>
+                <div class="grid grid-cols-2 gap-4 mt-4">
+                  <div>
+                    <p class="text-3xl font-black text-gray-900">+58</p>
+                    <p class="text-sm text-gray-500">New arrivals this week</p>
+                  </div>
+                  <div>
+                    <p class="text-3xl font-black text-gray-900">13</p>
+                    <p class="text-sm text-gray-500">Creators in rotation</p>
+                  </div>
+                  <div>
+                    <p class="text-3xl font-black text-gray-900">4</p>
+                    <p class="text-sm text-gray-500">City pop-ups</p>
+                  </div>
+                  <div>
+                    <p class="text-3xl font-black text-gray-900">रु 2.1M</p>
+                    <p class="text-sm text-gray-500">Member rewards earned</p>
+                  </div>
+                </div>
+              </div>
+              <div class="rounded-[28px] bg-gradient-to-br from-slate-900 to-slate-800 p-6 border border-white/10">
+                <p class="text-xs uppercase tracking-[0.4em] text-white/50">Next drop</p>
+                <h3 class="text-2xl font-semibold mt-3">Capsule 07 — Kathmandu Dusk</h3>
+                <p class="text-white/70 mt-2">Layered textiles with monsoon-proof outerwear. Limited to 120 pieces.</p>
+                <div class="mt-4 flex items-center gap-4 text-sm">
+                  <span class="px-3 py-1 rounded-full bg-white/10 border border-white/10">Opens Friday 9 PM</span>
+                  <a href="products.html" class="text-emerald-200 font-medium">Join waitlist →</a>
+                </div>
               </div>
             </div>
           </div>
         </section>
 
-        <section class="featured-products mb-6">
-          <h2 class="text-2xl font-bold mb-6">Featured Products</h2>
+        <!-- Collections Grid -->
+        <section class="mt-16 grid lg:grid-cols-3 gap-6">
+          <article class="relative overflow-hidden rounded-[32px] bg-gradient-to-br from-emerald-500 to-teal-700 p-6 shadow-2xl">
+            <div class="absolute inset-0 opacity-30 bg-[radial-gradient(circle_at_top,_rgba(255,255,255,0.65),_transparent_55%)]"></div>
+            <div class="relative flex flex-col h-full">
+              <p class="text-xs uppercase tracking-[0.4em] text-white/70">Drop 032</p>
+              <h3 class="text-2xl font-bold mt-4">Mindful Home Objects</h3>
+              <p class="text-white/80 mt-2 flex-1">Ceramics, incense labs, and modular lighting designed for slow evenings.</p>
+              <a href="products.html?category=home" class="mt-6 inline-flex items-center gap-2 text-white font-semibold">Explore home <span>→</span></a>
+            </div>
+          </article>
+          <article class="relative overflow-hidden rounded-[32px] bg-gradient-to-br from-indigo-500 via-blue-500 to-purple-600 p-6 shadow-2xl">
+            <div class="absolute inset-0 opacity-30 bg-[radial-gradient(circle_at_70%_20%,rgba(255,255,255,0.6),transparent_50%)]"></div>
+            <div class="relative flex flex-col h-full">
+              <p class="text-xs uppercase tracking-[0.4em] text-white/70">Drop 033</p>
+              <h3 class="text-2xl font-bold mt-4">Creator Tech Lab</h3>
+              <p class="text-white/80 mt-2 flex-1">Audio stacks, cameras, and modular desks tuned for Nepali content creators.</p>
+              <a href="products.html?category=electronics" class="mt-6 inline-flex items-center gap-2 text-white font-semibold">View rigs <span>→</span></a>
+            </div>
+          </article>
+          <article class="relative overflow-hidden rounded-[32px] bg-gradient-to-br from-rose-500 via-pink-500 to-orange-400 p-6 shadow-2xl">
+            <div class="absolute inset-0 opacity-30 bg-[radial-gradient(circle_at_40%_0%,rgba(255,255,255,0.65),transparent_50%)]"></div>
+            <div class="relative flex flex-col h-full">
+              <p class="text-xs uppercase tracking-[0.4em] text-white/70">Drop 034</p>
+              <h3 class="text-2xl font-bold mt-4">Street Capsule • Thamel</h3>
+              <p class="text-white/80 mt-2 flex-1">Genderless tailoring, tactile knits, and stormproof outerwear.</p>
+              <a href="products.html?category=fashion" class="mt-6 inline-flex items-center gap-2 text-white font-semibold">Shop capsule <span>→</span></a>
+            </div>
+          </article>
+        </section>
+
+        <section class="featured-products mt-16">
+          <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6 mb-8">
+            <div>
+              <p class="text-sm uppercase tracking-[0.4em] text-white/60">Spotlight</p>
+              <h2 class="text-3xl font-bold">Featured products</h2>
+              <p class="text-white/70">Handpicked pieces that are live right now. Tap in before they sell out.</p>
+            </div>
+            <div class="flex flex-wrap gap-3 text-sm">
+              <span class="px-4 py-2 rounded-full bg-white/10 border border-white/10">All</span>
+              <span class="px-4 py-2 rounded-full bg-white/5 border border-white/10">Electronics</span>
+              <span class="px-4 py-2 rounded-full bg-white/5 border border-white/10">Fashion</span>
+              <span class="px-4 py-2 rounded-full bg-white/5 border border-white/10">Home</span>
+            </div>
+          </div>
           <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6" id="featuredProducts">
-            <!-- Products will be loaded via JavaScript -->
+            <div class="col-span-full rounded-2xl border border-dashed border-white/20 bg-white/5 p-6 text-center text-white/60">
+              Loading featured products…
+            </div>
           </div>
         </section>
 
         <!-- Subscribe Section -->
-        <section class="relative overflow-hidden rounded-3xl bg-white shadow-xl border border-gray-100 p-8 lg:p-10">
-          <div class="absolute -right-10 -bottom-10 w-48 h-48 bg-indigo-100 rounded-full blur-3xl"></div>
-          <div class="grid lg:grid-cols-2 gap-8 items-center relative">
-            <div class="space-y-3">
-              <p class="text-sm font-semibold text-indigo-600">Stay in the loop</p>
-              <h3 class="text-3xl font-bold text-gray-900">Subscribe for weekly drops, deals, and first access.</h3>
-              <p class="text-gray-600">No spam—just beautifully curated products, launch alerts, and insider-only offers.</p>
-              <ul class="text-sm text-gray-600 space-y-1">
+        <section class="relative overflow-hidden rounded-[32px] bg-gradient-to-br from-slate-900 to-slate-800 border border-white/10 p-10 mt-16">
+          <div class="absolute inset-0 opacity-30 bg-[radial-gradient(circle_at_top,_rgba(147,197,253,0.4),transparent_55%)]"></div>
+          <div class="relative grid lg:grid-cols-2 gap-10 items-center">
+            <div class="space-y-4">
+              <p class="text-sm uppercase tracking-[0.4em] text-white/60">Stay in the loop</p>
+              <h3 class="text-4xl font-bold">Subscribe for weekly drops, deals, and first access.</h3>
+              <p class="text-white/70">No spam—just beautifully curated products, launch alerts, and insider-only offers.</p>
+              <ul class="text-sm text-white/70 space-y-1">
                 <li>• Early access to new arrivals</li>
                 <li>• Exclusive coupons and bundles</li>
                 <li>• Tips for tech, fashion, and home</li>
               </ul>
             </div>
-            <form id="subscribeForm" class="space-y-4 bg-gray-50 rounded-2xl p-6 shadow-inner">
+            <form id="subscribeForm" class="space-y-4 bg-white/10 border border-white/10 rounded-3xl p-6 backdrop-blur">
               <div>
-                <label class="block text-sm font-medium text-gray-700 mb-2">Email address</label>
-                <input type="email" name="email" required placeholder="you@example.com" class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent">
+                <label class="block text-sm font-medium text-white/80 mb-2">Email address</label>
+                <input type="email" name="email" required placeholder="you@example.com" class="w-full px-4 py-3 bg-white text-slate-900 rounded-2xl border border-white/70 focus:ring-2 focus:ring-indigo-500">
               </div>
-              <div class="flex items-center space-x-2 text-sm text-gray-600">
+              <div class="flex items-center space-x-2 text-sm text-white/80">
                 <input type="checkbox" id="agree" name="agree" required class="w-4 h-4 text-indigo-600 rounded focus:ring-indigo-500">
                 <label for="agree">I agree to receive updates and promotions.</label>
               </div>
-              <button type="submit" class="w-full bg-indigo-600 text-white px-6 py-3 rounded-xl font-semibold hover:bg-indigo-700 transition">Subscribe</button>
-              <p class="text-xs text-gray-500">You can unsubscribe anytime. We respect your inbox.</p>
+              <button type="submit" class="w-full bg-white text-slate-900 px-6 py-3 rounded-2xl font-semibold hover:bg-slate-100 transition">Subscribe</button>
+              <p class="text-xs text-white/60">You can unsubscribe anytime. We respect your inbox.</p>
             </form>
           </div>
         </section>
       </main>
-    </main>
     <custom-footer></custom-footer>
+    </div>
 
     <script src="components/navbar.js"></script>
     <script src="components/footer.js"></script>
     <script>
-      // Search functionality
-      let allProducts = [];
+      (function() {
+        const SEARCH_API_URL = (window.API_URL || (window.location?.origin ? `${window.location.origin}/api` : '/api')).replace(/\/$/, '') ;
+        let allProducts = [];
+        const SEARCH_NPR_NUMBER_FORMATTER = new Intl.NumberFormat('en-IN', {
+          minimumFractionDigits: 2,
+          maximumFractionDigits: 2
+        });
 
-      async function loadAllProducts() {
-        try {
-          const res = await fetch('/api/products');
-          const data = await res.json();
-          if (data.success) {
-            allProducts = data.data;
-          }
-        } catch (err) {
-          console.error('Failed to load products:', err);
+        function formatNpr(amount = 0) {
+          const value = Number(amount) || 0;
+          return `रु ${SEARCH_NPR_NUMBER_FORMATTER.format(value)}`;
         }
-      }
+
+        async function loadAllProducts() {
+          try {
+            const res = await fetch(`${SEARCH_API_URL}/products`);
+            const data = await res.json();
+            if (data.success) {
+              allProducts = data.data;
+            }
+          } catch (err) {
+            console.error('Failed to load products:', err);
+          }
+        }
 
       function searchProducts(query) {
         if (!query.trim()) return [];
@@ -222,7 +360,7 @@
               <h4 class="font-semibold text-gray-900 text-sm mb-1 line-clamp-2">${product.name}</h4>
               <p class="text-xs text-gray-500 mb-2">${product.category}</p>
               <div class="flex items-center justify-between">
-                <span class="text-lg font-bold text-indigo-600">$${product.price}</span>
+                <span class="text-lg font-bold text-indigo-600">${formatNpr(product.price)}</span>
                 ${product.stock > 0 
                   ? '<span class="text-xs text-green-600 font-medium">In Stock</span>' 
                   : '<span class="text-xs text-red-600 font-medium">Out of Stock</span>'}
@@ -232,8 +370,8 @@
         }
       }
 
-      document.addEventListener('DOMContentLoaded', () => {
-        loadAllProducts();
+        document.addEventListener('DOMContentLoaded', () => {
+          loadAllProducts();
 
         // Search form submission
         const searchForm = document.getElementById('searchForm');
@@ -280,7 +418,7 @@
             const email = subscribeForm.email.value.trim();
             if (!email) return;
             try {
-              const res = await fetch('/api/subscribers', {
+              const res = await fetch(`${SEARCH_API_URL}/subscribers`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ email, consent: true, source: 'homepage' })
@@ -297,16 +435,14 @@
             }
           });
         }
-      });
+        });
+      })();
     </script>
 <!-- ========== ZENRIX CHATBOT ========== -->
 <div id="chatbot-container">
   <!-- Chat Button -->
   <button id="chatbot-toggle" class="fixed bottom-6 right-6 bg-blue-600 text-white w-14 h-14 rounded-full shadow-lg hover:bg-blue-700 transition-all z-50 flex items-center justify-center" aria-label="Open chat">
-    <!-- chat bubble svg -->
-    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden>
-      <path d="M21 15a2 2 0 0 1-2 2H8l-5 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" stroke="#fff" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
-    </svg>
+    <img src="/uploads/avatars/chat-avatar.png?v=2" alt="Chatbot Avatar" style="width:56px;height:56px;display:block;border-radius:50%;object-fit:cover;" />
   </button>
 
   <!-- Chat Window -->
@@ -315,12 +451,7 @@
     <div class="bg-gradient-to-r from-blue-500 to-purple-600 text-white p-4 rounded-t-lg flex justify-between items-center">
       <div class="flex items-center">
         <div class="w-8 h-8 bg-white rounded-full flex items-center justify-center mr-3">
-          <!-- robot svg -->
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden>
-            <path d="M8 7h8v4H8z" stroke="#2563EB" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
-            <path d="M12 11v4" stroke="#2563EB" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
-            <rect x="7" y="3" width="10" height="6" rx="2" stroke="#2563EB" stroke-width="1.2" fill="#fff"/>
-          </svg>
+          <img src="/uploads/avatars/chat-avatar.png?v=2" alt="Zenrix Assistant" style="width:32px;height:32px;border-radius:50%;object-fit:cover;" />
         </div>
         <div>
           <h3 class="font-bold">Zenrix Assistant</h3>
@@ -339,11 +470,7 @@
     <div id="chatbot-messages" class="flex-grow p-4 overflow-y-auto space-y-3">
       <div class="flex">
         <div class="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center mr-2 flex-shrink-0">
-          <!-- small robot svg -->
-          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden>
-            <path d="M8 7h8v4H8z" stroke="#2563EB" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"/>
-            <rect x="7" y="3" width="10" height="6" rx="2" stroke="#2563EB" stroke-width="1" fill="#fff"/>
-          </svg>
+          <img src="/uploads/avatars/chat-avatar.png?v=2" alt="Zenrix Assistant" style="width:20px;height:20px;border-radius:50%;object-fit:cover;" />
         </div>
         <div class="bg-gray-100 rounded-lg p-3 max-w-[80%]">
           <p class="text-sm">Hello! 👋 I'm Zenrix Assistant. How can I help you today?</p>
@@ -376,142 +503,92 @@
 </div>
 
 <!-- Chatbot JavaScript -->
-<script>
-// Chatbot functionality
-document.addEventListener('DOMContentLoaded', function() {
-  const toggleBtn = document.getElementById('chatbot-toggle');
-  const closeBtn = document.getElementById('chatbot-close');
-  const chatWindow = document.getElementById('chatbot-window');
-  const chatInput = document.getElementById('chatbot-input');
-  const sendBtn = document.getElementById('chatbot-send');
-  const messagesDiv = document.getElementById('chatbot-messages');
-  const quickBtns = document.querySelectorAll('.quick-btn');
+<script src="js/chatbot-enhanced.js" defer></script>
 
-  // Toggle chat window
-  toggleBtn.addEventListener('click', () => {
-    chatWindow.classList.toggle('hidden');
-    if (!chatWindow.classList.contains('hidden')) {
-      chatInput.focus();
+<!-- Chatbot CSS -->    }
+    // Order tracking
+    else if (msg.includes('order') || msg.includes('track') || msg.includes('status') || msg.includes('where is my')) {
+      response = "📦 Check your Orders page in your account dashboard for real-time order status. Need help tracking? Share your order number with our support team.";
     }
-  });
-
-  closeBtn.addEventListener('click', () => {
-    chatWindow.classList.add('hidden');
-  });
-
-  // Send message
-  function sendMessage() {
-    const message = chatInput.value.trim();
-    if (message) {
-      addMessage('user', message);
-      chatInput.value = '';
-      getBotResponse(message);
+    // Payment
+    else if (msg.includes('payment') || msg.includes('pay') || msg.includes('card') || msg.includes('cash') || msg.includes('method')) {
+      response = "💳 We accept all major credit/debit cards, eSewa, Khalti, and bank transfers. All payments are secure and encrypted.";
     }
-  }
-
-  sendBtn.addEventListener('click', sendMessage);
-  chatInput.addEventListener('keypress', (e) => {
-    if (e.key === 'Enter') sendMessage();
-  });
-
-  // Quick buttons
-  quickBtns.forEach(btn => {
-    btn.addEventListener('click', () => {
-      const msg = btn.getAttribute('data-msg');
-      addMessage('user', msg);
-      getBotResponse(msg);
-    });
-  });
-
-  // Add message to chat
-  function addMessage(sender, text) {
-    const messageDiv = document.createElement('div');
-    messageDiv.className = `flex ${sender === 'user' ? 'justify-end' : ''}`;
-    
-    messageDiv.innerHTML = `
-      ${sender === 'bot' ? `
-        <div class="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center mr-2 flex-shrink-0">
-          <!-- small robot svg -->
-          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden>
-            <path d="M8 7h8v4H8z" stroke="#2563EB" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"/>
-            <rect x="7" y="3" width="10" height="6" rx="2" stroke="#2563EB" stroke-width="1" fill="#fff"/>
-          </svg>
-        </div>
-      ` : ''}
-      <div class="${sender === 'user' ? 'bg-blue-600 text-white' : 'bg-gray-100'} rounded-lg p-3 max-w-[80%]">
-        <p class="text-sm">${text}</p>
-        <p class="text-xs ${sender === 'user' ? 'text-blue-200' : 'text-gray-500'} mt-1">${new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</p>
-      </div>
-      ${sender === 'user' ? `
-        <div class="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center ml-2 flex-shrink-0">
-          <!-- small user svg -->
-          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden>
-            <path d="M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8z" stroke="#2563EB" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"/>
-            <path d="M4 21a8 8 0 0 1 16 0" stroke="#2563EB" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"/>
-          </svg>
-        </div>
-      ` : ''}
-    `;
-    
-    messagesDiv.appendChild(messageDiv);
-    messagesDiv.scrollTop = messagesDiv.scrollHeight;
-  }
-
-  // Bot responses
-  function getBotResponse(userMessage) {
-    const msg = userMessage.toLowerCase();
-    let response = '';
-    
-    // Simple response logic
-    if (msg.includes('hello') || msg.includes('hi') || msg.includes('hey')) {
-      response = "Hello! Welcome to Zenrix. How can I assist you today?";
-    } else if (msg.includes('product') || msg.includes('item')) {
-      response = "We have electronics, fashion, home goods, and beauty products. Check our Products page for all items!";
-    } else if (msg.includes('price') || msg.includes('cost')) {
-      response = "Products start from $24.99. Check individual product pages for exact prices.";
-    } else if (msg.includes('delivery') || msg.includes('shipping')) {
-      response = "We deliver in 3-5 business days. Free shipping on orders over $50!";
-    } else if (msg.includes('return') || msg.includes('refund')) {
-      response = "We have a 30-day return policy. Contact support@zenrix.com for returns.";
-    } else if (msg.includes('contact') || msg.includes('support')) {
-      response = "Email: support@zenrix.com\nPhone: +977 9801234567\nHours: 9AM-6PM (NPT)";
-    } else if (msg.includes('order') || msg.includes('track')) {
-      response = "Check your Orders page for order status. Need help? Contact our support team.";
-    } else {
-      response = "I'm here to help! For detailed questions, please contact our support team at support@zenrix.com";
+    // Account/Login
+    else if (msg.includes('account') || msg.includes('login') || msg.includes('register') || msg.includes('signup') || msg.includes('password')) {
+      response = "🔐 Create an account to track orders, save favorites, and get personalized recommendations. Visit our Login/Register page to get started.";
+    }
+    // Warranty/Guarantee
+    else if (msg.includes('warranty') || msg.includes('guarantee') || msg.includes('defective') || msg.includes('broken')) {
+      response = "🛡️ All our products come with manufacturer warranty. Electronics have 1-2 year warranty, fashion items have quality guarantee. Contact us for warranty claims.";
+    }
+    // Size/Measurements
+    else if (msg.includes('size') || msg.includes('fit') || msg.includes('measurement') || msg.includes('large') || msg.includes('small')) {
+      response = "📏 Check the size guide on each product page. We include detailed measurements to help you choose the perfect fit. Still unsure? Contact us for advice!";
+    }
+    // Stock/Availability
+    else if (msg.includes('stock') || msg.includes('available') || msg.includes('in stock') || msg.includes('out of stock')) {
+      response = "📊 Stock status is shown on each product page. Popular items sell out quickly! Subscribe to notifications for restocks.";
+    }
+    // Discounts/Promotions
+    else if (msg.includes('discount') || msg.includes('promo') || msg.includes('coupon') || msg.includes('deal') || msg.includes('sale') || msg.includes('offer')) {
+      response = "🎉 Check our current promotions on the homepage. Subscribe to our newsletter for exclusive coupons and early access to sales!";
+    }
+    // Thank you
+    else if (msg.includes('thank') || msg.includes('thanks') || msg.includes('appreciate')) {
+      response = "You're most welcome! 🙏 Happy shopping at Zenrix. Namaste! 🇳🇵";
+    }
+    // Goodbye
+    else if (msg.includes('bye') || msg.includes('goodbye') || msg.includes('see you') || msg.includes('later')) {
+      response = "Namaste! 👋 Come back soon for more amazing Nepali products. Have a great day!";
+    }
+    // Default response
+    else {
+      const defaultResponses = [
+        "I'm here to help with your shopping questions! Try asking about products, delivery, returns, or contact info.",
+        "That's an interesting question! For detailed assistance, please contact our support team at support@zenrix.com",
+        "I'd love to help! Could you please rephrase your question? I'm best at answering questions about products, orders, and shipping.",
+        "🙏 For complex inquiries, our human support team is ready to assist. Reach out to support@zenrix.com"
+      ];
+      response = defaultResponses[Math.floor(Math.random() * defaultResponses.length)];
     }
     
-    // Simulate typing delay
+    // Simulate typing delay (randomized for more natural feel)
+    const delay = 800 + Math.random() * 1200;
     setTimeout(() => {
       addMessage('bot', response);
-    }, 1000);
+    }, delay);
   }
 });
 </script>
 
 <!-- Chatbot CSS -->
 <style>
+/* Container */
 #chatbot-window {
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
-  border: 1px solid #e5e7eb;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.12);
+  border: 1px solid #e2e8f0;
+  background: #ffffff;
 }
 
 #chatbot-messages {
   scroll-behavior: smooth;
 }
 
+/* Quick buttons - improved contrast */
 .quick-btn {
-  background: #f3f4f6;
-  border: 1px solid #e5e7eb;
+  background: #ffffff;
+  border: 1px solid #e6eef0;
+  color: #0f172a;
   padding: 6px 12px;
   border-radius: 20px;
   font-size: 12px;
   cursor: pointer;
-  transition: all 0.2s;
+  transition: all 0.15s;
 }
 
 .quick-btn:hover {
-  background: #e5e7eb;
+  background: #f3f4f6;
   transform: translateY(-1px);
 }
 
@@ -521,11 +598,29 @@ document.addEventListener('DOMContentLoaded', function() {
 
 /* Smooth animations */
 #chatbot-toggle, #chatbot-window {
-  transition: all 0.3s ease;
+  transition: all 0.25s ease;
 }
 
 #chatbot-toggle:hover {
-  transform: scale(1.1);
+  transform: scale(1.06);
+}
+
+/* Bubble styles - accessible colors */
+.bubble { word-break: break-word; }
+.bubble.bot { background: #f3f4f6 !important; color: #0f172a !important; align-self: flex-start; }
+.bubble.user { background: linear-gradient(90deg,#0f172a,#111827) !important; color: #ffffff !important; align-self: flex-end; }
+
+/* Timestamps / meta */
+.bubble p.text-xs { color: #6b7280 !important; }
+
+/* Namaste animation */
+.namaste-icon {
+  animation: namaste-bow 2s ease-in-out infinite;
+}
+
+@keyframes namaste-bow {
+  0%, 100% { transform: rotate(0deg); }
+  50% { transform: rotate(-5deg); }
 }
 </style>
 <!-- ========== END CHATBOT ========== -->

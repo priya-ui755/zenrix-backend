@@ -1,4 +1,15 @@
 node_modules/
+dist/
+.env
+.env.local
+.env.*.local
+.DS_Store
+.vscode/
+debug.log
+tmp/
+uploads/
+/*.tar
+node_modules/
 .env
 tmp/
 .DS_Store

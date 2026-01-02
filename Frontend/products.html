@@ -8,63 +8,56 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="script.js" defer></script>
 </head>
-<body class="bg-gray-50">
-    <custom-navbar></custom-navbar>
-    <main class="container mx-auto px-4 py-8">
-        <div class="flex justify-between items-center mb-8">
-            <div id="pageContent" class="prose max-w-none">Loading page content…</div>
-            <div class="flex items-center">
-                <label for="sort" class="mr-2">Sort by:</label>
-                <select id="sort" class="border rounded px-3 py-2">
-                    <option value="popular">Most Popular</option>
-                    <option value="price-low">Price: Low to High</option>
-                    <option value="price-high">Price: High to Low</option>
-                    <option value="rating">Highest Rated</option>
-                    <option value="newest">Newest</option>
-                </select>
+<body class="bg-slate-950 text-slate-100">
+  <custom-navbar></custom-navbar>
+  <main class="relative">
+    <section class="relative overflow-hidden bg-gradient-to-br from-slate-900 via-indigo-900 to-purple-900 py-14 products-hero">
+      <div class="absolute inset-0 opacity-30 bg-[radial-gradient(circle_at_15%_20%,rgba(99,102,241,0.4),transparent_45%),radial-gradient(circle_at_80%_10%,rgba(236,72,153,0.25),transparent_40%)] products-hero-overlay"></div>
+      <div class="container mx-auto px-4 relative">
+        <div class="flex flex-wrap items-center justify-between gap-6">
+          <div class="space-y-4 max-w-2xl">
+            <p class="text-xs uppercase tracking-[0.4em] text-indigo-200">Products</p>
+            <h1 class="text-4xl md:text-5xl font-black leading-tight">Browse the latest drops.</h1>
+            <p class="text-slate-200/80 max-w-xl">Filter by price, sort by what matters, and jump straight to sale picks when you want the best deals.</p>
+            <div class="flex flex-wrap gap-2 text-sm">
+              <a href="/products.html" class="px-4 py-2 rounded-full bg-white text-slate-900 font-semibold shadow">All</a>
+              <a href="/products.html?category=sale" class="px-4 py-2 rounded-full bg-white/10 border border-white/20 text-white">On Sale</a>
+              <a href="/products.html?category=electronics" class="px-4 py-2 rounded-full bg-white/10 border border-white/20 text-white">Electronics</a>
+              <a href="/products.html?category=fashion" class="px-4 py-2 rounded-full bg-white/10 border border-white/20 text-white">Fashion</a>
+              <a href="/products.html?category=home" class="px-4 py-2 rounded-full bg-white/10 border border-white/20 text-white">Home</a>
+              <a href="/products.html?category=beauty" class="px-4 py-2 rounded-full bg-white/10 border border-white/20 text-white">Beauty</a>
             </div>
-        </div>
-
-        <div class="flex flex-col md:flex-row gap-8">
-            <aside class="w-full md:w-64 flex-shrink-0">
-                <div class="bg-white p-4 rounded-lg shadow-sm mb-6">
-                    <h3 class="font-semibold mb-4">Categories</h3>
-                    <ul class="space-y-2">
-                        <li><a href="/products.html" class="text-gray-600 hover:text-blue-600">All Categories</a></li>
-                        <li><a href="/products.html?category=electronics" class="text-gray-600 hover:text-blue-600">Electronics</a></li>
-                        <li><a href="/products.html?category=fashion" class="text-gray-600 hover:text-blue-600">Fashion</a></li>
-                        <li><a href="/products.html?category=home" class="text-gray-600 hover:text-blue-600">Home & Kitchen</a></li>
-                        <li><a href="/products.html?category=beauty" class="text-gray-600 hover:text-blue-600">Beauty</a></li>
-                    </ul>
-                </div>
-
-                <div class="bg-white p-4 rounded-lg shadow-sm">
-                    <h3 class="font-semibold mb-4">Filter by Price</h3>
-                    <input type="range" min="0" max="1000" value="500" class="w-full mb-4">
-                    <div class="flex justify-between">
-                        <span>$0</span>
-                        <span>$1000</span>
-                    </div>
-                </div>
-            </aside>
-
-            <div class="flex-grow">
-                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6" id="productsGrid">
-                    <!-- Products will be loaded here -->
-                </div>
-                <div class="flex justify-center mt-8">
-                    <nav class="flex items-center gap-2">
-                        <a href="#" class="px-4 py-2 border rounded hover:bg-gray-100">1</a>
-                        <a href="#" class="px-4 py-2 border rounded hover:bg-gray-100">2</a>
-                        <a href="#" class="px-4 py-2 border rounded hover:bg-gray-100">3</a>
-                        <span class="px-4 py-2">...</span>
-                        <a href="#" class="px-4 py-2 border rounded hover:bg-gray-100">10</a>
-                    </nav>
-                </div>
+          </div>
+          <div class="rounded-[28px] bg-white/5 border border-white/10 p-6 min-w-[280px] backdrop-blur shadow-2xl">
+            <div class="flex items-center justify-between text-sm text-indigo-100">
+              <span>Sort</span>
+              <select id="sort" class="bg-white/10 border border-white/20 rounded-xl px-3 py-2 text-white text-sm focus:outline-none">
+                <option value="popular">Most Popular</option>
+                <option value="price-low">Price: Low to High</option>
+                <option value="price-high">Price: High to Low</option>
+                <option value="rating">Highest Rated</option>
+                <option value="newest">Newest</option>
+              </select>
             </div>
+            <div class="mt-5 text-sm text-indigo-100">
+              <div class="flex items-center justify-between mb-2">
+                <span>Max price</span>
+                <span id="priceFilterValue">रु 1,000</span>
+              </div>
+              <input id="priceFilter" type="range" min="0" max="1000" value="1000" step="50" data-default-max="1000" class="w-full accent-white/80">
+              <p class="text-xs text-indigo-100/80 mt-2">Drag to cap prices. Uses sale price when applicable.</p>
+            </div>
+          </div>
         </div>
-    </main>
-    <custom-footer></custom-footer>
+      </div>
+    </section>
+
+    <section class="container mx-auto px-4 py-12">
+      <div id="pageContent" class="prose prose-invert max-w-none mb-10"></div>
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6" id="productsGrid"></div>
+    </section>
+  </main>
+  <custom-footer></custom-footer>
 
     <script src="components/navbar.js"></script>
     <script src="components/footer.js"></script>
@@ -72,9 +65,7 @@
 <div id="chatbot-container">
   <!-- Chat Button -->
   <button id="chatbot-toggle" class="fixed bottom-6 right-6 bg-blue-600 text-white w-14 h-14 rounded-full shadow-lg hover:bg-blue-700 transition-all z-50 flex items-center justify-center" aria-label="Open chat">
-    <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-      <path stroke-linecap="round" stroke-linejoin="round" d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
-    </svg>
+    <img src="/uploads/avatars/chat-avatar.png?v=2" alt="Chatbot Avatar" style="width:56px;height:56px;display:block;border-radius:50%;object-fit:cover;" />
   </button>
 
   <!-- Chat Window -->
@@ -83,12 +74,7 @@
     <div class="bg-gradient-to-r from-blue-500 to-purple-600 text-white p-4 rounded-t-lg flex justify-between items-center">
       <div class="flex items-center">
         <div class="w-8 h-8 bg-white rounded-full flex items-center justify-center mr-3">
-          <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-blue-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-            <rect x="3" y="7" width="18" height="11" rx="2" ry="2" />
-            <path d="M7 7V5a5 5 0 0 1 10 0v2" />
-            <circle cx="8.5" cy="12" r="1" />
-            <circle cx="15.5" cy="12" r="1" />
-          </svg>
+          <img src="/uploads/avatars/chat-avatar.png?v=2" alt="Zenrix Assistant" style="width:32px;height:32px;border-radius:50%;object-fit:cover;" />
         </div>
         <div>
           <h3 class="font-bold">Zenrix Assistant</h3>
@@ -106,12 +92,7 @@
     <div id="chatbot-messages" class="flex-grow p-4 overflow-y-auto space-y-3">
       <div class="flex">
         <div class="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center mr-2 flex-shrink-0">
-            <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-blue-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-              <rect x="3" y="7" width="18" height="11" rx="2" ry="2" />
-              <path d="M7 7V5a5 5 0 0 1 10 0v2" />
-              <circle cx="8.5" cy="12" r="1" />
-              <circle cx="15.5" cy="12" r="1" />
-            </svg>
+            <img src="/uploads/avatars/chat-avatar.png?v=2" alt="Zenrix Assistant" style="width:20px;height:20px;border-radius:50%;object-fit:cover;" />
           </div>
         <div class="bg-gray-100 rounded-lg p-3 max-w-[80%]">
           <p class="text-sm">Hello! 👋 I'm Zenrix Assistant. How can I help you today?</p>
@@ -143,110 +124,109 @@
 </div>
 
 <!-- Chatbot JavaScript -->
-<script>
-// Chatbot functionality
-document.addEventListener('DOMContentLoaded', function() {
-  const toggleBtn = document.getElementById('chatbot-toggle');
-  const closeBtn = document.getElementById('chatbot-close');
-  const chatWindow = document.getElementById('chatbot-window');
-  const chatInput = document.getElementById('chatbot-input');
-  const sendBtn = document.getElementById('chatbot-send');
-  const messagesDiv = document.getElementById('chatbot-messages');
-  const quickBtns = document.querySelectorAll('.quick-btn');
+<script src="js/chatbot-enhanced.js" defer></script>
 
-  // Toggle chat window
-  toggleBtn.addEventListener('click', () => {
-    chatWindow.classList.toggle('hidden');
-    if (!chatWindow.classList.contains('hidden')) {
-      chatInput.focus();
+<!-- Chatbot CSS -->
+<style>
+/* Container */
+#chatbot-window {
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.12);
+  border: 1px solid #e2e8f0;
+  background: #ffffff;
+}
+
+#chatbot-messages {
+  scroll-behavior: smooth;
+}
+
+/* Quick buttons - improved contrast */
+.quick-btn {
+  background: #ffffff;
+  border: 1px solid #e6eef0;
+  color: #0f172a;
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.quick-btn:hover {
+  background: #f3f4f6;
+  transform: translateY(-1px);
+}
+
+.hidden {
+  display: none !important;
+}
+
+/* Smooth animations */
+#chatbot-toggle, #chatbot-window {
+  transition: all 0.25s ease;
+}
+
+#chatbot-toggle:hover {
+  transform: scale(1.06);
+}
+
+/* Bubble styles - accessible colors */
+.bubble { word-break: break-word; }
+.bubble.bot { background: #f3f4f6 !important; color: #0f172a !important; align-self: flex-start; }
+.bubble.user { background: linear-gradient(90deg,#0f172a,#111827) !important; color: #ffffff !important; align-self: flex-end; }
+
+/* Timestamps / meta */
+.bubble p.text-xs { color: #6b7280 !important; }
+
+/* Namaste animation */
+.namaste-icon {
+  animation: namaste-bow 2s ease-in-out infinite;
+}
+
+@keyframes namaste-bow {
+  0%, 100% { transform: rotate(0deg); }
+  50% { transform: rotate(-5deg); }
+}
+</style>
+<!-- ========== END CHATBOT ========== -->    // Warranty/Guarantee
+    else if (msg.includes('warranty') || msg.includes('guarantee') || msg.includes('defective') || msg.includes('broken')) {
+      response = "🛡️ All our products come with manufacturer warranty. Electronics have 1-2 year warranty, fashion items have quality guarantee. Contact us for warranty claims.";
     }
-  });
-
-  closeBtn.addEventListener('click', () => {
-    chatWindow.classList.add('hidden');
-  });
-
-  // Send message
-  function sendMessage() {
-    const message = chatInput.value.trim();
-    if (message) {
-      addMessage('user', message);
-      chatInput.value = '';
-      getBotResponse(message);
+    // Size/Measurements
+    else if (msg.includes('size') || msg.includes('fit') || msg.includes('measurement') || msg.includes('large') || msg.includes('small')) {
+      response = "📏 Check the size guide on each product page. We include detailed measurements to help you choose the perfect fit. Still unsure? Contact us for advice!";
     }
-  }
-
-  sendBtn.addEventListener('click', sendMessage);
-  chatInput.addEventListener('keypress', (e) => {
-    if (e.key === 'Enter') sendMessage();
-  });
-
-  // Quick buttons
-  quickBtns.forEach(btn => {
-    btn.addEventListener('click', () => {
-      const msg = btn.getAttribute('data-msg');
-      addMessage('user', msg);
-      getBotResponse(msg);
-    });
-  });
-
-  // Add message to chat
-  function addMessage(sender, text) {
-    const messageDiv = document.createElement('div');
-    messageDiv.className = `flex ${sender === 'user' ? 'justify-end' : ''}`;
-    
-    messageDiv.innerHTML = `
-      ${sender === 'bot' ? `
-        <div class="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center mr-2 flex-shrink-0">
-          <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-blue-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="7" width="18" height="11" rx="2" ry="2"/><path d="M7 7V5a5 5 0 0 1 10 0v2"/><circle cx="8.5" cy="12" r="1"/><circle cx="15.5" cy="12" r="1"/></svg>
-        </div>
-      ` : ''}
-      <div class="${sender === 'user' ? 'bg-blue-600 text-white' : 'bg-gray-100'} rounded-lg p-3 max-w-[80%]">
-        <p class="text-sm">${text}</p>
-        <p class="text-xs ${sender === 'user' ? 'text-blue-200' : 'text-gray-500'} mt-1">${new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</p>
-      </div>
-      ${sender === 'user' ? `
-        <div class="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center ml-2 flex-shrink-0">
-            <svg xmlns="http://www.w3.org/2000/svg" class="w-3 h-3 text-blue-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-              <path d="M16 11c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3z" />
-              <path d="M4 20c0-3.314 2.686-6 6-6h4c3.314 0 6 2.686 6 6" />
-            </svg>
-        </div>
-      ` : ''}
-    `;
-    
-    messagesDiv.appendChild(messageDiv);
-    messagesDiv.scrollTop = messagesDiv.scrollHeight;
-  }
-
-  // Bot responses
-  function getBotResponse(userMessage) {
-    const msg = userMessage.toLowerCase();
-    let response = '';
-    
-    // Simple response logic
-    if (msg.includes('hello') || msg.includes('hi') || msg.includes('hey')) {
-      response = "Hello! Welcome to Zenrix. How can I assist you today?";
-    } else if (msg.includes('product') || msg.includes('item')) {
-      response = "We have electronics, fashion, home goods, and beauty products. Check our Products page for all items!";
-    } else if (msg.includes('price') || msg.includes('cost')) {
-      response = "Products start from $24.99. Check individual product pages for exact prices.";
-    } else if (msg.includes('delivery') || msg.includes('shipping')) {
-      response = "We deliver in 3-5 business days. Free shipping on orders over $50!";
-    } else if (msg.includes('return') || msg.includes('refund')) {
-      response = "We have a 30-day return policy. Contact support@zenrix.com for returns.";
-    } else if (msg.includes('contact') || msg.includes('support')) {
-      response = "Email: support@zenrix.com\nPhone: +977 9801234567\nHours: 9AM-6PM (NPT)";
-    } else if (msg.includes('order') || msg.includes('track')) {
-      response = "Check your Orders page for order status. Need help? Contact our support team.";
-    } else {
-      response = "I'm here to help! For detailed questions, please contact our support team at support@zenrix.com";
+    // Stock/Availability
+    else if (msg.includes('stock') || msg.includes('available') || msg.includes('in stock') || msg.includes('out of stock')) {
+      response = "📊 Stock status is shown on each product page. Popular items sell out quickly! Subscribe to notifications for restocks.";
+    }
+    // Discounts/Promotions
+    else if (msg.includes('discount') || msg.includes('promo') || msg.includes('coupon') || msg.includes('deal') || msg.includes('sale') || msg.includes('offer')) {
+      response = "🎉 Check our current promotions on the homepage. Subscribe to our newsletter for exclusive coupons and early access to sales!";
+    }
+    // Thank you
+    else if (msg.includes('thank') || msg.includes('thanks') || msg.includes('appreciate')) {
+      response = "You're most welcome! 🙏 Happy shopping at Zenrix. Namaste! 🇳🇵";
+    }
+    // Goodbye
+    else if (msg.includes('bye') || msg.includes('goodbye') || msg.includes('see you') || msg.includes('later')) {
+      response = "Namaste! 👋 Come back soon for more amazing Nepali products. Have a great day!";
+    }
+    // Default response
+    else {
+      const defaultResponses = [
+        "I'm here to help with your shopping questions! Try asking about products, delivery, returns, or contact info.",
+        "That's an interesting question! For detailed assistance, please contact our support team at support@zenrix.com",
+        "I'd love to help! Could you please rephrase your question? I'm best at answering questions about products, orders, and shipping.",
+        "🙏 For complex inquiries, our human support team is ready to assist. Reach out to support@zenrix.com"
+      ];
+      response = defaultResponses[Math.floor(Math.random() * defaultResponses.length)];
     }
     
-    // Simulate typing delay
+    // Simulate typing delay (randomized for more natural feel)
+    const delay = 800 + Math.random() * 1200;
     setTimeout(() => {
       addMessage('bot', response);
-    }, 1000);
+    }, delay);
   }
 });
 </script>
@@ -288,6 +268,16 @@ document.addEventListener('DOMContentLoaded', function() {
 
 #chatbot-toggle:hover {
   transform: scale(1.1);
+}
+
+/* Namaste animation */
+.namaste-icon {
+  animation: namaste-bow 2s ease-in-out infinite;
+}
+
+@keyframes namaste-bow {
+  0%, 100% { transform: rotate(0deg); }
+  50% { transform: rotate(-5deg); }
 }
 </style>
 <!-- ========== END CHATBOT ========== -->
