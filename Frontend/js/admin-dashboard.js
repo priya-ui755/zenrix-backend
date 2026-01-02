@@ -5,7 +5,14 @@
     const root = document.querySelector('.admin-app');
     if (!root) return;
 
-    // Chart.js lazy load check (lib loaded via CDN in HTML). If not available, skip charts gracefully
+    // Chart utilities and dynamic loader
+    function loadScript(src){
+      return new Promise((resolve, reject) => {
+        if (document.querySelector(`script[src="${src}"]`)) return resolve();
+        const s = document.createElement('script'); s.src = src; s.onload = () => resolve(); s.onerror = () => reject(new Error('Failed to load '+src)); document.head.appendChild(s);
+      });
+    }
+
     function createChart(ctx, type, data, options) {
       if (!window.Chart) return null;
       return new Chart(ctx, { type, data, options: options || {} });
@@ -20,8 +27,8 @@
       try{
         const token = localStorage.getItem('adminToken');
         const headers = token ? { 'Authorization': 'Bearer ' + token } : {};
-        const res = await fetch('/api/admin/orders?limit=500', { headers });
-        const j = await res.json();
+        const res = await safeFetch('/api/admin/orders?limit=500', { headers }, { silent: true });
+        const j = res ? await res.json() : null;
         if (j && j.success && Array.isArray(j.data)){
           // bucket by day (last 7 days)
           const days = Array.from({length:7},(_,i)=>{
@@ -42,8 +49,8 @@
 
     async function fetchProductsByCategory(){
       try{
-        const res = await fetch('/api/products');
-        const j = await res.json();
+        const res = await safeFetch('/api/products', {}, { silent: true });
+        const j = res ? await res.json() : null;
         if (j && j.success && Array.isArray(j.data)){
           const groups = {};
           j.data.forEach(p=> groups[p.category] = (groups[p.category]||0)+1);
@@ -57,8 +64,8 @@
       try{
         const token = localStorage.getItem('adminToken');
         const headers = token ? { 'Authorization': 'Bearer ' + token } : {};
-        const res = await fetch('/api/admin/orders?limit=1000', { headers });
-        const j = await res.json();
+        const res = await safeFetch('/api/admin/orders?limit=1000', { headers }, { silent: true });
+        const j = res ? await res.json() : null;
         if (j && j.success && Array.isArray(j.data)){
           // aggregate revenue by last 7 days
           const days = Array.from({length:7},(_,i)=>{const d=new Date(); d.setDate(d.getDate()-6+i); return d.toLocaleDateString(undefined,{weekday:'short'});});
@@ -72,8 +79,8 @@
 
     async function fetchPaymentBreakdown(){
       try{
-        const res = await fetch('/api/admin/orders?limit=1000');
-        const j = await res.json();
+        const res = await safeFetch('/api/admin/orders?limit=1000', {}, { silent: true });
+        const j = res ? await res.json() : null;
         if (j && j.success && Array.isArray(j.data)){
           const counts = {};
           j.data.forEach(o=>{const m = o.payment?.method || 'unknown'; counts[m]=(counts[m]||0)+1});
@@ -85,6 +92,11 @@
 
     // render charts
     try{
+      // ensure Chart.js is available (lazy-load if needed)
+      if (!window.Chart) {
+        try{ await loadScript('https://cdn.jsdelivr.net/npm/chart.js'); }catch(e){ console.warn('Failed to load Chart.js', e && e.message); }
+      }
+
       const ordersCtx = document.getElementById('chartOrders')?.getContext('2d');
       const productsCtx = document.getElementById('chartProducts')?.getContext('2d');
 
@@ -132,9 +144,10 @@
 
     // Quick KPI numbers
     try{
-      const p = await (await fetch('/api/products')).json();
-      if (p && p.success) document.getElementById('totalProducts').textContent = p.data.length;
-    }catch(e){}
+      const pRes = await safeFetch('/api/products', {}, { silent: true });
+      const p = pRes ? await pRes.json() : null;
+      if (p && p.success) { const el = document.getElementById('totalProducts'); if (el) { el.textContent = p.data.length; el.classList.remove('skeleton'); } }
+    }catch(e){ console.warn('Quick KPI load failed', e && e.message); }
 
     // revenue, conversion, refunds
     async function fetchRevenueConversion(){
@@ -181,18 +194,44 @@
           const total = orders.length || 1;
           const refunds = orders.filter(o=>o.status === 'Canceled').reduce((s,o)=>s + (o.total||0), 0);
           const aov = computeAOV(orders);
-      return { revenue: totalRevenue, conversion: Math.round((completed/total)*100), refunds, aov };
+
+          // compute last 7 days vs previous 7 days revenue for trend
+          const now = Date.now();
+          const DAY = 24*60*60*1000;
+          let last7 = 0, prev7 = 0;
+          orders.forEach(o=>{
+            const d = Date.parse(o.createdAt);
+            if (isNaN(d)) return;
+            const diffDays = Math.floor((now - d)/DAY);
+            if (diffDays >=0 && diffDays < 7) last7 += Number(o.total||0);
+            else if (diffDays >=7 && diffDays < 14) prev7 += Number(o.total||0);
+          });
+          let revenueTrendDelta = 0;
+          if (prev7 > 0) revenueTrendDelta = Math.round(((last7 - prev7)/prev7)*100);
+          else revenueTrendDelta = last7 > 0 ? 100 : 0;
+
+      return { revenue: totalRevenue, conversion: Math.round((completed/total)*100), refunds, aov, revenueTrendDelta };
         }
       }catch(e){}
-      return { revenue: 0, conversion: 0, refunds: 0, aov: 0 };
+      return { revenue: 0, conversion: 0, refunds: 0, aov: 0, revenueTrendDelta: 0 };
     }
 
     try{
       const m = await fetchRevenueConversion();
-      const revEl = document.getElementById('revenueTotal'); if (revEl) revEl.textContent = 'NPR ' + (m.revenue || 0).toLocaleString();
-      const convEl = document.getElementById('conversionRate'); if (convEl) convEl.textContent = (m.conversion || 0) + '%';
-      const refEl = document.getElementById('refundsTotal'); if (refEl) refEl.textContent = 'NPR ' + (m.refunds || 0).toLocaleString();
-      const aovEl = document.getElementById('aovValue'); if (aovEl) aovEl.textContent = 'NPR ' + (m.aov || 0).toLocaleString();
+      const revEl = document.getElementById('revenueTotal'); if (revEl) { revEl.textContent = 'NPR ' + (m.revenue || 0).toLocaleString(); revEl.classList.remove('skeleton'); }
+      const convEl = document.getElementById('conversionRate'); if (convEl) { convEl.textContent = (m.conversion || 0) + '%'; convEl.classList.remove('skeleton'); }
+      const refEl = document.getElementById('refundsTotal'); if (refEl) { refEl.textContent = 'NPR ' + (m.refunds || 0).toLocaleString(); refEl.classList.remove('skeleton'); }
+      const aovEl = document.getElementById('aovValue'); if (aovEl) { aovEl.textContent = 'NPR ' + (m.aov || 0).toLocaleString(); aovEl.classList.remove('skeleton'); }
+
+      // revenue trend
+      const trendEl = document.getElementById('revenueTrend');
+      if (trendEl) {
+        const d = Number(m.revenueTrendDelta || 0);
+        if (d > 0) { trendEl.className = 'trend-up'; trendEl.textContent = `▲ ${d}%`; }
+        else if (d < 0) { trendEl.className = 'trend-down'; trendEl.textContent = `▼ ${Math.abs(d)}%`; }
+        else { trendEl.className = 'trend-neutral'; trendEl.textContent = '—'; }
+      }
+
     }catch(e){/* ignore */}
 
     // ensure admin body class so admin css is active

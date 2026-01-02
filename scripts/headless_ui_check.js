@@ -90,6 +90,14 @@ const fs = require('fs');
         // ignore
       }
 
+      // collect any admin diagnostics exposed by the page
+      try {
+        const diag = await page.evaluate(() => window.__adminDiagnostics || null);
+        if (diag) pageResult.adminDiagnostics = diag;
+      } catch (e) {
+        // ignore
+      }
+
       // capture screenshot
       const outdir = 'tmp/ui-check-screenshots';
       if (!fs.existsSync(outdir)) fs.mkdirSync(outdir, { recursive: true });
@@ -105,6 +113,23 @@ const fs = require('fs');
     fs.writeFileSync(summaryPath, JSON.stringify(results, null, 2));
     console.log('UI check completed. Results written to', summaryPath);
     console.log(JSON.stringify(results, null, 2));
+
+    // Opt-in failure rules: fail if UI_FAIL_ON_ERRORS environment flag is set
+    const failOnErrors = (process.env.UI_FAIL_ON_ERRORS === '1' || process.env.UI_FAIL_ON_ERRORS === 'true');
+    if (failOnErrors) {
+      let found = false;
+      results.forEach(r => {
+        if (r.console && r.console.some(c => c.type === 'error')) found = true;
+        if (r.adminDiagnostics && Array.isArray(r.adminDiagnostics.failedResponses) && r.adminDiagnostics.failedResponses.length) found = true;
+        if (r.failedResponses && r.failedResponses.some(f => f.status >= 400)) found = true;
+      });
+      if (found) {
+        console.error('UI check failed due to console errors/failed responses (UI_FAIL_ON_ERRORS enabled).');
+        await browser.close();
+        process.exit(2);
+      }
+    }
+
     await browser.close();
     process.exit(0);
 

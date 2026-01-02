@@ -6,6 +6,7 @@
     "start": "node server.js",
     "reindex:knowledge": "node scripts/reindex_knowledge.js",
     "test:ui": "node scripts/headless_ui_check.js",
+    "test:ui:strict": "node scripts/headless_ui_check_strict.js",
     "test:a11y": "node scripts/a11y_check.js"
   },
   "keywords": [],

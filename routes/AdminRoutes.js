@@ -82,7 +82,8 @@ router.put('/orders/:orderId/status', requireAdmin, async (req, res) => {
       order.status = status;
       changed = true;
     }
-    if (paymentStatus && paymentStatus !== order.payment?.status) {
+    if (paymentStatus && paymentStatus !== (order.payment && order.payment.status)) {
+      order.payment = order.payment || {};
       order.payment.status = paymentStatus;
       order.payment.reviewedBy = adminName || 'Admin Dashboard';
       order.payment.reviewedAt = new Date();
@@ -107,6 +108,8 @@ router.put('/orders/:orderId/status', requireAdmin, async (req, res) => {
     if (!changed && !note) {
       return res.status(400).json({ success: false, error: 'No changes detected' });
     }
+
+    console.info('Admin order update', { orderId: order._id, admin: adminName || 'Admin Dashboard', changed });
 
     await order.save();
     await order.populate('user', 'firstName lastName email phone');
