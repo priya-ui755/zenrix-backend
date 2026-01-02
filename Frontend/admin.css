@@ -68,7 +68,15 @@ html body:not(.admin) .admin-app{display:none}
 .trend-up{color:#059669;font-weight:700}
 .trend-down{color:#ef4444;font-weight:700}
 .trend-neutral{color:#6b7280;font-weight:600}
+/* footer error area */
+.footer-error{display:flex;align-items:center;justify-content:center;gap:1rem;background:#fff4f4;border:1px solid #fecaca;color:#7f1d1d;padding:.6rem 1rem;border-radius:8px;margin-top:1rem;box-shadow:0 6px 18px rgba(15,23,42,0.06)}
+.footer-error.hidden{display:none}
+.footer-error.show{display:flex}
 
+/* button: danger */
+.btn-danger{background:#ef4444;color:white;border:none}
+.btn-danger svg{opacity:0.95}
+.btn-danger:focus{box-shadow:0 0 0 4px rgba(239,68,68,0.12)}
 /* logged-out / auth overlay */
 .auth-overlay{padding:2rem}
 .auth-card{max-width:520px}
