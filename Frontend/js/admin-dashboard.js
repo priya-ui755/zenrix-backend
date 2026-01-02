@@ -53,6 +53,36 @@
       return sampleProducts;
     }
 
+    async function fetchRevenueByDay(){
+      try{
+        const token = localStorage.getItem('adminToken');
+        const headers = token ? { 'Authorization': 'Bearer ' + token } : {};
+        const res = await fetch('/api/admin/orders?limit=1000', { headers });
+        const j = await res.json();
+        if (j && j.success && Array.isArray(j.data)){
+          // aggregate revenue by last 7 days
+          const days = Array.from({length:7},(_,i)=>{const d=new Date(); d.setDate(d.getDate()-6+i); return d.toLocaleDateString(undefined,{weekday:'short'});});
+          const sums = days.map(()=>0);
+          j.data.forEach(o=>{const short=new Date(o.createdAt).toLocaleDateString(undefined,{weekday:'short'}); const idx=days.indexOf(short); if (idx>=0) sums[idx]+=Number(o.total||0)});
+          return { labels: days, data: sums };
+        }
+      }catch(e){}
+      return { labels: ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'], data: [12000,18000,9000,22000,14000,26000,30000] };
+    }
+
+    async function fetchPaymentBreakdown(){
+      try{
+        const res = await fetch('/api/admin/orders?limit=1000');
+        const j = await res.json();
+        if (j && j.success && Array.isArray(j.data)){
+          const counts = {};
+          j.data.forEach(o=>{const m = o.payment?.method || 'unknown'; counts[m]=(counts[m]||0)+1});
+          return { labels: Object.keys(counts), data: Object.values(counts) };
+        }
+      }catch(e){}
+      return { labels:['cod','bank-transfer','esewa','khalti','imepay'], data:[40,25,18,10,7] };
+    }
+
     // render charts
     try{
       const ordersCtx = document.getElementById('chartOrders')?.getContext('2d');
@@ -64,12 +94,31 @@
       if (ordersCtx) createChart(ordersCtx,'line',{labels:ordersData.labels,datasets:[{label:'Orders',data:ordersData.data,backgroundColor:'rgba(79,70,229,0.12)',borderColor:'#4f46e5',fill:true,tension:0.3}]}, {scales:{y:{beginAtZero:true}}});
       if (productsCtx) createChart(productsCtx,'doughnut',{labels:productsData.labels,datasets:[{label:'Products by category',data:productsData.data,backgroundColor:['#667eea','#a78bfa','#7dd3fc','#f472b6','#fbbf24']}]});
 
-      // sidebar toggle
+      // revenue chart and payments chart
+      const revCtx = document.getElementById('chartRevenue')?.getContext('2d');
+      const payCtx = document.getElementById('chartPayments')?.getContext('2d');
+      // revenue by day
+      try{
+        const rev = await fetchRevenueByDay();
+        if (revCtx) createChart(revCtx,'line',{labels:rev.labels,datasets:[{label:'Revenue',data:rev.data,backgroundColor:'rgba(5,150,105,0.12)',borderColor:'#059669',fill:true,tension:0.3}]}, {scales:{y:{beginAtZero:true}}});
+      }catch(e){}
+      // payments
+      try{
+        const payments = await fetchPaymentBreakdown();
+        if (payCtx) createChart(payCtx,'doughnut',{labels:payments.labels,datasets:[{data:payments.data,backgroundColor:['#34d399','#60a5fa','#f97316','#fb7185','#a78bfa']}]});
+      }catch(e){}
+
+
+      // sidebar toggle with aria handling and persistence
       const sidebarToggle = document.getElementById('sidebarToggle');
       const sidebar = document.querySelector('.admin-sidebar');
+      const collapsed = localStorage.getItem('adminSidebarCollapsed') === '1';
+      if (collapsed) { sidebar.classList.add('collapsed'); sidebar.style.width='64px'; sidebarToggle.setAttribute('aria-expanded','true'); }
       sidebarToggle?.addEventListener('click', () => {
-        sidebar.classList.toggle('collapsed');
-        sidebar.style.width = sidebar.classList.contains('collapsed') ? '64px' : '220px';
+        const isCollapsed = sidebar.classList.toggle('collapsed');
+        sidebar.style.width = isCollapsed ? '64px' : '220px';
+        sidebarToggle.setAttribute('aria-expanded', String(isCollapsed));
+        localStorage.setItem('adminSidebarCollapsed', isCollapsed ? '1' : '0');
       });
 
     }catch(e){console.warn('Charts init failed', e.message)}
@@ -98,7 +147,7 @@
                 <td style="padding:.6rem .75rem">#${(o._id||'').slice(-6).toUpperCase()}</td>
                 <td style="padding:.6rem .75rem">${(o.user && (o.user.firstName||'') + ' ' + (o.user.lastName||'')) || (o.user && o.user.email) || 'Guest'}</td>
                 <td style="padding:.6rem .75rem">NPR ${Number(o.total||0).toLocaleString()}</td>
-                <td style="padding:.6rem .75rem">${o.status || '—'}</td>
+                <td style="padding:.6rem .75rem"><span class="badge ${o.status === 'Completed' ? 'success' : (o.status === 'Canceled' ? 'danger' : 'warn')}">${o.status || '—'}</span></td>
                 <td style="padding:.6rem .75rem">${new Date(o.createdAt).toLocaleString()}</td>
               </tr>
             `).join('');

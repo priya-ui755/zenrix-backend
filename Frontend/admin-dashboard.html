@@ -55,6 +55,7 @@
     </style>
 </head>
 <body class="bg-gray-50 min-h-screen">
+    <a class="skip-link" href="#adminContent">Skip to dashboard</a>
     <!-- Modern Header -->
     <div class="gradient-bg text-white shadow-lg">
         <div class="container mx-auto px-6 py-4">
@@ -99,13 +100,13 @@
         </div>
     </div>
     <div class="admin-layout">
-      <aside class="admin-sidebar">
+      <aside class="admin-sidebar" role="navigation" aria-label="Admin navigation">
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:0.5rem">
             <div style="display:flex;gap:.5rem;align-items:center">
                 <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="width:24px;height:24px;color:var(--accent)"><path d="M12 2L2 7l10 5 10-5-10-5z" fill="currentColor"/></svg>
                 <strong>Admin</strong>
             </div>
-            <button id="sidebarToggle" class="px-2 py-1" style="background:transparent;border:0;color:var(--muted);cursor:pointer">☰</button>
+            <button id="sidebarToggle" class="px-2 py-1" aria-expanded="false" aria-controls="adminContent" style="background:transparent;border:0;color:var(--muted);cursor:pointer">☰<span class="sr-only">Toggle sidebar</span></button>
         </div>
         <nav>
             <a href="#" data-jump-tab="products">Products</a>
@@ -171,7 +172,11 @@
 
             <div class="card">
                 <div class="label">Revenue</div>
-                <div id="revenueTotal" class="value" style="color:#059669">NPR 0</div>
+                <div class="kpi-row">
+                    <div id="revenueTotal" class="value" style="color:#059669">NPR 0</div>
+                    <div class="kpi-small"><span class="sub">AOV</span><span id="aovValue" class="num">NPR 0</span></div>
+                </div>
+                <div style="margin-top:.6rem"><canvas id="chartRevenue" width="600" height="80"></canvas></div>
             </div>
 
             <div class="card">
@@ -182,6 +187,11 @@
             <div class="card">
                 <div class="label">Refunds</div>
                 <div id="refundsTotal" class="value" style="color:#ef4444">NPR 0</div>
+            </div>
+
+            <div class="card">
+                <div class="label">Payment Methods</div>
+                <div style="margin-top:.6rem"><canvas id="chartPayments" width="300" height="150"></canvas></div>
             </div>
 
             <div class="card">

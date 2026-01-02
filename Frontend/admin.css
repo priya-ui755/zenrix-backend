@@ -20,6 +20,26 @@
 .kpi-small{display:flex;flex-direction:column}
 .kpi-small .sub{color:var(--muted);font-size:.85rem}
 .kpi-small .num{font-size:1.25rem;font-weight:700}
+
+/* badges */
+.badge{display:inline-block;padding:.2rem .5rem;border-radius:999px;font-size:.75rem;font-weight:700}
+.badge.success{background:#dcfce7;color:#166534}
+.badge.warn{background:#fff7ed;color:#92400e}
+.badge.danger{background:#fee2e2;color:#991b1b}
+
+/* trend arrows */
+.trend-up{color:#059669}
+.trend-down{color:#ef4444}
+
+/* focus styles for accessibility */
+:focus{outline:none}
+:focus-visible{outline:3px solid rgba(79,70,229,0.22);outline-offset:3px;border-radius:6px}
+.admin-sidebar nav a:focus-visible, .card button:focus-visible, .admin-sidebar button:focus-visible{box-shadow:0 0 0 4px rgba(79,70,229,0.06)}
+
+/* skip link */
+.skip-link{position:absolute;left:-9999px;top:auto;width:1px;height:1px;overflow:hidden}
+.skip-link:focus{position:fixed;left:1rem;top:1rem;width:auto;height:auto;background:#111;color:#fff;padding:.5rem 1rem;border-radius:6px;z-index:9999}
+
 /* keep admin css scoped to avoid affecting main site */
 html body:not(.admin) .admin-app{display:none}
 
