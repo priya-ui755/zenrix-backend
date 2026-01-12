@@ -5492,8 +5492,22 @@
                 finally{ btn.disabled = false; btn.textContent = 'Clear Vectors'; updateKnowledgeStatus(); }
             });
 
-            // Refresh knowledge when clicking Refresh data
-            document.getElementById('refreshAllBtn')?.addEventListener('click', () => updateKnowledgeStatus());
+            // Refresh all data when clicking Refresh data
+            document.getElementById('refreshAllBtn')?.addEventListener('click', async () => {
+                const btn = document.getElementById('refreshAllBtn');
+                if (!btn) return;
+                if (!btn.dataset.defaultLabel) btn.dataset.defaultLabel = btn.textContent.trim();
+                btn.disabled = true; btn.classList.add('opacity-60'); btn.textContent = 'Refreshing...';
+                try {
+                    await loadAllData();
+                    showToast('success', 'All data refreshed');
+                } catch (err) {
+                    console.error('refreshAll failed', err && err.message);
+                    showToast('error', 'Failed to refresh data');
+                } finally {
+                    btn.disabled = false; btn.classList.remove('opacity-60'); btn.textContent = btn.dataset.defaultLabel;
+                }
+            });
 
             document.querySelectorAll('[data-jump-tab]').forEach(btn => {
                 btn.addEventListener('click', (e) => {
