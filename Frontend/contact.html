@@ -4,12 +4,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Contact Us | Zenrix</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="/css/tailwind-site.css">
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="script.js" defer></script>
 </head>
-<body class="bg-slate-950 text-slate-100">
+<body class="surface text">
     <custom-navbar></custom-navbar>
 
     <main>
@@ -21,8 +21,8 @@
                     <h1 class="text-3xl md:text-4xl font-bold">Contact Zenrix Support</h1>
                     <p class="text-slate-200 text-lg">Reach us anytime for orders, returns, or product help. Expect a reply within one business day.</p>
                     <div class="flex flex-wrap gap-3">
-                        <a href="mailto:support@zenrix.com" class="inline-flex items-center gap-2 px-5 py-3 rounded-xl bg-white text-slate-900 font-semibold shadow hover:-translate-y-0.5 transition"><i class="fas fa-envelope"></i>Email support</a>
-                        <a href="tel:+18001234567" class="inline-flex items-center gap-2 px-5 py-3 rounded-xl border border-white/20 text-white font-semibold hover:bg-white/10 transition"><i class="fas fa-phone"></i>Call us</a>
+                        <a id="contactHeroEmailLink" href="#contactMailtoForm" class="inline-flex items-center gap-2 px-5 py-3 rounded-xl bg-white text-slate-900 font-semibold shadow hover:-translate-y-0.5 transition"><i class="fas fa-envelope"></i>Email support</a>
+                        <a id="contactHeroPhoneLink" href="tel:+18001234567" class="inline-flex items-center gap-2 px-5 py-3 rounded-xl border border-white/20 text-white font-semibold hover:bg-white/10 transition"><i class="fas fa-phone"></i>Call us</a>
                     </div>
                 </div>
                 <div class="grid grid-cols-2 gap-4 w-full lg:w-[420px]">
@@ -40,7 +40,7 @@
                         <p class="text-sm text-indigo-100">Need quick help?</p>
                         <p class="text-xl font-semibold">Check orders, wishlist, and addresses in your dashboard.</p>
                         <div class="flex gap-2 mt-3">
-                            <a href="account.html" class="px-4 py-2 rounded-lg bg-indigo-500 text-white font-semibold hover:-translate-y-0.5 transition">Open dashboard</a>
+                            <a href="profile.html" class="px-4 py-2 rounded-lg bg-indigo-500 text-white font-semibold hover:-translate-y-0.5 transition">Open dashboard</a>
                             <a href="terms.html" class="px-4 py-2 rounded-lg border border-white/20 text-white hover:bg-white/10 transition">Policies</a>
                         </div>
                     </div>
@@ -63,16 +63,16 @@
                             <div class="w-10 h-10 rounded-lg bg-indigo-500/20 border border-indigo-400/30 flex items-center justify-center text-indigo-100"><i class="fas fa-envelope"></i></div>
                             <div>
                                 <p class="font-semibold text-white">Email</p>
-                                <p class="text-sm text-slate-300">support@zenrix.com</p>
-                                <a href="mailto:support@zenrix.com" class="text-indigo-200 text-sm font-semibold hover:text-white">Send a message</a>
+                                <p id="contactEmailValue" class="text-sm text-slate-300">support@zenrix.com</p>
+                                <a id="contactEmailLink" href="#contactMailtoForm" class="text-indigo-200 text-sm font-semibold hover:text-white">Send a message</a>
                             </div>
                         </div>
                         <div class="p-4 rounded-xl bg-white/5 border border-white/10 flex gap-3 items-start">
                             <div class="w-10 h-10 rounded-lg bg-emerald-500/20 border border-emerald-400/30 flex items-center justify-center text-emerald-100"><i class="fas fa-phone"></i></div>
                             <div>
                                 <p class="font-semibold text-white">Phone</p>
-                                <p class="text-sm text-slate-300">+1 (800) 123-4567</p>
-                                <a href="tel:+18001234567" class="text-emerald-100 text-sm font-semibold hover:text-white">Call now</a>
+                                <p id="contactPhoneValue" class="text-sm text-slate-300">+1 (800) 123-4567</p>
+                                <a id="contactPhoneLink" href="tel:+18001234567" class="text-emerald-100 text-sm font-semibold hover:text-white">Call now</a>
                             </div>
                         </div>
                         <div class="p-4 rounded-xl bg-white/5 border border-white/10 flex gap-3 items-start">
@@ -87,8 +87,8 @@
                             <div class="w-10 h-10 rounded-lg bg-amber-500/20 border border-amber-400/30 flex items-center justify-center text-amber-100"><i class="fas fa-store"></i></div>
                             <div>
                                 <p class="font-semibold text-white">Visit</p>
-                                <p class="text-sm text-slate-300">123 Commerce St, New York, NY 10001</p>
-                                <a href="https://maps.google.com/?q=123+Commerce+St+New+York+NY+10001" target="_blank" rel="noopener" class="text-amber-100 text-sm font-semibold hover:text-white">Open map</a>
+                                <p id="contactAddressValue" class="text-sm text-slate-300">123 Commerce St, New York, NY 10001</p>
+                                <a id="contactAddressLink" href="https://maps.google.com/?q=123+Commerce+St+New+York+NY+10001" target="_blank" rel="noopener" class="text-amber-100 text-sm font-semibold hover:text-white">Open map</a>
                             </div>
                         </div>
                     </div>
@@ -100,29 +100,30 @@
                             <h2 class="text-2xl font-semibold text-white">Send a note</h2>
                             <p class="text-slate-300">Drop your query and we will email back.</p>
                         </div>
-                        <span class="px-3 py-1 rounded-full bg-white/10 text-white text-xs font-semibold">Email form</span>
+                        <span class="px-3 py-1 rounded-full bg-white/10 text-white text-xs font-semibold">Support form</span>
                     </div>
-                    <form class="space-y-3" onsubmit="event.preventDefault(); window.location.href='mailto:support@zenrix.com';">
+                    <form id="contactMailtoForm" class="space-y-3">
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                             <div>
                                 <label class="block text-sm text-slate-200 mb-1">Full name</label>
-                                <input type="text" class="w-full px-4 py-3 rounded-xl bg-white/10 border border-white/15 text-white placeholder:text-slate-400 focus:outline-none focus:border-indigo-400" placeholder="Your name" required>
+                                <input id="contactName" name="name" type="text" class="w-full px-4 py-3 rounded-xl bg-white/10 border border-white/15 text-white placeholder:text-slate-400 focus:outline-none focus:border-indigo-400" placeholder="Your name" required autocomplete="name">
                             </div>
                             <div>
                                 <label class="block text-sm text-slate-200 mb-1">Email</label>
-                                <input type="email" class="w-full px-4 py-3 rounded-xl bg-white/10 border border-white/15 text-white placeholder:text-slate-400 focus:outline-none focus:border-indigo-400" placeholder="you@example.com" required>
+                                <input id="contactEmail" name="email" type="email" class="w-full px-4 py-3 rounded-xl bg-white/10 border border-white/15 text-white placeholder:text-slate-400 focus:outline-none focus:border-indigo-400" placeholder="you@example.com" required autocomplete="email">
                             </div>
                         </div>
                         <div>
                             <label class="block text-sm text-slate-200 mb-1">Subject</label>
-                            <input type="text" class="w-full px-4 py-3 rounded-xl bg-white/10 border border-white/15 text-white placeholder:text-slate-400 focus:outline-none focus:border-indigo-400" placeholder="Order help, return, feedback" required>
+                            <input id="contactSubject" name="subject" type="text" class="w-full px-4 py-3 rounded-xl bg-white/10 border border-white/15 text-white placeholder:text-slate-400 focus:outline-none focus:border-indigo-400" placeholder="Order help, return, feedback" required>
                         </div>
                         <div>
                             <label class="block text-sm text-slate-200 mb-1">Message</label>
-                            <textarea rows="4" class="w-full px-4 py-3 rounded-xl bg-white/10 border border-white/15 text-white placeholder:text-slate-400 focus:outline-none focus:border-indigo-400" placeholder="Tell us how we can help" required></textarea>
+                            <textarea id="contactMessage" name="message" rows="4" class="w-full px-4 py-3 rounded-xl bg-white/10 border border-white/15 text-white placeholder:text-slate-400 focus:outline-none focus:border-indigo-400" placeholder="Tell us how we can help" required></textarea>
                         </div>
-                        <button type="submit" class="w-full px-6 py-3 rounded-xl bg-gradient-to-r from-indigo-500 to-purple-500 text-white font-semibold shadow hover:-translate-y-0.5 transition">Send email</button>
-                        <p class="text-xs text-slate-400">This form opens your email client to send a message to support@zenrix.com.</p>
+                        <button id="contactSubmitBtn" type="submit" class="w-full px-6 py-3 rounded-xl bg-gradient-to-r from-indigo-500 to-purple-500 text-white font-semibold shadow hover:-translate-y-0.5 transition">Send note</button>
+                        <p class="text-xs text-slate-400">This form sends your message to our support team. We typically reply within one business day.</p>
+                        <p id="contactNoteStatus" class="text-sm hidden" role="status" aria-live="polite"></p>
                     </form>
                 </div>
             </div>

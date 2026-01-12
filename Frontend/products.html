@@ -3,35 +3,35 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Products | ShopNest</title>
+    <title>Products | Zenrix</title>
     <link rel="stylesheet" href="style.css">
-    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="/css/tailwind-site.css">
     <script src="script.js" defer></script>
 </head>
-<body class="bg-slate-950 text-slate-100">
+<body class="surface text products-page">
   <custom-navbar></custom-navbar>
   <main class="relative">
-    <section class="relative overflow-hidden bg-gradient-to-br from-slate-900 via-indigo-900 to-purple-900 py-14 products-hero">
-      <div class="absolute inset-0 opacity-30 bg-[radial-gradient(circle_at_15%_20%,rgba(99,102,241,0.4),transparent_45%),radial-gradient(circle_at_80%_10%,rgba(236,72,153,0.25),transparent_40%)] products-hero-overlay"></div>
+    <section class="relative overflow-hidden products-hero py-14">
+      <div class="absolute inset-0 opacity-30 products-hero-overlay"></div>
       <div class="container mx-auto px-4 relative">
         <div class="flex flex-wrap items-center justify-between gap-6">
           <div class="space-y-4 max-w-2xl">
-            <p class="text-xs uppercase tracking-[0.4em] text-indigo-200">Products</p>
-            <h1 class="text-4xl md:text-5xl font-black leading-tight">Browse the latest drops.</h1>
-            <p class="text-slate-200/80 max-w-xl">Filter by price, sort by what matters, and jump straight to sale picks when you want the best deals.</p>
+            <p class="text-xs uppercase tracking-[0.4em] text-indigo-300 font-medium">Products</p>
+            <h1 class="text-4xl md:text-5xl font-black leading-tight text">Browse the latest drops.</h1>
+            <p class="muted max-w-xl">Filter by price, sort by what matters, and jump straight to sale picks when you want the best deals.</p>
             <div class="flex flex-wrap gap-2 text-sm">
-              <a href="/products.html" class="px-4 py-2 rounded-full bg-white text-slate-900 font-semibold shadow">All</a>
-              <a href="/products.html?category=sale" class="px-4 py-2 rounded-full bg-white/10 border border-white/20 text-white">On Sale</a>
-              <a href="/products.html?category=electronics" class="px-4 py-2 rounded-full bg-white/10 border border-white/20 text-white">Electronics</a>
-              <a href="/products.html?category=fashion" class="px-4 py-2 rounded-full bg-white/10 border border-white/20 text-white">Fashion</a>
-              <a href="/products.html?category=home" class="px-4 py-2 rounded-full bg-white/10 border border-white/20 text-white">Home</a>
-              <a href="/products.html?category=beauty" class="px-4 py-2 rounded-full bg-white/10 border border-white/20 text-white">Beauty</a>
+              <a href="/products.html" class="px-4 py-2 rounded-full bg-accent">All</a>
+              <a href="/products.html?category=sale" class="px-4 py-2 rounded-full surface-2 border text muted font-medium transition">On Sale</a>
+              <a href="/products.html?category=electronics" class="px-4 py-2 rounded-full surface-2 border text muted font-medium transition">Electronics</a>
+              <a href="/products.html?category=fashion" class="px-4 py-2 rounded-full surface-2 border text muted font-medium transition">Fashion</a>
+              <a href="/products.html?category=home" class="px-4 py-2 rounded-full surface-2 border text muted font-medium transition">Home</a>
+              <a href="/products.html?category=beauty" class="px-4 py-2 rounded-full surface-2 border text muted font-medium transition">Beauty</a>
             </div>
           </div>
-          <div class="rounded-[28px] bg-white/5 border border-white/10 p-6 min-w-[280px] backdrop-blur shadow-2xl">
-            <div class="flex items-center justify-between text-sm text-indigo-100">
-              <span>Sort</span>
-              <select id="sort" class="bg-white/10 border border-white/20 rounded-xl px-3 py-2 text-white text-sm focus:outline-none">
+          <div class="products-filter-card">
+            <div class="flex items-center justify-between mb-2">
+              <span class="filter-label">Sort</span>
+              <select id="sort" class="filter-select">
                 <option value="popular">Most Popular</option>
                 <option value="price-low">Price: Low to High</option>
                 <option value="price-high">Price: High to Low</option>
@@ -39,13 +39,13 @@
                 <option value="newest">Newest</option>
               </select>
             </div>
-            <div class="mt-5 text-sm text-indigo-100">
+            <div class="mt-5">
               <div class="flex items-center justify-between mb-2">
-                <span>Max price</span>
-                <span id="priceFilterValue">रु 1,000</span>
+                <span class="filter-label">Max price</span>
+                <span id="priceFilterValue" class="price-value">रु 1,000</span>
               </div>
-              <input id="priceFilter" type="range" min="0" max="1000" value="1000" step="50" data-default-max="1000" class="w-full accent-white/80">
-              <p class="text-xs text-indigo-100/80 mt-2">Drag to cap prices. Uses sale price when applicable.</p>
+              <input id="priceFilter" type="range" min="0" max="1000" value="1000" step="50" data-default-max="1000" class="filter-range">
+              <p class="filter-hint">Drag to cap prices. Uses sale price when applicable.</p>
             </div>
           </div>
         </div>
@@ -63,55 +63,28 @@
     <script src="components/footer.js"></script>
 <!-- ========== ZENRIX CHATBOT ========== -->
 <div id="chatbot-container">
-  <!-- Chat Button -->
-  <button id="chatbot-toggle" class="fixed bottom-6 right-6 bg-blue-600 text-white w-14 h-14 rounded-full shadow-lg hover:bg-blue-700 transition-all z-50 flex items-center justify-center" aria-label="Open chat">
+  <button id="chatbot-toggle" class="fixed bottom-6 right-6 bg-accent text w-14 h-14 rounded-full shadow-lg transition-all z-50 flex items-center justify-center" aria-label="Open chat">
     <img src="/uploads/avatars/chat-avatar.png?v=2" alt="Chatbot Avatar" style="width:56px;height:56px;display:block;border-radius:50%;object-fit:cover;" />
   </button>
 
-  <!-- Chat Window -->
   <div id="chatbot-window" class="fixed bottom-24 right-6 w-80 h-96 bg-white rounded-lg shadow-xl hidden flex flex-col z-50 border">
-    <!-- Header -->
-    <div class="bg-gradient-to-r from-blue-500 to-purple-600 text-white p-4 rounded-t-lg flex justify-between items-center">
-      <div class="flex items-center">
-        <div class="w-8 h-8 bg-white rounded-full flex items-center justify-center mr-3">
-          <img src="/uploads/avatars/chat-avatar.png?v=2" alt="Zenrix Assistant" style="width:32px;height:32px;border-radius:50%;object-fit:cover;" />
-        </div>
+    <div class="bg-accent p-3 rounded-t-lg flex justify-between items-center">
+      <div class="flex items-center gap-3">
+        <img src="/uploads/avatars/chat-avatar.png?v=2" alt="Zenrix Assistant" style="width:32px;height:32px;border-radius:50%;object-fit:cover;" />
         <div>
-          <h3 class="font-bold">Zenrix Assistant</h3>
-          <p class="text-xs opacity-80">Online • 24/7 Support</p>
+          <div class="font-bold">Zenrix Assistant</div>
+          <div class="text-xs opacity-80">Online • 24/7 Support</div>
         </div>
       </div>
-      <button id="chatbot-close" aria-label="Close chat" class="text-white hover:text-gray-200">
-        <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
-        </svg>
-      </button>
+      <button id="chatbot-close" aria-label="Close chat" class="text">✕</button>
     </div>
 
-    <!-- Messages -->
-    <div id="chatbot-messages" class="flex-grow p-4 overflow-y-auto space-y-3">
-      <div class="flex">
-        <div class="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center mr-2 flex-shrink-0">
-            <img src="/uploads/avatars/chat-avatar.png?v=2" alt="Zenrix Assistant" style="width:20px;height:20px;border-radius:50%;object-fit:cover;" />
-          </div>
-        <div class="bg-gray-100 rounded-lg p-3 max-w-[80%]">
-          <p class="text-sm">Hello! 👋 I'm Zenrix Assistant. How can I help you today?</p>
-          <p class="text-xs text-gray-500 mt-2">Try asking about: products, delivery, or returns</p>
-        </div>
-      </div>
-    </div>
+    <div id="chatbot-messages" class="flex-grow p-3 overflow-y-auto space-y-3 bg-white"></div>
 
-    <!-- Input -->
-    <div class="border-t p-4">
+    <div class="border-t p-3 bg-white">
       <div class="flex space-x-2">
-        <input type="text" id="chatbot-input" placeholder="Type your message..." 
-               class="flex-grow border rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
-        <button id="chatbot-send" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700" aria-label="Send message">
-          <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M22 2L11 13" />
-            <path stroke-linecap="round" stroke-linejoin="round" d="M22 2l-7 20  -4-9-9-4 20-7z" />
-          </svg>
-        </button>
+        <input type="text" id="chatbot-input" placeholder="Type your message..." class="flex-grow border rounded-lg px-3 py-2 focus:outline-none">
+        <button id="chatbot-send" class="bg-blue-600 text-white px-3 py-2 rounded-lg">Send</button>
       </div>
       <div class="flex flex-wrap gap-2 mt-3">
         <button class="quick-btn" data-msg="What products do you have?">Products</button>
@@ -123,163 +96,8 @@
   </div>
 </div>
 
-<!-- Chatbot JavaScript -->
+<!-- Chatbot JS (external) -->
 <script src="js/chatbot-enhanced.js" defer></script>
-
-<!-- Chatbot CSS -->
-<style>
-/* Container */
-#chatbot-window {
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.12);
-  border: 1px solid #e2e8f0;
-  background: #ffffff;
-}
-
-#chatbot-messages {
-  scroll-behavior: smooth;
-}
-
-/* Quick buttons - improved contrast */
-.quick-btn {
-  background: #ffffff;
-  border: 1px solid #e6eef0;
-  color: #0f172a;
-  padding: 6px 12px;
-  border-radius: 20px;
-  font-size: 12px;
-  cursor: pointer;
-  transition: all 0.15s;
-}
-
-.quick-btn:hover {
-  background: #f3f4f6;
-  transform: translateY(-1px);
-}
-
-.hidden {
-  display: none !important;
-}
-
-/* Smooth animations */
-#chatbot-toggle, #chatbot-window {
-  transition: all 0.25s ease;
-}
-
-#chatbot-toggle:hover {
-  transform: scale(1.06);
-}
-
-/* Bubble styles - accessible colors */
-.bubble { word-break: break-word; }
-.bubble.bot { background: #f3f4f6 !important; color: #0f172a !important; align-self: flex-start; }
-.bubble.user { background: linear-gradient(90deg,#0f172a,#111827) !important; color: #ffffff !important; align-self: flex-end; }
-
-/* Timestamps / meta */
-.bubble p.text-xs { color: #6b7280 !important; }
-
-/* Namaste animation */
-.namaste-icon {
-  animation: namaste-bow 2s ease-in-out infinite;
-}
-
-@keyframes namaste-bow {
-  0%, 100% { transform: rotate(0deg); }
-  50% { transform: rotate(-5deg); }
-}
-</style>
-<!-- ========== END CHATBOT ========== -->    // Warranty/Guarantee
-    else if (msg.includes('warranty') || msg.includes('guarantee') || msg.includes('defective') || msg.includes('broken')) {
-      response = "🛡️ All our products come with manufacturer warranty. Electronics have 1-2 year warranty, fashion items have quality guarantee. Contact us for warranty claims.";
-    }
-    // Size/Measurements
-    else if (msg.includes('size') || msg.includes('fit') || msg.includes('measurement') || msg.includes('large') || msg.includes('small')) {
-      response = "📏 Check the size guide on each product page. We include detailed measurements to help you choose the perfect fit. Still unsure? Contact us for advice!";
-    }
-    // Stock/Availability
-    else if (msg.includes('stock') || msg.includes('available') || msg.includes('in stock') || msg.includes('out of stock')) {
-      response = "📊 Stock status is shown on each product page. Popular items sell out quickly! Subscribe to notifications for restocks.";
-    }
-    // Discounts/Promotions
-    else if (msg.includes('discount') || msg.includes('promo') || msg.includes('coupon') || msg.includes('deal') || msg.includes('sale') || msg.includes('offer')) {
-      response = "🎉 Check our current promotions on the homepage. Subscribe to our newsletter for exclusive coupons and early access to sales!";
-    }
-    // Thank you
-    else if (msg.includes('thank') || msg.includes('thanks') || msg.includes('appreciate')) {
-      response = "You're most welcome! 🙏 Happy shopping at Zenrix. Namaste! 🇳🇵";
-    }
-    // Goodbye
-    else if (msg.includes('bye') || msg.includes('goodbye') || msg.includes('see you') || msg.includes('later')) {
-      response = "Namaste! 👋 Come back soon for more amazing Nepali products. Have a great day!";
-    }
-    // Default response
-    else {
-      const defaultResponses = [
-        "I'm here to help with your shopping questions! Try asking about products, delivery, returns, or contact info.",
-        "That's an interesting question! For detailed assistance, please contact our support team at support@zenrix.com",
-        "I'd love to help! Could you please rephrase your question? I'm best at answering questions about products, orders, and shipping.",
-        "🙏 For complex inquiries, our human support team is ready to assist. Reach out to support@zenrix.com"
-      ];
-      response = defaultResponses[Math.floor(Math.random() * defaultResponses.length)];
-    }
-    
-    // Simulate typing delay (randomized for more natural feel)
-    const delay = 800 + Math.random() * 1200;
-    setTimeout(() => {
-      addMessage('bot', response);
-    }, delay);
-  }
-});
-</script>
-
-<!-- Chatbot CSS -->
-<style>
-#chatbot-window {
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
-  border: 1px solid #e5e7eb;
-}
-
-#chatbot-messages {
-  scroll-behavior: smooth;
-}
-
-.quick-btn {
-  background: #f3f4f6;
-  border: 1px solid #e5e7eb;
-  padding: 6px 12px;
-  border-radius: 20px;
-  font-size: 12px;
-  cursor: pointer;
-  transition: all 0.2s;
-}
-
-.quick-btn:hover {
-  background: #e5e7eb;
-  transform: translateY(-1px);
-}
-
-.hidden {
-  display: none !important;
-}
-
-/* Smooth animations */
-#chatbot-toggle, #chatbot-window {
-  transition: all 0.3s ease;
-}
-
-#chatbot-toggle:hover {
-  transform: scale(1.1);
-}
-
-/* Namaste animation */
-.namaste-icon {
-  animation: namaste-bow 2s ease-in-out infinite;
-}
-
-@keyframes namaste-bow {
-  0%, 100% { transform: rotate(0deg); }
-  50% { transform: rotate(-5deg); }
-}
-</style>
 <!-- ========== END CHATBOT ========== -->
 </body>
 </html>

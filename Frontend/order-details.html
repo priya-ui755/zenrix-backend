@@ -3,129 +3,162 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Order Details | ShopNest</title>
+    <title>Order Details | Zenrix</title>
     <link rel="stylesheet" href="style.css">
-    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="/css/tailwind-site.css">
     <script src="script.js" defer></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
-<body class="bg-gray-50">
+<body class="bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 min-h-screen">
     <custom-navbar></custom-navbar>
-    <main class="container mx-auto px-4 py-8">
-        <div class="flex flex-col md:flex-row gap-8">
-            <aside class="w-full md:w-64 flex-shrink-0">
-                <div class="bg-white p-6 rounded-lg shadow-sm">
+    <main class="container mx-auto px-4 py-8 max-w-7xl">
+        <div class="flex flex-col lg:flex-row gap-8">
+            <!-- Sidebar -->
+            <aside class="w-full lg:w-80 flex-shrink-0">
+                <div class="bg-white/80 backdrop-blur-sm p-6 rounded-2xl shadow-xl border border-white/20">
                     <div class="flex items-center mb-6">
-                        <img src="http://static.photos/people/200x200/5" alt="User" class="w-12 h-12 rounded-full mr-4">
+                        <div class="w-14 h-14 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-full flex items-center justify-center mr-4">
+                            <i class="fas fa-user text-white text-xl"></i>
+                        </div>
                         <div>
-                            <h3 class="font-semibold">John Doe</h3>
-                            <span class="text-sm text-gray-500">Gold Member</span>
+                            <h3 class="font-bold text-gray-900">My Account</h3>
+                            <span class="text-sm text-gray-500">Premium Member</span>
                         </div>
                     </div>
-                    <ul class="space-y-2">
-                        <li><a href="/account.html" class="flex items-center p-2 rounded-lg hover:bg-gray-100">
-                            <i class="fas fa-user-circle mr-3"></i> My Profile</a></li>
-                        <li><a href="/orders.html" class="flex items-center p-2 rounded-lg bg-blue-50 text-blue-600">
-                            <i class="fas fa-box-open mr-3"></i> My Orders</a></li>
-                        <li><a href="/wishlist.html" class="flex items-center p-2 rounded-lg hover:bg-gray-100">
-                            <i class="fas fa-heart mr-3"></i> Wishlist</a></li>
-                        <li><a href="/addresses.html" class="flex items-center p-2 rounded-lg hover:bg-gray-100">
-                            <i class="fas fa-map-marker-alt mr-3"></i> Addresses</a></li>
-                    </ul>
+                    <nav class="space-y-3">
+                        <a href="/profile.html" class="flex items-center p-3 rounded-xl hover:bg-indigo-50 text-gray-700 hover:text-indigo-600 transition">
+                            <i class="fas fa-user-circle mr-3 w-5"></i> Profile Settings</a>
+                        <a href="/orders.html" class="flex items-center p-3 rounded-xl bg-indigo-100 text-indigo-700 font-semibold">
+                            <i class="fas fa-box-open mr-3 w-5"></i> My Orders</a>
+                        <a href="/wishlist.html" class="flex items-center p-3 rounded-xl hover:bg-indigo-50 text-gray-700 hover:text-indigo-600 transition">
+                            <i class="fas fa-heart mr-3 w-5"></i> Wishlist</a>
+                        <a href="/addresses.html" class="flex items-center p-3 rounded-xl hover:bg-indigo-50 text-gray-700 hover:text-indigo-600 transition">
+                            <i class="fas fa-map-marker-alt mr-3 w-5"></i> Addresses</a>
+                    </nav>
                 </div>
             </aside>
 
+            <!-- Main Content -->
             <div class="flex-grow">
-                <div class="flex justify-between items-center mb-6">
-                    <h1 class="text-3xl font-bold">Order #<span id="orderId">1001</span></h1>
-                    <a href="/orders.html" class="text-blue-600 hover:text-blue-800">
-                        <i class="fas fa-arrow-left mr-1"></i> Back to Orders
+                <!-- Header -->
+                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 gap-4">
+                    <div>
+                        <h1 class="text-4xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
+                            Order Details
+                        </h1>
+                        <p class="text-gray-600 mt-2">Order #<span id="orderId" class="font-mono font-semibold">Loading...</span></p>
+                    </div>
+                    <a href="/orders.html" class="inline-flex items-center px-6 py-3 bg-white border border-gray-200 rounded-xl text-gray-700 font-semibold hover:bg-gray-50 hover:border-gray-300 transition shadow-sm">
+                        <i class="fas fa-arrow-left mr-2"></i> Back to Orders
                     </a>
                 </div>
 
-                <div class="bg-white rounded-lg shadow-sm p-6 mb-6">
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
-                        <div>
-                            <h3 class="font-semibold mb-2">Order Status</h3>
-                            <p class="text-green-600 font-medium" id="orderStatus">Delivered</p>
+                <!-- Order Status Card -->
+                <div class="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl border border-white/20 p-6 mb-6">
+                    <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+                        <div class="text-center">
+                            <div class="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-3">
+                                <i class="fas fa-check-circle text-green-600 text-xl"></i>
+                            </div>
+                            <h3 class="font-semibold text-gray-900 mb-1">Status</h3>
+                            <p class="text-green-600 font-medium" id="orderStatus">Loading...</p>
                         </div>
-                        <div>
-                            <h3 class="font-semibold mb-2">Order Date</h3>
-                            <p id="orderDate">May 15, 2023</p>
+                        <div class="text-center">
+                            <div class="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-3">
+                                <i class="fas fa-calendar text-blue-600 text-xl"></i>
+                            </div>
+                            <h3 class="font-semibold text-gray-900 mb-1">Order Date</h3>
+                            <p id="orderDate">Loading...</p>
                         </div>
-                        <div>
-                            <h3 class="font-semibold mb-2">Total Amount</h3>
-                            <p class="font-bold" id="orderTotal">रु 149.98</p>
+                        <div class="text-center">
+                            <div class="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-3">
+                                <i class="fas fa-credit-card text-purple-600 text-xl"></i>
+                            </div>
+                            <h3 class="font-semibold text-gray-900 mb-1">Payment</h3>
+                            <p id="paymentMethod">Loading...</p>
+                        </div>
+                        <div class="text-center">
+                            <div class="w-12 h-12 bg-indigo-100 rounded-full flex items-center justify-center mx-auto mb-3">
+                                <i class="fas fa-dollar-sign text-indigo-600 text-xl"></i>
+                            </div>
+                            <h3 class="font-semibold text-gray-900 mb-1">Total</h3>
+                            <p class="font-bold text-lg text-indigo-600" id="orderTotal">Loading...</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Shipping & Payment Info -->
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+                    <!-- Shipping Address -->
+                    <div class="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl border border-white/20 p-6">
+                        <div class="flex items-center mb-4">
+                            <div class="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center mr-3">
+                                <i class="fas fa-truck text-blue-600"></i>
+                            </div>
+                            <h3 class="text-xl font-semibold text-gray-900">Shipping Address</h3>
+                        </div>
+                        <div class="text-gray-700" id="shippingAddress">
+                            Loading...
                         </div>
                     </div>
 
-                    <div class="border-t pt-6">
-                        <h3 class="font-semibold mb-4">Delivery Information</h3>
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            <div>
-                                <h4 class="text-gray-500 mb-2">Shipping Address</h4>
-                                <p id="shippingAddress">
-                                    John Doe<br>
-                                    123 Main Street<br>
-                                    Apartment 4B<br>
-                                    New York, NY 10001<br>
-                                    United States<br>
-                                    Phone: +1 234 567 890
-                                </p>
+                    <!-- Payment Method -->
+                    <div class="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl border border-white/20 p-6">
+                        <div class="flex items-center mb-4">
+                            <div class="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center mr-3">
+                                <i class="fas fa-credit-card text-green-600"></i>
                             </div>
-                            <div>
-                                <h4 class="text-gray-500 mb-2">Payment Method</h4>
-                                <div class="flex items-center">
-                                    <i class="fas fa-credit-card text-xl mr-3 text-gray-600"></i>
-                                    <span id="paymentMethod">Visa ending in 4242</span>
-                                </div>
+                            <h3 class="text-xl font-semibold text-gray-900">Payment Details</h3>
+                        </div>
+                        <div class="space-y-3">
+                            <div class="flex justify-between">
+                                <span class="text-gray-600">Method:</span>
+                                <span class="font-medium" id="paymentMethodDetail">Loading...</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-gray-600">Status:</span>
+                                <span class="font-medium text-green-600" id="paymentStatus">Pending</span>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <div class="bg-white rounded-lg shadow-sm overflow-hidden">
-                    <h2 class="text-xl font-bold p-6 border-b">Order Items</h2>
+                <!-- Order Items -->
+                <div class="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl border border-white/20 overflow-hidden">
+                    <div class="p-6 border-b border-gray-100">
+                        <h2 class="text-2xl font-bold text-gray-900 flex items-center">
+                            <i class="fas fa-shopping-bag mr-3 text-indigo-600"></i>
+                            Order Items
+                        </h2>
+                    </div>
                     <div id="orderItems">
                         <!-- Items will be loaded here -->
-                        <div class="p-6 border-b">
-                            <div class="flex flex-col sm:flex-row gap-6">
-                                <div class="flex-shrink-0">
-                                    <img src="http://static.photos/technology/200x200/1" alt="Product" class="w-20 h-20 object-contain">
-                                </div>
-                                <div class="flex-grow">
-                                    <h3 class="font-semibold">Wireless Headphones</h3>
-                                    <p class="text-gray-600">SKU: WH-001</p>
-                                    <div class="flex items-center mt-1">
-                                        <i class="fas fa-star text-yellow-400"></i>
-                                        <i class="fas fa-star text-yellow-400"></i>
-                                        <i class="fas fa-star text-yellow-400"></i>
-                                        <i class="fas fa-star text-yellow-400"></i>
-                                        <i class="fas fa-star-half-alt text-yellow-400"></i>
-                                    </div>
-                                </div>
-                                <div class="flex flex-col items-end">
-                                    <p class="text-blue-600 font-semibold">रु 99.99</p>
-                                    <p class="text-sm text-gray-500">Qty: 1</p>
-                                </div>
-                            </div>
+                        <div class="p-8 text-center">
+                            <div class="animate-spin w-8 h-8 border-4 border-indigo-600 border-t-transparent rounded-full mx-auto mb-4"></div>
+                            <p class="text-gray-600">Loading order items...</p>
                         </div>
                     </div>
-                    <div class="p-6 bg-gray-50">
-                        <div class="flex justify-between items-center mb-2">
-                            <span>Subtotal</span>
-                            <span id="orderSubtotal">रु 149.98</span>
-                        </div>
-                        <div class="flex justify-between items-center mb-2">
-                            <span>Shipping</span>
-                            <span id="orderShipping">Free</span>
-                        </div>
-                        <div class="flex justify-between items-center">
-                            <span>Tax</span>
-                            <span id="orderTax">रु 12.00</span>
-                        </div>
-                        <div class="border-t mt-4 pt-4 flex justify-between items-center font-bold">
-                            <span>Total</span>
-                            <span id="orderGrandTotal">रु 161.98</span>
+
+                    <!-- Order Summary -->
+                    <div class="bg-gray-50/80 p-6">
+                        <h3 class="text-lg font-semibold text-gray-900 mb-4">Order Summary</h3>
+                        <div class="space-y-3">
+                            <div class="flex justify-between text-gray-600">
+                                <span>Subtotal</span>
+                                <span id="orderSubtotal">रु 0.00</span>
+                            </div>
+                            <div class="flex justify-between text-gray-600">
+                                <span>Shipping</span>
+                                <span id="orderShipping">Free</span>
+                            </div>
+                            <div class="flex justify-between text-gray-600">
+                                <span>Tax</span>
+                                <span id="orderTax">रु 0.00</span>
+                            </div>
+                            <div class="border-t border-gray-200 pt-3 flex justify-between text-lg font-bold text-gray-900">
+                                <span>Total</span>
+                                <span id="orderGrandTotal">रु 0.00</span>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -136,5 +169,116 @@
 
     <script src="components/navbar.js"></script>
     <script src="components/footer.js"></script>
+    <script>
+        // Load order details
+        async function loadOrderDetails() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const orderId = urlParams.get('id');
+            
+            if (!orderId) {
+                document.getElementById('orderItems').innerHTML = '<div class="p-6 text-center text-red-600">Order ID not provided</div>';
+                return;
+            }
+
+            try {
+                const token = localStorage.getItem('userToken');
+                if (!token) {
+                    window.location.href = 'login.html';
+                    return;
+                }
+
+                const response = await fetch(`/api/users/orders/${orderId}`, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+
+                const data = await response.json();
+                
+                if (!data.success) {
+                    document.getElementById('orderItems').innerHTML = `<div class="p-6 text-center text-red-600">${data.error || 'Failed to load order'}</div>`;
+                    return;
+                }
+
+                const order = data.data;
+                
+                // Update order header
+                document.getElementById('orderId').textContent = order._id.slice(-8);
+                document.getElementById('orderStatus').textContent = order.status;
+                document.getElementById('orderDate').textContent = new Date(order.createdAt).toLocaleDateString();
+                document.getElementById('orderTotal').textContent = `रु ${order.total.toFixed(2)}`;
+
+                // Update shipping info
+                const shipping = order.shipping || {};
+                document.getElementById('shippingAddress').innerHTML = `
+                    ${shipping.fullName || 'N/A'}<br>
+                    ${shipping.address1 || ''} ${shipping.address2 || ''}<br>
+                    ${shipping.city || ''}, ${shipping.province || ''} ${shipping.postalCode || ''}<br>
+                    Nepal<br>
+                    Phone: ${shipping.phone || 'N/A'}
+                `.trim().replace(/\n\s*\n/g, '\n');
+
+                // Update payment method
+                const paymentMethod = order.payment?.method || 'cod';
+                const methodNames = {
+                    'cod': 'Cash on Delivery',
+                    'bank-transfer': 'Bank Transfer',
+                    'esewa': 'eSewa',
+                    'khalti': 'Khalti',
+                    'imepay': 'IME Pay'
+                };
+                document.getElementById('paymentMethod').textContent = methodNames[paymentMethod] || paymentMethod;
+                document.getElementById('paymentMethodDetail').textContent = methodNames[paymentMethod] || paymentMethod;
+                document.getElementById('paymentStatus').textContent = order.payment?.status || 'Pending';
+
+                // Update order items
+                const itemsHtml = order.items.map(item => {
+                    const product = item.product || {};
+                    const image = product.image || 'http://static.photos/technology/200x200/1';
+                    const name = item.name || product.name || 'Unknown Product';
+                    const price = item.price || 0;
+                    
+                    return `
+                        <div class="p-6 border-b border-gray-100 last:border-b-0">
+                            <div class="flex flex-col sm:flex-row gap-6">
+                                <div class="flex-shrink-0">
+                                    <img src="${image}" alt="${name}" class="w-24 h-24 object-contain rounded-xl bg-gray-50 p-2">
+                                </div>
+                                <div class="flex-grow">
+                                    <h3 class="font-semibold text-lg text-gray-900 mb-2">${name}</h3>
+                                    <p class="text-gray-600 mb-1">SKU: ${product.sku || 'N/A'}</p>
+                                    ${item.variant?.color || item.variant?.size ? `<p class="text-sm text-gray-500 mb-1">Variant: ${item.variant.color || ''} ${item.variant.size || ''}</p>` : ''}
+                                    ${item.variant?.notes ? `<p class="text-sm text-gray-500">Notes: ${item.variant.notes}</p>` : ''}
+                                </div>
+                                <div class="flex flex-col items-end justify-center">
+                                    <p class="text-indigo-600 font-bold text-xl">रु ${price.toFixed(2)}</p>
+                                    <p class="text-sm text-gray-500 bg-gray-100 px-3 py-1 rounded-full mt-2">Qty: ${item.quantity}</p>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+                
+                document.getElementById('orderItems').innerHTML = itemsHtml;
+
+                // Update totals
+                const subtotal = order.items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+                const shippingCost = 0; // Assuming free shipping for now
+                const tax = 0; // Assuming no tax for now
+                
+                document.getElementById('orderSubtotal').textContent = `रु ${subtotal.toFixed(2)}`;
+                document.getElementById('orderShipping').textContent = shippingCost > 0 ? `रु ${shippingCost.toFixed(2)}` : 'Free';
+                document.getElementById('orderTax').textContent = tax > 0 ? `रु ${tax.toFixed(2)}` : 'रु 0.00';
+                document.getElementById('orderGrandTotal').textContent = `रु ${order.total.toFixed(2)}`;
+
+            } catch (error) {
+                console.error('Error loading order details:', error);
+                document.getElementById('orderItems').innerHTML = '<div class="p-6 text-center text-red-600">Failed to load order details</div>';
+            }
+        }
+
+        // Load order details on page load
+        document.addEventListener('DOMContentLoaded', loadOrderDetails);
+    </script>
 </body>
 </html>

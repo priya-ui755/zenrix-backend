@@ -7,33 +7,19 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Clash+Display:wght@500;600;700&family=Space+Grotesk:wght@400;500;600&display=swap" rel="stylesheet">
+    <!-- Load Tailwind first so style.css overrides are respected -->
+    <link rel="stylesheet" href="/css/tailwind-site.css">
     <link rel="stylesheet" href="style.css">
-    <script src="https://cdn.tailwindcss.com"></script>
     <script src="script.js" defer></script>
-    <style>
-      :root {
-        --zenrix-bg: linear-gradient(135deg, #060b1a 0%, #0f172a 35%, #1e1b4b 65%, #312e81 100%);
-        --zenrix-card: rgba(255,255,255,0.04);
-      }
-      body {
-        font-family: 'Space Grotesk', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-        background: #0f172a;
-        color: #0f172a;
-      }
-      h1, h2, h3, h4, .display-font {
-        font-family: 'Clash Display', 'Space Grotesk', sans-serif;
-      }
-    </style>
 </head>
-<body class="bg-[#060a16] relative">
+<body class="surface text relative home-page">
     <div class="absolute inset-0 opacity-70" aria-hidden="true" style="background-image: radial-gradient(circle at 20% 20%, rgba(99,102,241,0.25), transparent 45%), radial-gradient(circle at 80% 0%, rgba(8,145,178,0.25), transparent 40%), radial-gradient(circle at 50% 80%, rgba(244,114,182,0.2), transparent 45%);"></div>
     <div class="relative">
     <custom-navbar></custom-navbar>
-    <main class="container mx-auto px-4 py-12 lg:py-16 text-white">
-        <div id="pageContent" class="prose max-w-none">Loading page content…</div>
+    <main class="container mx-auto px-4 pt-4 pb-12 lg:pt-6 lg:pb-16 text">
 
         <!-- Hero Section (Aurora Edition) -->
-        <section id="heroSection" class="relative overflow-hidden rounded-[40px] bg-gradient-to-br from-slate-900 via-indigo-900 to-purple-800 text-white shadow-[0_25px_80px_rgba(15,23,42,0.4)] home-hero">
+        <section id="heroSection" class="relative overflow-hidden rounded-[40px] home-hero glass-panel" data-elevated="true">
           <div id="heroBackgroundImage" class="absolute inset-0 bg-cover bg-center opacity-50 hidden home-hero-bg" aria-hidden="true"></div>
           <div class="absolute inset-0 opacity-60 home-hero-overlay" aria-hidden="true">
             <div class="absolute -left-32 top-10 w-64 h-64 bg-emerald-500/40 blur-[120px] rounded-full"></div>
@@ -57,24 +43,24 @@
               </div>
               <div class="flex flex-wrap gap-3">
                 <a id="heroPrimaryCta" href="products.html" class="px-7 py-3 rounded-2xl bg-white text-slate-900 font-semibold shadow-xl shadow-slate-900/20 hover:-translate-y-0.5 transition">Browse Collections</a>
-                <a href="products.html?category=sale" class="px-7 py-3 rounded-2xl border border-white/40 text-white font-semibold hover:bg-white/10 transition">On Sale</a>
+                <a href="products.html?category=sale" class="px-7 py-3 rounded-2xl border border-white/40 text-white font-semibold shadow-xl shadow-slate-900/20 hover:-translate-y-0.5 hover:bg-white/10 transition">On Sale</a>
               </div>
               <div class="grid sm:grid-cols-3 gap-4 text-sm text-white/80">
-                <div class="p-4 rounded-2xl bg-white/5 border border-white/10">
+                <div class="p-4 rounded-2xl glass-panel hero-metric">
                   <p class="text-3xl font-black text-white">25k+</p>
                   <p>Members in Kathmandu / Pokhara</p>
                 </div>
-                <div class="p-4 rounded-2xl bg-white/5 border border-white/10">
+                <div class="p-4 rounded-2xl glass-panel hero-metric">
                   <p class="text-3xl font-black text-white">48h</p>
                   <p>Insured express dispatch</p>
                 </div>
-                <div class="p-4 rounded-2xl bg-white/5 border border-white/10">
+                <div class="p-4 rounded-2xl glass-panel hero-metric">
                   <p class="text-3xl font-black text-white">92%</p>
                   <p>Repeat purchase rate</p>
                 </div>
               </div>
               <div class="grid sm:grid-cols-2 gap-4" id="heroProductShowcase">
-                <div class="rounded-2xl bg-white/5 border border-white/10 p-4">
+                <div class="rounded-2xl glass-panel hero-metric hero-product-placeholder p-4">
                   <p class="text-sm text-white/70">Loading hero picks…</p>
                 </div>
               </div>
@@ -135,148 +121,287 @@
           </div>
         </section>
 
-        <!-- Search & Discovery -->
-        <section class="relative overflow-hidden rounded-[32px] bg-white/10 backdrop-blur-xl border border-white/10 shadow-[0_20px_70px_rgba(15,23,42,0.45)] mt-16">
-          <div class="absolute inset-0 opacity-40 bg-[radial-gradient(circle_at_10%_20%,rgba(14,165,233,0.4),transparent_45%),radial-gradient(circle_at_80%_0%,rgba(236,72,153,0.35),transparent_40%)]"></div>
-          <div class="relative grid lg:grid-cols-[1.1fr_0.9fr] gap-10 p-8 lg:p-12">
-            <div class="space-y-6">
-              <div>
-                <p class="text-sm uppercase tracking-[0.4em] text-slate-200 mb-2">Discover</p>
-                <h2 class="text-3xl font-semibold text-white">Find the next piece that feels like you.</h2>
-                <p class="text-white/80">Search across tech, fashion, slow home, and creator collaborations—all localized to Nepali rupees.</p>
+        <!-- Hero Fallback Carousel (shown when Hero is disabled) -->
+        <section id="heroCarouselSection" class="relative overflow-hidden rounded-[40px] mt-0 pb-6 hero-carousel glass-panel carousel-hidden" data-elevated="true">
+          <div class="absolute inset-0 opacity-60" aria-hidden="true">
+            <div class="absolute -left-32 top-10 w-64 h-64 bg-indigo-500/25 blur-[120px] rounded-full"></div>
+            <div class="absolute right-0 -bottom-32 w-80 h-80 bg-emerald-500/20 blur-[140px] rounded-full"></div>
+            <div class="absolute inset-0 bg-[conic-gradient(from_120deg,rgba(255,255,255,0.10),transparent_55%)]"></div>
+          </div>
+
+          <div class="relative">
+            <div id="heroCarouselSlides" class="relative h-[420px] lg:h-[520px]">
+              <div id="heroCarouselFallback" class="hero-carousel-fallback absolute inset-0 grid place-items-center px-8 lg:px-14">
+                <div class="max-w-3xl text-center space-y-4">
+                  <p class="text-xs uppercase tracking-[0.4em] text-emerald-300 font-semibold">Zenrix</p>
+                  <h2 class="text-3xl lg:text-4xl font-black text-white">Hero carousel loading new drops…</h2>
+                  <p class="text-base text-white/70">We’ll show curated offers here shortly. This fallback keeps the carousel visible while the data arrives.</p>
+                </div>
               </div>
-              <form id="searchForm" class="relative">
-                <div class="relative flex items-center bg-white/95 rounded-3xl border border-white/40 shadow-xl">
-                  <div class="absolute left-5 text-gray-400">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            </div>
+
+            <button id="heroCarouselPrev" type="button" class="absolute left-4 top-1/2 -translate-y-1/2 w-11 h-11 rounded-2xl bg-white/15 border border-white/20 backdrop-blur flex items-center justify-center hover:bg-white/20 transition" aria-label="Previous slide">
+              <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+            </button>
+            <button id="heroCarouselNext" type="button" class="absolute right-4 top-1/2 -translate-y-1/2 w-11 h-11 rounded-2xl bg-white/15 border border-white/20 backdrop-blur flex items-center justify-center hover:bg-white/20 transition" aria-label="Next slide">
+              <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+            </button>
+
+            <div id="heroCarouselDots" class="absolute bottom-6 left-0 right-0 flex items-center justify-center gap-2" aria-label="Carousel pagination"></div>
+          </div>
+        </section>
+
+        <!-- Search & Discovery (moved just after carousel/hero) -->
+        <section class="relative overflow-hidden rounded-[36px] mt-16 lg:mt-20 z-10 group/search home-light-card home-discover glass-panel">
+          <!-- Animated background blobs -->
+          <div class="absolute inset-0 overflow-hidden" aria-hidden="true">
+            <div class="absolute -top-20 -left-20 w-72 h-72 bg-gradient-to-br from-cyan-500/30 to-blue-500/20 rounded-full blur-[100px] animate-pulse"></div>
+            <div class="absolute top-1/2 -right-20 w-80 h-80 bg-gradient-to-br from-fuchsia-500/25 to-pink-500/15 rounded-full blur-[120px] animate-pulse" style="animation-delay: 1s;"></div>
+            <div class="absolute -bottom-10 left-1/3 w-60 h-60 bg-gradient-to-br from-emerald-500/20 to-teal-500/15 rounded-full blur-[80px] animate-pulse" style="animation-delay: 2s;"></div>
+          </div>
+          <!-- Decorative top line -->
+          <div class="absolute top-0 left-1/2 -translate-x-1/2 w-2/3 h-px bg-gradient-to-r from-transparent via-indigo-400/60 to-transparent"></div>
+          
+          <div class="relative grid lg:grid-cols-[1.15fr_0.85fr] gap-8 lg:gap-12 p-8 lg:p-14">
+            <div class="space-y-7">
+              <!-- Header with icon -->
+              <div class="space-y-3">
+                <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-gradient-to-r from-cyan-500/15 to-indigo-500/15 border border-white/15">
+                  <span class="w-2 h-2 rounded-full bg-cyan-400 animate-pulse"></span>
+                  <p class="text-xs uppercase tracking-[0.35em] muted font-semibold">Discover</p>
+                </div>
+                <h2 class="text-3xl lg:text-4xl font-bold text leading-tight discover-headline">Find the next piece that <span class="discover-accent text-transparent bg-clip-text bg-gradient-to-r from-cyan-300 via-indigo-300 to-fuchsia-300">feels like you</span>.</h2>
+                <p class="muted text-base max-w-lg font-medium">Search across tech, fashion, slow home, and creator collaborations—all localized to Nepali rupees.</p>
+              </div>
+              
+              <!-- Enhanced search form -->
+              <form id="searchForm" class="relative group/form discover-search-form">
+                <div class="absolute -inset-1 bg-gradient-to-r from-cyan-500/50 via-indigo-500/50 to-fuchsia-500/50 rounded-[28px] blur-lg opacity-0 group-hover/form:opacity-60 transition-opacity duration-500"></div>
+                <div class="relative flex items-center bg-white/90 rounded-[24px] border border-white/20 shadow-2xl shadow-indigo-500/20 overflow-hidden group-focus-within/form:border-indigo-400/50 transition-all discover-search-shell">
+                  <div class="absolute left-6 text-indigo-400 pointer-events-none discover-search-icon">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
                     </svg>
                   </div>
-                  <input type="text" id="searchInput" placeholder="Search products, drop codes, or collections" class="w-full pl-14 pr-36 py-5 text-base text-slate-900 bg-transparent rounded-3xl focus:ring-0 focus:outline-none">
-                  <button type="submit" class="absolute right-2 px-6 py-2.5 bg-slate-900 text-white rounded-2xl font-semibold hover:bg-slate-800 transition">Search</button>
+                  <input type="text" id="searchInput" placeholder="Search products, collections, or categories..." class="w-full pl-16 pr-44 py-5 text-base text-slate-800 bg-transparent focus:ring-0 focus:outline-none placeholder:text-slate-400 discover-search-input">
+                  <button type="submit" class="absolute right-2 px-6 py-3 bg-gradient-to-r from-indigo-600 via-purple-600 to-fuchsia-600 text-white rounded-2xl font-semibold hover:shadow-lg hover:shadow-indigo-500/40 hover:scale-[1.02] active:scale-[0.98] transition-all duration-200 discover-search-btn">
+                    <span class="flex items-center gap-2">
+                      Search
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+                    </span>
+                  </button>
                 </div>
               </form>
-              <div class="flex flex-wrap gap-2">
-                <span class="text-xs uppercase tracking-[0.4em] text-slate-300">Trending</span>
-                <div class="flex flex-wrap gap-2">
-                  <button class="search-tag px-4 py-2 rounded-full bg-white/15 border border-white/20 text-sm font-medium text-white hover:bg-white/25 transition">Electronics</button>
-                  <button class="search-tag px-4 py-2 rounded-full bg-white/15 border border-white/20 text-sm font-medium text-white hover:bg-white/25 transition">Fashion</button>
-                  <button class="search-tag px-4 py-2 rounded-full bg-white/15 border border-white/20 text-sm font-medium text-white hover:bg-white/25 transition">Home & Kitchen</button>
-                  <button class="search-tag px-4 py-2 rounded-full bg-white/15 border border-white/20 text-sm font-medium text-white hover:bg-white/25 transition">Beauty</button>
-                  <button class="search-tag px-4 py-2 rounded-full bg-white/15 border border-white/20 text-sm font-medium text-white hover:bg-white/25 transition">Sports</button>
+              
+              <!-- Trending tags with better styling -->
+              <div class="space-y-3">
+                <div class="flex items-center gap-3">
+                  <span class="text-sm uppercase tracking-[0.3em] muted font-bold">Trending now</span>
+                  <div class="flex-1 h-px bg-gradient-to-r from-emerald-500/50 to-transparent"></div>
+                </div>
+                <div class="flex flex-wrap gap-2.5">
+                  <button class="search-tag group px-5 py-2.5 rounded-2xl bg-gradient-to-br from-emerald-500/25 to-emerald-600/15 border border-emerald-400/50 text-sm font-medium text hover:from-emerald-500/40 hover:to-emerald-600/25 hover:border-emerald-400/80 hover:shadow-lg hover:shadow-emerald-500/25 hover:scale-105 transition-all duration-200" data-query="electronics">
+                    <span class="flex items-center gap-2">🎧 Electronics</span>
+                  </button>
+                  <button class="search-tag group px-5 py-2.5 rounded-2xl bg-gradient-to-br from-fuchsia-500/25 to-fuchsia-600/15 border border-fuchsia-400/50 text-sm font-medium text hover:from-fuchsia-500/40 hover:to-fuchsia-600/25 hover:border-fuchsia-400/80 hover:shadow-lg hover:shadow-fuchsia-500/25 hover:scale-105 transition-all duration-200" data-query="fashion">
+                    <span class="flex items-center gap-2">👕 Fashion</span>
+                  </button>
+                  <button class="search-tag group px-5 py-2.5 rounded-2xl bg-gradient-to-br from-amber-500/25 to-amber-600/15 border border-amber-400/50 text-sm font-medium text hover:from-amber-500/40 hover:to-amber-600/25 hover:border-amber-400/80 hover:shadow-lg hover:shadow-amber-500/25 hover:scale-105 transition-all duration-200" data-query="home">
+                    <span class="flex items-center gap-2">🏠 Home</span>
+                  </button>
+                  <button class="search-tag group px-5 py-2.5 rounded-2xl bg-gradient-to-br from-pink-500/25 to-pink-600/15 border border-pink-400/50 text-sm font-medium text hover:from-pink-500/40 hover:to-pink-600/25 hover:border-pink-400/80 hover:shadow-lg hover:shadow-pink-500/25 hover:scale-105 transition-all duration-200" data-query="beauty">
+                    <span class="flex items-center gap-2">✨ Beauty</span>
+                  </button>
+                  <button class="search-tag group px-5 py-2.5 rounded-2xl bg-gradient-to-br from-sky-500/25 to-sky-600/15 border border-sky-400/50 text-sm font-medium text hover:from-sky-500/40 hover:to-sky-600/25 hover:border-sky-400/80 hover:shadow-lg hover:shadow-sky-500/25 hover:scale-105 transition-all duration-200" data-query="sports">
+                    <span class="flex items-center gap-2">⚽ Sports</span>
+                  </button>
                 </div>
               </div>
 
-              <div id="searchResults" class="hidden bg-white/10 rounded-3xl border border-white/20 p-6">
+              <!-- Search results container -->
+              <div id="searchResults" class="hidden mt-6 bg-white/90 backdrop-blur-xl rounded-3xl border border-white/30 p-6 shadow-xl discover-results-card">
                 <div class="flex items-center justify-between mb-4">
-                  <h3 class="text-lg font-semibold text-white">Search Results</h3>
-                  <button id="clearSearch" class="text-sm text-emerald-200 hover:text-white font-medium">Clear</button>
+                  <h3 class="text-lg font-semibold text-slate-900">Search Results</h3>
+                  <button id="clearSearch" class="text-sm text-indigo-600 hover:text-slate-900 font-medium transition-colors">Clear all</button>
                 </div>
-                <div id="searchResultsGrid" class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                </div>
-                <div id="noResults" class="hidden text-center py-6 text-white/70">
-                  <svg class="w-12 h-12 mx-auto mb-3 text-white/40" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                  </svg>
-                  <p class="text-base font-medium">No products found</p>
-                  <p class="text-sm text-white/60">Try different keywords or browse all products</p>
+                <div id="searchResultsGrid" class="grid grid-cols-1 sm:grid-cols-2 gap-4"></div>
+                <div id="noResults" class="hidden text-center py-8 text-slate-600">
+                  <div class="w-16 h-16 mx-auto mb-4 rounded-full bg-slate-900/5 flex items-center justify-center">
+                    <svg class="w-8 h-8 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                    </svg>
+                  </div>
+                  <p class="text-base font-medium text-slate-900">No products found</p>
+                  <p class="text-sm text-slate-500 mt-1">Try different keywords or browse all products</p>
                 </div>
               </div>
             </div>
-            <div class="space-y-6">
-              <div class="rounded-[28px] bg-white/95 text-slate-900 p-6 shadow-2xl border border-white/80">
-                <p class="text-xs uppercase tracking-[0.3em] text-gray-400">Live stats</p>
-                <div class="grid grid-cols-2 gap-4 mt-4">
-                  <div>
-                    <p class="text-3xl font-black text-gray-900">+58</p>
-                    <p class="text-sm text-gray-500">New arrivals this week</p>
+            
+            <!-- Right column: Live stats + Quick actions -->
+            <div class="space-y-5">
+              <!-- Live stats card with glass effect -->
+              <div class="relative rounded-[28px] p-8 home-light-card home-3d-card home-live-stats overflow-hidden glass-panel" data-elevated="true">
+                <div class="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(99,102,241,0.16),transparent_55%)] rounded-[28px]" aria-hidden="true"></div>
+                <div class="relative">
+                  <div class="flex items-center justify-between mb-5">
+                    <div class="flex items-center gap-2 pl-0.5">
+                      <div class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse flex-shrink-0"></div>
+                      <p class="text-xs uppercase tracking-[0.25em] muted font-bold whitespace-nowrap">Live stats</p>
+                    </div>
+                    <span class="text-xs muted">Updated now</span>
                   </div>
-                  <div>
-                    <p class="text-3xl font-black text-gray-900">13</p>
-                    <p class="text-sm text-gray-500">Creators in rotation</p>
-                  </div>
-                  <div>
-                    <p class="text-3xl font-black text-gray-900">4</p>
-                    <p class="text-sm text-gray-500">City pop-ups</p>
-                  </div>
-                  <div>
-                    <p class="text-3xl font-black text-gray-900">रु 2.1M</p>
-                    <p class="text-sm text-gray-500">Member rewards earned</p>
+                  <div class="grid grid-cols-2 gap-5">
+                    <div class="group/stat p-4 rounded-2xl bg-gradient-to-br from-indigo-500/10 to-purple-500/5 border border-indigo-200/50 hover:border-indigo-300 hover:shadow-lg hover:shadow-indigo-200/30 transition-all duration-200">
+                      <p class="text-3xl font-black text-indigo-600">2.5k+</p>
+                      <p class="text-sm muted mt-1">Products listed</p>
+                    </div>
+                    <div class="group/stat p-4 rounded-2xl bg-gradient-to-br from-emerald-500/10 to-teal-500/5 border border-emerald-200/50 hover:border-emerald-300 hover:shadow-lg hover:shadow-emerald-200/30 transition-all duration-200">
+                      <p class="text-3xl font-black text-emerald-600">48h</p>
+                      <p class="text-sm muted mt-1">Fast delivery</p>
+                    </div>
+                    <div class="group/stat p-4 rounded-2xl bg-gradient-to-br from-amber-500/10 to-orange-500/5 border border-amber-200/50 hover:border-amber-300 hover:shadow-lg hover:shadow-amber-200/30 transition-all duration-200">
+                      <p class="text-3xl font-black text-amber-600">15k+</p>
+                      <p class="text-sm muted mt-1">Happy customers</p>
+                    </div>
+                    <div class="group/stat p-4 rounded-2xl bg-gradient-to-br from-fuchsia-500/10 to-pink-500/5 border border-fuchsia-200/50 hover:border-fuchsia-300 hover:shadow-lg hover:shadow-fuchsia-200/30 transition-all duration-200">
+                      <p class="text-3xl font-black text-fuchsia-600">4.8★</p>
+                      <p class="text-sm muted mt-1">Avg. rating</p>
+                    </div>
                   </div>
                 </div>
               </div>
-              <div class="rounded-[28px] bg-gradient-to-br from-slate-900 to-slate-800 p-6 border border-white/10">
-                <p class="text-xs uppercase tracking-[0.4em] text-white/50">Next drop</p>
-                <h3 class="text-2xl font-semibold mt-3">Capsule 07 — Kathmandu Dusk</h3>
-                <p class="text-white/70 mt-2">Layered textiles with monsoon-proof outerwear. Limited to 120 pieces.</p>
-                <div class="mt-4 flex items-center gap-4 text-sm">
-                  <span class="px-3 py-1 rounded-full bg-white/10 border border-white/10">Opens Friday 9 PM</span>
-                  <a href="products.html" class="text-emerald-200 font-medium">Join waitlist →</a>
+              
+              <!-- Quick browse card -->
+              <div class="rounded-[24px] p-5 hover:border-white/25 transition-all home-light-card home-3d-card glass-panel">
+                <p class="text-xs uppercase tracking-[0.25em] muted font-semibold mb-3">Quick browse</p>
+                <div class="grid grid-cols-3 gap-2">
+                  <a href="products.html?sort=newest" class="group flex flex-col items-center gap-2 p-3 rounded-2xl glass-panel quick-browse-card" data-accent="indigo">
+                    <span class="text-2xl group-hover:scale-110 transition-transform">🆕</span>
+                    <span class="text-xs font-medium">New in</span>
+                  </a>
+                  <a href="products.html?category=sale" class="group flex flex-col items-center gap-2 p-3 rounded-2xl glass-panel quick-browse-card" data-accent="rose">
+                    <span class="text-2xl group-hover:scale-110 transition-transform">🔥</span>
+                    <span class="text-xs font-medium">On sale</span>
+                  </a>
+                  <a href="products.html?sort=popular" class="group flex flex-col items-center gap-2 p-3 rounded-2xl glass-panel quick-browse-card" data-accent="amber">
+                    <span class="text-2xl group-hover:scale-110 transition-transform">⭐</span>
+                    <span class="text-xs font-medium">Top rated</span>
+                  </a>
                 </div>
               </div>
             </div>
           </div>
         </section>
 
-        <!-- Collections Grid -->
-        <section class="mt-16 grid lg:grid-cols-3 gap-6">
-          <article class="relative overflow-hidden rounded-[32px] bg-gradient-to-br from-emerald-500 to-teal-700 p-6 shadow-2xl">
-            <div class="absolute inset-0 opacity-30 bg-[radial-gradient(circle_at_top,_rgba(255,255,255,0.65),_transparent_55%)]"></div>
-            <div class="relative flex flex-col h-full">
-              <p class="text-xs uppercase tracking-[0.4em] text-white/70">Drop 032</p>
-              <h3 class="text-2xl font-bold mt-4">Mindful Home Objects</h3>
-              <p class="text-white/80 mt-2 flex-1">Ceramics, incense labs, and modular lighting designed for slow evenings.</p>
-              <a href="products.html?category=home" class="mt-6 inline-flex items-center gap-2 text-white font-semibold">Explore home <span>→</span></a>
-            </div>
-          </article>
-          <article class="relative overflow-hidden rounded-[32px] bg-gradient-to-br from-indigo-500 via-blue-500 to-purple-600 p-6 shadow-2xl">
-            <div class="absolute inset-0 opacity-30 bg-[radial-gradient(circle_at_70%_20%,rgba(255,255,255,0.6),transparent_50%)]"></div>
-            <div class="relative flex flex-col h-full">
-              <p class="text-xs uppercase tracking-[0.4em] text-white/70">Drop 033</p>
-              <h3 class="text-2xl font-bold mt-4">Creator Tech Lab</h3>
-              <p class="text-white/80 mt-2 flex-1">Audio stacks, cameras, and modular desks tuned for Nepali content creators.</p>
-              <a href="products.html?category=electronics" class="mt-6 inline-flex items-center gap-2 text-white font-semibold">View rigs <span>→</span></a>
-            </div>
-          </article>
-          <article class="relative overflow-hidden rounded-[32px] bg-gradient-to-br from-rose-500 via-pink-500 to-orange-400 p-6 shadow-2xl">
-            <div class="absolute inset-0 opacity-30 bg-[radial-gradient(circle_at_40%_0%,rgba(255,255,255,0.65),transparent_50%)]"></div>
-            <div class="relative flex flex-col h-full">
-              <p class="text-xs uppercase tracking-[0.4em] text-white/70">Drop 034</p>
-              <h3 class="text-2xl font-bold mt-4">Street Capsule • Thamel</h3>
-              <p class="text-white/80 mt-2 flex-1">Genderless tailoring, tactile knits, and stormproof outerwear.</p>
-              <a href="products.html?category=fashion" class="mt-6 inline-flex items-center gap-2 text-white font-semibold">Shop capsule <span>→</span></a>
-            </div>
-          </article>
-        </section>
-
-        <section class="featured-products mt-16">
-          <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6 mb-8">
+        <!-- Featured Products (moved up for prominence) -->
+        <section class="featured-products mt-16 lg:mt-20">
+          <div class="flex items-center justify-between mb-8">
             <div>
-              <p class="text-sm uppercase tracking-[0.4em] text-white/60">Spotlight</p>
-              <h2 class="text-3xl font-bold">Featured products</h2>
-              <p class="text-white/70">Handpicked pieces that are live right now. Tap in before they sell out.</p>
+              <p class="text-sm uppercase tracking-[0.4em] muted font-medium">Featured</p>
+              <h2 class="text-3xl font-bold text">Editor picks to start with</h2>
+              <div class="mt-2 h-1 w-20 rounded-full bg-gradient-to-r from-emerald-400 via-sky-400 to-indigo-400"></div>
             </div>
-            <div class="flex flex-wrap gap-3 text-sm">
-              <span class="px-4 py-2 rounded-full bg-white/10 border border-white/10">All</span>
-              <span class="px-4 py-2 rounded-full bg-white/5 border border-white/10">Electronics</span>
-              <span class="px-4 py-2 rounded-full bg-white/5 border border-white/10">Fashion</span>
-              <span class="px-4 py-2 rounded-full bg-white/5 border border-white/10">Home</span>
-            </div>
+            <a href="products.html" class="group text-sm font-semibold flex items-center gap-2 px-4 py-2 rounded-full border transition-all" style="color: var(--accent-600); border-color: rgba(15,23,42,0.12);">View all <span aria-hidden="true" class="group-hover:translate-x-1 transition-transform">→</span></a>
           </div>
           <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6" id="featuredProducts">
-            <div class="col-span-full rounded-2xl border border-dashed border-white/20 bg-white/5 p-6 text-center text-white/60">
-              Loading featured products…
+            <!-- Filled by script.js -->
+          </div>
+        </section>
+
+        <!-- Store promises + quick links (moved up) -->
+        <section class="mt-16 lg:mt-20 grid lg:grid-cols-[1.2fr_0.8fr] gap-8">
+          <div class="rounded-[28px] p-8 space-y-6 hover:border-white/25 transition-all duration-300 home-light-card glass-panel">
+            <div>
+              <p class="text-sm uppercase tracking-[0.35em] muted font-medium">Why shop with Zenrix</p>
+              <h3 class="text-3xl font-bold text">Built for Nepal — fast, reliable, supported.</h3>
+              <div class="mt-3 h-1 w-16 rounded-full bg-gradient-to-r from-sky-400 to-indigo-400"></div>
+            </div>
+            <div class="grid sm:grid-cols-2 gap-4">
+              <div class="rounded-2xl bg-white/5 border border-white/10 p-4 flex gap-3 items-start hover:bg-white/10 hover:border-emerald-400/30 hover:scale-[1.02] transition-all duration-200 cursor-default">
+                <div class="w-10 h-10 rounded-2xl bg-gradient-to-br from-emerald-500/20 to-emerald-600/10 border border-emerald-400/30 grid place-items-center text-emerald-200 text-lg">🚚</div>
+                <div>
+                  <p class="text-lg font-semibold text">Express delivery</p>
+                  <p class="text-sm muted">Same-week dispatch from Kathmandu hubs; track every step.</p>
+                </div>
+              </div>
+              <div class="rounded-2xl bg-white/5 border border-white/10 p-4 flex gap-3 items-start hover:bg-white/10 hover:border-indigo-400/30 hover:scale-[1.02] transition-all duration-200 cursor-default">
+                <div class="w-10 h-10 rounded-2xl bg-gradient-to-br from-indigo-500/20 to-indigo-600/10 border border-indigo-400/30 grid place-items-center text-indigo-200 text-lg">🔒</div>
+                <div>
+                  <p class="text-lg font-semibold text">Secure payments</p>
+                  <p class="text-sm muted">COD, bank, and digital wallets with SSL + fraud checks.</p>
+                </div>
+              </div>
+              <div class="rounded-2xl bg-white/5 border border-white/10 p-4 flex gap-3 items-start hover:bg-white/10 hover:border-amber-400/30 hover:scale-[1.02] transition-all duration-200 cursor-default">
+                <div class="w-10 h-10 rounded-2xl bg-gradient-to-br from-amber-500/20 to-amber-600/10 border border-amber-400/30 grid place-items-center text-amber-200 text-lg">↺</div>
+                <div>
+                  <p class="text-lg font-semibold text">Easy returns</p>
+                  <p class="text-sm muted">7-day support-first resolution with pickup assistance.</p>
+                </div>
+              </div>
+              <div class="rounded-2xl bg-white/5 border border-white/10 p-4 flex gap-3 items-start hover:bg-white/10 hover:border-sky-400/30 hover:scale-[1.02] transition-all duration-200 cursor-default">
+                <div class="w-10 h-10 rounded-2xl bg-gradient-to-br from-sky-500/20 to-sky-600/10 border border-sky-400/30 grid place-items-center text-sky-200 text-lg">🎧</div>
+                <div>
+                  <p class="text-lg font-semibold text">Local support</p>
+                  <p class="text-sm muted">Chat, phone, and ticket support from Nepal-based agents.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="rounded-[28px] p-8 space-y-5 hover:border-white/25 transition-all duration-300 home-light-card glass-panel">
+            <div class="flex items-center justify-between">
+              <div>
+                <p class="text-sm uppercase tracking-[0.35em] muted font-medium">Shop by category</p>
+                <h3 class="text-2xl font-bold text">Start with a lane</h3>
+              </div>
+              <a href="products.html" class="group text-sm font-semibold flex items-center gap-1" style="color: var(--accent-600);">All products <span class="group-hover:translate-x-1 transition-transform">→</span></a>
+            </div>
+            <div class="grid gap-3">
+              <a class="group flex items-center justify-between rounded-2xl bg-white/5 border border-white/10 px-4 py-4 hover:bg-emerald-500/10 hover:border-emerald-400/30 hover:scale-[1.02] transition-all duration-200" href="products.html?category=electronics">
+                <div class="flex items-center gap-3 text">
+                  <span class="w-10 h-10 rounded-2xl bg-gradient-to-br from-emerald-500/25 to-emerald-600/15 grid place-items-center text-lg group-hover:scale-110 transition-transform">🎧</span>
+                  <div>
+                    <p class="font-semibold">Electronics</p>
+                    <p class="text-xs muted">Headphones, wearables, workspace</p>
+                  </div>
+                </div>
+                <span class="text-emerald-300 font-medium group-hover:translate-x-1 transition-transform">Browse →</span>
+              </a>
+              <a class="group flex items-center justify-between rounded-2xl bg-white/5 border border-white/10 px-4 py-4 hover:bg-fuchsia-500/10 hover:border-fuchsia-400/30 hover:scale-[1.02] transition-all duration-200" href="products.html?category=fashion">
+                <div class="flex items-center gap-3 text">
+                  <span class="w-10 h-10 rounded-2xl bg-gradient-to-br from-fuchsia-500/25 to-fuchsia-600/15 grid place-items-center text-lg group-hover:scale-110 transition-transform">👕</span>
+                  <div>
+                    <p class="font-semibold">Fashion</p>
+                    <p class="text-xs muted">Capsules, layers, everyday fits</p>
+                  </div>
+                </div>
+                <span class="text-fuchsia-300 font-medium group-hover:translate-x-1 transition-transform">Browse →</span>
+              </a>
+              <a class="group flex items-center justify-between rounded-2xl bg-white/5 border border-white/10 px-4 py-4 hover:bg-amber-500/10 hover:border-amber-400/30 hover:scale-[1.02] transition-all duration-200" href="products.html?category=home">
+                <div class="flex items-center gap-3 text">
+                  <span class="w-10 h-10 rounded-2xl bg-gradient-to-br from-amber-500/25 to-amber-600/15 grid place-items-center text-lg group-hover:scale-110 transition-transform">🏠</span>
+                  <div>
+                    <p class="font-semibold">Home</p>
+                    <p class="text-xs muted">Lighting, decor, slow-home</p>
+                  </div>
+                </div>
+                <span class="text-amber-300 font-medium group-hover:translate-x-1 transition-transform">Browse →</span>
+              </a>
             </div>
           </div>
         </section>
 
+
+        <!-- (Collections and duplicate featured removed) -->
+
         <!-- Subscribe Section -->
-        <section class="relative overflow-hidden rounded-[32px] bg-gradient-to-br from-slate-900 to-slate-800 border border-white/10 p-10 mt-16">
-          <div class="absolute inset-0 opacity-30 bg-[radial-gradient(circle_at_top,_rgba(147,197,253,0.4),transparent_55%)]"></div>
+        <section class="subscribe-section relative overflow-hidden rounded-[32px] bg-gradient-to-br from-indigo-950 via-slate-900 to-purple-950 border border-indigo-500/20 p-10 mt-16 lg:mt-20 shadow-[0_0_80px_rgba(99,102,241,0.15)]">
+          <div class="absolute inset-0 opacity-40 bg-[radial-gradient(circle_at_20%_30%,rgba(99,102,241,0.4),transparent_50%),radial-gradient(circle_at_80%_70%,rgba(168,85,247,0.3),transparent_45%)]"></div>
+          <div class="absolute top-0 left-1/2 -translate-x-1/2 w-1/2 h-px bg-gradient-to-r from-transparent via-indigo-400/50 to-transparent"></div>
           <div class="relative grid lg:grid-cols-2 gap-10 items-center">
             <div class="space-y-4">
-              <p class="text-sm uppercase tracking-[0.4em] text-white/60">Stay in the loop</p>
-              <h3 class="text-4xl font-bold">Subscribe for weekly drops, deals, and first access.</h3>
+              <p class="text-sm uppercase tracking-[0.4em] text-indigo-300 font-medium">Stay in the loop</p>
+              <h3 class="text-4xl font-bold bg-gradient-to-r from-white via-indigo-100 to-purple-200 bg-clip-text text-transparent">Subscribe for weekly drops, deals, and first access.</h3>
               <p class="text-white/70">No spam—just beautifully curated products, launch alerts, and insider-only offers.</p>
               <ul class="text-sm text-white/70 space-y-1">
                 <li>• Early access to new arrivals</li>
@@ -284,17 +409,17 @@
                 <li>• Tips for tech, fashion, and home</li>
               </ul>
             </div>
-            <form id="subscribeForm" class="space-y-4 bg-white/10 border border-white/10 rounded-3xl p-6 backdrop-blur">
+            <form id="subscribeForm" class="space-y-4 bg-gradient-to-br from-white/15 to-white/5 border border-white/20 rounded-3xl p-6 backdrop-blur-lg shadow-xl">
               <div>
-                <label class="block text-sm font-medium text-white/80 mb-2">Email address</label>
-                <input type="email" name="email" required placeholder="you@example.com" class="w-full px-4 py-3 bg-white text-slate-900 rounded-2xl border border-white/70 focus:ring-2 focus:ring-indigo-500">
+                <label class="block text-sm font-medium text-white/90 mb-2">Email address</label>
+                <input type="email" name="email" required placeholder="you@example.com" class="w-full px-4 py-3.5 bg-white text-slate-900 rounded-2xl border-2 border-transparent focus:border-indigo-400 focus:ring-0 transition-all shadow-lg">
               </div>
               <div class="flex items-center space-x-2 text-sm text-white/80">
-                <input type="checkbox" id="agree" name="agree" required class="w-4 h-4 text-indigo-600 rounded focus:ring-indigo-500">
+                <input type="checkbox" id="agree" name="agree" required class="w-4 h-4 text-indigo-600 rounded focus:ring-indigo-500 bg-white/20 border-white/30">
                 <label for="agree">I agree to receive updates and promotions.</label>
               </div>
-              <button type="submit" class="w-full bg-white text-slate-900 px-6 py-3 rounded-2xl font-semibold hover:bg-slate-100 transition">Subscribe</button>
-              <p class="text-xs text-white/60">You can unsubscribe anytime. We respect your inbox.</p>
+              <button type="submit" class="w-full bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 text-white px-6 py-3.5 rounded-2xl font-semibold hover:opacity-90 hover:scale-[1.02] transition-all shadow-lg shadow-indigo-500/25">Subscribe</button>
+              <p class="text-xs text-white/60 text-center">You can unsubscribe anytime. We respect your inbox.</p>
             </form>
           </div>
         </section>
@@ -308,6 +433,7 @@
       (function() {
         const SEARCH_API_URL = (window.API_URL || (window.location?.origin ? `${window.location.origin}/api` : '/api')).replace(/\/$/, '') ;
         let allProducts = [];
+        let productsLoaded = false;
         const SEARCH_NPR_NUMBER_FORMATTER = new Intl.NumberFormat('en-IN', {
           minimumFractionDigits: 2,
           maximumFractionDigits: 2
@@ -325,19 +451,34 @@
             if (data.success) {
               allProducts = data.data;
             }
+            productsLoaded = Array.isArray(allProducts) && allProducts.length >= 0;
           } catch (err) {
             console.error('Failed to load products:', err);
+            productsLoaded = false;
           }
         }
 
       function searchProducts(query) {
-        if (!query.trim()) return [];
-        const searchTerm = query.toLowerCase();
-        return allProducts.filter(product => 
-          product.name.toLowerCase().includes(searchTerm) ||
-          product.description.toLowerCase().includes(searchTerm) ||
-          product.category.toLowerCase().includes(searchTerm)
-        );
+        const raw = String(query || '');
+        if (!raw.trim()) return [];
+        const searchTerm = raw.toLowerCase();
+        const products = Array.isArray(allProducts) ? allProducts : [];
+        return products.filter(product => {
+          const name = String(product?.name || '').toLowerCase();
+          const description = String(product?.description || '').toLowerCase();
+          const category = String(product?.category || '').toLowerCase();
+          return name.includes(searchTerm) || description.includes(searchTerm) || category.includes(searchTerm);
+        });
+      }
+
+      function normalizeTagQuery(tag) {
+        const dataQuery = tag?.dataset?.query;
+        if (dataQuery) return dataQuery;
+        // Fallback: remove emoji/symbol prefixes and collapse spaces.
+        return String(tag?.textContent || '')
+          .replace(/^[^\p{L}\p{N}]+/u, '')
+          .replace(/\s+/g, ' ')
+          .trim();
       }
 
       function displaySearchResults(results) {
@@ -380,18 +521,25 @@
         if (searchForm) {
           searchForm.addEventListener('submit', (e) => {
             e.preventDefault();
-            const query = searchInput.value;
-            const results = searchProducts(query);
-            displaySearchResults(results);
+            const run = async () => {
+              if (!productsLoaded) await loadAllProducts();
+              const query = searchInput.value;
+              const results = searchProducts(query);
+              displaySearchResults(results);
+            };
+            run();
           });
 
           // Real-time search as user types
           searchInput.addEventListener('input', (e) => {
-            const query = e.target.value;
-            if (query.length >= 2) {
+            const run = async () => {
+              const query = e.target.value;
+              if (query.length < 2) return;
+              if (!productsLoaded) await loadAllProducts();
               const results = searchProducts(query);
               displaySearchResults(results);
-            }
+            };
+            run();
           });
         }
 
@@ -404,9 +552,14 @@
         // Popular search tags
         document.querySelectorAll('.search-tag').forEach(tag => {
           tag.addEventListener('click', () => {
-            searchInput.value = tag.textContent;
-            const results = searchProducts(tag.textContent);
-            displaySearchResults(results);
+            const q = normalizeTagQuery(tag);
+            searchInput.value = q;
+            const run = async () => {
+              if (!productsLoaded) await loadAllProducts();
+              const results = searchProducts(q);
+              displaySearchResults(results);
+            };
+            run();
           });
         });
 
@@ -440,59 +593,30 @@
     </script>
 <!-- ========== ZENRIX CHATBOT ========== -->
 <div id="chatbot-container">
-  <!-- Chat Button -->
   <button id="chatbot-toggle" class="fixed bottom-6 right-6 bg-blue-600 text-white w-14 h-14 rounded-full shadow-lg hover:bg-blue-700 transition-all z-50 flex items-center justify-center" aria-label="Open chat">
     <img src="/uploads/avatars/chat-avatar.png?v=2" alt="Chatbot Avatar" style="width:56px;height:56px;display:block;border-radius:50%;object-fit:cover;" />
   </button>
 
-  <!-- Chat Window -->
-  <div id="chatbot-window" class="fixed bottom-24 right-6 w-80 h-96 bg-white rounded-lg shadow-xl hidden flex flex-col z-50 border">
-    <!-- Header -->
-    <div class="bg-gradient-to-r from-blue-500 to-purple-600 text-white p-4 rounded-t-lg flex justify-between items-center">
-      <div class="flex items-center">
-        <div class="w-8 h-8 bg-white rounded-full flex items-center justify-center mr-3">
-          <img src="/uploads/avatars/chat-avatar.png?v=2" alt="Zenrix Assistant" style="width:32px;height:32px;border-radius:50%;object-fit:cover;" />
-        </div>
+  <div id="chatbot-window" class="fixed bottom-24 right-6 w-80 h-96 hidden flex flex-col z-50">
+    <div class="chatbot-header p-3 rounded-t-[24px] flex justify-between items-center">
+      <div class="flex items-center gap-3">
+        <img src="/uploads/avatars/chat-avatar.png?v=2" alt="Zenrix Assistant" style="width:32px;height:32px;border-radius:50%;object-fit:cover;" />
         <div>
-          <h3 class="font-bold">Zenrix Assistant</h3>
-          <p class="text-xs opacity-80">Online • 24/7 Support</p>
+          <div class="font-bold">Zenrix Assistant</div>
+          <div class="text-xs opacity-80">Online • 24/7 Support</div>
         </div>
       </div>
-      <button id="chatbot-close" class="text-white hover:text-gray-200" aria-label="Close chat">
-        <!-- close X svg -->
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden>
-          <path d="M18 6L6 18M6 6l12 12" stroke="#fff" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
-        </svg>
-      </button>
+      <button id="chatbot-close" aria-label="Close chat" class="text-white">✕</button>
     </div>
 
-    <!-- Messages -->
-    <div id="chatbot-messages" class="flex-grow p-4 overflow-y-auto space-y-3">
-      <div class="flex">
-        <div class="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center mr-2 flex-shrink-0">
-          <img src="/uploads/avatars/chat-avatar.png?v=2" alt="Zenrix Assistant" style="width:20px;height:20px;border-radius:50%;object-fit:cover;" />
-        </div>
-        <div class="bg-gray-100 rounded-lg p-3 max-w-[80%]">
-          <p class="text-sm">Hello! 👋 I'm Zenrix Assistant. How can I help you today?</p>
-          <p class="text-xs text-gray-500 mt-2">Try asking about: products, delivery, or returns</p>
-        </div>
-      </div>
-    </div>
+    <div id="chatbot-messages" class="flex-grow p-3 overflow-y-auto space-y-3"></div>
 
-    <!-- Input -->
-    <div class="border-t p-4">
-      <div class="flex space-x-2">
-        <input type="text" id="chatbot-input" placeholder="Type your message..." 
-               class="flex-grow border rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
-        <button id="chatbot-send" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700" aria-label="Send message">
-          <!-- paper plane svg -->
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden>
-            <path d="M22 2L11 13" stroke="#fff" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
-            <path d="M22 2l-7 20 1-7 7-13z" stroke="#fff" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
-          </svg>
-        </button>
+    <div class="border-t border-white/10 p-3">
+      <div class="chatbot-input-row">
+        <input type="text" id="chatbot-input" placeholder="Type your message..." class="flex-grow border rounded-lg px-3 py-2 focus:outline-none">
+        <button id="chatbot-send" class="bg-blue-600 text-white px-3 py-2 rounded-lg">Send</button>
       </div>
-      <div class="flex flex-wrap gap-2 mt-3">
+      <div class="chatbot-quick-actions mt-3">
         <button class="quick-btn" data-msg="What products do you have?">Products</button>
         <button class="quick-btn" data-msg="What is delivery time?">Delivery</button>
         <button class="quick-btn" data-msg="How to return product?">Returns</button>
@@ -502,127 +626,8 @@
   </div>
 </div>
 
-<!-- Chatbot JavaScript -->
+<!-- Chatbot JS (external) -->
 <script src="js/chatbot-enhanced.js" defer></script>
-
-<!-- Chatbot CSS -->    }
-    // Order tracking
-    else if (msg.includes('order') || msg.includes('track') || msg.includes('status') || msg.includes('where is my')) {
-      response = "📦 Check your Orders page in your account dashboard for real-time order status. Need help tracking? Share your order number with our support team.";
-    }
-    // Payment
-    else if (msg.includes('payment') || msg.includes('pay') || msg.includes('card') || msg.includes('cash') || msg.includes('method')) {
-      response = "💳 We accept all major credit/debit cards, eSewa, Khalti, and bank transfers. All payments are secure and encrypted.";
-    }
-    // Account/Login
-    else if (msg.includes('account') || msg.includes('login') || msg.includes('register') || msg.includes('signup') || msg.includes('password')) {
-      response = "🔐 Create an account to track orders, save favorites, and get personalized recommendations. Visit our Login/Register page to get started.";
-    }
-    // Warranty/Guarantee
-    else if (msg.includes('warranty') || msg.includes('guarantee') || msg.includes('defective') || msg.includes('broken')) {
-      response = "🛡️ All our products come with manufacturer warranty. Electronics have 1-2 year warranty, fashion items have quality guarantee. Contact us for warranty claims.";
-    }
-    // Size/Measurements
-    else if (msg.includes('size') || msg.includes('fit') || msg.includes('measurement') || msg.includes('large') || msg.includes('small')) {
-      response = "📏 Check the size guide on each product page. We include detailed measurements to help you choose the perfect fit. Still unsure? Contact us for advice!";
-    }
-    // Stock/Availability
-    else if (msg.includes('stock') || msg.includes('available') || msg.includes('in stock') || msg.includes('out of stock')) {
-      response = "📊 Stock status is shown on each product page. Popular items sell out quickly! Subscribe to notifications for restocks.";
-    }
-    // Discounts/Promotions
-    else if (msg.includes('discount') || msg.includes('promo') || msg.includes('coupon') || msg.includes('deal') || msg.includes('sale') || msg.includes('offer')) {
-      response = "🎉 Check our current promotions on the homepage. Subscribe to our newsletter for exclusive coupons and early access to sales!";
-    }
-    // Thank you
-    else if (msg.includes('thank') || msg.includes('thanks') || msg.includes('appreciate')) {
-      response = "You're most welcome! 🙏 Happy shopping at Zenrix. Namaste! 🇳🇵";
-    }
-    // Goodbye
-    else if (msg.includes('bye') || msg.includes('goodbye') || msg.includes('see you') || msg.includes('later')) {
-      response = "Namaste! 👋 Come back soon for more amazing Nepali products. Have a great day!";
-    }
-    // Default response
-    else {
-      const defaultResponses = [
-        "I'm here to help with your shopping questions! Try asking about products, delivery, returns, or contact info.",
-        "That's an interesting question! For detailed assistance, please contact our support team at support@zenrix.com",
-        "I'd love to help! Could you please rephrase your question? I'm best at answering questions about products, orders, and shipping.",
-        "🙏 For complex inquiries, our human support team is ready to assist. Reach out to support@zenrix.com"
-      ];
-      response = defaultResponses[Math.floor(Math.random() * defaultResponses.length)];
-    }
-    
-    // Simulate typing delay (randomized for more natural feel)
-    const delay = 800 + Math.random() * 1200;
-    setTimeout(() => {
-      addMessage('bot', response);
-    }, delay);
-  }
-});
-</script>
-
-<!-- Chatbot CSS -->
-<style>
-/* Container */
-#chatbot-window {
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.12);
-  border: 1px solid #e2e8f0;
-  background: #ffffff;
-}
-
-#chatbot-messages {
-  scroll-behavior: smooth;
-}
-
-/* Quick buttons - improved contrast */
-.quick-btn {
-  background: #ffffff;
-  border: 1px solid #e6eef0;
-  color: #0f172a;
-  padding: 6px 12px;
-  border-radius: 20px;
-  font-size: 12px;
-  cursor: pointer;
-  transition: all 0.15s;
-}
-
-.quick-btn:hover {
-  background: #f3f4f6;
-  transform: translateY(-1px);
-}
-
-.hidden {
-  display: none !important;
-}
-
-/* Smooth animations */
-#chatbot-toggle, #chatbot-window {
-  transition: all 0.25s ease;
-}
-
-#chatbot-toggle:hover {
-  transform: scale(1.06);
-}
-
-/* Bubble styles - accessible colors */
-.bubble { word-break: break-word; }
-.bubble.bot { background: #f3f4f6 !important; color: #0f172a !important; align-self: flex-start; }
-.bubble.user { background: linear-gradient(90deg,#0f172a,#111827) !important; color: #ffffff !important; align-self: flex-end; }
-
-/* Timestamps / meta */
-.bubble p.text-xs { color: #6b7280 !important; }
-
-/* Namaste animation */
-.namaste-icon {
-  animation: namaste-bow 2s ease-in-out infinite;
-}
-
-@keyframes namaste-bow {
-  0%, 100% { transform: rotate(0deg); }
-  50% { transform: rotate(-5deg); }
-}
-</style>
 <!-- ========== END CHATBOT ========== -->
 </body>
 </html>

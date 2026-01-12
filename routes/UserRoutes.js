@@ -408,6 +408,19 @@ router.get('/orders', authenticateUser, async (req, res) => {
   }
 });
 
+// Get single order details
+router.get('/orders/:orderId', authenticateUser, async (req, res) => {
+  try {
+    const order = await Order.findOne({ _id: req.params.orderId, user: req.userId }).populate('items.product');
+    if (!order) {
+      return res.status(404).json({ success: false, error: 'Order not found' });
+    }
+    res.json({ success: true, data: order });
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
 // Checkout: accept local cart payload, capture shipping + payment metadata
 router.post('/orders/checkout', authenticateUser, async (req, res) => {
   try {

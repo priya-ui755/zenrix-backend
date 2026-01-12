@@ -8,15 +8,15 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
-    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="/css/tailwind-site.css">
     <script src="script.js" defer></script>
 </head>
-<body class="bg-slate-950 text-slate-100" style="font-family: 'Space Grotesk', 'Poppins', sans-serif;">
+<body class="surface text product-page">
     <custom-navbar></custom-navbar>
 
     <main class="px-4 py-12">
         <section class="max-w-6xl mx-auto space-y-10">
-            <div class="product-shell relative overflow-hidden rounded-[32px] border border-white/10 bg-gradient-to-br from-slate-900 via-slate-950 to-[#071521] shadow-[0_25px_120px_rgba(7,14,30,0.85)] px-6 lg:px-10 py-10">
+            <div class="product-shell crystal glass-panel relative overflow-hidden rounded-[32px] border px-6 lg:px-10 py-10">
                 <div class="absolute inset-0 opacity-[0.28] pointer-events-none">
                     <div class="absolute -top-24 -right-10 w-80 h-80 bg-gradient-to-br from-emerald-400/40 to-cyan-500/30 blur-3xl"></div>
                     <div class="absolute -bottom-32 -left-20 w-96 h-96 bg-gradient-to-tr from-blue-500/30 via-teal-400/20 to-transparent blur-3xl"></div>
@@ -35,7 +35,7 @@
                     <article class="space-y-6">
                         <div class="media-frame">
                             <div class="media-glow"></div>
-                            <img id="mainProductImage" src="https://via.placeholder.com/1000x1000?text=Zenrix" alt="Product photo" class="relative z-10 object-contain h-full w-full" />
+                            <img id="mainProductImage" src="/assets/placeholder.svg" alt="Product photo" class="relative z-10 object-contain h-full w-full" />
                             <div class="media-frost"></div>
                         </div>
                         <div id="productThumbnails" class="media-rail"></div>
@@ -118,9 +118,9 @@
         </section>
 
         <section class="max-w-6xl mx-auto grid gap-10 lg:grid-cols-2">
-            <div class="bg-slate-900/70 border border-white/8 rounded-3xl p-8 shadow-[0_18px_90px_rgba(7,14,30,0.55)]">
-                <h2 class="text-2xl font-semibold mb-6">Highlights</h2>
-                <ul id="productHighlights" class="space-y-4 text-slate-200">
+            <div class="glass-panel rounded-3xl p-8">
+                <h2 class="text-2xl font-semibold mb-6 text">Highlights</h2>
+                <ul id="productHighlights" class="space-y-4 text">
                     <li class="flex items-start gap-3">
                         <span class="mt-1 h-2 w-2 rounded-full bg-emerald-400"></span>
                         Active noise cancellation with adaptive transparency.
@@ -136,66 +136,63 @@
                 </ul>
             </div>
 
-            <div class="bg-slate-900/70 border border-white/8 rounded-3xl p-8 shadow-[0_18px_90px_rgba(7,14,30,0.55)]">
-                <h2 class="text-2xl font-semibold mb-6">Customer Reviews</h2>
+            <div class="glass-panel rounded-3xl p-8">
+                <h2 class="text-2xl font-semibold mb-6 text">Customer Reviews</h2>
                 <div class="space-y-6" id="customerReviews">
-                    <article class="bg-slate-950/50 border border-white/10 rounded-2xl p-5">
+                    <article class="glass-panel rounded-2xl p-5" data-elevated="true">
                         <div class="flex justify-between items-center mb-3">
-                            <p class="font-semibold">John D.</p>
-                            <p class="text-amber-300 text-sm">★★★★★</p>
+                            <p class="font-semibold text">John D.</p>
+                            <p class="text-amber-500 text-sm">★★★★★</p>
                         </div>
-                        <p class="text-slate-200">“Noise cancellation is unreal and the comfort is next-level. Easily my favorite daily headset.”</p>
+                        <p class="muted">“Noise cancellation is unreal and the comfort is next-level. Easily my favorite daily headset.”</p>
                     </article>
                 </div>
             </div>
         </section>
     </main>
 
-        <custom-footer></custom-footer>
-        <script src="components/navbar.js"></script>
-        <script src="components/footer.js"></script>
-        <script src="js/chatbot-enhanced.js" defer></script>
+    <custom-footer></custom-footer>
 
-        <!-- ========== ZENRIX CHATBOT ========== -->
-        <div id="chatbot-container">
-            <button id="chatbot-toggle" class="fixed bottom-6 right-6 bg-blue-600 text-white w-14 h-14 rounded-full shadow-lg hover:bg-blue-700 transition-all z-50 flex items-center justify-center" aria-label="Open chat">
-                <img src="/uploads/avatars/chat-avatar.png?v=2" alt="Chatbot Avatar" style="width:56px;height:56px;display:block;border-radius:50%;object-fit:cover;" />
-            </button>
+    <!-- ========== ZENRIX CHATBOT ========== -->
+    <div id="chatbot-container">
+        <button id="chatbot-toggle" class="fixed bottom-6 right-6 bg-blue-600 text-white w-14 h-14 rounded-full shadow-lg hover:bg-blue-700 transition-all z-50 flex items-center justify-center" aria-label="Open chat">
+            <img src="/uploads/avatars/chat-avatar.png?v=2" alt="Chatbot Avatar" class="chat-avatar chat-avatar-lg" />
+        </button>
 
-            <div id="chatbot-window" class="chat-panel hidden">
-                <div class="chat-header">
-                    <div class="assistant-meta">
-                        <div class="namaste-badge" aria-hidden="true">
-                            <img src="/uploads/avatars/chat-avatar.png?v=2" alt="Zenrix Assistant" style="width:32px;height:32px;border-radius:50%;object-fit:cover;" />
-                        </div>
-                        <div>
-                            <p class="assistant-name">Zenrix Assistant</p>
-                            <p class="assistant-status">नमस्ते! Online • Nepali buddy</p>
-                        </div>
+        <div id="chatbot-window" class="chat-panel hidden">
+            <div class="chat-header">
+                <div class="assistant-meta">
+                    <div class="namaste-badge" aria-hidden="true">
+                        <img src="/uploads/avatars/chat-avatar.png?v=2" alt="Zenrix Assistant" class="chat-avatar chat-avatar-sm" />
                     </div>
-                    <div class="header-actions">
-                        <span class="status-pill"><span class="dot"></span>Live</span>
-                        <button id="chatbot-close" aria-label="Close chat" class="icon-btn">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
-                            </svg>
-                        </button>
+                    <div>
+                        <p class="assistant-name">Zenrix Assistant</p>
+                        <p class="assistant-status">नमस्ते! Online • Nepali buddy</p>
                     </div>
                 </div>
+                <div class="header-actions">
+                    <span class="status-pill"><span class="dot"></span>Live</span>
+                    <button id="chatbot-close" aria-label="Close chat" class="icon-btn">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                    </button>
+                </div>
+            </div>
 
-                <div class="chat-hero-card">
-                    <div>
-                        <p class="hero-eyebrow">Friendly Nepali guide</p>
-                        <p class="hero-title">Smarter help in seconds</p>
-                        <p class="hero-sub">Ask in English or Nepali about products, delivery, or returns. I can greet you with a Namaste too.</p>
-                        <div class="hero-tags">
-                            <span>Namaste ready</span>
-                            <span>24/7 support</span>
-                            <span>Deals scout</span>
-                        </div>
+            <div class="chat-hero-card">
+                <div>
+                    <p class="hero-eyebrow">Friendly Nepali guide</p>
+                    <p class="hero-title">Smarter help in seconds</p>
+                    <p class="hero-sub">Ask in English or Nepali about products, delivery, or returns. I can greet you with a Namaste too.</p>
+                    <div class="hero-tags">
+                        <span>Namaste ready</span>
+                        <span>24/7 support</span>
+                        <span>Deals scout</span>
                     </div>
-                    <div class="hero-figure" aria-hidden="true">
-                        <div class="hero-figure-shell">
+                </div>
+                <div class="hero-figure" aria-hidden="true">
+                    <div class="hero-figure-shell">
                         <svg class="namaste-anim" viewBox="0 0 160 180" role="presentation" aria-hidden="true" focusable="false">
                             <defs>
                                 <linearGradient id="skin" x1="0%" x2="100%" y1="0%" y2="100%">
@@ -221,506 +218,67 @@
                             <circle cx="94" cy="66" r="6" fill="#0f172a" />
                             <path d="M68 82q12 10 24 0" stroke="#0f172a" stroke-width="5" stroke-linecap="round" fill="none" />
                         </svg>
-                        </div>
                     </div>
-                </div>
-
-                <div id="chatbot-messages" class="chat-messages">
-                    <div class="chat-greeting">
-                        <div class="hero-figure-shell">
-                            <svg class="namaste-anim" viewBox="0 0 160 180" role="presentation" aria-hidden="true" focusable="false">
-                                <defs>
-                                    <linearGradient id="skin-greet" x1="0%" x2="100%" y1="0%" y2="100%">
-                                        <stop offset="0%" stop-color="#f5c89c" />
-                                        <stop offset="100%" stop-color="#e4ad79" />
-                                    </linearGradient>
-                                    <linearGradient id="robe-greet" x1="0%" x2="100%" y1="0%" y2="100%">
-                                        <stop offset="0%" stop-color="#111827" />
-                                        <stop offset="100%" stop-color="#1f2937" />
-                                    </linearGradient>
-                                    <linearGradient id="glow-greet" x1="0%" x2="100%" y1="0%" y2="0%">
-                                        <stop offset="0%" stop-color="rgba(99,102,241,0.55)" />
-                                        <stop offset="100%" stop-color="rgba(34,211,238,0.55)" />
-                                    </linearGradient>
-                                </defs>
-                                <circle cx="80" cy="90" r="74" fill="url(#glow-greet)" opacity="0.3" />
-                                <circle cx="80" cy="70" r="42" fill="url(#skin-greet)" stroke="#0f172a" stroke-width="3" />
-                                <rect x="50" y="92" width="60" height="60" rx="24" fill="url(#robe-greet)" stroke="rgba(255,255,255,0.25)" stroke-width="3" />
-                                <rect class="hand hand-left" x="46" y="82" width="18" height="52" rx="12" fill="url(#skin-greet)" />
-                                <rect class="hand hand-right" x="96" y="82" width="18" height="52" rx="12" fill="url(#skin-greet)" />
-                                <rect x="62" y="112" width="36" height="38" rx="12" fill="rgba(255,255,255,0.16)" />
-                                <circle cx="66" cy="66" r="6" fill="#0f172a" />
-                                <circle cx="94" cy="66" r="6" fill="#0f172a" />
-                                <path d="M68 82q12 10 24 0" stroke="#0f172a" stroke-width="5" stroke-linecap="round" fill="none" />
-                            </svg>
-                        </div>
-                        <p class="greet-text">नमस्ते! Tap a quick question or type to start.</p>
-                    </div>
-                </div>
-
-                <div class="chat-input-shell">
-                    <div class="input-wrapper">
-                        <input type="text" id="chatbot-input" placeholder="Ask anything about products, delivery, returns..." aria-label="Chat message" />
-                    </div>
-                    <button id="chatbot-send" class="send-btn" aria-label="Send message">
-                        <span>Send</span>
-                        <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M22 2L11 13" />
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M22 2l-7 20-4-9-9-4 20-7z" />
-                        </svg>
-                    </button>
-                </div>
-                <div class="chips-row">
-                    <button class="quick-btn" data-msg="Show me today's best deals">Best deals</button>
-                    <button class="quick-btn" data-msg="What is delivery time?">Delivery</button>
-                    <button class="quick-btn" data-msg="How to return a product?">Returns</button>
-                    <button class="quick-btn" data-msg="Recommend me a gift">Gift ideas</button>
                 </div>
             </div>
+
+            <div id="chatbot-messages" class="chat-messages">
+                <div class="chat-greeting">
+                    <div class="hero-figure-shell">
+                        <svg class="namaste-anim" viewBox="0 0 160 180" role="presentation" aria-hidden="true" focusable="false">
+                            <defs>
+                                <linearGradient id="skin-greet" x1="0%" x2="100%" y1="0%" y2="100%">
+                                    <stop offset="0%" stop-color="#f5c89c" />
+                                    <stop offset="100%" stop-color="#e4ad79" />
+                                </linearGradient>
+                                <linearGradient id="robe-greet" x1="0%" x2="100%" y1="0%" y2="100%">
+                                    <stop offset="0%" stop-color="#111827" />
+                                    <stop offset="100%" stop-color="#1f2937" />
+                                </linearGradient>
+                                <linearGradient id="glow-greet" x1="0%" x2="100%" y1="0%" y2="0%">
+                                    <stop offset="0%" stop-color="rgba(99,102,241,0.55)" />
+                                    <stop offset="100%" stop-color="rgba(34,211,238,0.55)" />
+                                </linearGradient>
+                            </defs>
+                            <circle cx="80" cy="90" r="74" fill="url(#glow-greet)" opacity="0.3" />
+                            <circle cx="80" cy="70" r="42" fill="url(#skin-greet)" stroke="#0f172a" stroke-width="3" />
+                            <rect x="50" y="92" width="60" height="60" rx="24" fill="url(#robe-greet)" stroke="rgba(255,255,255,0.25)" stroke-width="3" />
+                            <rect class="hand hand-left" x="46" y="82" width="18" height="52" rx="12" fill="url(#skin-greet)" />
+                            <rect class="hand hand-right" x="96" y="82" width="18" height="52" rx="12" fill="url(#skin-greet)" />
+                            <rect x="62" y="112" width="36" height="38" rx="12" fill="rgba(255,255,255,0.16)" />
+                            <circle cx="66" cy="66" r="6" fill="#0f172a" />
+                            <circle cx="94" cy="66" r="6" fill="#0f172a" />
+                            <path d="M68 82q12 10 24 0" stroke="#0f172a" stroke-width="5" stroke-linecap="round" fill="none" />
+                        </svg>
+                    </div>
+                    <p class="greet-text">नमस्ते! Tap a quick question or type to start.</p>
+                </div>
+            </div>
+
+            <div class="chat-input-shell">
+                <div class="input-wrapper">
+                    <input type="text" id="chatbot-input" placeholder="Ask anything about products, delivery, returns..." aria-label="Chat message" />
+                </div>
+                <button id="chatbot-send" class="send-btn" aria-label="Send message">
+                    <span>Send</span>
+                    <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M22 2L11 13" />
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M22 2l-7 20-4-9-9-4 20-7z" />
+                    </svg>
+                </button>
+            </div>
+            <div class="chips-row">
+                <button class="quick-btn" data-msg="Show me today's best deals">Best deals</button>
+                <button class="quick-btn" data-msg="What is delivery time?">Delivery</button>
+                <button class="quick-btn" data-msg="How to return a product?">Returns</button>
+                <button class="quick-btn" data-msg="Recommend me a gift">Gift ideas</button>
+            </div>
         </div>
-
-        <script src="js/chatbot-enhanced.js" defer></script>
-
-        <style>
-            :root {
-                --chat-gradient: linear-gradient(135deg, #111827, #0b1224 60%, #1e1b4b);
-                --chat-accent: linear-gradient(135deg, #6366f1, #22d3ee);
-                --chat-card: rgba(255, 255, 255, 0.06);
-                --chat-border: rgba(255, 255, 255, 0.1);
-                --chat-blur: blur(12px);
-            }
-
-            #chatbot-container {
-                position: relative;
-                z-index: 60;
-            }
-
-            .chat-fab {
-                position: fixed;
-                bottom: 1.5rem;
-                right: 1.5rem;
-                background: var(--chat-accent);
-                color: #fff;
-                border: none;
-                width: 3.75rem;
-                height: 3.75rem;
-                border-radius: 9999px;
-                box-shadow: 0 10px 30px rgba(99, 102, 241, 0.4);
-                display: inline-flex;
-                align-items: center;
-                justify-content: center;
-                gap: 0;
-                font-weight: 700;
-                letter-spacing: 0.01em;
-                overflow: hidden;
-                transition: all 0.25s ease;
-                z-index: 1050;
-            }
-
-            .chat-fab:hover {
-                transform: translateY(-2px) scale(1.03);
-                box-shadow: 0 12px 34px rgba(99, 102, 241, 0.5);
-            }
-
-            .fab-text {
-                font-size: 0.85rem;
-            }
-
-            .fab-figure {
-                width: 2.5rem;
-                height: 2.5rem;
-                display: inline-flex;
-                align-items: center;
-                justify-content: center;
-            }
-
-            .fab-anim {
-                width: 54px;
-                height: 54px;
-            }
-
-            .fab-pulse {
-                position: absolute;
-                inset: -8px;
-                border-radius: 9999px;
-                background: radial-gradient(circle, rgba(99, 102, 241, 0.25), transparent 55%);
-                animation: pulse 2.4s infinite;
-                z-index: 1;
-            }
-
-            .fab-icon,
-            .fab-text {
-                position: relative;
-                z-index: 2;
-            }
-
-            .chat-panel { position: fixed; bottom: 6.5rem; right: 1.5rem; width: 22.5rem; max-height: 34rem; background: #fff; border-radius: 12px; border: 1px solid #e6eef0; box-shadow: 0 25px 50px rgba(0,0,0,0.08); overflow:hidden; display:flex; flex-direction:column; z-index:1050; }
-
-            .chat-header { padding:0.9rem 1rem; display:flex; align-items:center; justify-content:space-between; gap:0.75rem; background:linear-gradient(120deg, rgba(99,102,241,0.12), rgba(34,211,238,0.06)); color:#0f172a; }
-
-            .assistant-meta {
-                display: flex;
-                align-items: center;
-                gap: 0.65rem;
-            }
-
-            .assistant-name {
-                color: #e5e7eb;
-                font-weight: 700;
-                margin: 0;
-            }
-
-            .assistant-status {
-                color: #cbd5e1;
-                font-size: 0.8rem;
-                margin: 0.1rem 0 0;
-            }
-
-            .header-actions {
-                display: flex;
-                align-items: center;
-                gap: 0.35rem;
-            }
-
-            .status-pill {
-                display: inline-flex;
-                align-items: center;
-                gap: 0.35rem;
-                background: rgba(34, 197, 94, 0.12);
-                color: #bbf7d0;
-                border: 1px solid rgba(34, 197, 94, 0.2);
-                border-radius: 9999px;
-                padding: 0.25rem 0.6rem;
-                font-size: 0.75rem;
-                font-weight: 600;
-            }
-
-            .dot {
-                width: 0.5rem;
-                height: 0.5rem;
-                border-radius: 9999px;
-                background: #22c55e;
-                box-shadow: 0 0 0 6px rgba(34, 197, 94, 0.15);
-            }
-
-            .icon-btn {
-                background: rgba(255, 255, 255, 0.08);
-                border: 1px solid var(--chat-border);
-                color: #e2e8f0;
-                width: 2rem;
-                height: 2rem;
-                border-radius: 0.7rem;
-                display: inline-flex;
-                align-items: center;
-                justify-content: center;
-                transition: all 0.2s ease;
-            }
-
-            .icon-btn:hover {
-                background: rgba(255, 255, 255, 0.12);
-                transform: translateY(-1px);
-            }
-
-            .chat-hero-card {
-                display: grid;
-                grid-template-columns: 1.3fr 0.7fr;
-                gap: 0.9rem;
-                padding: 1rem;
-                background: rgba(255, 255, 255, 0.04);
-                border-bottom: 1px solid var(--chat-border);
-            }
-
-            .hero-eyebrow {
-                color: #a5b4fc;
-                font-size: 0.78rem;
-                letter-spacing: 0.02em;
-                margin: 0 0 0.2rem;
-            }
-
-            .hero-title {
-                color: #f8fafc;
-                font-weight: 800;
-                margin: 0 0 0.3rem;
-                font-size: 1.25rem;
-            }
-
-            .hero-sub {
-                color: #cbd5e1;
-                font-size: 0.9rem;
-                margin: 0 0 0.6rem;
-                line-height: 1.4;
-            }
-
-            .hero-tags {
-                display: flex;
-                flex-wrap: wrap;
-                gap: 0.4rem;
-            }
-
-            .hero-tags span {
-                background: rgba(255, 255, 255, 0.06);
-                border: 1px solid var(--chat-border);
-                color: #e5e7eb;
-                font-size: 0.75rem;
-                padding: 0.25rem 0.55rem;
-                border-radius: 9999px;
-            }
-
-            .hero-figure {
-                display: flex;
-                align-items: center;
-                justify-content: center;
-            }
-
-            .hero-figure-shell {
-                padding: 0.35rem;
-                border-radius: 1rem;
-                background: rgba(255, 255, 255, 0.06);
-                border: 1px solid var(--chat-border);
-                box-shadow: 0 12px 30px rgba(0, 0, 0, 0.2);
-            }
-
-            .namaste-anim {
-                width: 140px;
-                height: 140px;
-                filter: drop-shadow(0 10px 30px rgba(0, 0, 0, 0.25));
-            }
-
-            .namaste-anim .hand {
-                transform-origin: center 20px;
-                animation: bow 2.2s ease-in-out infinite;
-            }
-
-            .namaste-anim .hand-right { animation-delay: 0.2s; }
-
-            .chat-messages { padding:12px; height:320px; overflow-y:auto; background:#f8fafc; display:flex; flex-direction:column; gap:10px; scroll-behavior:smooth; }
-
-            .chat-greeting {
-                width: 100%;
-                display: grid;
-                place-items: center;
-                gap: 0.5rem;
-                padding: 0.5rem 0;
-                color: #e2e8f0;
-                text-align: center;
-            }
-
-            .greet-text {
-                margin: 0;
-                font-size: 0.95rem;
-                color: #cbd5e1;
-            }
-
-            .chat-line {
-                display: flex;
-                align-items: flex-end;
-                gap: 0.6rem;
-            }
-
-            .chat-line.from-user {
-                justify-content: flex-end;
-            }
-
-            .avatar {
-                width: 2.2rem;
-                height: 2.2rem;
-                border-radius: 0.8rem;
-                display: inline-flex;
-                align-items: center;
-                justify-content: center;
-                border: 1px solid var(--chat-border);
-                background: rgba(255, 255, 255, 0.05);
-                flex-shrink: 0;
-            }
-
-            .avatar.bot {
-                background: rgba(99, 102, 241, 0.1);
-                border-color: rgba(99, 102, 241, 0.2);
-            }
-
-            .avatar.user {
-                background: rgba(255, 255, 255, 0.08);
-            }
-
-            .bubble { padding:10px 12px; border-radius:12px; max-width:78%; line-height:1.3; word-break:break-word; }
-
-            .bot-bubble { background:#f3f4f6; color:#0f172a; align-self:flex-start; }
-            .user-bubble { background:linear-gradient(90deg,#0f172a,#111827); color:#fff; align-self:flex-end; }
-
-            .caption { color:#6b7280; font-size:12px; margin-top:6px; }
-            }
-
-            .chat-input-shell {
-                padding: 0.9rem;
-                display: flex;
-                gap: 0.55rem;
-                align-items: center;
-                border-top: 1px solid var(--chat-border);
-                background: rgba(12, 17, 31, 0.85);
-            }
-
-            .input-wrapper {
-                flex: 1;
-                background: rgba(255, 255, 255, 0.04);
-                border: 1px solid var(--chat-border);
-                border-radius: 0.85rem;
-                padding: 0.55rem 0.7rem;
-            }
-
-            #chatbot-input {
-                width: 100%;
-                background: transparent;
-                border: none;
-                color: #e5e7eb;
-                outline: none;
-                font-size: 0.95rem;
-            }
-
-            #chatbot-input::placeholder {
-                color: #94a3b8;
-            }
-
-            .send-btn {
-                display: inline-flex;
-                align-items: center;
-                gap: 0.4rem;
-                background: var(--chat-accent);
-                color: #fff;
-                border: none;
-                padding: 0.65rem 0.9rem;
-                border-radius: 0.9rem;
-                font-weight: 700;
-                box-shadow: 0 10px 30px rgba(99, 102, 241, 0.35);
-                transition: all 0.2s ease;
-            }
-
-            .send-btn:hover {
-                transform: translateY(-1px);
-            }
-
-            .chips-row {
-                display: flex;
-                flex-wrap: wrap;
-                gap: 0.5rem;
-                padding: 0 0.9rem 1rem;
-                background: rgba(12, 17, 31, 0.85);
-            }
-
-            .quick-btn {
-                background: rgba(255, 255, 255, 0.06);
-                border: 1px solid var(--chat-border);
-                color: #e5e7eb;
-                padding: 0.45rem 0.9rem;
-                border-radius: 9999px;
-                font-size: 0.82rem;
-                cursor: pointer;
-                transition: all 0.2s ease;
-            }
-
-            .quick-btn:hover {
-                transform: translateY(-1px);
-                background: rgba(255, 255, 255, 0.1);
-            }
-
-            .hidden {
-                display: none !important;
-            }
-
-            /* Namaste figure (Nepali boy) */
-            .namaste-figure {
-                position: relative;
-                width: 56px;
-                height: 64px;
-                filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.25));
-            }
-
-            .namaste-figure.mini { transform: scale(0.8); }
-            .namaste-figure.tiny { transform: scale(0.65); }
-
-            .namaste-figure .halo {
-                position: absolute;
-                inset: 6px;
-                background: radial-gradient(circle, rgba(99, 102, 241, 0.22), transparent 60%);
-                border-radius: 50%;
-                animation: float 3s ease-in-out infinite;
-            }
-
-            .namaste-figure .head {
-                position: absolute;
-                top: 4px;
-                left: 14px;
-                width: 28px;
-                height: 28px;
-                background: linear-gradient(135deg, #f1c27d, #e0ac69);
-                border-radius: 50%;
-                box-shadow: inset 0 -2px 0 rgba(0, 0, 0, 0.08);
-            }
-
-            .namaste-figure .body {
-                position: absolute;
-                top: 26px;
-                left: 10px;
-                width: 36px;
-                height: 28px;
-                background: linear-gradient(135deg, #111827, #1f2937);
-                border-radius: 14px;
-                border: 2px solid rgba(255, 255, 255, 0.08);
-            }
-
-            .namaste-figure .arm {
-                position: absolute;
-                top: 24px;
-                width: 16px;
-                height: 30px;
-                background: linear-gradient(135deg, #f1c27d, #e0ac69);
-                border-radius: 12px;
-                transform-origin: top;
-            }
-
-            .namaste-figure .arm.left {
-                left: 6px;
-                animation: namaste-left 2.2s ease-in-out infinite;
-            }
-
-            .namaste-figure .arm.right {
-                right: 6px;
-                animation: namaste-right 2.2s ease-in-out infinite;
-            }
-
-            @keyframes namaste-left {
-                0%, 100% { transform: rotate(10deg) translate(4px, 4px); }
-                50% { transform: rotate(-14deg) translate(12px, -2px); }
-            }
-
-            @keyframes namaste-right {
-                0%, 100% { transform: rotate(-10deg) translate(-4px, 4px); }
-                50% { transform: rotate(14deg) translate(-12px, -2px); }
-            }
-
-            @keyframes pulse {
-                0% { opacity: 0.9; transform: scale(0.98); }
-                50% { opacity: 0.3; transform: scale(1.08); }
-                100% { opacity: 0.9; transform: scale(0.98); }
-            }
-
-            @keyframes float {
-                0%, 100% { transform: translateY(0); }
-                50% { transform: translateY(-2px); }
-            }
-
-            @keyframes bow {
-                0%, 100% { transform: rotate(8deg) translateY(0); }
-                50% { transform: rotate(-18deg) translateY(-6px); }
-            }
-
-            @media (prefers-reduced-motion: reduce) {
-                .fab-pulse,
-                .namaste-figure .halo,
-                .namaste-figure .arm,
-                .namaste-anim .hand,
-                .dot { animation: none !important; }
-            }
-        </style>
-        <!-- ========== END CHATBOT ========== -->
+    </div>
+
+    <script src="components/navbar.js"></script>
+    <script src="components/footer.js"></script>
+    <script src="js/chatbot-enhanced.js" defer></script>
+    <!-- ========== END CHATBOT ========== -->
 </body>
 </html>

@@ -31,34 +31,54 @@ mongoose.connect(MONGO_URI, { autoIndex: true })
   .catch(err => console.error('❌ MongoDB connection error:', err));
 
 mongoose.connection.on('error', err => console.error('❌ Mongoose error:', err.message));
-mongoose.connection.once('open', () => {
-  addSampleProducts();
-  addSamplePages();
-  addSampleComponents();
+mongoose.connection.once('open', async () => {
+  try {
+    await addSampleProducts();
+    await addSamplePages();
+    await addSampleComponents();
+  } catch (error) {
+    console.error('Error during seeding:', error);
+  }
 });
 
 // Security middleware first
 app.use(helmet({
-  contentSecurityPolicy: {
-    directives: {
-      defaultSrc: ["'self'"],
-      scriptSrc: ["'self'", "'unsafe-inline'", 'https://cdn.quilljs.com', 'https://cdn.tailwindcss.com', 'https://cdn.jsdelivr.net'],
-      // Allow inline event handlers in legacy admin/front-end pages that use onclick attributes
-      // Note: enabling this is less secure than using nonces/hashes; consider refactoring inline handlers later.
-      scriptSrcAttr: ["'unsafe-inline'"],
-      styleSrc: ["'self'", "'unsafe-inline'", 'https://cdn.quilljs.com', 'https://cdn.tailwindcss.com', 'https://fonts.googleapis.com', 'https://cdnjs.cloudflare.com'],
-      imgSrc: ["'self'", 'data:', 'https://images.unsplash.com', 'https://ui-avatars.com'],
-      connectSrc: ["'self'"],
-      fontSrc: ["'self'", 'https://fonts.gstatic.com', 'https://cdnjs.cloudflare.com'],
-      objectSrc: ["'none'"]
-    }
-  }
+  contentSecurityPolicy: false // Disable Helmet's CSP
 }));
+
+// Set minimal CSP that allows the required resources
+app.use((req, res, next) => {
+  res.setHeader('Content-Security-Policy', 
+    "default-src 'self'; " +
+    "script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; " +
+    "style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://fonts.googleapis.com; " +
+    "img-src 'self' data: https:; " +
+    "connect-src 'self' https://cdn.jsdelivr.net; " +
+    "font-src 'self' https://fonts.gstatic.com https://cdn.jsdelivr.net; " +
+    "frame-src 'self' https://www.google.com https://maps.google.com https://www.google.com/maps https://maps.app.goo.gl; " +
+    "object-src 'none'"
+  );
+  next();
+});
+console.log('Minimal CSP set allowing jsdelivr');
 
 app.use(cors());
 app.use(express.json({ limit: '1mb' }));
 app.use(express.urlencoded({ extended: true }));
-app.use(rateLimit({ windowMs: 60 * 1000, max: 100 }));
+
+// Apply rate limiting to API routes only (not static assets).
+// Use a higher limit in non-production to avoid hampering local admin UI/E2E checks.
+const RATE_LIMIT_MAX = Number.parseInt(process.env.RATE_LIMIT_MAX || '', 10);
+const apiLimiter = rateLimit({
+  windowMs: 60 * 1000,
+  max: Number.isFinite(RATE_LIMIT_MAX)
+    ? RATE_LIMIT_MAX
+    : (process.env.NODE_ENV === 'production' ? 100 : 500),
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { success: false, error: 'Too many requests, try again later.' },
+});
+app.use('/api', apiLimiter);
 
 require('./config/passport');
 app.use(passport.initialize());
@@ -66,6 +86,18 @@ app.use(passport.initialize());
 // Static assets
 app.use(express.static(FRONTEND_DIR));
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+
+// Avoid noisy 404s for browsers requesting /favicon.ico.
+// Serve a tiny SVG favicon (works in modern browsers) instead of 404.
+app.get('/favicon.ico', (_req, res) => {
+  res.type('image/svg+xml');
+  res.status(200).send(
+    "<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'>" +
+      "<rect width='32' height='32' rx='8' fill='#667eea'/>" +
+      "<text x='16' y='22' text-anchor='middle' font-size='18' font-family='Arial, sans-serif' fill='white'>Z</text>" +
+    "</svg>"
+  );
+});
 
 // API routes
 const adminRoutes = require('./routes/AdminRoutes');
@@ -77,12 +109,34 @@ const userRoutes = require('./routes/UserRoutes');
 const subscriberRoutes = require('./routes/SubscriberRoutes');
 const careerRoutes = require('./routes/CareerRoutes');
 const heroRoutes = require('./routes/HeroRoutes');
+const carouselRoutes = require('./routes/CarouselRoutes');
 const paymentSettingsRoutes = require('./routes/PaymentSettingsRoutes');
 const ticketRoutes = require('./routes/TicketRoutes');
-const knowledgeRoutes = require('./routes/KnowledgeRoutes');
+// const knowledgeRoutes = require('./routes/KnowledgeRoutes');
+const staffRoutes = require('./routes/StaffRoutes');
+
+// Temporary staff route
+app.get('/api/employees', (req, res) => {
+    res.end('OK');
+});
 
 app.use('/api/admin', adminRoutes);
 app.use('/api/auth', authRoutes);
+
+// Debugging: log modifying requests to products to help diagnose admin UI issues
+app.use('/api/products', (req, res, next) => {
+  if (['PUT', 'DELETE', 'POST'].includes(req.method)) {
+    try {
+      console.log('[DEBUG] Product API request:', req.method, req.originalUrl, 'auth=', !!req.headers.authorization);
+      if (req.body && Object.keys(req.body).length) {
+        const preview = JSON.stringify(req.body).slice(0, 200);
+        console.log('[DEBUG] Body preview:', preview);
+      }
+    } catch (e) {}
+  }
+  next();
+});
+
 app.use('/api/products', productRoutes);
 app.use('/api/pages', pageRoutes);
 app.use('/api/components', componentRoutes);
@@ -90,9 +144,16 @@ app.use('/api/users', userRoutes);
 app.use('/api/subscribers', subscriberRoutes);
 app.use('/api/careers', careerRoutes);
 app.use('/api/hero', heroRoutes);
+app.use('/api/carousel', carouselRoutes);
 app.use('/api/payment-settings', paymentSettingsRoutes);
 app.use('/api/tickets', ticketRoutes);
-app.use('/api/knowledge', knowledgeRoutes);
+// app.use('/api/knowledge', knowledgeRoutes);
+app.use('/api/staff', staffRoutes);
+
+// Temporary staff route
+// app.get('/api/staff', (req, res) => {
+//     res.json({ success: true, count: 0, data: [] });
+// });
 
 app.get('/api/health', (_req, res) => {
   res.json({ success: true, status: 'ok', timestamp: Date.now() });
@@ -124,15 +185,27 @@ app.use((err, req, res, _next) => {
   res.status(err.status || 500).json({ success: false, error: err.message || 'Internal Server Error' });
 });
 
+process.on('exit', (code) => {
+  console.log('Process exiting with code:', code);
+});
+
+process.on('uncaughtException', (err) => {
+  console.error('Uncaught Exception:', err);
+  process.exit(1);
+});
+
+process.on('unhandledRejection', (reason, promise) => {
+  console.error('Unhandled Rejection at:', promise, 'reason:', reason);
+  process.exit(1);
+});
+
 const PORT = process.env.PORT || 3000;
-if (require.main === module) {
-  app.listen(PORT, () => {
-    console.log('=================================');
-    console.log('✅ Zenrix Server Started!');
-    console.log(`📡 http://localhost:${PORT}`);
-    console.log('=================================');
-  });
-}
+app.listen(PORT, () => {
+  console.log('=================================');
+  console.log('✅ Zenrix Server Started!');
+  console.log(`📡 http://localhost:${PORT}`);
+  console.log('=================================');
+});
 
 module.exports = app;
 
@@ -323,7 +396,7 @@ async function addSampleComponents() {
 
     console.log('🧩 Adding sample components...');
     const samples = [
-      { slug: 'navbar', name: 'Main Navbar', html: '<div class="nav-links"><a href="/">Home</a><a href="/products.html">Products</a><a href="/account.html">Account</a><a href="/contact.html">Contact</a></div>', published: true },
+      { slug: 'navbar', name: 'Main Navbar', html: '<div class="nav-links"><a href="/">Home</a><a href="/products.html">Products</a><a href="/profile.html">Account</a><a href="/contact.html">Contact</a></div>', published: true },
       { slug: 'footer', name: 'Main Footer', html: '<div class="footer-about"><a href="/" class="footer-logo">Zenrix</a><p>One place for all your needs. High quality products at affordable prices.</p></div>', published: true }
     ];
 

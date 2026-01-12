@@ -1,5 +1,6 @@
 const express = require('express');
 const jwt = require('jsonwebtoken');
+const crypto = require('crypto');
 const Order = require('../models/Order');
 const { requireAdmin } = require('../middleware/auth');
 const router = express.Router();
@@ -12,7 +13,12 @@ router.post('/login', (req, res) => {
   const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'admin';
   const JWT_SECRET = process.env.JWT_SECRET || 'zenrix-secret';
 
-  if (password !== ADMIN_PASSWORD) return res.status(401).json({ success: false, error: 'Invalid credentials' });
+  // Timing-safe compare to reduce password oracle leakage.
+  const a = Buffer.from(String(password));
+  const b = Buffer.from(String(ADMIN_PASSWORD));
+  const sameLen = a.length === b.length;
+  const ok = sameLen && crypto.timingSafeEqual(a, b);
+  if (!ok) return res.status(401).json({ success: false, error: 'Invalid credentials' });
 
   const token = jwt.sign({ isAdmin: true }, JWT_SECRET, { expiresIn: '2h' });
   res.json({ success: true, token });

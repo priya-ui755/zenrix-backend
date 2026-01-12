@@ -2,7 +2,19 @@ const express = require('express');
 const router = express.Router();
 const { requireAdmin } = require('../middleware/auth');
 const Subscriber = require('../models/Subscriber');
-const XLSX = require('xlsx');
+
+function csvEscape(value) {
+  if (value === null || value === undefined) return '';
+  const s = String(value);
+  // Escape double quotes; wrap in quotes if it contains special chars.
+  const needsQuotes = /[",\r\n]/.test(s);
+  const escaped = s.replace(/"/g, '""');
+  return needsQuotes ? `"${escaped}"` : escaped;
+}
+
+function toCsv(rows) {
+  return rows.map((row) => row.map(csvEscape).join(',')).join('\r\n') + '\r\n';
+}
 
 // Public subscribe
 router.post('/', async (req, res) => {
@@ -44,49 +56,33 @@ router.delete('/:id', requireAdmin, async (req, res) => {
   }
 });
 
-// Admin: export subscribers to Excel
+// Admin: export subscribers (CSV; opens in Excel)
 router.get('/export/excel', requireAdmin, async (_req, res) => {
   try {
     const subs = await Subscriber.find().sort({ createdAt: -1 }).lean();
-    
-    // Prepare data for Excel
-    const excelData = subs.map((sub, index) => ({
-      '#': index + 1,
-      'Email': sub.email,
-      'Source': sub.source || 'homepage',
-      'Consent': sub.consent ? 'Yes' : 'No',
-      'Subscribed Date': new Date(sub.createdAt).toLocaleString('en-US', {
+
+    const header = ['#', 'Email', 'Source', 'Consent', 'Subscribed Date'];
+    const rows = subs.map((sub, index) => ([
+      index + 1,
+      sub.email,
+      sub.source || 'homepage',
+      sub.consent ? 'Yes' : 'No',
+      new Date(sub.createdAt).toLocaleString('en-US', {
         year: 'numeric',
         month: 'short',
         day: 'numeric',
         hour: '2-digit',
         minute: '2-digit'
       })
-    }));
+    ]));
 
-    // Create workbook and worksheet
-    const wb = XLSX.utils.book_new();
-    const ws = XLSX.utils.json_to_sheet(excelData);
+    const csv = toCsv([header, ...rows]);
 
-    // Set column widths
-    ws['!cols'] = [
-      { wch: 5 },  // #
-      { wch: 30 }, // Email
-      { wch: 12 }, // Source
-      { wch: 10 }, // Consent
-      { wch: 20 }  // Date
-    ];
-
-    XLSX.utils.book_append_sheet(wb, ws, 'Subscribers');
-
-    // Generate buffer
-    const buffer = XLSX.write(wb, { type: 'buffer', bookType: 'xlsx' });
-
-    // Set headers for file download
     const date = new Date().toISOString().split('T')[0];
-    res.setHeader('Content-Disposition', `attachment; filename="subscribers_${date}.xlsx"`);
-    res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-    res.send(buffer);
+    res.setHeader('Content-Disposition', `attachment; filename="subscribers_${date}.csv"`);
+    res.setHeader('Content-Type', 'text/csv; charset=utf-8');
+    // UTF-8 BOM improves Excel compatibility for non-ASCII content.
+    res.send('\ufeff' + csv);
   } catch (error) {
     res.status(500).json({ success: false, error: error.message });
   }

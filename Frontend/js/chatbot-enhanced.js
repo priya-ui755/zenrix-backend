@@ -52,8 +52,8 @@
     {p:/\b(product|products|catalog|category)\b/i, r: "Browse our full catalog at <a href=\"/products.html\">Products</a>. You can also ask about a specific product id (e.g. 'product id 69554ce7b4f651f29d9ea369') and I'll try to fetch details displayed on the product page."},
     {p:/\b(price|cost|how much|price of)\b/i, r: "Prices are shown on each product page and may include ongoing discounts. For bulk or wholesale pricing, contact support@zenrix.com.np with your requirements."},
     {p:/\b(payment|pay|payment methods|card|upi|esewa|khalti)\b/i, r: "We accept major credit/debit cards and local wallets like eSewa and Khalti. For payment issues, email support@zenrix.com.np with your order id and payment reference and we'll investigate."},
-    {p:/\b(account|profile|login|register|password)\b/i, r: "Manage your account at <a href=\"/account.html\">Account</a>. If you forgot your password, use 'Forgot password' or contact support for help."},
-    {p:/\b(contact|support|help|agent|human)\b/i, r: "You can reach support at <a href=\"mailto:support@zenrix.com.np\">support@zenrix.com.np</a>. For urgent assistance, say 'connect to agent' and I'll provide next steps for escalation."},
+    {p:/\b(account|profile|login|register|password)\b/i, r: "Manage your account at <a href=\"/profile.html\">Account</a>. If you forgot your password, use 'Forgot password' or contact support for help."},
+    {p:/\b(contact|support|help|agent|human)\b/i, r: "You can reach support at <a href=\"mailto:support@zenrix.com.np\">support@zenrix.com.np</a>. To open a support ticket from here, say 'open ticket' or 'create ticket' and I'll help you submit it. For urgent assistance, say 'connect to agent' and I'll provide next steps for escalation."},
     {p:/\b(cancel order|cancel)\b/i, r: "To cancel an order, visit Orders and tap 'Cancel' as early as possible. If your order is already dispatched, please use the return process after delivery."},
     {p:/\b(warranty|guarantee|defective|broken)\b/i, r: "Warranty terms vary by product—electronics usually have 1-year manufacturer warranty. Please check the product page under 'Warranty' or contact support for claims."},
     {p:/\b(career|jobs|work with|hiring)\b/i, r: "For careers at Zenrix, visit our Careers page or email hr@zenrix.com.np with your CV and the position you're interested in."},
@@ -64,6 +64,12 @@
   function handleUserMessage(msg){
     const text = String(msg || '').trim();
     if (!text) return appendMessage('Please type a short message so I can help.', 'bot');
+
+    // Quick clarifying response for terse 'how' queries
+    const low = text.toLowerCase();
+    if (low === 'how' || low === 'how?'){
+      return appendMessage('Do you mean: "how to return an item", "how delivery works", or "how to place an order"? Tell me which one and I\'ll explain the steps.', 'bot');
+    }
 
     // Product id detection (Mongo ObjectId-like 24 hex chars)
     const idMatch = text.match(/\b[0-9a-fA-F]{24}\b/);
@@ -92,6 +98,13 @@
       }
     }
 
+    // If user asks about tickets, open the ticket form directly (avoid KB noise)
+    const ticketIntent = /\b(open (a )?ticket|create (a )?ticket|how to open (a )?ticket|how to create (a )?ticket|submit (a )?ticket|raise (a )?ticket|how to open ticket)\b/i;
+    if (ticketIntent.test(text)){
+      showTicketForm(text);
+      return;
+    }
+
     // Fallback: consult knowledge index (Hugging Face powered)
     appendMessage('Let me check our knowledge base for that...', 'bot');
     fetch('/api/knowledge/query', {
@@ -99,11 +112,25 @@
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ q: text, topK: 3, useLLM: true })
     }).then(r => r.json()).then(data => {
+      if (window.__CHATBOT_DEBUG) console.debug('KB response', data);
       if (!data || !data.success) return appendMessage('I could not find a helpful answer. Please try rephrasing or contact support@zenrix.com.np', 'bot');
       if (data.answer){
-        appendMessage(data.answer, 'bot');
+        const answerText = stripHtmlText(String(data.answer));
+        if (looksLikeCode(answerText)){
+          appendMessage('The knowledge result appears to contain implementation code. I have omitted the raw code for safety — would you like a plain-language summary or the source link?', 'bot');
+        } else {
+          appendMessage(sanitizeHtml(String(data.answer)), 'bot');
+        }
       } else if (data.snippets && data.snippets.length){
-        const s = data.snippets.map((sn,i)=> `<strong>Source ${i+1} (${sn.source})</strong>: ${sn.text.slice(0,500)}${sn.text.length>500? '...':''}`).join('<br><br>');
+        const s = data.snippets.map((sn,i)=>{
+          const txt = stripHtmlText(String(sn.text || ''));
+          if (looksLikeCode(txt) || looksLikeHtml(String(sn.text || ''))){
+            const src = escapeHtml(String(sn.source || 'unknown'));
+            return `<strong>Source ${i+1} (${src})</strong>: [Code/HTML omitted] — <a href="${src}" target="_blank">Open source</a>`;
+          }
+          const short = txt.slice(0,300);
+          return `<strong>Source ${i+1} (${escapeHtml(String(sn.source||'unknown'))})</strong>: ${escapeHtml(short)}${txt.length>300? '...':''}`;
+        }).join('<br><br>');
         appendMessage('I found some related information:<br><br>' + s + '<br><br>If this does not answer your question, try contacting support@zenrix.com.np', 'bot');
       } else {
         appendMessage('No relevant documents were found. Try contacting support@zenrix.com.np for detailed help.', 'bot');
@@ -113,6 +140,57 @@
       // Offer ticket creation
       showTicketOffer(text);
     });
+  }
+
+  // Utility: strip HTML tags and script/style content to plain text
+  function stripHtmlText(html){
+    try{
+      const dp = new DOMParser();
+      const doc = dp.parseFromString(html, 'text/html');
+      // remove script/style
+      doc.querySelectorAll('script,style').forEach(n=>n.remove());
+      return (doc.body && doc.body.textContent) ? doc.body.textContent.trim() : String(html).replace(/<[^>]+>/g,'').trim();
+    }catch(e){ return String(html).replace(/<[^>]+>/g,'').trim(); }
+  }
+
+  // Utility: sanitize HTML but allow simple anchors and basic formatting
+  function sanitizeHtml(html){
+    try{
+      const dp = new DOMParser();
+      const doc = dp.parseFromString(html, 'text/html');
+      doc.querySelectorAll('script,style,iframe').forEach(n=>n.remove());
+      // strip event handlers and unsafe attributes
+      doc.querySelectorAll('*').forEach(el=>{
+        [...el.attributes].forEach(attr=>{
+          if (/^on/i.test(attr.name)) el.removeAttribute(attr.name);
+        });
+      });
+      // make links safe
+      doc.querySelectorAll('a').forEach(a=>{ a.target = '_blank'; a.rel = 'noopener noreferrer'; });
+      return doc.body.innerHTML.trim() || escapeHtml(stripHtmlText(html));
+    }catch(e){ return escapeHtml(stripHtmlText(html)); }
+  }
+
+  // Heuristic to detect code-like text so we can omit it from chat replies
+  function looksLikeCode(text){
+    if (!text) return false;
+    const indicators = /\b(function|return|var|let|const|=>|console\.|alert\(|\/\*|\*\/|\/\/|\{|\}|;|\(|\))|<script\b|<\/?div\b|<\w+\s+class=|<\w+\s+id=/i;
+    const semicolons = (text.match(/;/g) || []).length;
+    const lines = text.split('\n').length;
+    const angleBrackets = (text.match(/</g) || []).length;
+    if (indicators.test(text)) return true;
+    if (semicolons > 3 && lines > 3) return true;
+    if (angleBrackets > 6 && lines > 2) return true;
+    if (text.length > 2000) return true;
+    return false;
+  }
+
+  // Heuristic to detect large HTML blocks
+  function looksLikeHtml(text){
+    if (!text) return false;
+    const tags = /<\/(div|script|style|header|footer|main|section|article|nav|form|input|button)\b/i;
+    const manyAngles = (text.match(/</g) || []).length > 8;
+    return tags.test(text) || manyAngles;
   }
 
   // Show a quick offer to create a support ticket
@@ -161,6 +239,16 @@
     messages.scrollTop = messages.scrollHeight;
 
     setTimeout(()=>{
+      // Autofill from localStorage if user is logged in
+      try{
+        const stored = localStorage.getItem('userData');
+        if (stored){
+          const cu = JSON.parse(stored);
+          if (cu && cu.name){ const el = document.getElementById('_ticket_name'); if (el) el.value = cu.name; }
+          if (cu && cu.email){ const el2 = document.getElementById('_ticket_email'); if (el2) el2.value = cu.email; }
+        }
+      }catch(e){ /* ignore parse errors */ }
+
       const submit = document.getElementById('_ticket_submit');
       const cancel = document.getElementById('_ticket_cancel');
       if (cancel) cancel.addEventListener('click', ()=> appendMessage('Ticket creation cancelled. Let me know if you need anything else.', 'bot'));
@@ -209,7 +297,7 @@
         if (!chatWindow) return;
         chatWindow.classList.toggle('hidden');
         if (!chatWindow.classList.contains('hidden') && messages && messages.children.length === 0){
-          setTimeout(() => appendMessage('Hi there 👋 I can help with orders, products, delivery, returns, and account issues. Try: "order status"', 'bot'), 250);
+          setTimeout(() => appendMessage('Hi there 👋 I can help with orders, products, delivery, returns, and account issues. Try: "order status", "product id <id>", or "connect to agent". You can also use the quick buttons below.', 'bot'), 250);
         }
       });
     });

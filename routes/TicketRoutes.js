@@ -38,7 +38,7 @@ router.get('/:id', requireAuth, async (req, res, next) => {
 // Create new ticket (authenticated users)
 router.post('/', requireAuth, async (req, res, next) => {
   try {
-    const { subject, description, category, priority } = req.body;
+    const { subject, description, category, priority, source } = req.body;
     if (!subject || !description) {
       return res.status(400).json({ success: false, error: 'Subject and description are required' });
     }
@@ -49,6 +49,7 @@ router.post('/', requireAuth, async (req, res, next) => {
       description,
       category: category || 'other',
       priority: priority || 'medium',
+      source: source === 'api' ? 'api' : 'user',
       messages: [{
         sender: 'user',
         senderName: `${req.user.firstName || ''} ${req.user.lastName || ''}`.trim(),

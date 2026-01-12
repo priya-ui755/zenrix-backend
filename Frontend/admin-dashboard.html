@@ -1,15 +1,18 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <script>window.API_URL = '/api';</script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Zenrix Admin Dashboard</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="/css/tailwind-admin.css">
+    <!-- AdminLTE + icon stack -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.15.4/css/all.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/admin-lte@4.0.0-rc6/dist/css/adminlte.min.css">
     <link rel="stylesheet" href="/admin.css">
     <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
-    <!-- admin styles and chart library -->
-    <link rel="stylesheet" href="/admin.css">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- admin styles; Chart.js is lazy-loaded by /js/admin-dashboard.js -->
     <!-- favicon to avoid 404 and small site id -->
     <link rel="icon" href="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><text y='28' font-size='28' font-family='Poppins' fill='%236674ee'>Z</text></svg>">
     <script src="/js/admin-dashboard.js" defer></script>
@@ -20,7 +23,7 @@
         }
         .slide-in { animation: slideIn 0.3s ease-out; }
         .modal-backdrop { backdrop-filter: blur(4px); }
-        .gradient-bg { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
+        .gradient-bg { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); overflow: visible; }
         .card-hover { transition: all 0.3s; }
         .card-hover:hover { transform: translateY(-2px); box-shadow: 0 10px 25px rgba(0,0,0,0.1); }
         .image-preview { max-width: 100px; max-height: 100px; object-fit: cover; }
@@ -52,46 +55,113 @@
         .field-disabled {
             opacity: 0.5;
         }
+
+        /* Notifications should not appear as pop-up boxes. */
+        #toastContainer { display: none !important; }
+        /* Fancy animated gradient for map preview */
+        .fancy-map-bg {
+            background: linear-gradient(135deg, #7c3aed 0%, #06b6d4 25%, #34d399 50%, #f97316 75%, #e11d48 100%);
+            background-size: 200% 200%;
+            animation: gradientShift 8s ease infinite;
+            border: 0;
+            color: #ffffff;
+            box-shadow: inset 0 0 0 2px rgba(255,255,255,0.06), 0 8px 24px rgba(15,23,42,0.12);
+        }
+
+        @keyframes gradientShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
     </style>
 </head>
-<body class="bg-gray-50 min-h-screen">
-    <a class="skip-link" href="#adminContent">Skip to dashboard</a>
-    <!-- Modern Header -->
-    <div class="gradient-bg text-white shadow-lg">
-        <div class="container mx-auto px-6 py-4">
-            <div class="flex justify-between items-center">
-                <div class="flex items-center space-x-3">
-                    <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"/>
-                    </svg>
-                    <div>
-                        <h1 class="text-2xl font-bold">Zenrix</h1>
-                        <p class="text-xs opacity-90">Admin Dashboard</p>
-                            <div class="flex items-center gap-3 mt-3">
-                                <input type="file" id="uploadHeroBgInput" accept="image/*" class="hidden">
-                                <button type="button" id="uploadHeroBgBtn" class="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition">Upload Image</button>
-                                <span id="uploadHeroBgStatus" class="text-xs text-gray-500"></span>
-                            </div>
+<body class="hold-transition sidebar-mini layout-fixed bg-gray-50 min-h-screen adminlte-enabled admin">
+        <a class="skip-link" href="#adminContent">Skip to dashboard</a>
+        <div class="wrapper admin-app">
+                <nav class="main-header navbar navbar-expand navbar-white navbar-light shadow-sm">
+                    <div class="navbar-nav d-flex align-items-center">
+                        <button class="btn btn-link text-secondary pr-3" id="sidebarToggle" aria-label="Toggle sidebar" aria-controls="adminSidebar" aria-expanded="true">
+                            <i class="fas fa-bars"></i>
+                        </button>
+                        <span class="brand-text font-weight-bold text-indigo-800" style="letter-spacing:0.5px">Zenrix Admin</span>
                     </div>
-                </div>
-                <div class="flex items-center space-x-4">
-                    <div id="adminStatus" class="bg-white bg-opacity-20 px-4 py-2 rounded-full text-sm cursor-pointer">
-                        <span id="adminLoginBtn">Click to Login</span>
-                    </div>
-                    <button id="logoutBtn" class="btn btn-danger hidden" aria-label="Logout">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M9 3h6v2H9V3zM7 7h10v12a2 2 0 01-2 2H9a2 2 0 01-2-2V7z" fill="currentColor"/></svg>
-                        <span class="ml-1">Logout</span>
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>
+                        <ul class="navbar-nav ml-auto" role="list" style="overflow: visible; align-items: center;">
+                            <li class="nav-item mr-2 d-flex align-items-center">
+                                <button id="ticketsUnseenBadge" class="btn btn-link nav-link px-2" type="button" title="Unseen tickets" aria-label="Unseen tickets">
+                                    <i class="far fa-bell" style="font-size: 1.1rem; color: #374151"></i>
+                                    <span class="badge badge-danger navbar-badge" id="ticketsUnseenCount">0</span>
+                                </button>
+                            </li>
+                            <li class="nav-item mr-2 d-flex align-items-center">
+                                <div id="adminStatus" class="bg-indigo-50 px-3 py-1 rounded-pill text-sm cursor-pointer">
+                                    <span id="adminLoginBtn">Click to Login</span>
+                                </div>
+                            </li>
+                            <li class="nav-item d-flex align-items-center">
+                                        <button id="logoutBtn" class="star-btn btn btn-danger hidden" type="button" aria-label="Logout" style="position: relative; overflow: visible;">
+                                            Log Out
+                                            <span class="smoke" aria-hidden="true"></span>
+                                            <div class="star-1">
+                                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 784.11 815.53"><g><path class="fil0" d="M392.05 0c-20.9,210.08 -184.06,378.41 -392.05,407.78 207.96,29.37 371.12,197.68 392.05,407.74 20.93,-210.06 184.09,-378.37 392.05,-407.74 -207.98,-29.38 -371.16,-197.69 -392.06,-407.78z"/></g></svg>
+                                            </div>
+                                            <div class="star-2">
+                                                <svg xmlns="http://www.w3.org/2000/svg" xml:space="preserve" version="1.1" style="shape-rendering:geometricPrecision; text-rendering:geometricPrecision; image-rendering:optimizeQuality; fill-rule:evenodd; clip-rule:evenodd" viewBox="0 0 784.11 815.53" xmlns:xlink="http://www.w3.org/1999/xlink">
+                                                    <g id="Layer_x0020_1"><metadata id="CorelCorpID_0Corel-Layer"></metadata><path class="fil0" d="M392.05 0c-20.9,210.08 -184.06,378.41 -392.05,407.78 207.96,29.37 371.12,197.68 392.05,407.74 20.93,-210.06 184.09,-378.37 392.05,-407.74 -207.98,-29.38 -371.16,-197.69 -392.06,-407.78z"></path></g>
+                                                </svg>
+                                            </div>
+                                            <div class="star-3">
+                                                <svg xmlns="http://www.w3.org/2000/svg" xml:space="preserve" version="1.1" style="shape-rendering:geometricPrecision; text-rendering:geometricPrecision; image-rendering:optimizeQuality; fill-rule:evenodd; clip-rule:evenodd" viewBox="0 0 784.11 815.53" xmlns:xlink="http://www.w3.org/1999/xlink">
+                                                    <g id="Layer_x0020_1"><metadata id="CorelCorpID_0Corel-Layer"></metadata><path class="fil0" d="M392.05 0c-20.9,210.08 -184.06,378.41 -392.05,407.78 207.96,29.37 371.12,197.68 392.05,407.74 20.93,-210.06 184.09,-378.37 392.05,-407.74 -207.98,-29.38 -371.16,-197.69 -392.06,-407.78z"></path></g>
+                                                </svg>
+                                            </div>
+                                            <div class="star-4">
+                                                <svg xmlns="http://www.w3.org/2000/svg" xml:space="preserve" version="1.1" style="shape-rendering:geometricPrecision; text-rendering:geometricPrecision; image-rendering:optimizeQuality; fill-rule:evenodd; clip-rule:evenodd" viewBox="0 0 784.11 815.53" xmlns:xlink="http://www.w3.org/1999/xlink">
+                                                    <g id="Layer_x0020_1"><metadata id="CorelCorpID_0Corel-Layer"></metadata><path class="fil0" d="M392.05 0c-20.9,210.08 -184.06,378.41 -392.05,407.78 207.96,29.37 371.12,197.68 392.05,407.74 20.93,-210.06 184.09,-378.37 392.05,-407.74 -207.98,-29.38 -371.16,-197.69 -392.06,-407.78z"></path></g>
+                                                </svg>
+                                            </div>
+                                            <div class="star-5">
+                                                <svg xmlns="http://www.w3.org/2000/svg" xml:space="preserve" version="1.1" style="shape-rendering:geometricPrecision; text-rendering:geometricPrecision; image-rendering:optimizeQuality; fill-rule:evenodd; clip-rule:evenodd" viewBox="0 0 784.11 815.53" xmlns:xlink="http://www.w3.org/1999/xlink">
+                                                    <g id="Layer_x0020_1"><metadata id="CorelCorpID_0Corel-Layer"></metadata><path class="fil0" d="M392.05 0c-20.9,210.08 -184.06,378.41 -392.05,407.78 207.96,29.37 371.12,197.68 392.05,407.74 20.93,-210.06 184.09,-378.37 392.05,-407.74 -207.98,-29.38 -371.16,-197.69 -392.06,-407.78z"></path></g>
+                                                </svg>
+                                            </div>
+                                            <div class="star-6">
+                                                <svg xmlns="http://www.w3.org/2000/svg" xml:space="preserve" version="1.1" style="shape-rendering:geometricPrecision; text-rendering:geometricPrecision; image-rendering:optimizeQuality; fill-rule:evenodd; clip-rule:evenodd" viewBox="0 0 784.11 815.53" xmlns:xlink="http://www.w3.org/1999/xlink">
+                                                    <g id="Layer_x0020_1"><metadata id="CorelCorpID_0Corel-Layer"></metadata><path class="fil0" d="M392.05 0c-20.9,210.08 -184.06,378.41 -392.05,407.78 207.96,29.37 371.12,197.68 392.05,407.74 20.93,-210.06 184.09,-378.37 392.05,-407.74 -207.98,-29.38 -371.16,-197.69 -392.06,-407.78z"></path></g>
+                                                </svg>
+                                            </div>
+                                        </button>
+                                </li>
+                        </ul>
+                </nav>
 
-    <div class="admin-app">
+                <aside id="adminSidebar" class="main-sidebar sidebar-dark-primary elevation-4">
+                        <a href="#" class="brand-link text-center">
+                                <span class="brand-text font-weight-light">Zenrix AdminLTE</span>
+                        </a>
+                        <div class="sidebar">
+                                <nav class="mt-2">
+                                        <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="list" aria-label="Sidebar navigation" data-accordion="false">
+                                            <li class="nav-item"><a href="#" class="nav-link active" data-jump-tab="dashboard"><i class="nav-icon fas fa-tachometer-alt"></i><p>Dashboard</p></a></li>
+                                            <li class="nav-item"><a href="#" class="nav-link" data-jump-tab="products"><i class="nav-icon fas fa-box"></i><p>Products</p></a></li>
+                                                <li class="nav-item"><a href="#" class="nav-link" data-jump-tab="pages"><i class="nav-icon fas fa-file-alt"></i><p>Pages</p></a></li>
+                                                <li class="nav-item"><a href="#" class="nav-link" data-jump-tab="components"><i class="nav-icon fas fa-th-large"></i><p>Components</p></a></li>
+                                                <li class="nav-item"><a href="#" class="nav-link" data-jump-tab="footer-map"><i class="nav-icon fas fa-map-marked-alt"></i><p>Footer Map</p></a></li>
+                                                <li class="nav-item"><a href="#" class="nav-link" data-jump-tab="hero"><i class="nav-icon fas fa-images"></i><p>Hero</p></a></li>
+                                                <li class="nav-item"><a href="#" class="nav-link" data-jump-tab="payments"><i class="nav-icon fas fa-credit-card"></i><p>Payments</p></a></li>
+                                                <li class="nav-item"><a href="#" class="nav-link" data-jump-tab="orders"><i class="nav-icon fas fa-shopping-cart"></i><p>Orders</p></a></li>
+                                                <li class="nav-item"><a href="#" class="nav-link" data-jump-tab="careers"><i class="nav-icon fas fa-user-tie"></i><p>Careers</p></a></li>
+                                                <li class="nav-item"><a href="#" class="nav-link" data-jump-tab="staff"><i class="nav-icon fas fa-users"></i><p>Staff</p></a></li>
+                                                <li class="nav-item"><a href="#" class="nav-link" data-jump-tab="subscribers"><i class="nav-icon fas fa-envelope-open-text"></i><p>Subscribers</p></a></li>
+                                                <li class="nav-item"><a href="#" class="nav-link" data-jump-tab="tickets"><i class="nav-icon fas fa-life-ring"></i><p>Support Tickets</p></a></li>
+                                                <li class="nav-item"><a href="/index.html" target="_blank" class="nav-link"><i class="nav-icon fas fa-external-link-alt"></i><p>View Store</p></a></li>
+                                        </ul>
+                                </nav>
+                        </div>
+                </aside>
 
 
-    <!-- Main Content -->
-    <div id="authOverlay" class="fixed inset-0 bg-white bg-opacity-70 backdrop-blur-sm z-50 hidden" aria-hidden="true">
+                <!-- Main Content -->
+                <div id="authOverlay" class="fixed inset-0 bg-white bg-opacity-70 backdrop-blur-sm z-50 hidden" aria-hidden="true">
         <div class="auth-overlay flex items-center justify-center w-full h-full px-4">
             <div class="auth-card bg-white rounded-xl shadow-xl p-8 max-w-md w-full text-center" role="dialog" aria-modal="true" aria-labelledby="authOverlayTitle">
                 <div class="flex items-start gap-6">
@@ -112,26 +182,36 @@
             </div>
         </div>
     </div>
-    <div class="admin-layout">
-      <aside class="admin-sidebar" role="navigation" aria-label="Admin navigation">
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:0.5rem">
-            <div style="display:flex;gap:.5rem;align-items:center">
-                <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="width:24px;height:24px;color:var(--accent)"><path d="M12 2L2 7l10 5 10-5-10-5z" fill="currentColor"/></svg>
-                <strong>Admin</strong>
-            </div>
-            <button id="sidebarToggle" class="px-2 py-1" aria-expanded="false" aria-controls="adminContent" style="background:transparent;border:0;color:var(--muted);cursor:pointer">☰<span class="sr-only">Toggle sidebar</span></button>
-        </div>
-        <nav>
-            <a href="#" data-jump-tab="products">Products</a>
-            <a href="#" data-jump-tab="orders">Orders</a>
-            <a href="#" data-jump-tab="payments">Payments</a>
-            <a href="#" data-jump-tab="pages">Pages</a>
-            <a href="#" data-jump-tab="components">Components</a>
-            <a href="#" data-jump-tab="subscribers">Subscribers</a>
-        </nav>
-      </aside>
+        <div class="content-wrapper">
+            <section class="content pt-3">
+                <main id="adminContent" class="container-fluid px-3 py-6 admin-main">
+                    <div class="gradient-bg text-white shadow-lg rounded-xl mb-6">
+                        <div class="px-6 py-4 flex justify-between items-start">
+                            <div class="flex items-center space-x-3">
+                                <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"/>
+                                </svg>
+                                <div>
+                                    <h1 class="text-2xl font-bold">Zenrix</h1>
+                                    <p class="text-xs opacity-90">AdminLTE Dashboard</p>
+                                    <div class="flex items-center gap-3 mt-3">
+                                        <input type="file" id="uploadHeroBgInput" accept="image/*" class="hidden">
+                                        <button type="button" id="uploadHeroBgBtn" class="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition">Upload Image</button>
+                                        <span id="uploadHeroBgStatus" class="text-xs text-gray-200"></span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
 
-      <main id="adminContent" class="container mx-auto px-6 py-8 hidden admin-main">
+        <div id="content-dashboard">
+            <!-- Dashboard Overview -->
+            <div class="card mb-6 shadow-sm">
+                <div class="card-header bg-white border-0 pb-1">
+                    <h2 class="text-lg font-semibold text-gray-800 mb-1">Dashboard Overview</h2>
+                    <p class="text-sm text-gray-500">Key metrics, charts, and recent activity at a glance.</p>
+                </div>
+            </div>
 
         <!-- Quick shortcuts / sticky toolbar -->
         <div class="sticky top-2 z-30 mb-6">
@@ -148,6 +228,12 @@
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9M20 20v-5h-.581m-15.357-2a8.003 8.003 0 0015.357 2" />
                         </svg>
                         Refresh data
+                    </button>
+                    <button id="reprocessImagesBtn" class="inline-flex items-center gap-2 px-3 py-2 rounded-xl bg-emerald-600 text-white text-sm font-semibold hover:bg-emerald-700 transition">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                        </svg>
+                        Reprocess All Product Images
                     </button>
                     <button data-jump-tab="orders" class="inline-flex items-center gap-2 px-3 py-2 rounded-xl border border-gray-200 text-sm font-semibold text-gray-700 hover:border-gray-300 hover:bg-gray-50 transition">Orders</button>
                     <button data-jump-tab="payments" class="inline-flex items-center gap-2 px-3 py-2 rounded-xl border border-gray-200 text-sm font-semibold text-gray-700 hover:border-gray-300 hover:bg-gray-50 transition">Payments</button>
@@ -259,12 +345,16 @@
                     </div>
                 </div>
             </div>
-        </div>
 
-        <!-- Tabs -->
+        </div> <!-- /#content-dashboard -->
+
+        <!-- Tabs (kept for logic; navigation is via sidebar) -->
         <div class="bg-white rounded-xl shadow-md mb-8">
             <div class="border-b">
-                <div class="flex space-x-8 px-6 overflow-x-auto">
+                <div class="flex space-x-8 px-6 overflow-x-auto admin-tabs-header" style="display:none">
+                    <button data-tab="dashboard" id="tab-dashboard" class="py-4 px-2 border-b-2 border-blue-600 text-blue-600 font-medium whitespace-nowrap">
+                        Dashboard
+                    </button>
                     <button data-tab="products" id="tab-products" class="py-4 px-2 border-b-2 border-blue-600 text-blue-600 font-medium whitespace-nowrap">
                         Products
                     </button>
@@ -286,6 +376,9 @@
                     <button data-tab="careers" id="tab-careers" class="py-4 px-2 border-b-2 border-transparent text-gray-500 hover:text-gray-700 font-medium whitespace-nowrap">
                         Careers
                     </button>
+                    <button data-tab="staff" id="tab-staff" class="py-4 px-2 border-b-2 border-transparent text-gray-500 hover:text-gray-700 font-medium whitespace-nowrap">
+                        Staff
+                    </button>
                     <button data-tab="subscribers" id="tab-subscribers" class="py-4 px-2 border-b-2 border-transparent text-gray-500 hover:text-gray-700 font-medium whitespace-nowrap">
                         Subscribers
                     </button>
@@ -296,7 +389,7 @@
             </div>
 
             <!-- Products Tab -->
-            <div id="content-products" class="p-6">
+            <div id="content-products" class="p-6 hidden">
                 <div class="mb-6">
                     <h2 class="text-xl font-bold text-gray-800 mb-4">Add New Product</h2>
                     <form id="addProductForm" class="space-y-4">
@@ -362,6 +455,34 @@
 
                 <div class="mt-8">
                     <h2 class="text-xl font-bold text-gray-800 mb-4">All Products</h2>
+                    <div class="mb-4 flex flex-wrap gap-4 items-center justify-between">
+                        <div class="flex items-center gap-4">
+                            <div class="flex items-center gap-2">
+                                <label for="viewByCategory" class="text-sm font-medium text-gray-700">View by:</label>
+                                <select id="viewByCategory" class="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                                    <option value="all">All Categories</option>
+                                    <option value="electronics">Electronics</option>
+                                    <option value="fashion">Fashion</option>
+                                    <option value="home">Home & Kitchen</option>
+                                    <option value="beauty">Beauty</option>
+                                    <option value="sports">Sports</option>
+                                </select>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <label for="viewMode" class="text-sm font-medium text-gray-700">View:</label>
+                                <select id="viewMode" class="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                                    <option value="list">List</option>
+                                    <option value="tile">Tile</option>
+                                    <option value="small-icon">Small Icon</option>
+                                    <option value="table">Table</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <label for="searchProducts" class="text-sm font-medium text-gray-700">Search:</label>
+                            <input type="text" id="searchProducts" placeholder="Search products..." class="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                        </div>
+                    </div>
                     <div id="productsList" class="space-y-4"></div>
                 </div>
             </div>
@@ -448,7 +569,7 @@
                         </div>
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-2">HTML</label>
-                            <textarea name="html" rows="6" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-yellow-500 focus:border-transparent font-mono text-sm"></textarea>
+                            <textarea name="html" rows="18" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-yellow-500 focus:border-transparent font-mono text-sm resize-y" style="min-height: 45vh;"></textarea>
                         </div>
                         <div>
                             <label class="flex items-center space-x-2">
@@ -465,6 +586,66 @@
                 <div class="mt-8">
                     <h2 class="text-xl font-bold text-gray-800 mb-4">All Components</h2>
                     <div id="componentsList" class="space-y-4"></div>
+                </div>
+            </div>
+
+            <!-- Footer Map Tab -->
+            <div id="content-footer-map" class="p-6 hidden">
+                <div class="bg-gradient-to-r from-green-50 to-emerald-50 rounded-xl p-6 mb-6 border border-green-100">
+                    <div class="flex items-center justify-between mb-4">
+                        <div>
+                            <h2 class="text-2xl font-bold text-gray-800 flex items-center">
+                                <svg class="w-6 h-6 mr-2 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"/>
+                                </svg>
+                                Footer Map Settings
+                            </h2>
+                            <p class="text-sm text-gray-600 mt-1">Configure the interactive map displayed in the website footer</p>
+                        </div>
+                        <button id="refreshFooterMap" class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition">
+                            Refresh
+                        </button>
+                    </div>
+
+                    <form id="footerMapForm" class="space-y-6">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Map Embed URL</label>
+                            <input type="url" name="mapEmbed" placeholder="https://www.google.com/maps/embed?..." class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent text-sm">
+                            <p class="text-xs text-gray-500 mt-2">Enter a Google Maps embed URL. Get this from Google Maps by clicking "Share" → "Embed a map".</p>
+                        </div>
+
+                        <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                            <h3 class="text-sm font-medium text-blue-800 mb-2">How to get a Google Maps embed URL:</h3>
+                            <ol class="text-sm text-blue-700 space-y-1 list-decimal list-inside">
+                                <li>Go to <a href="https://maps.google.com" target="_blank" class="underline">Google Maps</a></li>
+                                <li>Search for your location</li>
+                                <li>Click the "Share" button</li>
+                                <li>Click the "Embed a map" tab</li>
+                                <li>Copy the URL from the iframe src attribute</li>
+                            </ol>
+                        </div>
+
+                        <div class="flex items-center justify-between pt-4">
+                            <button type="button" id="previewMapBtn" class="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition">
+                                Preview Map
+                            </button>
+                            <button type="submit" class="px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition">
+                                Save Map Settings
+                            </button>
+                        </div>
+                    </form>
+                </div>
+
+                <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+                    <h3 class="text-lg font-semibold text-gray-800 mb-4">Current Map Preview</h3>
+                    <div id="mapPreview" class="w-full h-64 rounded-lg fancy-map-bg flex items-center justify-center">
+                        <div class="text-center">
+                            <svg class="w-12 h-12 mx-auto mb-2 text-white/90" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"/>
+                            </svg>
+                            <p class="text-sm" style="color:rgba(255,255,255,0.92)">Map preview will appear here</p>
+                        </div>
+                    </div>
                 </div>
             </div>
 
@@ -538,6 +719,7 @@
                                 Save Hero Settings
                             </span>
                         </button>
+                        <div id="heroSaveStatus" class="text-xs text-gray-500 text-center" aria-live="polite"></div>
                     </form>
                     </div>
 
@@ -606,6 +788,27 @@
                                 Save Spotlight Bundle
                             </button>
                         </form>
+                </div>
+
+                <!-- Hero Fallback Carousel (shown when Hero is disabled) -->
+                <div class="bg-white rounded-xl shadow-md p-6 border border-gray-100 mt-6" id="carouselAdminSection">
+                    <div class="flex items-center justify-between mb-4">
+                        <div>
+                            <h3 class="text-xl font-bold text-gray-800">Homepage Carousel (Hero OFF)</h3>
+                            <p class="text-sm text-gray-500">When you disable the Hero section, this carousel will appear on the homepage.</p>
+                        </div>
+                        <button id="refreshCarousel" type="button" class="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition">Refresh</button>
+                    </div>
+
+                    <div id="carouselSlidesEditor" class="space-y-4"></div>
+
+                    <div class="flex flex-wrap gap-3 mt-4">
+                        <button id="addCarouselSlide" type="button" class="px-4 py-2 bg-white border border-gray-200 text-gray-800 rounded-lg hover:bg-gray-50 transition">Add Slide</button>
+                        <button id="saveCarousel" type="button" class="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition">Save Carousel</button>
+                        <span id="carouselSaveStatus" class="text-xs text-gray-500 self-center"></span>
+                    </div>
+
+                    <p class="text-xs text-gray-500 mt-3">Slides support image upload (JPEG/PNG/WEBP up to 5MB). Leave fields empty to omit them.</p>
                 </div>
 
                 <!-- Preview Section -->
@@ -700,8 +903,8 @@
                                 <div class="space-y-3">
                                     <label class="block text-sm font-semibold text-gray-700">Fallback QR Image URL</label>
                                     <div class="flex flex-col sm:flex-row sm:items-center gap-3">
-                                        <input type="text" name="qrImageUrl" inputmode="url" autocomplete="off" spellcheck="false" class="flex-1 border border-gray-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-indigo-500" placeholder="https://... or /uploads/qr.png">
-                                        <div class="flex items-center gap-2">
+                                        <input type="text" name="qrImageUrl" inputmode="url" autocomplete="off" spellcheck="false" class="flex-1 min-w-0 border border-gray-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-indigo-500" placeholder="https://... or /uploads/qr.png">
+                                        <div class="flex items-center gap-2 shrink-0">
                                             <button type="button" class="px-4 py-2 bg-indigo-100 text-indigo-700 rounded-lg hover:bg-indigo-200 transition" data-upload-btn="qrImageUrl">Upload</button>
                                             <input type="file" accept="image/*" class="hidden" data-upload-input="qrImageUrl">
                                         </div>
@@ -731,8 +934,8 @@
                                     <textarea name="esewaInstructions" rows="2" class="w-full border border-emerald-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-emerald-500" placeholder="Send payment screenshot via email"></textarea>
                                     <div class="space-y-2">
                                         <div class="flex flex-col sm:flex-row sm:items-center gap-3">
-                                            <input type="text" name="esewaQr" inputmode="url" autocomplete="off" spellcheck="false" class="flex-1 border border-emerald-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-emerald-500" placeholder="QR image URL or /uploads/esewa.png">
-                                            <div class="flex items-center gap-2">
+                                            <input type="text" name="esewaQr" inputmode="url" autocomplete="off" spellcheck="false" class="flex-1 min-w-0 border border-emerald-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-emerald-500" placeholder="QR image URL or /uploads/esewa.png">
+                                            <div class="flex items-center gap-2 shrink-0">
                                                 <button type="button" class="px-4 py-2 bg-emerald-100 text-emerald-700 rounded-lg hover:bg-emerald-200 transition" data-upload-btn="esewaQr">Upload</button>
                                                 <input type="file" accept="image/*" class="hidden" data-upload-input="esewaQr">
                                             </div>
@@ -761,8 +964,8 @@
                                     <textarea name="khaltiInstructions" rows="2" class="w-full border border-fuchsia-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-fuchsia-500" placeholder="Reference message customers should use"></textarea>
                                     <div class="space-y-2">
                                         <div class="flex flex-col sm:flex-row sm:items-center gap-3">
-                                            <input type="text" name="khaltiQr" inputmode="url" autocomplete="off" spellcheck="false" class="flex-1 border border-fuchsia-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-fuchsia-500" placeholder="QR image URL or /uploads/khalti.png">
-                                            <div class="flex items-center gap-2">
+                                            <input type="text" name="khaltiQr" inputmode="url" autocomplete="off" spellcheck="false" class="flex-1 min-w-0 border border-fuchsia-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-fuchsia-500" placeholder="QR image URL or /uploads/khalti.png">
+                                            <div class="flex items-center gap-2 shrink-0">
                                                 <button type="button" class="px-4 py-2 bg-fuchsia-100 text-fuchsia-700 rounded-lg hover:bg-fuchsia-200 transition" data-upload-btn="khaltiQr">Upload</button>
                                                 <input type="file" accept="image/*" class="hidden" data-upload-input="khaltiQr">
                                             </div>
@@ -791,8 +994,8 @@
                                     <textarea name="imeInstructions" rows="2" class="w-full border border-amber-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-amber-500" placeholder="Mention your IME Pay reference note"></textarea>
                                     <div class="space-y-2">
                                         <div class="flex flex-col sm:flex-row sm:items-center gap-3">
-                                            <input type="text" name="imeQr" inputmode="url" autocomplete="off" spellcheck="false" class="flex-1 border border-amber-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-amber-500" placeholder="QR image URL or /uploads/imepay.png">
-                                            <div class="flex items-center gap-2">
+                                            <input type="text" name="imeQr" inputmode="url" autocomplete="off" spellcheck="false" class="flex-1 min-w-0 border border-amber-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-amber-500" placeholder="QR image URL or /uploads/imepay.png">
+                                            <div class="flex items-center gap-2 shrink-0">
                                                 <button type="button" class="px-4 py-2 bg-amber-100 text-amber-800 rounded-lg hover:bg-amber-200 transition" data-upload-btn="imeQr">Upload</button>
                                                 <input type="file" accept="image/*" class="hidden" data-upload-input="imeQr">
                                             </div>
@@ -968,6 +1171,120 @@
                 </div>
             </div>
 
+            <!-- Staff Tab -->
+            <div id="content-staff" class="p-6 hidden">
+                <div class="mb-6">
+                    <h2 class="text-xl font-bold text-gray-800 mb-4">Add Team Member</h2>
+                    <form id="addStaffForm" class="space-y-4" enctype="multipart/form-data">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Name *</label>
+                                <input type="text" name="name" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Position *</label>
+                                <input type="text" name="position" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                            </div>
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Email</label>
+                                <input type="email" name="email" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">LinkedIn URL</label>
+                                <input type="url" name="linkedin" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Bio *</label>
+                            <textarea name="bio" rows="4" required placeholder="Brief biography of the team member..." class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"></textarea>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Profile Image</label>
+                            <input type="file" name="image" accept="image/*" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                            <p class="text-sm text-gray-500 mt-1">Upload a profile photo (JPEG, PNG, WebP, GIF - max 5MB)</p>
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Display Order</label>
+                                <input type="number" name="order" value="0" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                            </div>
+                            <div class="flex items-center">
+                                <label class="flex items-center space-x-2 mt-6">
+                                    <input type="checkbox" name="active" class="w-4 h-4 text-blue-600 rounded focus:ring-2 focus:ring-blue-500" checked>
+                                    <span class="text-sm font-medium text-gray-700">Active member</span>
+                                </label>
+                            </div>
+                        </div>
+                        <button type="submit" class="w-full bg-blue-600 text-white px-6 py-3 rounded-lg font-medium hover:bg-blue-700 transition">
+                            Add Team Member
+                        </button>
+                    </form>
+                </div>
+
+                <div class="mt-8">
+                    <h2 class="text-xl font-bold text-gray-800 mb-4">Team Members</h2>
+                    <div id="staffList" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
+                </div>
+            </div>
+
+            <!-- Edit Staff Modal -->
+            <div id="editStaffModal" class="fixed inset-0 bg-black bg-opacity-50 modal-backdrop hidden flex items-center justify-center z-50">
+                <div class="bg-white rounded-2xl shadow-2xl p-8 w-full max-w-2xl max-h-[90vh] overflow-y-auto slide-in">
+                    <h2 class="text-2xl font-bold text-gray-800 mb-6">Edit Team Member</h2>
+                    <form id="editStaffForm" class="space-y-4" enctype="multipart/form-data">
+                        <input type="hidden" name="id">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Name *</label>
+                                <input type="text" name="name" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Position *</label>
+                                <input type="text" name="position" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Email</label>
+                            <input type="email" name="email" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">LinkedIn URL</label>
+                            <input type="url" name="linkedin" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Bio *</label>
+                            <textarea name="bio" rows="4" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"></textarea>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Profile Image</label>
+                            <div class="flex items-center gap-4">
+                                <img id="editStaffPreview" src="/assets/placeholder.svg" class="w-20 h-20 object-cover rounded-full" alt="Preview">
+                                <input type="file" name="image" accept="image/*" class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                            </div>
+                            <p class="text-sm text-gray-500 mt-1">Upload a profile photo (JPEG, PNG, WebP, GIF - max 5MB)</p>
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Display Order</label>
+                                <input type="number" name="order" value="0" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                            </div>
+                            <div class="flex items-center">
+                                <label class="flex items-center space-x-2 mt-6">
+                                    <input type="checkbox" name="active" class="w-4 h-4 text-blue-600 rounded focus:ring-2 focus:ring-blue-500">
+                                    <span class="text-sm font-medium text-gray-700">Active member</span>
+                                </label>
+                            </div>
+                        </div>
+                        <div class="flex space-x-3 pt-4">
+                            <button type="submit" class="flex-1 bg-blue-600 text-white px-6 py-3 rounded-lg font-medium hover:bg-blue-700 transition">Save Changes</button>
+                            <button type="button" id="closeEditStaffModalBtn" class="flex-1 bg-gray-200 text-gray-700 px-6 py-3 rounded-lg font-medium hover:bg-gray-300 transition">Cancel</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
             <!-- Subscribers Tab -->
             <div id="content-subscribers" class="p-6 hidden">
                 <div class="flex items-center justify-between mb-4">
@@ -980,7 +1297,7 @@
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
                             </svg>
-                            <span>Export Excel</span>
+                            <span>Export CSV</span>
                         </button>
                         <button id="refreshSubscribers" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition">Refresh</button>
                     </div>
@@ -1019,10 +1336,6 @@
                         <button id="groupGuestBtn" class="px-3 py-2 bg-white text-indigo-700 rounded-lg text-sm border border-indigo-100 hover:bg-indigo-50">Group Guests</button>
                         <button id="filterUnseenBtn" class="px-3 py-2 bg-rose-50 text-rose-700 rounded-lg text-sm border border-rose-100 hover:bg-rose-100">Unseen</button>
                         <button id="refreshTickets" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition">Refresh</button>
-                        <button id="ticketsUnseenBadge" class="ml-2 inline-flex items-center gap-2 px-3 py-2 bg-white border border-gray-200 rounded-full text-sm text-gray-700" title="Unseen tickets">
-                            <svg class="w-4 h-4 text-rose-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6 6 0 10-12 0v3.159c0 .538-.214 1.055-.595 1.436L4 17h5"/></svg>
-                            <span id="ticketsUnseenCount" class="text-sm font-semibold">0</span>
-                        </button>
                     </div>
                 </div>
                 <div id="ticketsList" class="space-y-4"></div>
@@ -1035,9 +1348,10 @@
         <div class="bg-white rounded-2xl shadow-2xl p-8 w-full max-w-md slide-in">
             <h2 class="text-2xl font-bold text-gray-800 mb-6">Admin Login</h2>
             <form id="loginForm" class="space-y-4">
+                <input type="text" name="username" value="admin" style="display:none;" autocomplete="username">
                 <div>
                     <label for="adminPassword" class="block text-sm font-medium text-gray-700 mb-2">Password</label>
-                    <input id="adminPassword" type="password" name="password" required aria-label="Admin password" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                    <input id="adminPassword" type="password" name="password" required aria-label="Admin password" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" autocomplete="current-password">
                 </div>
                 <div class="flex space-x-3">
                     <button type="submit" class="flex-1 bg-blue-600 text-white px-6 py-3 rounded-lg font-medium hover:bg-blue-700 transition">
@@ -1176,7 +1490,7 @@
 
     <!-- Edit Component Modal -->
     <div id="editComponentModal" class="fixed inset-0 bg-black bg-opacity-50 modal-backdrop hidden flex items-center justify-center z-50">
-        <div class="bg-white rounded-2xl shadow-2xl p-8 w-full max-w-3xl max-h-[90vh] overflow-y-auto slide-in">
+        <div class="bg-white rounded-2xl shadow-2xl p-8 w-full overflow-y-auto slide-in" style="width: min(96vw, 1280px); max-height: 96vh;">
             <h2 class="text-2xl font-bold text-gray-800 mb-6">Edit Component</h2>
             <form id="editComponentForm" class="space-y-4">
                 <input type="hidden" name="id">
@@ -1192,11 +1506,16 @@
                 </div>
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-2">HTML</label>
-                    <textarea name="html" rows="10" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-yellow-500 focus:border-transparent font-mono text-sm"></textarea>
+                    <textarea name="html" rows="28" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-yellow-500 focus:border-transparent font-mono text-sm resize-y" style="min-height: 60vh;"></textarea>
+                </div>
+                <div id="footerMapSection" class="hidden">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Footer Map Embed URL</label>
+                    <input type="url" name="mapEmbed" placeholder="https://www.google.com/maps/embed?..." class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-yellow-500 focus:border-transparent">
+                    <p class="text-xs text-gray-500 mt-1">Enter a Google Maps embed URL for the footer map. Leave empty to use default.</p>
                 </div>
                 <div>
                     <label class="flex items-center space-x-2">
-                        <input type="checkbox" name="published" class="w-4 h-4 text-yellow-600 rounded focus:ring-2 focus:ring-yellow-500">
+                        <input type="checkbox" name="published" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-yellow-500 focus:border-transparent">
                         <span class="text-sm font-medium text-gray-700">Published</span>
                     </label>
                 </div>
@@ -1334,18 +1653,20 @@
         let ordersLastFetchedAt = null;
         const ordersFilters = { status: 'all', paymentStatus: 'all' };
         let ticketsCache = [];
+        let staffCache = [];
         const NPR_FORMATTER = new Intl.NumberFormat('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
         let productSaleCountdownInterval = null;
 
         // Toast notification
+        // NOTE: All notifications are displayed in the footer area (not as pop-ups).
         function showToast(type, message) {
-            const toast = document.createElement('div');
-            toast.className = `slide-in px-6 py-4 rounded-lg shadow-lg ${
-                type === 'success' ? 'bg-green-500' : 'bg-red-500'
-            } text-white max-w-md`;
-            toast.textContent = message;
-            document.getElementById('toastContainer').appendChild(toast);
-            setTimeout(() => toast.remove(), 4000);
+            const toastType = String(type || '').toLowerCase();
+            const msg = String(message || '');
+
+            // Keep behavior minimal: render everything in footer.
+            // Prefix non-error types so they still make sense in an "error" style banner.
+            const prefix = (toastType === 'success') ? '✅ ' : (toastType === 'info') ? 'ℹ️ ' : (toastType === 'warn' || toastType === 'warning') ? '⚠️ ' : '';
+            showErrorBanner(prefix + (msg || 'Something happened.'), { autoHide: true });
         }
 
         // Admin diagnostics: track console errors and failed responses
@@ -1374,60 +1695,39 @@
             }
         }
 
-        // Error banner helper (display in footer area)
+        // Error banner helper (fixed to bottom-right of the screen)
         function showErrorBanner(msg, opts = { autoHide: true }){
             try{
-                // ensure footer block exists
-                let footer = document.getElementById('siteFooter');
-                if (!footer) {
-                    footer = document.createElement('footer');
-                    footer.id = 'siteFooter';
-                    footer.className = 'admin-footer';
-                    // append to body end
-                    document.body.appendChild(footer);
-                }
-
-                let f = document.getElementById('footerError');
-                if (!f) {
-                    f = document.createElement('div');
-                    f.id = 'footerError';
-                    f.className = 'footer-error hidden';
-                    f.setAttribute('role', 'alert');
-                    f.setAttribute('aria-live', 'assertive');
-                    f.innerHTML = `<span id="footerErrorText"></span><button id="footerErrorClose" class="btn btn-ghost" aria-label="Dismiss error">Dismiss</button>`;
-                    footer.appendChild(f);
-                    document.getElementById('footerErrorClose')?.addEventListener('click', () => {
-                        f.classList.remove('show'); f.classList.add('hidden'); f.setAttribute('aria-hidden','true'); if (f._hideTimeout) clearTimeout(f._hideTimeout);
+                let banner = document.getElementById('errorBanner');
+                if (!banner) {
+                    banner = document.createElement('div');
+                    banner.id = 'errorBanner';
+                    banner.className = 'error-banner hidden';
+                    banner.setAttribute('role', 'alert');
+                    banner.setAttribute('aria-live', 'assertive');
+                    banner.innerHTML = `<div class="error-banner-inner"><span id="errorBannerText"></span><button id="errorBannerClose" class="btn btn-ghost" aria-label="Dismiss message">Dismiss</button></div>`;
+                    document.body.appendChild(banner);
+                    document.getElementById('errorBannerClose')?.addEventListener('click', () => {
+                        banner.classList.remove('show');
+                        banner.classList.add('hidden');
+                        banner.setAttribute('aria-hidden','true');
+                        if (banner._hideTimeout) clearTimeout(banner._hideTimeout);
                     });
                 }
 
-                const txt = document.getElementById('footerErrorText');
+                const txt = document.getElementById('errorBannerText');
                 if (txt) txt.textContent = msg;
-                f.classList.remove('hidden'); f.classList.add('show'); f.setAttribute('aria-hidden','false');
-                if (f._hideTimeout) clearTimeout(f._hideTimeout);
-                if (opts.autoHide) f._hideTimeout = setTimeout(()=>{f.classList.remove('show');f.classList.add('hidden');f.setAttribute('aria-hidden','true');}, 7000);
+                banner.classList.remove('hidden');
+                banner.classList.add('show');
+                banner.setAttribute('aria-hidden','false');
+                if (banner._hideTimeout) clearTimeout(banner._hideTimeout);
+                if (opts.autoHide) banner._hideTimeout = setTimeout(()=>{
+                    banner.classList.remove('show');
+                    banner.classList.add('hidden');
+                    banner.setAttribute('aria-hidden','true');
+                }, 7000);
             }catch(e){console.error('showErrorBanner', e)}
         }
-
-        // Ensure logout button is bound reliably (idempotent) - prevents multiple click issues and removes overlay that may block clicks
-        (function bindLogout(){
-            function attach(){
-                const btn = document.getElementById('logoutBtn');
-                if (!btn) return;
-                if (btn.dataset.bound === '1') return;
-                btn.addEventListener('click', (ev)=>{
-                    ev.preventDefault();
-                    if (btn.disabled) return;
-                    btn.disabled = true;
-                    setTimeout(()=>btn.disabled = false, 800);
-                    // hide any visible footer error if present
-                    const b = document.getElementById('footerError'); if (b && b.classList.contains('show')) { b.classList.remove('show'); b.classList.add('hidden'); b.setAttribute('aria-hidden','true'); }
-                    logout();
-                });
-                btn.dataset.bound = '1';
-            }
-            if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', attach); else attach();
-        })();
 
         function formatNpr(value) {
             const amount = Number(value) || 0;
@@ -1489,10 +1789,28 @@
             const overlay = document.getElementById('authOverlay');
             const app = document.getElementById('adminContent');
             if (!overlay || !app) return;
+            // Keep main visible; use overlay purely as a modal gate
             overlay.classList.toggle('hidden', isAuthed);
             overlay.setAttribute('aria-hidden', String(isAuthed));
-            app.classList.toggle('hidden', !isAuthed);
-            // focus the overlay login for quick keyboard access when logged out
+            app.classList.add('admin-content-visible');
+
+            // When the auth overlay is visible, hide and disable background regions for a11y.
+            // This prevents screen readers and automated checkers from reading/flagging the background
+            // while the modal gate is active.
+            const bgEls = [
+                document.querySelector('.main-header'),
+                document.querySelector('.main-sidebar'),
+                document.querySelector('.content-wrapper'),
+            ].filter(Boolean);
+            bgEls.forEach((el) => {
+                try {
+                    el.setAttribute('aria-hidden', String(!isAuthed));
+                } catch (e) {}
+                try {
+                    el.inert = !isAuthed;
+                } catch (e) {}
+            });
+
             if (!isAuthed) {
                 setTimeout(() => document.getElementById('authOverlayLogin')?.focus(), 120);
             }
@@ -1508,6 +1826,7 @@
                 statusEl.classList.add('bg-green-500');
                 statusEl.classList.remove('bg-white', 'bg-opacity-20');
                 btnEl.textContent = 'Logged In ✓';
+                btnEl.style.display = 'none';
                 logoutBtn && logoutBtn.classList.remove('hidden');
                 // refresh knowledge panel when admin logs in
                 setTimeout(() => updateKnowledgeStatus(), 200);
@@ -1515,6 +1834,7 @@
                 statusEl.classList.remove('bg-green-500');
                 statusEl.classList.add('bg-white', 'bg-opacity-20');
                 btnEl.textContent = 'Click to Login';
+                btnEl.style.display = '';
                 logoutBtn && logoutBtn.classList.add('hidden');
             }
         }
@@ -1566,30 +1886,107 @@
             }
         });
 
-        function logout() {
-            if (confirm('Logout from admin?')) {
-                clearAdminToken();
-                showToast('success', 'Logged out successfully');
+        function adminLogout() {
+            const logoutBtnEl = document.getElementById('logoutBtn');
+            if (logoutBtnEl) {
+                if (logoutBtnEl.dataset.loggingOut === '1') return; // guard against multi-clicks
+                logoutBtnEl.dataset.loggingOut = '1';
+                logoutBtnEl.disabled = true;
+                logoutBtnEl.setAttribute('aria-disabled', 'true');
+                logoutBtnEl.classList.add('active');
             }
+
+            // hide any visible banner to avoid covering the button
+            const banner = document.getElementById('errorBanner');
+            if (banner && banner.classList.contains('show')) {
+                banner.classList.remove('show');
+                banner.classList.add('hidden');
+                banner.setAttribute('aria-hidden', 'true');
+            }
+
+            // give the smoke animation a short head start but keep UX snappy
+            const SMOKE_PLAYOUT_MS = 350;
+            showToast('info', 'Logging you out...');
+            setTimeout(() => {
+                clearAdminToken();
+                try {
+                    localStorage.removeItem('userToken');
+                    localStorage.removeItem('userData');
+                } catch (e) {}
+                showToast('success', 'Redirecting to admin login…');
+                if (typeof openLoginModal === 'function') {
+                    openLoginModal();
+                }
+                const target = `${window.location.origin.replace(/\/$/, '')}/admin-dashboard.html`;
+                window.location.href = target;
+            }, SMOKE_PLAYOUT_MS);
+
+            // safety re-enable in case navigation is blocked
+            setTimeout(() => {
+                if (!logoutBtnEl) return;
+                logoutBtnEl.disabled = false;
+                logoutBtnEl.removeAttribute('aria-disabled');
+                logoutBtnEl.classList.remove('active');
+                logoutBtnEl.dataset.loggingOut = '0';
+            }, SMOKE_PLAYOUT_MS + 1500);
         }
+        // make adminLogout available globally and ensure logout button uses it
+        window.adminLogout = adminLogout;
+        (function bindAdminLogout(){
+            const logoutBtnEl = document.getElementById('logoutBtn');
+            if (!logoutBtnEl) return;
+            // Ensure the visual active class is applied even if click ordering varies
+            logoutBtnEl.addEventListener('pointerdown', function(e){
+                try { this.classList.add('active'); } catch (err){}
+            });
+            // Use capture listener and stopImmediatePropagation to avoid duplicate handlers
+            logoutBtnEl.addEventListener('click', function(e){
+                e.preventDefault();
+                e.stopImmediatePropagation();
+                adminLogout();
+            }, { capture: true });
+        })();
 
         // Tab switching
         function switchTab(tab) {
-            ['products', 'pages', 'components', 'hero', 'payments', 'orders', 'careers', 'subscribers', 'tickets'].forEach(t => {
-                document.getElementById(`tab-${t}`).classList.remove('border-blue-600', 'text-blue-600');
-                document.getElementById(`tab-${t}`).classList.add('border-transparent', 'text-gray-500');
-                document.getElementById(`content-${t}`).classList.add('hidden');
+            ['dashboard', 'products', 'pages', 'components', 'hero', 'payments', 'orders', 'careers', 'staff', 'subscribers', 'tickets'].forEach(t => {
+                const tabBtn = document.getElementById(`tab-${t}`);
+                const content = document.getElementById(`content-${t}`);
+                if (tabBtn) {
+                    tabBtn.classList.remove('border-blue-600', 'text-blue-600');
+                    tabBtn.classList.add('border-transparent', 'text-gray-500');
+                }
+                if (content) content.classList.add('hidden');
             });
-            
-            document.getElementById(`tab-${tab}`).classList.add('border-blue-600', 'text-blue-600');
-            document.getElementById(`tab-${tab}`).classList.remove('border-transparent', 'text-gray-500');
-            document.getElementById(`content-${tab}`).classList.remove('hidden');
+
+            const activeBtn = document.getElementById(`tab-${tab}`);
+            const activeContent = document.getElementById(`content-${tab}`);
+            if (activeBtn) {
+                activeBtn.classList.add('border-blue-600', 'text-blue-600');
+                activeBtn.classList.remove('border-transparent', 'text-gray-500');
+            }
+            if (activeContent) activeContent.classList.remove('hidden');
+
+            // keep AdminLTE sidebar in sync with tab selection
+            document.querySelectorAll('.nav-sidebar .nav-link[data-jump-tab]').forEach(link => {
+                const target = link.getAttribute('data-jump-tab');
+                link.classList.toggle('active', target === tab);
+            });
+
+            // Always keep the view focused on the selected section
+            try { window.scrollTo({ top: 0, behavior: 'smooth' }); } catch (e) {}
 
             if (tab === 'subscribers') {
                 loadSubscribers();
             }
             if (tab === 'tickets') {
                 loadTickets();
+            }
+            if (tab === 'staff') {
+                loadStaff();
+            }
+            if (tab === 'products') {
+                loadProducts();
             }
         }
 
@@ -1969,143 +2366,6 @@
             productSaleCountdownInterval = setInterval(render, 1000);
         }
 
-        async function loadProducts() {
-            try {
-                const res = await fetch(`${API_URL}/products`);
-                const data = await res.json();
-                
-                if (data.success) {
-                    productsCache = {};
-                    data.data.forEach(p => productsCache[p._id] = p);
-                    
-                    document.getElementById('totalProducts').textContent = data.count;
-                    document.getElementById('inStock').textContent = data.data.filter(p => p.stock > 0).length;
-                    
-                    const list = document.getElementById('productsList');
-                    list.innerHTML = data.data.map(p => {
-                        const images = p.images && p.images.length > 0 ? p.images : [p.image];
-                        const saleEndTs = p?.saleEnd ? new Date(p.saleEnd).getTime() : null;
-                        const saleActive = p.onSale && Number(p.salePrice) > 0 && (!saleEndTs || saleEndTs > Date.now());
-                        const displayPrice = saleActive ? `${formatNpr(p.salePrice)} (was ${formatNpr(p.price)})` : formatNpr(p.price);
-                        return `
-                        <div class="bg-white border border-gray-200 rounded-lg p-6 card-hover">
-                            <div class="flex items-start justify-between">
-                                <div class="flex items-start space-x-4 flex-1">
-                                    ${p.image ? `<img src="${p.image}" alt="${p.name}" class="w-20 h-20 object-cover rounded-lg">` : ''}
-                                    <div class="flex-1">
-                                        <h3 class="font-semibold text-gray-800 text-lg">${p.name}</h3>
-                                        <p class="text-sm text-gray-600 mt-1">${p.description || ''}</p>
-                                        <div class="flex items-center space-x-4 mt-2 text-sm">
-                                            <span class="text-blue-600 font-semibold">${displayPrice}</span>
-                                            <span class="text-gray-500">${p.category}</span>
-                                            <span class="${p.stock > 0 ? 'text-green-600' : 'text-red-600'}">Stock: ${p.stock}</span>
-                                            ${p.featured ? '<span class="bg-yellow-100 text-yellow-700 px-2 py-1 rounded text-xs">Featured</span>' : ''}
-                                            ${saleActive ? `<span class="bg-emerald-100 text-emerald-700 px-2 py-1 rounded text-xs">${p.saleLabel || 'On Sale'}</span>` : ''}
-                                            ${(saleActive && saleEndTs) ? `<span class="text-xs text-emerald-700" data-sale-countdown="${p._id}"></span>` : ''}
-                                        </div>
-                                        ${images.length > 1 ? `
-                                        <div class="flex space-x-2 mt-3">
-                                            ${images.slice(0, 4).map(img => `<img src="${img}" class="image-preview rounded border">`).join('')}
-                                        </div>
-                                        ` : ''}
-                                    </div>
-                                </div>
-                                <div class="flex flex-col space-y-2 ml-4">
-                                    <button data-edit-product="${p._id}" class="px-4 py-2 bg-blue-100 text-blue-600 rounded-lg hover:bg-blue-200 transition whitespace-nowrap">
-                                        Edit
-                                    </button>
-                                    <button data-delete-product="${p._id}" class="px-4 py-2 bg-red-100 text-red-600 rounded-lg hover:bg-red-200 transition whitespace-nowrap">
-                                        Delete
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    `}).join('');
-                    
-                    // Attach event listeners
-                    attachProductEventListeners();
-                    startProductSaleCountdowns(data.data);
-                }
-            } catch (err) {
-                showToast('error', 'Failed to load products: ' + err.message);
-            }
-        }
-
-        document.getElementById('addProductForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const token = getAdminToken();
-            if (!token) {
-                showToast('error', 'Please login first');
-                openLoginModal();
-                return;
-            }
-
-            const formData = new FormData(e.target);
-            // Validate file sizes (max 5MB each)
-            const mainFile = formData.get('image');
-            if (!mainFile || !mainFile.size) {
-                showToast('error', 'Main image is required');
-                return;
-            }
-            if (mainFile.size > 5 * 1024 * 1024) {
-                showToast('error', 'Main image exceeds 5MB limit');
-                return;
-            }
-
-            const extraFiles = formData.getAll('images');
-            if (extraFiles.length > 4) {
-                showToast('error', 'You can upload up to 4 additional images');
-                return;
-            }
-            for (const f of extraFiles) {
-                if (f.size > 5 * 1024 * 1024) {
-                    showToast('error', `Additional image ${f.name} exceeds 5MB limit`);
-                    return;
-                }
-            }
-
-            formData.append('featured', formData.get('featured') === 'on');
-
-            try {
-                const res = await fetch(`${API_URL}/products`, {
-                    method: 'POST',
-                    headers: {
-                        'Authorization': `Bearer ${token}`
-                    },
-                    body: formData
-                });
-
-                const result = await res.json();
-
-                if (result.success) {
-                    showToast('success', '✅ Product created!');
-                    e.target.reset();
-                    loadProducts();
-                } else {
-                    showToast('error', '❌ Failed: ' + (result.error || 'Unknown error'));
-                }
-            } catch (err) {
-                showToast('error', '❌ Network error: ' + err.message);
-            }
-        });
-
-        function attachProductEventListeners() {
-            // Edit buttons
-            document.querySelectorAll('[data-edit-product]').forEach(btn => {
-                btn.addEventListener('click', function() {
-                    const id = this.getAttribute('data-edit-product');
-                    editProduct(id);
-                });
-            });
-            
-            // Delete buttons
-            document.querySelectorAll('[data-delete-product]').forEach(btn => {
-                btn.addEventListener('click', function() {
-                    const id = this.getAttribute('data-delete-product');
-                    deleteProduct(id);
-                });
-            });
-        }
 
         function attachPageEventListeners() {
             document.querySelectorAll('[data-edit-page]').forEach(btn => {
@@ -2303,6 +2563,7 @@
 
         document.getElementById('editProductForm').addEventListener('submit', async (e) => {
             e.preventDefault();
+            console.log('Edit product form submitted');
             const token = getAdminToken();
             if (!token) {
                 showToast('error', 'Please login first');
@@ -2312,37 +2573,36 @@
 
             const formData = new FormData(e.target);
             const id = formData.get('id');
+            console.log('Editing product ID:', id);
             const imagesText = formData.get('images') || '';
             const imagesArray = imagesText.split('\n').map(s => s.trim()).filter(s => s.length > 0);
             const salePriceRaw = formData.get('salePrice');
             const saleEndRaw = formData.get('saleEnd');
             
-            const data = {
-                name: formData.get('name'),
-                price: parseFloat(formData.get('price')),
-                onSale: formData.get('onSale') === 'on',
-                salePrice: salePriceRaw === '' ? undefined : parseFloat(salePriceRaw),
-                saleLabel: formData.get('saleLabel'),
-                saleEnd: saleEndRaw || undefined,
-                description: formData.get('description'),
-                category: formData.get('category'),
-                stock: parseInt(formData.get('stock')),
-                image: formData.get('image'),
-                images: imagesArray,
-                featured: formData.get('featured') === 'on'
-            };
+            // Update form data with processed values
+            formData.set('price', parseFloat(formData.get('price')).toString());
+            formData.set('onSale', formData.get('onSale') === 'on' ? 'true' : 'false');
+            if (salePriceRaw !== '') {
+                formData.set('salePrice', parseFloat(salePriceRaw).toString());
+            } else {
+                formData.delete('salePrice');
+            }
+            formData.set('stock', parseInt(formData.get('stock')).toString());
+            formData.set('images', imagesArray.join('\n'));
+            formData.set('featured', formData.get('featured') === 'on' ? 'true' : 'false');
 
+            console.log('Sending update request to:', `${API_URL}/products/${id}`);
             try {
                 const res = await fetch(`${API_URL}/products/${id}`, {
                     method: 'PUT',
                     headers: {
-                        'Content-Type': 'application/json',
                         'Authorization': `Bearer ${token}`
                     },
-                    body: JSON.stringify(data)
+                    body: formData
                 });
 
                 const result = await res.json();
+                console.log('Update response:', result);
 
                 if (result.success) {
                     showToast('success', '✅ Product updated!');
@@ -2352,6 +2612,7 @@
                     showToast('error', '❌ Update failed: ' + (result.error || 'Unknown error'));
                 }
             } catch (err) {
+                console.error('Update error:', err);
                 showToast('error', '❌ Network error: ' + err.message);
             }
         });
@@ -2459,6 +2720,92 @@
             } catch (err) {
                 showToast('error', 'Failed to load pages');
             }
+        }
+
+        async function loadProducts() {
+            console.log('loadProducts called');
+            try {
+                const res = await fetch(`${API_URL}/products`);
+                const data = await res.json();
+                console.log('loadProducts response:', data);
+                
+                if (data.success) {
+                    productsCache = {};
+                    data.data.forEach(p => productsCache[p._id] = p);
+                    console.log('productsCache populated:', Object.keys(productsCache));
+                    
+                    document.getElementById('totalProducts').textContent = data.count;
+                    
+                    const list = document.getElementById('productsList');
+                    if (!data.count) {
+                        list.innerHTML = `
+                            <div class="text-center py-12 text-gray-500">
+                                <svg class="w-16 h-16 mx-auto mb-4 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>
+                                </svg>
+                                <p>No products yet. Create your first product above!</p>
+                            </div>
+                        `;
+                        return;
+                    }
+                    
+                    list.innerHTML = data.data.map(p => `
+                        <div class="bg-white border-2 border-gray-100 rounded-xl p-6 hover:border-blue-300 hover:shadow-lg transition-all duration-200">
+                            <div class="flex items-start justify-between mb-3">
+                                <div class="flex items-start space-x-4 flex-1">
+                                    <img src="${p.image || '/assets/placeholder.svg'}" alt="${p.name}" class="w-16 h-16 object-cover rounded-lg border border-gray-200">
+                                    <div class="flex-1">
+                                        <h3 class="font-bold text-gray-800 text-lg mb-1">${p.name}</h3>
+                                        <p class="text-sm text-gray-600 mb-1">${p.description.substring(0, 100)}${p.description.length > 100 ? '...' : ''}</p>
+                                        <p class="text-sm font-semibold text-green-600">रु ${p.price}</p>
+                                        <p class="text-xs text-gray-500">Stock: ${p.stock} | Category: ${p.category}</p>
+                                        ${p.featured ? '<span class="inline-block bg-yellow-100 text-yellow-800 px-2 py-1 rounded-full text-xs font-medium">Featured</span>' : ''}
+                                        ${p.onSale ? '<span class="inline-block bg-red-100 text-red-800 px-2 py-1 rounded-full text-xs font-medium ml-2">On Sale</span>' : ''}
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="flex items-center justify-end pt-3 border-t border-gray-100">
+                                <div class="flex space-x-2">
+                                    <button data-edit-product="${p._id}" class="px-3 py-1.5 bg-blue-100 text-blue-700 rounded-lg hover:bg-blue-200 transition text-sm font-medium">
+                                        Edit
+                                    </button>
+                                    <button data-delete-product="${p._id}" class="px-3 py-1.5 bg-red-100 text-red-600 rounded-lg hover:bg-red-200 transition text-sm font-medium">
+                                        Delete
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    `).join('');
+                    console.log('Products list rendered');
+                    attachProductEventListeners();
+                } else {
+                    console.error('loadProducts failed:', data);
+                }
+            } catch (err) {
+                console.error('Failed to load products:', err);
+                showToast('error', 'Failed to load products');
+            }
+        }
+
+        function attachProductEventListeners() {
+            console.log('Attaching product event listeners...');
+            document.querySelectorAll('[data-edit-product]').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const id = this.getAttribute('data-edit-product');
+                    console.log('Edit button clicked for product:', id);
+                    editProduct(id);
+                });
+            });
+            console.log('Edit listeners attached:', document.querySelectorAll('[data-edit-product]').length);
+            
+            document.querySelectorAll('[data-delete-product]').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const id = this.getAttribute('data-delete-product');
+                    console.log('Delete button clicked for product:', id);
+                    deleteProduct(id);
+                });
+            });
+            console.log('Delete listeners attached:', document.querySelectorAll('[data-delete-product]').length);
         }
 
         document.getElementById('addPageForm').addEventListener('submit', async (e) => {
@@ -2651,7 +2998,7 @@
                                     ${c.published ? '✓ Live' : 'Draft'}
                                 </span>
                             </div>
-                            ${c.html ? `<pre class="text-xs text-gray-600 bg-gray-50 p-3 rounded border border-gray-200 overflow-x-auto mb-3 max-h-20">${c.html.substring(0, 150)}${c.html.length > 150 ? '...' : ''}</pre>` : ''}
+                            ${c.html ? `<pre data-component-preview="${c._id}" class="text-xs text-gray-600 bg-gray-50 p-3 rounded border border-gray-200 overflow-auto mb-3 max-h-72 whitespace-pre-wrap break-words"></pre>` : ''}
                             <div class="flex items-center justify-between pt-3 border-t border-gray-100">
                                 <span class="text-xs text-gray-500">
                                     <svg class="w-4 h-4 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -2670,6 +3017,15 @@
                             </div>
                         </div>
                     `).join('');
+
+                    // Fill preview text safely (never render component HTML).
+                    for (const c of data.data) {
+                        const pre = list.querySelector(`pre[data-component-preview="${c._id}"]`);
+                        if (!pre) continue;
+                        const html = String(c.html || '');
+                        const snippet = html.substring(0, 900) + (html.length > 900 ? '...' : '');
+                        pre.textContent = snippet;
+                    }
                     
                     attachComponentEventListeners();
                 }
@@ -2762,6 +3118,17 @@
             form.querySelector('[name="html"]').value = component.html || '';
             form.querySelector('[name="published"]').checked = component.published;
 
+            // Show map embed field only for footer component
+            const footerMapSection = document.getElementById('footerMapSection');
+            const mapEmbedInput = form.querySelector('[name="mapEmbed"]');
+            if (component.slug === 'footer') {
+                footerMapSection.classList.remove('hidden');
+                mapEmbedInput.value = component.data?.mapEmbed || '';
+            } else {
+                footerMapSection.classList.add('hidden');
+                mapEmbedInput.value = '';
+            }
+
             document.getElementById('editComponentModal').classList.remove('hidden');
         }
 
@@ -2790,6 +3157,12 @@
                 published: formData.get('published') === 'on'
             };
 
+            // Add map embed data for footer component
+            const mapEmbed = formData.get('mapEmbed');
+            if (mapEmbed && mapEmbed.trim()) {
+                data.data = { mapEmbed: mapEmbed.trim() };
+            }
+
             try {
                 const res = await fetch(`${API_URL}/components/${id}`, {
                     method: 'PUT',
@@ -2806,6 +3179,125 @@
                     showToast('success', '✅ Component updated!');
                     closeEditComponentModal();
                     loadComponents();
+                } else {
+                    showToast('error', '❌ Failed: ' + (result.error || 'Unknown error'));
+                }
+            } catch (err) {
+                showToast('error', '❌ Network error: ' + err.message);
+            }
+        });
+
+        // Footer Map Management
+        async function loadFooterMap() {
+            try {
+                const res = await fetch(`${API_URL}/components/slug/footer`);
+                const data = await res.json();
+
+                if (data.success && data.data) {
+                    const mapEmbed = data.data.data?.mapEmbed || '';
+                    document.querySelector('#footerMapForm [name="mapEmbed"]').value = mapEmbed;
+                    updateMapPreview(mapEmbed);
+                }
+            } catch (err) {
+                showToast('error', 'Failed to load footer map settings');
+            }
+        }
+
+        function updateMapPreview(embedUrl) {
+            const previewDiv = document.getElementById('mapPreview');
+            if (!embedUrl || !embedUrl.trim()) {
+                previewDiv.innerHTML = `
+                    <div class="text-center text-gray-500">
+                        <svg class="w-12 h-12 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"/>
+                        </svg>
+                        <p class="text-sm">No map URL configured</p>
+                    </div>
+                `;
+                return;
+            }
+
+            previewDiv.innerHTML = `<iframe src="${embedUrl}" width="100%" height="100%" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>`;
+        }
+
+        document.getElementById('refreshFooterMap')?.addEventListener('click', () => {
+            loadFooterMap();
+            showToast('success', 'Footer map settings refreshed');
+        });
+
+        document.getElementById('previewMapBtn')?.addEventListener('click', () => {
+            const embedUrl = document.querySelector('#footerMapForm [name="mapEmbed"]').value.trim();
+            updateMapPreview(embedUrl);
+            showToast('success', 'Map preview updated');
+        });
+
+        document.getElementById('footerMapForm')?.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const token = getAdminToken();
+            if (!token) {
+                showToast('error', 'Please login first');
+                openLoginModal();
+                return;
+            }
+
+            const formData = new FormData(e.target);
+            const mapEmbed = formData.get('mapEmbed').trim();
+
+            // Get current footer component
+            try {
+                const getRes = await fetch(`${API_URL}/components/slug/footer`);
+                const getData = await getRes.json();
+
+                if (!getData.success) {
+                    showToast('error', 'Failed to get footer component');
+                    return;
+                }
+
+                const footerComponent = getData.data;
+                const updateData = {
+                    slug: footerComponent.slug,
+                    name: footerComponent.name,
+                    html: footerComponent.html,
+                    published: footerComponent.published
+                };
+
+                // Add or update map embed data
+                if (mapEmbed) {
+                    updateData.data = { ...footerComponent.data, mapEmbed };
+                } else if (footerComponent.data) {
+                    const newData = { ...footerComponent.data };
+                    delete newData.mapEmbed;
+                    if (Object.keys(newData).length > 0) {
+                        updateData.data = newData;
+                    }
+                }
+
+                const res = await fetch(`${API_URL}/components/${footerComponent._id}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify(updateData)
+                });
+
+                const result = await res.json();
+
+                // Check for token expiration
+                if (res.status === 401 && result && result.error === 'Invalid token') {
+                    clearAdminToken();
+                    showToast('error', 'Session expired. Please login again.');
+                    openLoginModal();
+                    return;
+                }
+
+                if (result.success) {
+                    showToast('success', '✅ Footer map updated successfully!');
+                    updateMapPreview(mapEmbed);
+                    // Update localStorage for immediate footer refresh
+                    localStorage.setItem('footerMapEmbed', mapEmbed);
+                    // Dispatch event to notify footer component of map update
+                    window.dispatchEvent(new CustomEvent('footerMapUpdated', { detail: { mapEmbed } }));
                 } else {
                     showToast('error', '❌ Failed: ' + (result.error || 'Unknown error'));
                 }
@@ -3075,7 +3567,7 @@
             }
 
             try {
-                showToast('info', 'Generating Excel file...');
+                showToast('info', 'Generating export file...');
                 const res = await fetch(`${API_URL}/subscribers/export/excel`, {
                     headers: { 'Authorization': `Bearer ${token}` }
                 });
@@ -3095,9 +3587,196 @@
                 a.click();
                 a.remove();
                 window.URL.revokeObjectURL(url);
-                showToast('success', '✅ Excel file downloaded!');
+                showToast('success', '✅ Export downloaded!');
             } catch (err) {
                 console.error('Export error:', err);
+                showToast('error', 'Network error: ' + err.message);
+            }
+        }
+
+        // ========== STAFF MANAGEMENT ==========
+        async function loadStaff() {
+            const token = getAdminToken();
+            if (!token) {
+                showToast('error', 'Please login to view staff');
+                openLoginModal();
+                return;
+            }
+
+            try {
+                const res = await fetch(`${API_URL}/staff`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const data = await res.json();
+
+                if (data.success) {
+                    const staffList = document.getElementById('staffList');
+                    staffCache = data.data || [];
+                    if (!staffCache.length) {
+                        staffList.innerHTML = '<p class="text-center text-gray-500 col-span-full">No staff members yet</p>';
+                    } else {
+                        staffList.innerHTML = staffCache.map(member => `
+                            <div class="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow">
+                                <div class="flex items-start space-x-4">
+                                    <img src="${member.image}" alt="${member.name}" class="w-16 h-16 rounded-full object-cover flex-shrink-0">
+                                    <div class="flex-1 min-w-0">
+                                        <h3 class="text-lg font-semibold text-gray-800 truncate">${member.name}</h3>
+                                        <p class="text-blue-600 font-medium">${member.position}</p>
+                                        <p class="text-sm text-gray-600 mt-2 line-clamp-3">${member.bio}</p>
+                                        <div class="flex items-center space-x-4 mt-3">
+                                            ${member.email ? `<a href="mailto:${member.email}" class="text-gray-400 hover:text-blue-600 text-sm">Email</a>` : ''}
+                                            ${member.linkedin ? `<a href="${member.linkedin}" target="_blank" class="text-gray-400 hover:text-blue-600 text-sm">LinkedIn</a>` : ''}
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="flex justify-end space-x-2 mt-4">
+                                    <button data-edit-staff="${member._id}" class="px-3 py-1 text-sm bg-blue-100 text-blue-600 rounded hover:bg-blue-200">Edit</button>
+                                    <button data-delete-staff="${member._id}" class="px-3 py-1 text-sm bg-red-100 text-red-600 rounded hover:bg-red-200">Delete</button>
+                                </div>
+                            </div>
+                        `).join('');
+                    }
+                    attachStaffEventListeners();
+                } else {
+                    showToast('error', 'Failed to load staff');
+                }
+            } catch (err) {
+                console.error('Failed to load staff:', err);
+                showToast('error', 'Failed to load staff: ' + err.message);
+            }
+        }
+
+        function attachStaffEventListeners() {
+            document.querySelectorAll('[data-edit-staff]').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const id = this.getAttribute('data-edit-staff');
+                    openEditStaffModal(id);
+                });
+            });
+            document.querySelectorAll('[data-delete-staff]').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const id = this.getAttribute('data-delete-staff');
+                    deleteStaff(id);
+                });
+            });
+        }
+
+        async function addStaff(formData) {
+            const token = getAdminToken();
+            if (!token) {
+                showToast('error', 'Please login first');
+                openLoginModal();
+                return;
+            }
+
+            try {
+                const res = await fetch(`${API_URL}/staff`, {
+                    method: 'POST',
+                    headers: { 'Authorization': `Bearer ${token}` },
+                    body: formData
+                });
+                const data = await res.json();
+
+                if (data.success) {
+                    showToast('success', 'Staff member added successfully');
+                    document.getElementById('addStaffForm').reset();
+                    loadStaff();
+                } else {
+                    showToast('error', data.error || 'Failed to add staff member');
+                }
+            } catch (err) {
+                showToast('error', 'Network error: ' + err.message);
+            }
+        }
+
+        function openEditStaffModal(id) {
+            const modal = document.getElementById('editStaffModal');
+            const form = document.getElementById('editStaffForm');
+            const preview = document.getElementById('editStaffPreview');
+            const inputs = form.elements;
+            const staff = staffCache.find(s => s._id === id);
+            if (!staff) { showToast('error', 'Staff not found'); return; }
+
+            form.reset();
+            form.name.value = staff.name || '';
+            form.position.value = staff.position || '';
+            form.email.value = staff.email || '';
+            form.linkedin.value = staff.linkedin || '';
+            form.bio.value = staff.bio || '';
+            form.order.value = staff.order || 0;
+            form.active.checked = !!staff.active;
+            form.id.value = staff._id;
+            preview.src = staff.image || '/assets/placeholder.svg';
+
+            modal.classList.remove('hidden');
+
+            // close handler
+            document.getElementById('closeEditStaffModalBtn')?.addEventListener('click', closeEditStaffModal);
+
+            // handle file preview
+            form.querySelector('input[type="file"]').addEventListener('change', (e) => {
+                const f = e.target.files && e.target.files[0];
+                if (!f) return;
+                const url = URL.createObjectURL(f);
+                preview.src = url;
+            });
+        }
+
+        function closeEditStaffModal() {
+            document.getElementById('editStaffModal').classList.add('hidden');
+        }
+
+        document.getElementById('editStaffForm')?.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const form = e.target;
+            const id = form.id.value;
+            const token = getAdminToken();
+            if (!token) { showToast('error', 'Please login first'); openLoginModal(); return; }
+
+            const formData = new FormData(form);
+
+            try {
+                const res = await fetch(`${API_URL}/staff/${id}`, {
+                    method: 'PUT',
+                    headers: { 'Authorization': `Bearer ${token}` },
+                    body: formData
+                });
+                const result = await res.json();
+                if (result.success) {
+                    showToast('success', '✅ Staff updated');
+                    closeEditStaffModal();
+                    loadStaff();
+                } else {
+                    showToast('error', '❌ Failed: ' + (result.error || 'Unknown error'));
+                }
+            } catch (err) {
+                showToast('error', '❌ Network error: ' + err.message);
+            }
+        });
+
+        async function deleteStaff(id) {
+            if (!confirm('Delete this staff member?')) return;
+            const token = getAdminToken();
+            if (!token) {
+                showToast('error', 'Please login first');
+                openLoginModal();
+                return;
+            }
+
+            try {
+                const res = await fetch(`${API_URL}/staff/${id}`, {
+                    method: 'DELETE',
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const data = await res.json();
+
+                if (data.success) {
+                    showToast('success', 'Staff member deleted');
+                    loadStaff();
+                } else {
+                    showToast('error', data.error || 'Failed to delete staff member');
+                }
+            } catch (err) {
                 showToast('error', 'Network error: ' + err.message);
             }
         }
@@ -3156,20 +3835,25 @@
                 const lastMessage = ticket.messages?.[messageCount - 1];
                 const lastMessageTime = lastMessage ? new Date(lastMessage.timestamp).toLocaleString() : '';
 
-                const guestBadge = (ticket.guestName || ticket.source === 'chatbot') ? `<span class="px-2 py-1 text-xs font-semibold rounded-full bg-indigo-100 text-indigo-700">💬 Guest</span>` : '';
+                const sourceBadge = (() => {
+                    if (ticket.source === 'api') return `<span class="px-2 py-1 text-xs font-semibold rounded-full bg-indigo-100 text-indigo-700">📝 Contact form</span>`;
+                    if (ticket.source === 'chatbot') return `<span class="px-2 py-1 text-xs font-semibold rounded-full bg-violet-100 text-violet-700">🤖 Chatbot</span>`;
+                    if (ticket.guestName) return `<span class="px-2 py-1 text-xs font-semibold rounded-full bg-slate-100 text-slate-700">👤 Guest</span>`;
+                    return '';
+                })();
                 const unseenBadge = (ticket.seen === false) ? `<span class="px-2 py-1 text-xs font-semibold rounded-full bg-rose-100 text-rose-700">⚠️ Unseen</span>` : '';
                 const highlightClass = (ticket.seen === false) ? 'ring-2 ring-rose-100' : '';
-                const guestClass = (ticket.guestName || ticket.source === 'chatbot') ? 'bg-indigo-50' : '';
+                const guestClass = (ticket.guestName || ticket.source === 'chatbot' || ticket.source === 'api') ? 'bg-indigo-50' : '';
 
                 return `
-                <div class="bg-white border ${highlightClass} border-gray-200 rounded-lg p-6 hover:shadow-md transition cursor-pointer ${guestClass}" onclick="openTicketDetails('${ticket._id}')">
+                <div class="bg-white border ${highlightClass} border-gray-200 rounded-lg p-6 hover:shadow-md transition cursor-pointer ${guestClass}" data-ticket-open="1" data-ticket-id="${ticket._id}">
                     <div class="flex items-start justify-between mb-3">
                         <div class="flex-1">
                             <div class="flex items-center gap-2 mb-2">
                                 <span class="text-xs font-semibold text-gray-500">#${ticket._id.slice(-6).toUpperCase()}</span>
                                 <span class="px-2 py-1 text-xs font-semibold rounded-full ${statusColors[ticket.status] || 'bg-gray-100 text-gray-700'}">${ticket.status}</span>
                                 <span class="text-xs ${priorityColors[ticket.priority] || 'text-gray-600'} font-semibold">${ticket.priority} priority</span>
-                                ${guestBadge}
+                                ${sourceBadge}
                                 ${unseenBadge}
                             </div>
                             <h3 class="text-lg font-semibold text-gray-800 mb-1">${ticket.subject}</h3>
@@ -3227,7 +3911,7 @@
                     </div>
                     <div class="grid gap-3">
                         ${group.map(t => `
-                            <div class="p-3 bg-gray-50 rounded cursor-pointer" onclick="openTicketDetails('${t._id}')">
+                            <div class="p-3 bg-gray-50 rounded cursor-pointer" data-ticket-open="1" data-ticket-id="${t._id}">
                                 <div class="flex items-center justify-between">
                                     <div>
                                         <div class="text-sm font-medium text-gray-900">${escapeHtml(t.subject || '(no subject)')} ${t.seen === false ? '<span class="ml-2 inline-flex items-center rounded-full bg-rose-100 px-2 py-0.5 text-xs font-medium text-rose-800">⚠️ Unseen</span>' : ''}</div>
@@ -3245,7 +3929,7 @@
             // Then render others (non-guest)
             others.forEach(t => {
                 html += `
-                <div class="bg-white border border-gray-200 rounded-lg p-4 mb-4 cursor-pointer" onclick="openTicketDetails('${t._id}')">
+                <div class="bg-white border border-gray-200 rounded-lg p-4 mb-4 cursor-pointer" data-ticket-open="1" data-ticket-id="${t._id}">
                     <div class="flex items-start justify-between mb-2">
                         <div>
                             <div class="text-sm font-medium text-gray-900">${escapeHtml(t.subject || '(no subject)')}</div>
@@ -3333,7 +4017,7 @@
                             <option value="solved">Mark as Solved</option>
                             <option value="closed">Close Ticket</option>
                         </select>
-                        <button onclick="sendTicketReply('${ticket._id}')" class="px-4 py-2 bg-blue-600 text-white text-sm rounded-lg hover:bg-blue-700">Send Reply</button>
+                        <button type="button" data-ticket-reply="1" data-ticket-id="${ticket._id}" class="px-4 py-2 bg-blue-600 text-white text-sm rounded-lg hover:bg-blue-700">Send Reply</button>
                     </div>
                 </div>
             `;
@@ -3347,6 +4031,22 @@
             const modal = document.getElementById('ticketDetailsModal');
             if (modal) modal.classList.add('hidden');
         }
+
+        // Delegate ticket clicks (avoids inline onclick attributes; improves CSP posture)
+        document.addEventListener('click', (e) => {
+            const openEl = e.target.closest('[data-ticket-open="1"][data-ticket-id]');
+            if (openEl) {
+                const id = openEl.getAttribute('data-ticket-id');
+                if (id) openTicketDetails(id);
+                return;
+            }
+
+            const replyEl = e.target.closest('[data-ticket-reply="1"][data-ticket-id]');
+            if (replyEl) {
+                const id = replyEl.getAttribute('data-ticket-id');
+                if (id) sendTicketReply(id);
+            }
+        });
 
         // Mark ticket as seen (admin action)
         async function markTicketSeen(ticketId, seen=true){
@@ -3442,14 +4142,23 @@
             try{
                 const res = await fetch(`${API_URL}/tickets/admin/unseen-count`, { headers: { 'Authorization': `Bearer ${token}` } });
                 const data = await res.json();
-                if (data.success) document.getElementById('ticketsUnseenCount').textContent = data.count || 0;
+                if (data.success) {
+                    const countEl = document.getElementById('ticketsUnseenCount');
+                    if (countEl) countEl.textContent = data.count || 0;
+                }
             }catch(e){ console.warn('Failed to update unseen count', e.message); }
         }
 
         document.getElementById('filterGuestBtn')?.addEventListener('click', ()=>{ showOnlyGuestTickets = !showOnlyGuestTickets; document.getElementById('filterGuestBtn').classList.toggle('bg-indigo-700'); document.getElementById('filterGuestBtn').classList.toggle('text-white'); loadTickets(); });
         document.getElementById('groupGuestBtn')?.addEventListener('click', ()=>{ showGroupGuests = !showGroupGuests; const el = document.getElementById('groupGuestBtn'); el.classList.toggle('bg-indigo-700'); el.classList.toggle('text-white'); loadTickets(); });
         document.getElementById('filterUnseenBtn')?.addEventListener('click', ()=>{ showOnlyUnseenTickets = !showOnlyUnseenTickets; document.getElementById('filterUnseenBtn').classList.toggle('bg-rose-700'); document.getElementById('filterUnseenBtn').classList.toggle('text-white'); loadTickets(); });
-        document.getElementById('ticketsUnseenBadge')?.addEventListener('click', ()=>{ document.querySelector('[data-tab="tickets"]').click(); showOnlyUnseenTickets = true; document.getElementById('filterUnseenBtn').classList.add('bg-rose-700'); document.getElementById('filterUnseenBtn').classList.add('text-white'); loadTickets(); });
+        document.getElementById('ticketsUnseenBadge')?.addEventListener('click', ()=>{
+            switchTab('tickets');
+            showOnlyUnseenTickets = true;
+            document.getElementById('filterUnseenBtn').classList.add('bg-rose-700');
+            document.getElementById('filterUnseenBtn').classList.add('text-white');
+            loadTickets();
+        });
 
         // Periodically refresh unseen count
         setInterval(updateUnseenCount, 60 * 1000);
@@ -3514,6 +4223,38 @@
                     showToast('success', '✅ Job opening posted!');
                     e.target.reset();
                     loadCareers();
+                } else {
+                    showToast('error', '❌ Failed: ' + (result.error || 'Unknown error'));
+                }
+            } catch (err) {
+                showToast('error', '❌ Network error: ' + err.message);
+            }
+        });
+
+        document.getElementById('addStaffForm')?.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const token = getAdminToken();
+            if (!token) {
+                showToast('error', 'Please login first');
+                openLoginModal();
+                return;
+            }
+
+            const formData = new FormData(e.target);
+
+            try {
+                const res = await fetch(`${API_URL}/staff`, {
+                    method: 'POST',
+                    headers: { 'Authorization': `Bearer ${token}` },
+                    body: formData
+                });
+
+                const result = await res.json();
+
+                if (result.success) {
+                    showToast('success', '✅ Staff member added successfully!');
+                    e.target.reset();
+                    loadStaff();
                 } else {
                     showToast('error', '❌ Failed: ' + (result.error || 'Unknown error'));
                 }
@@ -3820,13 +4561,29 @@
 
         async function saveHero(payload, successMessage = '✅ Saved!') {
             const token = getAdminToken();
+            const statusEl = document.getElementById('heroSaveStatus');
+
+            const setStatus = (text, variant) => {
+                if (!statusEl) return;
+                statusEl.textContent = text || '';
+                statusEl.className = 'text-xs text-center ' + (
+                    variant === 'success'
+                        ? 'text-green-600'
+                        : (variant === 'error'
+                            ? 'text-red-600'
+                            : 'text-gray-500')
+                );
+            };
+
             if (!token) {
                 showToast('error', 'Please login first');
                 openLoginModal();
+                setStatus('Login required to save hero settings.', 'error');
                 return;
             }
 
             try {
+                setStatus('Saving...', 'info');
                 const res = await fetch(`${API_URL}/hero`, {
                     method: 'PUT',
                     headers: {
@@ -3841,11 +4598,21 @@
                 if (result.success) {
                     showToast('success', successMessage);
                     updateHeroPreview(result.data);
+                    const isEnabled = result.data && result.data.enabled !== false;
+                    setStatus(`Saved. Hero is now ${isEnabled ? 'ON' : 'OFF'}.`, 'success');
+                    // Reload from server so the toggle reflects persisted state.
+                    loadHero();
                 } else {
                     showToast('error', '❌ Failed: ' + (result.error || 'Unknown error'));
+                    setStatus('Save failed: ' + (result.error || 'Unknown error'), 'error');
                 }
             } catch (err) {
                 showToast('error', '❌ Network error: ' + err.message);
+                const statusEl = document.getElementById('heroSaveStatus');
+                if (statusEl) {
+                    statusEl.textContent = 'Network error: ' + err.message;
+                    statusEl.className = 'text-xs text-center text-red-600';
+                }
             }
         }
 
@@ -3853,6 +4620,12 @@
             e.preventDefault();
             const payload = getHeroPayload();
             saveHero(payload, '✅ Hero settings saved!');
+        });
+
+        // Auto-save hero visibility toggle (users often expect this to apply immediately).
+        document.querySelector('#heroForm input[name="enabled"]')?.addEventListener('change', () => {
+            const payload = getHeroPayload();
+            saveHero(payload, '✅ Hero visibility updated!');
         });
 
         document.getElementById('spotlightForm')?.addEventListener('submit', async (e) => {
@@ -3942,6 +4715,250 @@
         });
 
         document.getElementById('refreshHero')?.addEventListener('click', loadHero);
+
+        // Carousel (Hero OFF)
+        async function loadCarousel() {
+            try {
+                const res = await fetch(`${API_URL}/carousel`);
+                const data = await res.json();
+                if (!data.success || !data.data) throw new Error(data.error || 'Failed to load carousel');
+                renderCarouselEditor(Array.isArray(data.data.slides) ? data.data.slides : []);
+            } catch (err) {
+                console.error('Failed to load carousel:', err);
+                showToast('error', 'Failed to load carousel');
+            }
+        }
+
+        function renderCarouselEditor(slides) {
+            const root = document.getElementById('carouselSlidesEditor');
+            if (!root) return;
+
+            const safeSlides = Array.isArray(slides) ? slides : [];
+            root.innerHTML = safeSlides.map((slide, idx) => {
+                const s = slide && typeof slide === 'object' ? slide : {};
+                const enabled = s.enabled !== false;
+                return `
+                    <div class="carousel-slide-editor bg-gray-50 border border-gray-200 rounded-xl p-4" data-slide-idx="${idx}">
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center gap-3">
+                                <div class="w-10 h-10 rounded-xl bg-indigo-50 text-indigo-700 grid place-items-center font-bold">${idx + 1}</div>
+                                <div>
+                                    <p class="font-semibold text-gray-900">Carousel Slide</p>
+                                    <p class="text-xs text-gray-500">Shown when Hero is disabled</p>
+                                </div>
+                            </div>
+                            <button type="button" class="text-sm text-red-600 hover:text-red-700" data-carousel-remove="${idx}">Remove</button>
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Title</label>
+                                <input type="text" name="title" value="${escapeHtmlAttr(s.title || '')}" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Badge</label>
+                                <input type="text" name="badgeText" value="${escapeHtmlAttr(s.badgeText || '')}" placeholder="Limited-time" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent">
+                            </div>
+                        </div>
+
+                        <div class="mt-4">
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Subtitle</label>
+                            <textarea name="subtitle" rows="2" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent">${escapeHtmlText(s.subtitle || '')}</textarea>
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Button Text</label>
+                                <input type="text" name="buttonText" value="${escapeHtmlAttr(s.buttonText || '')}" placeholder="Shop now" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Link</label>
+                                <input type="text" name="link" value="${escapeHtmlAttr(s.link || '')}" placeholder="/products.html" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent">
+                            </div>
+                        </div>
+
+                        <div class="mt-4">
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Image URL</label>
+                            <input type="text" name="image" value="${escapeHtmlAttr(s.image || '')}" placeholder="https://..." class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent">
+                            <div class="flex items-center gap-3 mt-2">
+                                <input type="file" data-carousel-upload-input="${idx}" accept="image/*" class="hidden">
+                                <button type="button" data-carousel-upload-btn="${idx}" class="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition">Upload Image</button>
+                                <span class="text-xs text-gray-500" data-carousel-upload-status="${idx}"></span>
+                            </div>
+                        </div>
+
+                        <div class="mt-4">
+                            <label class="flex items-center gap-3 cursor-pointer">
+                                <input type="checkbox" name="enabled" class="w-5 h-5 text-indigo-600 rounded focus:ring-2 focus:ring-indigo-500" ${enabled ? 'checked' : ''}>
+                                <span class="text-sm font-medium text-gray-900">Enabled</span>
+                            </label>
+                        </div>
+                    </div>
+                `;
+            }).join('') || `
+                <div class="p-4 rounded-xl border border-gray-200 bg-gray-50 text-sm text-gray-700">
+                    No slides yet. Click “Add Slide” to create your first carousel slide.
+                </div>
+            `;
+
+            // Bind remove handlers
+            root.querySelectorAll('[data-carousel-remove]').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const idx = Number(btn.getAttribute('data-carousel-remove'));
+                    const next = safeSlides.slice();
+                    if (Number.isInteger(idx) && idx >= 0 && idx < next.length) {
+                        next.splice(idx, 1);
+                        renderCarouselEditor(next);
+                    }
+                });
+            });
+
+            // Bind upload handlers
+            root.querySelectorAll('[data-carousel-upload-btn]').forEach(btn => {
+                const idx = btn.getAttribute('data-carousel-upload-btn');
+                const input = root.querySelector(`[data-carousel-upload-input="${idx}"]`);
+                if (!input) return;
+                btn.addEventListener('click', () => input.click());
+                input.addEventListener('change', async () => {
+                    const file = input.files && input.files[0];
+                    const statusEl = root.querySelector(`[data-carousel-upload-status="${idx}"]`);
+                    const url = await uploadCarouselAsset(file, statusEl);
+                    if (url) {
+                        const card = root.querySelector(`.carousel-slide-editor[data-slide-idx="${idx}"]`);
+                        const field = card ? card.querySelector('input[name="image"]') : null;
+                        if (field) field.value = url;
+                        showToast('success', 'Carousel image ready to save');
+                    }
+                    input.value = '';
+                });
+            });
+        }
+
+        function getCarouselSlidesFromEditor() {
+            const root = document.getElementById('carouselSlidesEditor');
+            if (!root) return [];
+            const cards = Array.from(root.querySelectorAll('.carousel-slide-editor'));
+            return cards.map(card => {
+                const read = (sel) => {
+                    const el = card.querySelector(sel);
+                    return el ? String(el.value || '').trim() : '';
+                };
+                const enabledEl = card.querySelector('input[name="enabled"]');
+                return {
+                    title: read('input[name="title"]'),
+                    subtitle: read('textarea[name="subtitle"]'),
+                    badgeText: read('input[name="badgeText"]'),
+                    buttonText: read('input[name="buttonText"]'),
+                    link: read('input[name="link"]'),
+                    image: read('input[name="image"]'),
+                    enabled: !!(enabledEl && enabledEl.checked)
+                };
+            }).filter(s => s.title || s.subtitle || s.image || s.badgeText || s.buttonText || s.link);
+        }
+
+        async function saveCarousel() {
+            const token = getAdminToken();
+            if (!token) {
+                showToast('error', 'Please login first');
+                openLoginModal();
+                return;
+            }
+
+            const statusEl = document.getElementById('carouselSaveStatus');
+            if (statusEl) statusEl.textContent = 'Saving...';
+
+            try {
+                const payload = { slides: getCarouselSlidesFromEditor() };
+                const res = await fetch(`${API_URL}/carousel`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify(payload)
+                });
+
+                const data = await res.json();
+                if (!data.success) {
+                    throw new Error(data.error || 'Failed to save carousel');
+                }
+
+                showToast('success', 'Carousel saved');
+                renderCarouselEditor(Array.isArray(data.data?.slides) ? data.data.slides : []);
+            } catch (err) {
+                console.error('Save carousel failed:', err);
+                showToast('error', 'Failed to save carousel: ' + err.message);
+            } finally {
+                if (statusEl) statusEl.textContent = '';
+            }
+        }
+
+        async function uploadCarouselAsset(file, statusEl) {
+            const token = getAdminToken();
+            if (!token) {
+                showToast('error', 'Please login first');
+                openLoginModal();
+                return null;
+            }
+            if (!file) return null;
+
+            try {
+                statusEl && (statusEl.textContent = 'Uploading...');
+                const formData = new FormData();
+                formData.append('image', file);
+                const res = await fetch(`${API_URL}/carousel/upload`, {
+                    method: 'POST',
+                    headers: { 'Authorization': `Bearer ${token}` },
+                    body: formData
+                });
+
+                const data = await res.json();
+                if (data.success && data.url) {
+                    statusEl && (statusEl.textContent = 'Uploaded');
+                    return data.url;
+                }
+                throw new Error(data.error || 'Upload failed');
+            } catch (err) {
+                console.error('Carousel upload failed', err);
+                statusEl && (statusEl.textContent = 'Failed');
+                showToast('error', 'Upload failed: ' + err.message);
+                return null;
+            }
+        }
+
+        function escapeHtmlAttr(value) {
+            return String(value)
+                .replace(/&/g, '&amp;')
+                .replace(/"/g, '&quot;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;');
+        }
+
+        function escapeHtmlText(value) {
+            return String(value)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;');
+        }
+
+        document.getElementById('refreshCarousel')?.addEventListener('click', loadCarousel);
+        document.getElementById('addCarouselSlide')?.addEventListener('click', () => {
+            const root = document.getElementById('carouselSlidesEditor');
+            const existing = root ? Array.from(root.querySelectorAll('.carousel-slide-editor')) : [];
+            // Collect current slides then append a blank one.
+            const slides = getCarouselSlidesFromEditor();
+            slides.push({
+                badgeText: 'New slide',
+                title: 'Your slide title',
+                subtitle: 'Short supporting copy goes here.',
+                buttonText: 'Shop now',
+                link: '/products.html',
+                image: '',
+                enabled: true
+            });
+            renderCarouselEditor(slides);
+        });
+        document.getElementById('saveCarousel')?.addEventListener('click', saveCarousel);
 
         // Load all data
         async function loadPaymentSettings(options = {}) {
@@ -4113,12 +5130,32 @@
             document.querySelectorAll('[data-toggle-slider]').forEach(slider => {
                 const input = slider.previousElementSibling;
                 if (!input) return;
-                const sync = () => updateSliderVisual(slider, input);
+                // Accessibility enhancements
+                slider.setAttribute('role', 'switch');
+                slider.setAttribute('tabindex', '0');
+                slider.setAttribute('aria-checked', String(!!input.checked));
+                // try to derive a helpful label for assistive tech
+                const labelText = slider.closest('label')?.previousElementSibling?.textContent?.trim() || slider.closest('label')?.querySelector('span')?.textContent?.trim() || '';
+                if (labelText) slider.setAttribute('aria-label', labelText);
+
+                const sync = () => {
+                    updateSliderVisual(slider, input);
+                    slider.setAttribute('aria-checked', String(!!input.checked));
+                };
                 sync();
-                slider.addEventListener('click', (event) => {
+
+                const toggle = (event) => {
                     event.preventDefault();
                     input.checked = !input.checked;
                     input.dispatchEvent(new Event('change', { bubbles: true }));
+                };
+
+                slider.addEventListener('click', toggle);
+                slider.addEventListener('keydown', (e) => {
+                    if (e.key === ' ' || e.key === 'Enter') {
+                        e.preventDefault();
+                        toggle(e);
+                    }
                 });
                 input.addEventListener('change', sync);
             });
@@ -4128,6 +5165,7 @@
             document.querySelectorAll('[data-toggle-slider]').forEach(slider => {
                 const input = slider.previousElementSibling;
                 updateSliderVisual(slider, input);
+                if (slider) slider.setAttribute('aria-checked', String(!!(input && input.checked)));
             });
         }
 
@@ -4192,6 +5230,16 @@
                 });
 
                 const data = await res.json();
+
+                // If the token is expired/invalid (common after restarts or secret changes),
+                // clear it and force a re-login so uploads can proceed.
+                if (res.status === 401 && data && data.error === 'Invalid token') {
+                    clearAdminToken();
+                    showToast('error', 'Session expired. Please login again.');
+                    openLoginModal();
+                    return;
+                }
+
                 if (!res.ok || !data.success) {
                     throw new Error(data.error || 'Upload failed');
                 }
@@ -4277,7 +5325,9 @@
                 loadProducts(),
                 loadPages(),
                 loadComponents(),
+                loadFooterMap(),
                 loadHero(),
+                loadCarousel(),
                 loadPaymentSettings(),
                 loadOrders({ silent: true }),
                 loadCareers(),
@@ -4309,10 +5359,18 @@
                 const res = await fetch(`${API_URL}/knowledge/status`, { headers: { 'Authorization': `Bearer ${token}` } });
                 const data = await res.json();
                 if (data.success){
-                    document.getElementById('knowledgeHF').textContent = data.hfAvailable ? 'Enabled' : 'Disabled';
-                    document.getElementById('knowledgeDocs').textContent = data.tfidf?.docCount || 0;
-                    document.getElementById('knowledgeVocab').textContent = data.tfidf?.vocabSize || 0;
-                    document.getElementById('knowledgeVectorCount').textContent = data.vectorCount || 0;
+                    const hfEl = document.getElementById('knowledgeHF');
+                    const docsEl = document.getElementById('knowledgeDocs');
+                    const vocabEl = document.getElementById('knowledgeVocab');
+                    const vecEl = document.getElementById('knowledgeVectorCount');
+                    if (hfEl) hfEl.textContent = data.hfAvailable ? 'Enabled' : 'Disabled';
+                    else console.debug('updateKnowledgeStatus: knowledgeHF element not found');
+                    if (docsEl) docsEl.textContent = data.tfidf?.docCount || 0;
+                    else console.debug('updateKnowledgeStatus: knowledgeDocs element not found');
+                    if (vocabEl) vocabEl.textContent = data.tfidf?.vocabSize || 0;
+                    else console.debug('updateKnowledgeStatus: knowledgeVocab element not found');
+                    if (vecEl) vecEl.textContent = data.vectorCount || 0;
+                    else console.debug('updateKnowledgeStatus: knowledgeVectorCount element not found');
                 }
             }catch(e){ console.warn('Failed to update knowledge status', e.message); }
         }
@@ -4322,8 +5380,11 @@
             const token = getAdminToken();
             updateAdminUI();
             setAuthGuard(!!token);
+            // Default to Dashboard view; sidebar controls navigation
+            try { switchTab('dashboard'); } catch (e) {}
             if (token) {
-                loadAllData();
+                // Defer actual loading so external deferred scripts can initialize
+                setTimeout(loadAllData, 0);
             } else {
                 openLoginModal();
             }
@@ -4412,11 +5473,11 @@
             document.getElementById('refreshAllBtn')?.addEventListener('click', () => updateKnowledgeStatus());
 
             document.querySelectorAll('[data-jump-tab]').forEach(btn => {
-                btn.addEventListener('click', () => {
+                btn.addEventListener('click', (e) => {
+                    e.preventDefault();
                     const tab = btn.getAttribute('data-jump-tab');
                     if (!tab) return;
                     switchTab(tab);
-                    document.getElementById(`content-${tab}`)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
                 });
             });
 
@@ -4448,17 +5509,23 @@
                     closeEditCareerModal();
                 }
             });
+
+            const editProductModal = document.getElementById('editProductModal');
+            editProductModal?.addEventListener('click', (e) => {
+                if (e.target === editProductModal) {
+                    closeEditProductModal();
+                }
+            });
             
             // Attach admin login button
             const adminLoginBtn = document.getElementById('adminLoginBtn');
             if (adminLoginBtn) {
                 adminLoginBtn.addEventListener('click', function() {
                     const token = getAdminToken();
-                    if (token) {
-                        logout();
-                    } else {
+                    if (!token) {
                         openLoginModal();
                     }
+                    // when logged in, the status is non-interactive (logout via star button)
                 });
             }
 
@@ -4539,8 +5606,14 @@
             });
         });
     </script>
-      </main>
-    </div> <!-- .admin-layout -->
-    </div> <!-- .admin-app -->
+
+    <!-- AdminLTE deps (v4 uses Bootstrap 5; no jQuery) -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/admin-lte@4.0.0-rc6/dist/js/adminlte.min.js"></script>
+
+                </main>
+            </section>
+        </div> <!-- .content-wrapper -->
+    </div> <!-- .wrapper admin-app -->
 </body>
 </html>

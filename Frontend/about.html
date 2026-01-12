@@ -5,17 +5,159 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>About Us | Zenrix</title>
     <link rel="stylesheet" href="style.css">
-    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="/css/tailwind-site.css">
     <script src="script.js" defer></script>
 </head>
 <body class="bg-gray-50">
     <custom-navbar></custom-navbar>
-    <main class="container mx-auto px-4 py-8">
-        <div id="pageContent" class="prose max-w-none">Loading page content…</div>
-    </main>
+
+    <!-- Hero Section -->
+    <section class="bg-gradient-to-r from-blue-600 to-purple-700 text-white py-20">
+        <div class="container mx-auto px-4 text-center">
+            <h1 class="text-5xl font-bold mb-6">About Zenrix</h1>
+            <p class="text-xl max-w-3xl mx-auto">Discover our story, our mission, and the amazing team behind Zenrix</p>
+        </div>
+    </section>
+
+    <!-- Company Info Section -->
+    <section class="py-16 bg-white">
+        <div class="container mx-auto px-4">
+            <div class="max-w-4xl mx-auto">
+                <h2 class="text-3xl font-bold text-center mb-8 text-gray-800">Our Story</h2>
+                <div id="companyContent" class="prose prose-lg max-w-none text-gray-700">
+                    <p>Loading company information...</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Mission & Vision -->
+    <section class="py-16 bg-gray-50">
+        <div class="container mx-auto px-4">
+            <div class="grid md:grid-cols-2 gap-12">
+                <div class="text-center">
+                    <div class="bg-blue-100 rounded-full w-20 h-20 flex items-center justify-center mx-auto mb-6">
+                        <svg class="w-10 h-10 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                        </svg>
+                    </div>
+                    <h3 class="text-2xl font-bold mb-4 text-gray-800">Our Mission</h3>
+                    <p class="text-gray-600">To provide innovative solutions that empower businesses and individuals to achieve their full potential through cutting-edge technology and exceptional service.</p>
+                </div>
+                <div class="text-center">
+                    <div class="bg-purple-100 rounded-full w-20 h-20 flex items-center justify-center mx-auto mb-6">
+                        <svg class="w-10 h-10 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+                        </svg>
+                    </div>
+                    <h3 class="text-2xl font-bold mb-4 text-gray-800">Our Vision</h3>
+                    <p class="text-gray-600">To be the leading technology company that transforms how people interact with digital solutions, making technology accessible, intuitive, and impactful for everyone.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Team Section -->
+    <section class="py-16 bg-white">
+        <div class="container mx-auto px-4">
+            <h2 class="text-3xl font-bold text-center mb-12 text-gray-800">Meet Our Team</h2>
+            <div id="teamGrid" class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <!-- Team members will be loaded here -->
+            </div>
+        </div>
+    </section>
+
+    <!-- Stats Section -->
+    <section class="py-16 bg-gradient-to-r from-blue-600 to-purple-700 text-white">
+        <div class="container mx-auto px-4">
+            <div class="grid md:grid-cols-4 gap-8 text-center">
+                <div>
+                    <div class="text-4xl font-bold mb-2">1000+</div>
+                    <div class="text-blue-100">Happy Customers</div>
+                </div>
+                <div>
+                    <div class="text-4xl font-bold mb-2">50+</div>
+                    <div class="text-blue-100">Projects Completed</div>
+                </div>
+                <div>
+                    <div class="text-4xl font-bold mb-2">24/7</div>
+                    <div class="text-blue-100">Support Available</div>
+                </div>
+                <div>
+                    <div class="text-4xl font-bold mb-2">5★</div>
+                    <div class="text-blue-100">Customer Rating</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
     <custom-footer></custom-footer>
 
     <script src="components/navbar.js"></script>
     <script src="components/footer.js"></script>
+    <script>
+        // Load company content
+        async function loadCompanyContent() {
+            try {
+                const response = await fetch('/api/pages/slug/about');
+                const data = await response.json();
+                if (data.success) {
+                    document.getElementById('companyContent').innerHTML = data.data.content;
+                } else {
+                    document.getElementById('companyContent').innerHTML = '<p>Company information coming soon...</p>';
+                }
+            } catch (error) {
+                console.error('Error loading company content:', error);
+                document.getElementById('companyContent').innerHTML = '<p>Unable to load company information.</p>';
+            }
+        }
+
+        // Load team members
+        async function loadTeam() {
+            try {
+                const response = await fetch('/api/staff');
+                const data = await response.json();
+                const teamGrid = document.getElementById('teamGrid');
+
+                if (data.success && data.data.length > 0) {
+                    teamGrid.innerHTML = data.data.map(member => `
+                        <div class="bg-white rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-shadow duration-300">
+                            <img src="${member.image}" alt="${member.name}" class="w-full h-64 object-cover">
+                            <div class="p-6">
+                                <h3 class="text-xl font-bold text-gray-800 mb-2">${member.name}</h3>
+                                <p class="text-blue-600 font-semibold mb-3">${member.position}</p>
+                                <p class="text-gray-600 mb-4">${member.bio}</p>
+                                <div class="flex space-x-4">
+                                    ${member.email ? `<a href="mailto:${member.email}" class="text-gray-400 hover:text-blue-600 transition-colors">
+                                        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                                            <path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z"/>
+                                            <path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z"/>
+                                        </svg>
+                                    </a>` : ''}
+                                    ${member.linkedin ? `<a href="${member.linkedin}" target="_blank" class="text-gray-400 hover:text-blue-600 transition-colors">
+                                        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                                            <path d="M16.338 16.338H13.67V12.16c0-.995-.017-2.277-1.387-2.277-1.39 0-1.601 1.086-1.601 2.207v4.248H8.014v-8.59h2.559v1.174h.037c.356-.675 1.227-1.387 2.526-1.387 2.703 0 3.203 1.778 3.203 4.092v4.711zM5.005 6.575a1.548 1.548 0 11-.003-3.096 1.548 1.548 0 01.003 3.096zm-1.337 9.763H6.34v-8.59H3.667v8.59zM17.668 1H2.328C1.595 1 1 1.581 1 2.298v15.403C1 18.418 1.595 19 2.328 19h15.34c.734 0 1.332-.582 1.332-1.299V2.298C19 1.581 18.402 1 17.668 1z"/>
+                                        </svg>
+                                    </a>` : ''}
+                                </div>
+                            </div>
+                        </div>
+                    `).join('');
+                } else {
+                    teamGrid.innerHTML = '<p class="text-center text-gray-600 col-span-full">Team information coming soon...</p>';
+                }
+            } catch (error) {
+                console.error('Error loading team:', error);
+                document.getElementById('teamGrid').innerHTML = '<p class="text-center text-gray-600 col-span-full">Unable to load team information.</p>';
+            }
+        }
+
+        // Load content when page loads
+        document.addEventListener('DOMContentLoaded', () => {
+            loadCompanyContent();
+            loadTeam();
+        });
+    </script>
 </body>
 </html>

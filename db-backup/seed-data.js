@@ -294,7 +294,7 @@ async function seedDatabase() {
         html: `<div class="nav-links">
           <a href="/">Home</a>
           <a href="/products.html">Products</a>
-          <a href="/account.html">Account</a>
+          <a href="/profile.html">Account</a>
           <a href="/contact.html">Contact</a>
         </div>`,
         published: true

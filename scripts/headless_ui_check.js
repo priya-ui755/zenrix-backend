@@ -7,7 +7,20 @@ const fs = require('fs');
   const TEST_PORT = process.env.UI_TEST_PORT || 3001;
   const server = app.listen(TEST_PORT);
   const base = `http://localhost:${TEST_PORT}`;
-  const pagesToCheck = ['/admin-dashboard.html', '/admin.html'];
+  const pagesToCheck = [
+    '/admin-dashboard.html',
+    '/admin.html',
+    '/',
+    '/index.html',
+    '/products.html',
+    '/product.html',
+    '/cart.html',
+    '/checkout.html',
+    '/support.html',
+    '/wishlist.html',
+    '/login.html',
+    '/register.html'
+  ];
   const results = [];
 
   const browser = await puppeteer.launch({ args: ['--no-sandbox','--disable-setuid-sandbox'] });
