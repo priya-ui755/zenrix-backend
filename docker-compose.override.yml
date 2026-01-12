@@ -1,0 +1,8 @@
+services:
+  app:
+    volumes:
+      - ./:/usr/src/app:cached
+      - /usr/src/app/node_modules
+    environment:
+      NODE_ENV: development
+    command: sh -c "npm run dev"
