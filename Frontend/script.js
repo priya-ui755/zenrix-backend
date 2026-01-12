@@ -140,8 +140,8 @@ const THEME_STORAGE_KEY = 'zenrix_theme';
 function resolvePreferredTheme() {
     const stored = localStorage.getItem(THEME_STORAGE_KEY);
     if (stored === 'light' || stored === 'dark') return stored;
-    const prefersLight = window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches;
-    return prefersLight ? 'light' : 'dark';
+    // Default to light theme when no stored preference (dark is secondary)
+    return 'light';
 }
 
 function applyTheme(theme) {
