@@ -126,6 +126,7 @@
                 return;
             }
 
+
             const token = localStorage.getItem('userToken');
             const formData = new FormData(e.target);
 
@@ -241,7 +242,7 @@
             }).join('');
         }
 
-        // Open ticket details modal
+        // Open ticket details modal (auth required)
         async function openTicketModal(ticketId) {
             const token = localStorage.getItem('userToken');
             try {
@@ -259,6 +260,76 @@
                 alert('Error loading ticket: ' + err.message);
             }
         }
+
+        // Public ticket view (guest access) from URL params: ?ticket_id=...&guest_email=...
+        async function tryLoadPublicTicketFromUrl(){
+            const params = new URLSearchParams(location.search);
+            const id = params.get('ticket_id');
+            const guest = params.get('guest_email');
+            if (!id || !guest) return;
+            try{
+                const res = await fetch(`${API_URL}/tickets/public/${id}?email=${encodeURIComponent(guest)}`);
+                const json = await res.json();
+                if (json.success && json.data){
+                    showTicketDetailsPublic(json.data);
+                }else{
+                    console.warn('Public ticket lookup failed', json);
+                }
+            }catch(e){ console.warn('Public ticket lookup error', e.message); }
+        }
+
+        // Public view helper (guest) — similar to showTicketDetails but read-only
+        function showTicketDetailsPublic(ticket){
+            const modal = document.getElementById('ticketModal');
+            const title = document.getElementById('modalTicketTitle');
+            const body = document.getElementById('ticketModalBody');
+
+            title.textContent = `#${ticket._id.slice(-6).toUpperCase()} - ${ticket.subject}`;
+
+            const statusColors = {
+                'open': 'bg-blue-500/20 text-blue-400 border-blue-500/30',
+                'in-progress': 'bg-yellow-500/20 text-yellow-400 border-yellow-500/30',
+                'solved': 'bg-green-500/20 text-green-400 border-green-500/30',
+                'closed': 'bg-slate-500/20 text-slate-400 border-slate-500/30'
+            };
+
+            const messagesHtml = (ticket.messages || []).map(msg => {
+                const isAdmin = msg.sender === 'admin';
+                return `
+                <div class="${isAdmin ? 'bg-blue-500/10 border-l-4 border-blue-500' : 'bg-slate-800/50 border-l-4 border-slate-600'} p-4 rounded-lg">
+                    <div class="flex items-center gap-2 mb-2">
+                        <span class="text-sm font-semibold ${isAdmin ? 'text-blue-400' : 'text-slate-300'}">${msg.senderName || (isAdmin ? 'Support Team' : 'Guest')}</span>
+                        <span class="text-xs text-slate-500">${new Date(msg.timestamp).toLocaleString()}</span>
+                    </div>
+                    <p class="text-sm text-slate-200 whitespace-pre-wrap">${msg.message}</p>
+                </div>
+                `;
+            }).join('');
+
+            body.innerHTML = `
+                <div class="bg-slate-800/50 rounded-xl border border-white/10 p-4 space-y-3">
+                    <div class="flex items-center justify-between">
+                        <span class="px-3 py-1 text-sm font-semibold rounded-full border ${statusColors[ticket.status]}">${ticket.status}</span>
+                        <div class="text-xs text-slate-400">
+                            <span>Category: ${ticket.category}</span> • 
+                            <span>Priority: ${ticket.priority}</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="space-y-3">
+                    <p class="text-xs uppercase tracking-wider text-slate-400">Messages</p>
+                    ${messagesHtml}
+                </div>
+
+                <div class="text-center text-slate-400 text-sm py-4 bg-slate-800/50 rounded-xl">This is a public view of your ticket. For privacy, limited details are shown. If you want to reply, please login to your account or reply via the email confirmation we sent.</div>
+            `;
+
+            modal.classList.remove('hidden');
+        }
+
+        // Run on load
+        tryLoadPublicTicketFromUrl();
 
         function showTicketDetails(ticket) {
             const modal = document.getElementById('ticketModal');

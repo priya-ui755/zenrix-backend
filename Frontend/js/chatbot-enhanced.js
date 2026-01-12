@@ -271,7 +271,9 @@
           });
           const data = await res.json();
           if (res.ok && data && data.success && data.data){
-            appendMessage(`Thank you! Your ticket has been created (ID: ${data.data._id}). Our support team will reach out to ${escapeHtml(email)}.` , 'bot');
+            const ticketId = data.data._id;
+          const viewUrl = `/support.html?ticket_id=${encodeURIComponent(ticketId)}&guest_email=${encodeURIComponent(email)}`;
+          appendMessage(`Thank you! Your ticket has been created (ID: ${ticketId}). <a href="${viewUrl}" target="_blank" rel="noopener">View ticket</a> — our support team will reach out to ${escapeHtml(email)}.` , 'bot');
           } else {
             appendMessage('There was an issue creating your ticket. Please try again later or email support@zenrix.com.np', 'bot');
           }
