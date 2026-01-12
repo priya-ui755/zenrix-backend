@@ -112,7 +112,7 @@ const heroRoutes = require('./routes/HeroRoutes');
 const carouselRoutes = require('./routes/CarouselRoutes');
 const paymentSettingsRoutes = require('./routes/PaymentSettingsRoutes');
 const ticketRoutes = require('./routes/TicketRoutes');
-// const knowledgeRoutes = require('./routes/KnowledgeRoutes');
+const knowledgeRoutes = require('./routes/KnowledgeRoutes');
 const staffRoutes = require('./routes/StaffRoutes');
 
 // Temporary staff route
@@ -147,7 +147,7 @@ app.use('/api/hero', heroRoutes);
 app.use('/api/carousel', carouselRoutes);
 app.use('/api/payment-settings', paymentSettingsRoutes);
 app.use('/api/tickets', ticketRoutes);
-// app.use('/api/knowledge', knowledgeRoutes);
+app.use('/api/knowledge', knowledgeRoutes);
 app.use('/api/staff', staffRoutes);
 
 // Temporary staff route
