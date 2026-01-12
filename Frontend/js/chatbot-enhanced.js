@@ -113,7 +113,11 @@
       body: JSON.stringify({ q: text, topK: 3, useLLM: true })
     }).then(r => r.json()).then(data => {
       if (window.__CHATBOT_DEBUG) console.debug('KB response', data);
-      if (!data || !data.success) return appendMessage('I could not find a helpful answer. Please try rephrasing or contact support@zenrix.com.np', 'bot');
+      if (!data || !data.success) {
+        appendMessage('I could not find a helpful answer. Would you like me to open a support ticket so our team can follow up?', 'bot');
+        showTicketOffer(text);
+        return;
+      }
       if (data.answer){
         const answerText = stripHtmlText(String(data.answer));
         if (looksLikeCode(answerText)){
@@ -133,7 +137,8 @@
         }).join('<br><br>');
         appendMessage('I found some related information:<br><br>' + s + '<br><br>If this does not answer your question, try contacting support@zenrix.com.np', 'bot');
       } else {
-        appendMessage('No relevant documents were found. Try contacting support@zenrix.com.np for detailed help.', 'bot');
+        appendMessage('No relevant documents were found. Would you like me to open a support ticket so our team can follow up?', 'bot');
+        showTicketOffer(text);
       }
     }).catch(()=> {
       appendMessage('Sorry, I had trouble contacting the knowledge service. Please try again later or contact support@zenrix.com.np', 'bot');
