@@ -267,6 +267,7 @@
                 <div class="label">Knowledge (TF‑IDF)</div>
                 <div class="value">Docs: <span id="knowledgeDocs">0</span></div>
                 <div class="label" style="margin-top:.5rem">Vocab: <span id="knowledgeVocab">0</span> • Vectors: <span id="knowledgeVectorCount">0</span></div>
+                <div class="label" style="margin-top:.5rem">Feature: <input type="checkbox" id="knowledgeFeatureToggle"> Enable Knowledge</div>
             </div>
 
             <div class="card">
@@ -5371,6 +5372,13 @@
                     else console.debug('updateKnowledgeStatus: knowledgeVocab element not found');
                     if (vecEl) vecEl.textContent = data.vectorCount || 0;
                     else console.debug('updateKnowledgeStatus: knowledgeVectorCount element not found');
+
+                    // Fetch feature flag
+                    try{
+                        const f = await (await fetch(`${API_URL}/knowledge/feature`, { headers: { 'Authorization': `Bearer ${token}` } })).json();
+                        const toggle = document.getElementById('knowledgeFeatureToggle');
+                        if (toggle) toggle.checked = f && f.enabled;
+                    }catch(e){ console.debug('updateKnowledgeStatus: failed to fetch feature flag', e.message); }
                 }
             }catch(e){ console.warn('Failed to update knowledge status', e.message); }
         }
@@ -5385,6 +5393,21 @@
             if (token) {
                 // Defer actual loading so external deferred scripts can initialize
                 setTimeout(loadAllData, 0);
+
+                // Attach handler for knowledge feature toggle
+                const kToggle = document.getElementById('knowledgeFeatureToggle');
+                if (kToggle) {
+                    kToggle.addEventListener('change', async (e) => {
+                        const enabled = !!e.target.checked;
+                        try{
+                            const res = await fetch(`${API_URL}/knowledge/feature`, { method: 'POST', headers: { 'Content-Type':'application/json', 'Authorization': `Bearer ${token}` }, body: JSON.stringify({ enabled }) });
+                            const j = await res.json();
+                            if (!j || !j.success) return alert('Failed to update knowledge feature');
+                            updateKnowledgeStatus();
+                        }catch(err){ alert('Failed to update knowledge feature: ' + err.message); }
+                    });
+                }
+
             } else {
                 openLoginModal();
             }

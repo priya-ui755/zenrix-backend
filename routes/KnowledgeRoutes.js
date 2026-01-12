@@ -9,6 +9,12 @@ const { requireAdmin } = require('../middleware/auth');
 // POST /api/knowledge/query
 // body: { q: string, topK?: number, useLLM?: boolean }
 router.post('/query', async (req,res,next) => {
+  // Respect runtime feature flag
+  try{
+    const flags = require('../server/knowledge/featureFlags');
+    if (!flags.isKnowledgeEnabled()) return res.status(503).json({ success:false, error: 'Knowledge service is disabled' });
+  }catch(e){ /* ignore */ }
+
   try{
     const q = (req.body && req.body.q) || req.query.q || '';
     const topK = parseInt(req.body.topK || req.query.topK || 4, 10);
@@ -129,6 +135,23 @@ router.post('/clear-vectors', requireAdmin, async (req,res,next)=>{
     const vectorCount = (vectorstore.getAll && typeof vectorstore.getAll === 'function') ? vectorstore.getAll().length : 0;
     res.json({ success:true, vectorCount });
   }catch(err){ next(err); }
+});
+
+// Admin endpoints to view and set the knowledge feature flag
+router.get('/feature', requireAdmin, (req,res) => {
+  try{
+    const f = require('../server/knowledge/featureFlags');
+    return res.json({ success:true, enabled: f.isKnowledgeEnabled() });
+  }catch(e){ return res.status(500).json({ success:false, error: 'Failed to read feature flag' }); }
+});
+
+router.post('/feature', requireAdmin, (req,res) => {
+  try{
+    const enabled = !!req.body.enabled;
+    const f = require('../server/knowledge/featureFlags');
+    f.setKnowledgeEnabled(enabled);
+    return res.json({ success:true, enabled: f.isKnowledgeEnabled() });
+  }catch(e){ return res.status(500).json({ success:false, error: 'Failed to update feature flag' }); }
 });
 
 module.exports = router;
