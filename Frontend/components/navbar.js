@@ -587,8 +587,14 @@ class CustomNavbar extends HTMLElement {
         const labelSpan = themeBtn?.querySelector('.theme-label');
 
         const getCurrentTheme = () => {
-            // Force light as the only theme for now to keep homepage visible
-            localStorage.setItem('zenrix_theme', 'light');
+            // Prefer an explicit stored preference; otherwise fall back to the system setting
+            const stored = localStorage.getItem('zenrix_theme');
+            if (stored === 'dark' || stored === 'light') return stored;
+            try {
+                if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) return 'dark';
+            } catch (e) {
+                // ignore and fall through
+            }
             return 'light';
         };
 
