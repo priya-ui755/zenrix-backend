@@ -5,4 +5,4 @@ services:
       - /usr/src/app/node_modules
     environment:
       NODE_ENV: development
-    command: sh -c "npm run dev"
+    command: sh -c "if [ ! -f node_modules/.bin/nodemon ]; then echo 'Installing dev dependencies...'; npm install; fi && npm run dev"
