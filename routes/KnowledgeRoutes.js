@@ -24,9 +24,14 @@ router.post('/query', async (req,res,next) => {
           const hits = vectorstore.search(emb, topK);
           snippets = hits.map(h=> ({ id: h.id, source: h.source, text: h.text, score: h.score, meta: h.meta, snippet: h.snippet || (h.text ? h.text.slice(0,300) : ''), matchedTerms: h.matchedTerms || [] }));
         } else {
-          // Embedding not produced; fallback to TF-IDF
-          const hits = tfidf.search(q, topK);
-          snippets = hits.map(h=> ({ id: h.id, source: h.source, text: h.text, score: h.score, meta: h.meta, snippet: h.snippet || (h.text ? h.text.slice(0,300) : ''), matchedTerms: h.matchedTerms || [] }));
+          // Embedding not produced; fallback to vectorstore query or TF-IDF
+          const hits = vectorstore.search(q, topK);
+          if (hits && hits.length) {
+            snippets = hits.map(h=> ({ id: h.id, source: h.source, text: h.text || '', score: h.score, meta: h.meta, snippet: h.snippet || '', matchedTerms: h.matchedTerms || [] }));
+          } else {
+            const tfhits = tfidf.search(q, topK);
+            snippets = tfhits.map(h=> ({ id: h.id, source: h.source, text: h.text, score: h.score, meta: h.meta, snippet: h.snippet || (h.text ? h.text.slice(0,300) : ''), matchedTerms: h.matchedTerms || [] }));
+          }
         }
       }catch(err){
         console.warn('Embedding failed, falling back to TF-IDF:', err.message);
@@ -34,8 +39,14 @@ router.post('/query', async (req,res,next) => {
         snippets = hits.map(h=> ({ id: h.id, source: h.source, text: h.text, score: h.score, meta: h.meta, snippet: h.snippet || (h.text ? h.text.slice(0,300) : ''), matchedTerms: h.matchedTerms || [] }));
       }
     } else {
-      const hits = tfidf.search(q, topK);
-      snippets = hits.map(h=> ({ id: h.id, source: h.source, text: h.text, score: h.score, meta: h.meta }));
+      // HF not available: use vectorstore.query fallback (TF-IDF-based similarity)
+      const hits = vectorstore.search(q, topK);
+      if (hits && hits.length){
+        snippets = hits.map(h=> ({ id: h.id, source: h.source, text: h.text || '', score: h.score, meta: h.meta }));
+      } else {
+        const tfhits = tfidf.search(q, topK);
+        snippets = tfhits.map(h=> ({ id: h.id, source: h.source, text: h.text, score: h.score, meta: h.meta }));
+      }
     }
 
     if (useLLM){
