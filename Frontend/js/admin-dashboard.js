@@ -36,15 +36,7 @@
           if (j && j.success) {
             alert(`Reprocessed: ${j.updated} products. Failed: ${j.failed}`);
           } else {
-            const errMsg = j && j.error ? j.error : 'Unknown error';
-            // If token invalid or missing, prompt re-login
-            if (errMsg === 'Invalid token' || errMsg === 'Missing authorization token' || res.status === 401 || res.status === 403) {
-              try { if (typeof clearAdminToken === 'function') clearAdminToken(); } catch(e){}
-              try { if (typeof openLoginModal === 'function') openLoginModal(); } catch(e){}
-              alert('Session expired or invalid. Please login again.');
-            } else {
-              alert('Failed: ' + errMsg);
-            }
+            alert('Failed: ' + (j && j.error ? j.error : 'Unknown error'));
           }
         } catch (e) {
           alert('Error: ' + (e && e.message ? e.message : e));

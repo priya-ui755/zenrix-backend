@@ -3497,18 +3497,7 @@
                     } else {
                         tbody.innerHTML = data.data.map(sub => `
                             <tr class="hover:bg-gray-50">
-                                <td class="px-4 py-3 text-sm text-gray-800">${sub.email}</td>`
-                } else {
-                    // handle auth errors by prompting re-login
-                    const err = data && data.error ? data.error : 'Unknown error';
-                    if (err === 'Invalid token' || err === 'Missing authorization token') {
-                        try { clearAdminToken(); } catch(e){}
-                        try { openLoginModal(); } catch(e){}
-                        showToast('error', 'Session expired. Please login again.');
-                    } else if (!silent) {
-                        showToast('error', 'Failed to load subscribers: ' + err);
-                    }
-                }
+                                <td class="px-4 py-3 text-sm text-gray-800">${sub.email}</td>
                                 <td class="px-4 py-3 text-sm text-gray-600 capitalize">${sub.source || 'homepage'}</td>
                                 <td class="px-4 py-3 text-sm text-gray-600">${new Date(sub.createdAt).toLocaleDateString()} ${new Date(sub.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</td>
                                 <td class="px-4 py-3 text-right">
