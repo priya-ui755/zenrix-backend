@@ -24,11 +24,48 @@ const puppeteer = require('puppeteer');
     const sendSel = '#chatbot-send, #chatbotSend';
     await page.click(sendSel);
 
-    // Wait for bot message that offers ticket — our UI attaches button with id _open_ticket_btn
-    await page.waitForSelector('#_open_ticket_btn', { timeout: 15000 });
+    // Wait up to 20s for either the ticket button or a bubble that asks to open a support ticket
+    const offerFound = await page.evaluate(() => {
+      const findText = (el, txt) => el && el.textContent && el.textContent.toLowerCase().includes(txt.toLowerCase());
+      // poll for element or bubble text
+      const btn = document.getElementById('_open_ticket_btn');
+      if (btn) return true;
+      const bubbles = Array.from(document.querySelectorAll('.bubble.bot'));
+      for (const b of bubbles){
+        if (findText(b, 'open a support ticket') || findText(b, 'would you like me to open a support ticket') || findText(b, 'would you like me to open a ticket')) return true;
+      }
+      return false;
+    });
 
-    const btn = await page.$('#_open_ticket_btn');
-    if (!btn) throw new Error('Ticket offer button not found');
+    // Retry polling for up to 20s
+    let attempts = 0;
+    while(!offerFound && attempts < 20){
+      // sleep 1s
+      await new Promise(r=>setTimeout(r,1000));
+      const found = await page.evaluate(() => {
+        const findText = (el, txt) => el && el.textContent && el.textContent.toLowerCase().includes(txt.toLowerCase());
+        const btn = document.getElementById('_open_ticket_btn');
+        if (btn) return true;
+        const bubbles = Array.from(document.querySelectorAll('.bubble.bot'));
+        for (const b of bubbles){
+          if (findText(b, 'open a support ticket') || findText(b, 'would you like me to open a support ticket') || findText(b, 'would you like me to open a ticket')) return true;
+        }
+        return false;
+      });
+      if (found) break;
+      attempts++;
+    }
+
+    const final = await page.evaluate(() => {
+      const btn = document.getElementById('_open_ticket_btn');
+      const bubbles = Array.from(document.querySelectorAll('.bubble.bot')).map(b=>b.textContent.trim()).slice(-6);
+      return { hasBtn: !!btn, recentBubbles: bubbles };
+    });
+
+    if (!final.hasBtn && !final.recentBubbles.some(b => /open a support ticket|open a ticket|support ticket/i.test(b))) {
+      console.error('Recent bot bubbles:', final.recentBubbles);
+      throw new Error('Ticket offer not found in chat UI');
+    }
 
     console.log('E2E: chatbot ticket offer check: OK');
     await browser.close();

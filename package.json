@@ -11,6 +11,7 @@
     "test:star-visual": "echo \"No visual tests configured\"",
     "test:admin:all": "echo \"No admin e2e tests configured\"",
     "test:chatbot:ticket": "node scripts/e2e_chatbot_ticket_offer_check.js",
+    "test:kb:toggle": "node scripts/e2e_knowledge_feature_toggle_check.js",
     "build:tailwind:site": "tailwindcss -c tailwind.site.config.js -i Frontend/css/tailwind-site.input.css -o Frontend/css/tailwind-site.css --minify",
     "build:tailwind:admin": "tailwindcss -c tailwind.admin.config.js -i Frontend/css/tailwind-admin.input.css -o Frontend/css/tailwind-admin.css --minify",
     "build:tailwind": "npm run build:tailwind:site && npm run build:tailwind:admin"
