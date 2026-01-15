@@ -57,6 +57,11 @@ router.put('/:id', requireAdmin, async (req, res) => {
     const comp = await Component.findByIdAndUpdate(req.params.id, req.body, { new: true, runValidators: true });
     if (!comp) return res.status(404).json({ success: false, error: 'Component not found' });
     res.json({ success: true, data: comp });
+    // Broadcast to connected clients that this component changed so public pages can update live
+    try {
+      const sse = require('../server/sse');
+      sse.broadcast('componentUpdated', { slug: comp.slug, data: comp });
+    } catch (e) { /* non-fatal */ }
   } catch (err) {
     res.status(400).json({ success: false, error: err.message });
   }

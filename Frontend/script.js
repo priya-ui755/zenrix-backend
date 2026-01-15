@@ -300,6 +300,23 @@ document.addEventListener('DOMContentLoaded', function() {
             })();
         }
     } catch (e) { /* ignore */ }
+
+    // Live updates: listen to server-sent events to receive componentUpdated broadcasts
+    (function(){
+        try {
+            if (typeof EventSource === 'undefined') return;
+            const es = new EventSource('/api/updates/stream');
+            es.addEventListener('componentUpdated', function(evt){
+                try {
+                    const payload = JSON.parse(evt.data || '{}');
+                    // write structured data to localStorage for other tabs and trigger event
+                    try { if (payload && payload.data && payload.data.data) localStorage.setItem('footerData', JSON.stringify(payload.data.data)); } catch(e){}
+                    try { window.dispatchEvent(new CustomEvent('componentUpdated', { detail: payload })); } catch(e){}
+                } catch(e) { console.warn('SSE parse error', e); }
+            });
+            es.addEventListener('error', function(e){ /* EventSource handles reconnect automatically */ });
+        } catch (e) {}
+    })();
     
     if (window.location.pathname.includes('cart.html')) {
         initCartPage();

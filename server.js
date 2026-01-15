@@ -171,6 +171,9 @@ console.log('Testimonials routes registered');
 
 app.use('/api/admin', adminRoutes);
 
+// Live updates stream (SSE) for client-side auto-refresh
+app.use('/api/updates', require('./routes/UpdatesRoutes'));
+
 // Temporary staff route
 app.get('/api/staff', (req, res) => {
     res.json({ success: true, count: 0, data: [] });
