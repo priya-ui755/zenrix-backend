@@ -87,8 +87,29 @@
             try { setTimeout(() => { window.location.href = window.location.origin.replace(/\/$/, '') + '/admin-dashboard.html'; }, 300); } catch(e) {}
         };
 
-        // Robust capture-phase handlers to ensure clicking the auth overlay opens the login modal
+        // Robust capture-phase handlers + observer to ensure clicking the auth overlay opens the login modal
         (function(){
+            function robustOpenLogin(reason){
+                try{
+                    const loginModal = document.getElementById('loginModal');
+                    const overlay = document.getElementById('authOverlay');
+                    if (!loginModal) return;
+                    // remove hidden and force visible styles as a last-resort
+                    loginModal.classList.remove('hidden');
+                    loginModal.style.zIndex = loginModal.style.zIndex || '99999';
+                    loginModal.style.pointerEvents = 'auto';
+                    try { document.getElementById('adminPassword')?.focus(); } catch(e){}
+
+                    // hide the overlay behind the modal (visual) but keep it interactive for accessibility
+                    try { if (overlay) { overlay.classList.add('hidden'); overlay.setAttribute('aria-hidden', 'true'); } } catch(e){}
+
+                    try {
+                        const b = document.getElementById('adminJsErrorBanner');
+                        if (b) { b.textContent = 'Notice: login modal opened (' + (reason || 'click') + ')'; b.classList.remove('hidden'); setTimeout(()=>{ try { b.classList.add('hidden'); } catch(e){} }, 2500); }
+                    } catch(e){}
+                } catch (e) { console.warn('robustOpenLogin failed', e); }
+            }
+
             function handleAuthPointer(e){
                 try{
                     const el = e.target;
@@ -96,14 +117,45 @@
                     if (!overlay) return;
                     const loginBtn = document.getElementById('authOverlayLogin');
                     if (overlay.contains(el) || (loginBtn && (el === loginBtn || loginBtn.contains(el)))) {
-                        // stop further processing and open modal immediately
-                        try { e.preventDefault(); e.stopImmediatePropagation(); } catch(_){}
-                        try { if (typeof openLoginModal === 'function') openLoginModal(); else { document.getElementById('loginModal')?.classList.remove('hidden'); document.getElementById('adminPassword')?.focus(); } } catch(err){}
+                        try { e.preventDefault(); e.stopImmediatePropagation(); } catch(_){ }
+                        try { if (typeof openLoginModal === 'function') openLoginModal(); } catch(err){}
+                        // If the modal is still hidden after a tiny delay, force it open
+                        setTimeout(() => {
+                            try {
+                                const lm = document.getElementById('loginModal');
+                                if (lm && lm.classList.contains('hidden')) {
+                                    robustOpenLogin('fallback-click');
+                                }
+                            } catch(e){}
+                        }, 120);
                     }
                 }catch(e){}
             }
+
             document.addEventListener('pointerdown', handleAuthPointer, true);
             document.addEventListener('click', handleAuthPointer, true);
+
+            // Watch for cases where the overlay is visible but the modal never opens (e.g., blocked handlers)
+            try {
+                const overlay = document.getElementById('authOverlay');
+                const loginModal = document.getElementById('loginModal');
+                if (overlay && loginModal && window.MutationObserver) {
+                    const debounced = (fn, ms=150) => { let t = null; return (...args) => { clearTimeout(t); t = setTimeout(()=>fn(...args), ms); }; };
+                    const checkAndOpen = debounced(() => {
+                        try {
+                            const overlayVisible = !!(overlay && !overlay.classList.contains('hidden') && getComputedStyle(overlay).display !== 'none');
+                            const modalHidden = !!(loginModal && loginModal.classList.contains('hidden'));
+                            if (overlayVisible && modalHidden && !localStorage.getItem('adminToken')) {
+                                robustOpenLogin('observer');
+                            }
+                        } catch(e){}
+                    }, 120);
+
+                    const mo = new MutationObserver(() => checkAndOpen());
+                    mo.observe(overlay, { attributes: true, attributeFilter: ['class', 'style', 'aria-hidden'] });
+                    mo.observe(loginModal, { attributes: true, attributeFilter: ['class', 'style'] });
+                }
+            } catch(e){}
         })();
         // Ensure overlay Login button opens login modal even if other scripts fail.
         (function attachOverlayLoginHandler(){
@@ -245,7 +297,7 @@
                                 </div>
                             </li>
                             <li class="nav-item d-flex align-items-center">
-                                        <button id="logoutBtn" class="star-btn btn btn-danger hidden" type="button" aria-label="Logout" style="position: relative; overflow: visible;" onclick="performLogout();">
+                                        <button id="logoutBtn" class="star-btn btn btn-danger hidden" type="button" aria-label="Logout" style="position: relative; overflow: visible;" onclick="adminLogout();">
                                             Log Out
                                             <span class="smoke" aria-hidden="true"></span>
                                             <div class="star-1">
@@ -323,7 +375,7 @@
                         <h2 id="authOverlayTitle" class="text-xl font-semibold text-gray-900">Sign in to continue</h2>
                         <p class="text-sm text-gray-600 mt-2 mb-4">Administrative access is required to view and manage site content. Enter your admin password to continue.</p>
                         <div class="flex items-center gap-3">
-                            <button id="authOverlayLogin" class="btn btn-primary" type="button" style="pointer-events:auto;" onclick="(function(){ try{ if(typeof openLoginModal==='function'){ openLoginModal(); } else { document.getElementById('loginModal')?.classList.remove('hidden'); document.getElementById('adminPassword')?.focus(); } }catch(e){} })()">Login</button>
+                            <button id="authOverlayLogin" class="btn btn-primary" type="button" style="pointer-events:auto;" onclick="robustOpenLogin('button-click')">Login</button>
                             <a href="/support.html" class="btn btn-ghost" id="contactSupport">Contact support</a>
                         </div>
                         <p class="text-xs text-gray-400 mt-4">Need an account or lost access? Contact your site admin via the support page.</p>
