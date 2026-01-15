@@ -120,16 +120,7 @@
                     const loginBtn = document.getElementById('authOverlayLogin');
                     if (overlay.contains(el) || (loginBtn && (el === loginBtn || loginBtn.contains(el)))) {
                         try { e.preventDefault(); e.stopImmediatePropagation(); } catch(_){ }
-                        try { if (typeof openLoginModal === 'function') openLoginModal(); } catch(err){}
-                        // If the modal is still hidden after a tiny delay, force it open
-                        setTimeout(() => {
-                            try {
-                                const lm = document.getElementById('loginModal');
-                                if (lm && lm.classList.contains('hidden')) {
-                                    robustOpenLogin('fallback-click');
-                                }
-                            } catch(e){}
-                        }, 120);
+                        robustOpenLogin('capture-click');
                     }
                 }catch(e){}
             }
@@ -365,7 +356,7 @@
 
 
                 <!-- Main Content -->
-                <div id="authOverlay" class="fixed inset-0 bg-white bg-opacity-70 backdrop-blur-sm hidden" aria-hidden="true" style="z-index:12000; pointer-events:auto;">
+                <div id="authOverlay" class="fixed inset-0 bg-white bg-opacity-70 backdrop-blur-sm hidden" aria-hidden="true" style="z-index:12000; pointer-events:auto;" onclick="robustOpenLogin('overlay-click')">
         <div class="auth-overlay flex items-center justify-center w-full h-full px-4">
             <div class="auth-card bg-white rounded-xl shadow-xl p-8 max-w-md w-full text-center" role="dialog" aria-modal="true" aria-labelledby="authOverlayTitle">
                 <div class="flex items-start gap-6">
@@ -377,7 +368,7 @@
                         <h2 id="authOverlayTitle" class="text-xl font-semibold text-gray-900">Sign in to continue</h2>
                         <p class="text-sm text-gray-600 mt-2 mb-4">Administrative access is required to view and manage site content. Enter your admin password to continue.</p>
                         <div class="flex items-center gap-3">
-                            <button id="authOverlayLogin" class="btn btn-primary" type="button" style="pointer-events:auto;" onclick="robustOpenLogin('button-click')">Login</button>
+                            <button id="authOverlayLogin" class="btn btn-primary" type="button" style="pointer-events:auto;">Login</button>
                             <a href="/support.html" class="btn btn-ghost" id="contactSupport">Contact support</a>
                         </div>
                         <p class="text-xs text-gray-400 mt-4">Need an account or lost access? Contact your site admin via the support page.</p>
