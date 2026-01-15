@@ -53,6 +53,28 @@
             try { setTimeout(() => { if (typeof openLoginModal === 'function') openLoginModal(); }, 120); } catch(e) {}
             try { setTimeout(() => { window.location.href = window.location.origin.replace(/\/$/, '') + '/admin-dashboard.html'; }, 300); } catch(e) {}
         };
+        // Ensure overlay Login button opens login modal even if other scripts fail.
+        (function attachOverlayLoginHandler(){
+            function install(){
+                try {
+                    const b = document.getElementById('authOverlayLogin');
+                    if (b) {
+                        b.setAttribute('type','button');
+                        b.removeEventListener('click', window.__overlayLoginHandler);
+                        window.__overlayLoginHandler = function(){ try { if (typeof openLoginModal === 'function') openLoginModal(); else { document.getElementById('loginModal')?.classList.remove('hidden'); document.getElementById('adminPassword')?.focus(); } } catch(e){} };
+                        b.addEventListener('click', window.__overlayLoginHandler);
+                        return true;
+                    }
+                } catch(e){}
+                return false;
+            }
+            if (!install()) {
+                // retry until DOM ready
+                const iv = setInterval(() => { if (install()) clearInterval(iv); }, 150);
+                // give up after 10s
+                setTimeout(() => clearInterval(iv), 10000);
+            }
+        })();
     </script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
