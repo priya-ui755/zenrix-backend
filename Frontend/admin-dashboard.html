@@ -1,7 +1,37 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <script>window.API_URL = '/api';</script>
+    <script>
+        window.API_URL = '/api';
+        // Robust inline admin login helper (early, so it's available even if other scripts fail)
+        window.__inlineAdminLogin = async function(password){
+            try{
+                const endpoint = (window.API_URL || '/api') + '/admin/login';
+                const res = await fetch(endpoint, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ password: String(password || '') })
+                });
+                let data = null;
+                try { data = await res.json(); } catch(e) { data = null; }
+                if (data && data.success && data.token) {
+                    try { localStorage.setItem('adminToken', data.token); } catch(e) {}
+                    try { if (typeof setAdminToken === 'function') setAdminToken(data.token); } catch(e) {}
+                    try { document.getElementById('loginModal')?.classList.add('hidden'); } catch(e) {}
+                    try { window.dispatchEvent(new CustomEvent('adminLoggedIn', { detail: {} })); } catch(e) {}
+                    try { if (typeof updateAdminUI === 'function') updateAdminUI(); } catch(e) {}
+                    try { location.reload(); } catch(e) {}
+                    return true;
+                }
+                try { alert('Login failed: ' + (data && data.error ? data.error : 'Invalid credentials')); } catch(e) {}
+                return false;
+            } catch (err) {
+                try { console.error('inlineAdminLogin error', err); } catch(e) {}
+                try { alert('Login failed: ' + (err && err.message ? err.message : String(err))); } catch(e) {}
+                return false;
+            }
+        };
+    </script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Zenrix Admin Dashboard</title>
@@ -2049,6 +2079,28 @@
             }
         });
 
+        // Backup handler: if the main login handler fails to run for any reason,
+        // ensure the form still submits using the robust inline helper defined early.
+        try {
+            const _loginForm = document.getElementById('loginForm');
+            if (_loginForm) {
+                _loginForm.addEventListener('submit', function(evt){
+                    // If previous handlers ran and prevented default, skip.
+                    try {
+                        // allow async handlers to run first; queue a fallback shortly after
+                        setTimeout(async () => {
+                            try {
+                                const token = localStorage.getItem('adminToken');
+                                if (token) return; // already logged in by primary handler
+                                const pw = (document.getElementById('adminPassword')||{}).value || '';
+                                await window.__inlineAdminLogin(pw);
+                            } catch(e) { /* ignore */ }
+                        }, 250);
+                    } catch (e) {}
+                }, { capture: false });
+            }
+        } catch (e) {}
+
         function adminLogout() {
             // Synchronous immediate logout to avoid timing/order issues
             try {
@@ -3634,22 +3686,29 @@
                         } catch (e) { console.warn('Failed to update site-settings', e); }
                     })();
 
-                            const pageResult = await pageRes.json();
-                            if (pageResult && pageResult.success) {
-                                const page = pageResult.data;
-                                const contentHtml = `<h1>Contact Us</h1><p>Email: ${escapeHtml(supportEmail)}<br>Phone: ${escapeHtml(supportPhone)}<br>Address: ${escapeHtml(address)}<br><a href="https://maps.google.com/?q=${encodeURIComponent(address)}">Open map</a></p>${mapEmbed ? `<iframe src="${escapeHtml(mapEmbed)}" width="600" height="450" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>` : ''}`;
-                                const pageUpdateData = {
-                                    title: page.title || 'Contact Us',
-                                    content: contentHtml,
-                                    published: true,
-                                    meta: { ...(page.meta || {}), mapEmbed: mapEmbed || '', supportEmail, supportPhone, address }
-                                };
-                                await fetch(`${API_URL}/pages/${page._id}`, { method: 'PUT', headers: { 'Content-Type':'application/json', 'Authorization': `Bearer ${token}` }, body: JSON.stringify(pageUpdateData) });
-                                // More descriptive confirmation
-                                const list = pushedFields.length ? pushedFields.join(', ') : 'no fields';
-                                showToast('success', `✅ Contact page updated: ${list}`);
-                            }
-                        } catch (err) { console.warn('Failed to push footer to contact page', err && err.message ? err.message : err); }
+                    try {
+                        const pageRes = await fetch(`${API_URL}/pages/slug/contact`);
+                        const pageResult = await pageRes.json();
+                        if (pageResult && pageResult.success) {
+                            const page = pageResult.data;
+                            const contentHtml = `<h1>Contact Us</h1><p>Email: ${escapeHtml(supportEmail)}<br>Phone: ${escapeHtml(supportPhone)}<br>Address: ${escapeHtml(address)}<br><a href="https://maps.google.com/?q=${encodeURIComponent(address)}">Open map</a></p>${mapEmbed ? `<iframe src="${escapeHtml(mapEmbed)}" width="600" height="450" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>` : ''}`;
+                            const pageUpdateData = {
+                                title: page.title || 'Contact Us',
+                                content: contentHtml,
+                                published: true,
+                                meta: { ...(page.meta || {}), mapEmbed: mapEmbed || '', supportEmail, supportPhone, address }
+                            };
+                            await fetch(`${API_URL}/pages/${page._id}`, { method: 'PUT', headers: { 'Content-Type':'application/json', 'Authorization': `Bearer ${token}` }, body: JSON.stringify(pageUpdateData) });
+                            // More descriptive confirmation
+                            const pushedFields = [];
+                            if (supportEmail) pushedFields.push('supportEmail');
+                            if (supportPhone) pushedFields.push('supportPhone');
+                            if (address) pushedFields.push('address');
+                            if (mapEmbed) pushedFields.push('mapEmbed');
+                            const list = pushedFields.length ? pushedFields.join(', ') : 'no fields';
+                            showToast('success', `✅ Contact page updated: ${list}`);
+                        }
+                    } catch (err) { console.warn('Failed to push footer to contact page', err && err.message ? err.message : err); }
                     }
 
                 } else {
