@@ -31,6 +31,9 @@
                 return false;
             }
         };
+        // Version stamp (visible in console) to confirm the latest file is loaded
+        try { console.log('admin-dashboard: build=20260115-debug'); } catch(e){}
+
         // Provide an early safeFetch fallback so deferred scripts can call it before full init
         if (typeof window.safeFetch !== 'function') {
             window.safeFetch = async function(input, init = {}, opts = { silent: true }){
@@ -83,6 +86,25 @@
             try { setTimeout(() => { if (typeof openLoginModal === 'function') openLoginModal(); }, 120); } catch(e) {}
             try { setTimeout(() => { window.location.href = window.location.origin.replace(/\/$/, '') + '/admin-dashboard.html'; }, 300); } catch(e) {}
         };
+
+        // Robust capture-phase handlers to ensure clicking the auth overlay opens the login modal
+        (function(){
+            function handleAuthPointer(e){
+                try{
+                    const el = e.target;
+                    const overlay = document.getElementById('authOverlay');
+                    if (!overlay) return;
+                    const loginBtn = document.getElementById('authOverlayLogin');
+                    if (overlay.contains(el) || (loginBtn && (el === loginBtn || loginBtn.contains(el)))) {
+                        // stop further processing and open modal immediately
+                        try { e.preventDefault(); e.stopImmediatePropagation(); } catch(_){}
+                        try { if (typeof openLoginModal === 'function') openLoginModal(); else { document.getElementById('loginModal')?.classList.remove('hidden'); document.getElementById('adminPassword')?.focus(); } } catch(err){}
+                    }
+                }catch(e){}
+            }
+            document.addEventListener('pointerdown', handleAuthPointer, true);
+            document.addEventListener('click', handleAuthPointer, true);
+        })();
         // Ensure overlay Login button opens login modal even if other scripts fail.
         (function attachOverlayLoginHandler(){
             function install(){
@@ -105,6 +127,10 @@
                 setTimeout(() => clearInterval(iv), 10000);
             }
         })();
+
+        /* Debug helper removed - was used for headless diagnostics */
+
+        /* Forced-login debug helper removed */
     </script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -285,7 +311,7 @@
 
 
                 <!-- Main Content -->
-                <div id="authOverlay" class="fixed inset-0 bg-white bg-opacity-70 backdrop-blur-sm hidden" aria-hidden="true" style="z-index:12000;">
+                <div id="authOverlay" class="fixed inset-0 bg-white bg-opacity-70 backdrop-blur-sm hidden" aria-hidden="true" style="z-index:12000; pointer-events:auto;">
         <div class="auth-overlay flex items-center justify-center w-full h-full px-4">
             <div class="auth-card bg-white rounded-xl shadow-xl p-8 max-w-md w-full text-center" role="dialog" aria-modal="true" aria-labelledby="authOverlayTitle">
                 <div class="flex items-start gap-6">
@@ -297,7 +323,7 @@
                         <h2 id="authOverlayTitle" class="text-xl font-semibold text-gray-900">Sign in to continue</h2>
                         <p class="text-sm text-gray-600 mt-2 mb-4">Administrative access is required to view and manage site content. Enter your admin password to continue.</p>
                         <div class="flex items-center gap-3">
-                            <button id="authOverlayLogin" class="btn btn-primary" onclick="(function(){ try{ if(typeof openLoginModal==='function'){ openLoginModal(); } else { document.getElementById('loginModal')?.classList.remove('hidden'); document.getElementById('adminPassword')?.focus(); } }catch(e){} })()">Login</button>
+                            <button id="authOverlayLogin" class="btn btn-primary" type="button" style="pointer-events:auto;" onclick="(function(){ try{ if(typeof openLoginModal==='function'){ openLoginModal(); } else { document.getElementById('loginModal')?.classList.remove('hidden'); document.getElementById('adminPassword')?.focus(); } }catch(e){} })()">Login</button>
                             <a href="/support.html" class="btn btn-ghost" id="contactSupport">Contact support</a>
                         </div>
                         <p class="text-xs text-gray-400 mt-4">Need an account or lost access? Contact your site admin via the support page.</p>
@@ -1880,6 +1906,8 @@
                 }
             } catch (e) { /* ignore */ }
         })();
+
+        /* Temporary diagnostic auto-open removed after verification */
     </script>
     <script>
         const API_URL = '/api';
@@ -2231,12 +2259,9 @@
                 if (typeof openLoginModal === 'function') {
                     try { openLoginModal(); } catch (e) {}
                 }
-                const target = `${window.location.origin.replace(/\/$/, '')}/admin-dashboard.html`;
+                const target = `${window.location.origin.replace(/\/$/, '')}/admin-dashboard.html?login=1`;
                 try { window.location.href = target; } catch (e) { window.location.assign(target); }
-            }, SMOKE_PLAYOUT_MS);
-
-            // safety re-enable in case navigation is blocked
-            setTimeout(() => {
+                return; // navigation initiated, bail out
                 if (!logoutBtnEl) return;
                 logoutBtnEl.disabled = false;
                 logoutBtnEl.removeAttribute('aria-disabled');
@@ -6001,6 +6026,14 @@
             } else {
                 openLoginModal();
             }
+            // If page was loaded with ?login=1 (for example after a logout redirect), ensure the login modal opens
+            try {
+                const params = new URLSearchParams(location.search);
+                if (params.get('login') === '1') {
+                    setTimeout(() => { try { if (typeof openLoginModal === 'function') openLoginModal(); } catch (e) {} }, 150);
+                }
+            } catch (e) {}
+
             setTimeout(initQuill, 100);
             initToggleSliders();
             initPaymentUploaders();
