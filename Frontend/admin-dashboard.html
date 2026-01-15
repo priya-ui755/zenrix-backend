@@ -2014,19 +2014,19 @@
             // When the auth overlay is visible, hide and disable background regions for a11y.
             // This prevents screen readers and automated checkers from reading/flagging the background
             // while the modal gate is active.
-            const bgEls = [
-                document.querySelector('.main-header'),
-                document.querySelector('.main-sidebar'),
-                document.querySelector('.content-wrapper'),
-            ].filter(Boolean);
-            bgEls.forEach((el) => {
-                try {
-                    el.setAttribute('aria-hidden', String(!isAuthed));
-                } catch (e) {}
-                try {
-                    el.inert = !isAuthed;
-                } catch (e) {}
-            });
+            const headerEl = document.querySelector('.main-header');
+            const sidebarEl = document.querySelector('.main-sidebar');
+            const contentEl = document.querySelector('.content-wrapper');
+            // ARIA + inert updates
+            try { if (headerEl) headerEl.setAttribute('aria-hidden', String(!isAuthed)); } catch(e) {}
+            try { if (sidebarEl) sidebarEl.setAttribute('aria-hidden', String(!isAuthed)); } catch(e) {}
+            try { if (contentEl) contentEl.setAttribute('aria-hidden', String(!isAuthed)); } catch(e) {}
+            try { if (headerEl) headerEl.inert = !isAuthed; } catch(e) {}
+            try { if (sidebarEl) sidebarEl.inert = !isAuthed; } catch(e) {}
+            try { if (contentEl) contentEl.inert = !isAuthed; } catch(e) {}
+            // Also set inline display to none for visual hide when overlay is active (robust against CSS ordering)
+            try { if (headerEl) headerEl.style.display = (!isAuthed ? 'none' : ''); } catch(e) {}
+            try { if (sidebarEl) sidebarEl.style.display = (!isAuthed ? 'none' : ''); } catch(e) {}
 
             if (!isAuthed) {
                 setTimeout(() => document.getElementById('authOverlayLogin')?.focus(), 120);
