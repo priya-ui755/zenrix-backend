@@ -2024,9 +2024,25 @@
             try { if (headerEl) headerEl.inert = !isAuthed; } catch(e) {}
             try { if (sidebarEl) sidebarEl.inert = !isAuthed; } catch(e) {}
             try { if (contentEl) contentEl.inert = !isAuthed; } catch(e) {}
-            // Also set inline display to none for visual hide when overlay is active (robust against CSS ordering)
-            try { if (headerEl) headerEl.style.display = (!isAuthed ? 'none' : ''); } catch(e) {}
-            try { if (sidebarEl) sidebarEl.style.display = (!isAuthed ? 'none' : ''); } catch(e) {}
+            // Also set multiple inline styles to robustly hide header/sidebar when overlay is active
+            try {
+                if (headerEl) {
+                    if (!isAuthed) {
+                        headerEl.style.display = 'none'; headerEl.style.visibility = 'hidden'; headerEl.style.pointerEvents = 'none'; headerEl.style.opacity = '0'; headerEl.style.zIndex = '0';
+                    } else {
+                        headerEl.style.display = ''; headerEl.style.visibility = ''; headerEl.style.pointerEvents = ''; headerEl.style.opacity = ''; headerEl.style.zIndex = '';
+                    }
+                }
+            } catch(e) {}
+            try {
+                if (sidebarEl) {
+                    if (!isAuthed) {
+                        sidebarEl.style.display = 'none'; sidebarEl.style.visibility = 'hidden'; sidebarEl.style.pointerEvents = 'none'; sidebarEl.style.opacity = '0'; sidebarEl.style.zIndex = '0';
+                    } else {
+                        sidebarEl.style.display = ''; sidebarEl.style.visibility = ''; sidebarEl.style.pointerEvents = ''; sidebarEl.style.opacity = ''; sidebarEl.style.zIndex = '';
+                    }
+                }
+            } catch(e) {}
 
             if (!isAuthed) {
                 setTimeout(() => document.getElementById('authOverlayLogin')?.focus(), 120);
