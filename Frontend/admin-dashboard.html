@@ -1742,6 +1742,24 @@
     <!-- Toast Container -->
     <div id="toastContainer" class="fixed top-6 right-6 z-50 space-y-2" role="status" aria-live="polite" aria-atomic="false"></div>
 
+    <!-- Admin JS Error Banner (shows top-most JS error to help debugging) -->
+    <div id="adminJsErrorBanner" class="fixed top-20 right-6 z-50 hidden bg-rose-600 text-white px-4 py-2 rounded-lg shadow-md max-w-xl" role="alert" aria-live="assertive"></div>
+    <script>
+        (function(){
+            const showErr = (msg) => {
+                try {
+                    const el = document.getElementById('adminJsErrorBanner');
+                    if (!el) return;
+                    el.textContent = String(msg).slice(0, 300);
+                    el.classList.remove('hidden');
+                    setTimeout(() => { try { el.classList.add('hidden'); } catch(e){} }, 10000);
+                } catch(e){}
+            };
+            window.addEventListener('error', function(e){ try { showErr((e && e.message) ? e.message + (e.filename? ' @'+e.filename:'' ) : String(e)); console.error('Captured window error', e.message, e.filename, e.lineno, e.colno); } catch(e){} });
+            window.addEventListener('unhandledrejection', function(e){ try { showErr('Unhandled rejection: ' + (e && e.reason ? (e.reason.message || String(e.reason)) : String(e))); console.error('Captured rejection', e); } catch(e){} });
+        })();
+    </script>
+
     <script src="https://cdn.quilljs.com/1.3.6/quill.js"></script>
     <!-- Ensure login overlay shows early even if later scripts fail to parse -->
     <script>
