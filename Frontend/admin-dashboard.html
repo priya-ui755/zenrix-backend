@@ -3578,17 +3578,28 @@
                     }
                     try { window.dispatchEvent(new CustomEvent('footerDataUpdated', { detail: { data: payloadData } })); } catch (e) {}
 
-                    // Optionally push footer values to the contact page if requested
-                    const push = !!document.getElementById('footerPushContact')?.checked;
-                    if (push) {
+                    // Update SiteSettings as a single authoritative source so public pages can read them
+                    (async () => {
                         try {
-                            const pushedFields = [];
-                            if (supportEmail) pushedFields.push('Email');
-                            if (supportPhone) pushedFields.push('Phone');
-                            if (address) pushedFields.push('Address');
-                            if (mapEmbed) pushedFields.push('Map');
+                            const ssPayload = {
+                                supportEmail: payloadData.supportEmail || '',
+                                supportPhone: payloadData.supportPhone || '',
+                                supportChatLink: payloadData.chatLink || '',
+                                mapEmbedUrl: payloadData.mapEmbed || '',
+                                address: payloadData.address || '',
+                                footerBottomText: payloadData.bottomText || ''
+                            };
+                            await fetch(`${API_URL}/site-settings`, {
+                                method: 'PUT',
+                                headers: {
+                                    'Content-Type': 'application/json',
+                                    'Authorization': `Bearer ${token}`
+                                },
+                                body: JSON.stringify(ssPayload)
+                            });
+                        } catch (e) { console.warn('Failed to update site-settings', e); }
+                    })();
 
-                            const pageRes = await fetch(`${API_URL}/pages/slug/contact`);
                             const pageResult = await pageRes.json();
                             if (pageResult && pageResult.success) {
                                 const page = pageResult.data;

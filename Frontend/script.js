@@ -274,6 +274,28 @@ document.addEventListener('DOMContentLoaded', function() {
         } catch (e) {}
     });
 
+    // Site settings (global) updates should also update contact UI and hero/footer shortcuts
+    window.addEventListener('siteSettingsUpdated', (e) => {
+        try {
+            const s = e.detail || (localStorage.getItem('siteSettings') ? JSON.parse(localStorage.getItem('siteSettings')) : null);
+            if (!s) return;
+            // Make support email available to other modules
+            try { window.ZENRIX_SUPPORT_EMAIL = s.supportEmail || window.ZENRIX_SUPPORT_EMAIL; } catch(e) {}
+            // Update contact page items
+            try {
+                const phone = (s.supportPhone || '').trim();
+                const email = (s.supportEmail || '').trim();
+                const heroPhoneLink = document.getElementById('contactHeroPhoneLink'); if (heroPhoneLink && phone) heroPhoneLink.href = `tel:${phone.replace(/[^+\d]/g, '')}`;
+                const contactPhoneValue = document.getElementById('contactPhoneValue'); if (contactPhoneValue && phone) contactPhoneValue.textContent = phone;
+                const contactPhoneLink = document.getElementById('contactPhoneLink'); if (contactPhoneLink && phone) contactPhoneLink.href = `tel:${phone.replace(/[^+\d]/g, '')}`;
+                const contactEmailValue = document.getElementById('contactEmailValue'); if (contactEmailValue && email) contactEmailValue.textContent = email;
+                const contactEmailLink = document.getElementById('contactEmailLink'); if (contactEmailLink && email) contactEmailLink.href = '#contactMailtoForm';
+            } catch (ee) { /* ignore */ }
+            // Update footer map embed if present
+            try { if (s.mapEmbedUrl) { localStorage.setItem('footerMapEmbed', s.mapEmbedUrl); window.dispatchEvent(new CustomEvent('footerMapUpdated', { detail: { mapEmbed: s.mapEmbedUrl } })); } } catch(e) {}
+        } catch (e) {}
+    });
+
     window.addEventListener('storage', (e) => {
         try {
             if (!e || !e.key) return;
@@ -299,6 +321,20 @@ document.addEventListener('DOMContentLoaded', function() {
                 } catch (e) { /* ignore */ }
             })();
         }
+
+        // Also load site settings (support email/phone/map/socials) so pages can render dynamic data
+        (async () => {
+            try {
+                const r = await fetch((window.API_URL || '/api') + '/site-settings');
+                const sj = await r.json();
+                if (sj && sj.success && sj.data) {
+                    try { localStorage.setItem('siteSettings', JSON.stringify(sj.data)); } catch(e){}
+                    try { window.ZENRIX_SUPPORT_EMAIL = sj.data.supportEmail || window.ZENRIX_SUPPORT_EMAIL; } catch(e){}
+                    try { window.dispatchEvent(new CustomEvent('siteSettingsUpdated', { detail: sj.data })); } catch(e){}
+                }
+            } catch (e) { /* ignore */ }
+        })();
+
     } catch (e) { /* ignore */ }
 
     // Live updates: listen to server-sent events to receive componentUpdated broadcasts
@@ -312,6 +348,19 @@ document.addEventListener('DOMContentLoaded', function() {
                     // write structured data to localStorage for other tabs and trigger event
                     try { if (payload && payload.data && payload.data.data) localStorage.setItem('footerData', JSON.stringify(payload.data.data)); } catch(e){}
                     try { window.dispatchEvent(new CustomEvent('componentUpdated', { detail: payload })); } catch(e){}
+                } catch(e) { console.warn('SSE parse error', e); }
+            });
+
+            // Listen to site settings broadcasts (if admin updates them)
+            es.addEventListener('siteSettingsUpdated', function(evt){
+                try {
+                    const payload = JSON.parse(evt.data || '{}');
+                    const s = payload && payload.data ? payload.data : null;
+                    if (s) {
+                        try { localStorage.setItem('siteSettings', JSON.stringify(s)); } catch(e){}
+                        try { window.ZENRIX_SUPPORT_EMAIL = s.supportEmail || window.ZENRIX_SUPPORT_EMAIL; } catch(e){}
+                        try { window.dispatchEvent(new CustomEvent('siteSettingsUpdated', { detail: s })); } catch(e){}
+                    }
                 } catch(e) { console.warn('SSE parse error', e); }
             });
             es.addEventListener('error', function(e){ /* EventSource handles reconnect automatically */ });

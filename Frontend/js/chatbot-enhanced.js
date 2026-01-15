@@ -50,16 +50,23 @@
     {p:/\b(return|refund|how to return|returns|exchange)\b/i, r: "🔄 We have a 30-day return window from delivery for most items. To start a return: visit <a href=\"/orders.html\">Orders</a> → select the item → 'Return'. Pack the item securely and follow the instructions. Refunds are processed within 5–7 business days after we receive the return."},
     {p:/\b(shipping|delivery|ship|delivery time)\b/i, r: "🚚 Standard delivery across Nepal typically takes 3–5 business days; remote areas may take longer. Free shipping applies for orders over रु 7,500. For exact delivery times, check the shipping options at checkout or your order's tracking page."},
     {p:/\b(product|products|catalog|category)\b/i, r: "Browse our full catalog at <a href=\"/products.html\">Products</a>. You can also ask about a specific product id (e.g. 'product id 69554ce7b4f651f29d9ea369') and I'll try to fetch details displayed on the product page."},
-    {p:/\b(price|cost|how much|price of)\b/i, r: "Prices are shown on each product page and may include ongoing discounts. For bulk or wholesale pricing, contact support@zenrix.com.np with your requirements."},
-    {p:/\b(payment|pay|payment methods|card|upi|esewa|khalti)\b/i, r: "We accept major credit/debit cards and local wallets like eSewa and Khalti. For payment issues, email support@zenrix.com.np with your order id and payment reference and we'll investigate."},
+    {p:/\b(price|cost|how much|price of)\b/i, r: "Prices are shown on each product page and may include ongoing discounts. For bulk or wholesale pricing, contact {supportEmail} with your requirements."},
+    {p:/\b(payment|pay|payment methods|card|upi|esewa|khalti)\b/i, r: "We accept major credit/debit cards and local wallets like eSewa and Khalti. For payment issues, email {supportEmail} with your order id and payment reference and we'll investigate."},
     {p:/\b(account|profile|login|register|password)\b/i, r: "Manage your account at <a href=\"/profile.html\">Account</a>. If you forgot your password, use 'Forgot password' or contact support for help."},
-    {p:/\b(contact|support|help|agent|human)\b/i, r: "You can reach support at <a href=\"mailto:support@zenrix.com.np\">support@zenrix.com.np</a>. To open a support ticket from here, say 'open ticket' or 'create ticket' and I'll help you submit it. For urgent assistance, say 'connect to agent' and I'll provide next steps for escalation."},
+    {p:/\b(contact|support|help|agent|human)\b/i, r: "You can reach support at <a href=\"mailto:{supportEmail}\">{supportEmail}</a>. To open a support ticket from here, say 'open ticket' or 'create ticket' and I'll help you submit it. For urgent assistance, say 'connect to agent' and I'll provide next steps for escalation."},
     {p:/\b(cancel order|cancel)\b/i, r: "To cancel an order, visit Orders and tap 'Cancel' as early as possible. If your order is already dispatched, please use the return process after delivery."},
     {p:/\b(warranty|guarantee|defective|broken)\b/i, r: "Warranty terms vary by product—electronics usually have 1-year manufacturer warranty. Please check the product page under 'Warranty' or contact support for claims."},
     {p:/\b(career|jobs|work with|hiring)\b/i, r: "For careers at Zenrix, visit our Careers page or email hr@zenrix.com.np with your CV and the position you're interested in."},
     {p:/\b(privacy|data|gdpr|personal)\b/i, r: "Your privacy matters to us. You can read our privacy policies on the Privacy page. For data requests, contact privacy@zenrix.com.np."},
     {p:/\b(hello|hi|hey|namaste)\b/i, r: "Namaste! 🙏 I'm Zenrix Assistant. I can help with orders, products, delivery, returns, or connecting you to support."}
   ];
+
+  function resolvePlaceholders(t){
+    if (!t || typeof t !== 'string') return t;
+    const support = (window.ZENRIX_SUPPORT_EMAIL || (localStorage.getItem('siteSettings') ? JSON.parse(localStorage.getItem('siteSettings')).supportEmail : null) || 'support@zenrix.com');
+    const legal = (localStorage.getItem('siteSettings') ? JSON.parse(localStorage.getItem('siteSettings')).legalEmail : null) || 'legal@zenrix.com.np';
+    return t.replace(/{supportEmail}/g, support).replace(/{legalEmail}/g, legal);
+  }
 
   function handleUserMessage(msg){
     const text = String(msg || '').trim();
@@ -94,7 +101,7 @@
     // Basic intent matching
     for (const item of canned){
       if (item.p.test(text)){
-        return appendMessage(item.r, 'bot');
+        return appendMessage(resolvePlaceholders(item.r), 'bot');
       }
     }
 

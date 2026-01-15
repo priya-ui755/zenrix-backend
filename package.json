@@ -13,6 +13,7 @@
     "test:admin:all": "echo \"No admin e2e tests configured\"",
     "e2e": "node scripts/e2e_admin_flows.js",
     "e2e:admin": "node scripts/e2e_admin_full.js",
+    "e2e:site-settings": "node scripts/e2e_site_settings_update_check.js",
     "test:chatbot:ticket": "node scripts/e2e_chatbot_ticket_offer_check.js",
     "test:kb:toggle": "node scripts/e2e_knowledge_feature_toggle_check.js",
     "build:tailwind:site": "tailwindcss -c tailwind.site.config.js -i Frontend/css/tailwind-site.input.css -o Frontend/css/tailwind-site.css --minify",
