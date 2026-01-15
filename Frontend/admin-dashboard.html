@@ -31,6 +31,18 @@
                 return false;
             }
         };
+        // Provide an early safeFetch fallback so deferred scripts can call it before full init
+        if (typeof window.safeFetch !== 'function') {
+            window.safeFetch = async function(input, init = {}, opts = { silent: true }){
+                try {
+                    return await fetch(input, init);
+                } catch (e) {
+                    if (!opts.silent) try { alert('Network error: ' + (e && e.message ? e.message : String(e))); } catch(_){}
+                    console.error('safeFetch fallback error', e);
+                    throw e;
+                }
+            };
+        }
         // Centralized logout helper to avoid inline onclick duplication and failures
         window.performLogout = function() {
             try { clearAdminToken(); } catch(e) {}
@@ -6115,11 +6127,6 @@
             });
             
             // Ensure auth overlay's login button opens modal
-            const overlayLoginBtn = document.getElementById('authOverlayLogin');
-            if (overlayLoginBtn) {
-                overlayLoginBtn.addEventListener('click', openLoginModal);
-            }
-
             const overlayLoginBtn = document.getElementById('authOverlayLogin');
             if (overlayLoginBtn) {
                 overlayLoginBtn.addEventListener('click', openLoginModal);
