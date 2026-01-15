@@ -31,6 +31,32 @@
                 return false;
             }
         };
+        // Centralized logout helper to avoid inline onclick duplication and failures
+        window.performLogout = function() {
+            try {
+                try { localStorage.removeItem('adminToken'); } catch(e) {}
+                try { localStorage.removeItem('userToken'); } catch(e) {}
+                try { localStorage.removeItem('userData'); } catch(e) {}
+            } catch (e) {}
+            try {
+                const btn = document.getElementById('logoutBtn');
+                if (btn) {
+                    btn.classList.add('hidden');
+                    btn.style.display = 'none';
+                    btn.style.visibility = 'hidden';
+                    btn.style.opacity = '0';
+                    btn.style.pointerEvents = 'none';
+                    btn.setAttribute('aria-hidden','true');
+                    btn.disabled = true;
+                }
+            } catch (e) {}
+            try {
+                const sign = document.getElementById('adminAuthSign');
+                if (sign) { sign.innerHTML = '<i class="fas fa-user-lock"></i>'; }
+            } catch (e) {}
+            try { if (typeof openLoginModal === 'function') openLoginModal(); } catch (e) {}
+            try { window.location.href = window.location.origin.replace(/\/$/, '') + '/admin-dashboard.html'; } catch(e) { try { window.location.assign('/admin-dashboard.html'); } catch(e2){} }
+        };
     </script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -140,10 +166,12 @@
                                 </button>
                             </li>
                             <li class="nav-item mr-2 d-flex align-items-center">
-                                <div id="adminStatus" class="bg-indigo-50 px-3 py-1 rounded-pill text-sm cursor-pointer" aria-label="Admin status"></div>
+                                <div id="adminAuthSign" class="px-3 py-1 text-sm text-gray-700" aria-hidden="true" title="Admin status">
+                                    <i class="fas fa-user-lock" aria-hidden="true"></i>
+                                </div>
                             </li>
                             <li class="nav-item d-flex align-items-center">
-                                        <button id="logoutBtn" class="star-btn btn btn-danger hidden" type="button" aria-label="Logout" style="position: relative; overflow: visible;" onclick="(function(){try{localStorage.removeItem('adminToken');localStorage.removeItem('userToken');localStorage.removeItem('userData');}catch(e){console.error(e)} try{ const lb = document.getElementById('logoutBtn'); if(lb){ lb.classList.add('hidden'); lb.style.display = 'none'; lb.style.visibility = 'hidden'; lb.style.opacity = '0'; lb.style.pointerEvents = 'none'; lb.setAttribute('aria-hidden','true'); lb.disabled = true; } const stat = document.getElementById('adminStatus'); if(stat) stat.textContent = ''; try{ if (typeof openLoginModal === 'function') openLoginModal(); }catch(e){} window.location.href = window.location.origin.replace(/\/$/, '') + '/admin-dashboard.html'; }catch(e){try{window.location.assign('/admin-dashboard.html')}catch(e2){} } })()">
+                                        <button id="logoutBtn" class="star-btn btn btn-danger hidden" type="button" aria-label="Logout" style="position: relative; overflow: visible;" onclick="performLogout();">
                                             Log Out
                                             <span class="smoke" aria-hidden="true"></span>
                                             <div class="star-1">
@@ -2007,26 +2035,22 @@
             if (!isAuthed) {
                 setTimeout(() => document.getElementById('authOverlayLogin')?.focus(), 120);
             }
+            try { document.body.classList.toggle('showing-auth', !isAuthed); } catch(e) {}
         }
 
         function updateAdminUI() {
             const token = getAdminToken();
-            const statusEl = document.getElementById('adminStatus');
+            const authSign = document.getElementById('adminAuthSign');
             const btnEl = document.getElementById('adminLoginBtn');
             const logoutBtn = document.getElementById('logoutBtn');
-            
+
             if (token) {
-                statusEl.classList.add('bg-green-500');
-                statusEl.classList.remove('bg-white', 'bg-opacity-20');
-                statusEl.textContent = 'Logged In ✓';
+                if (authSign) authSign.innerHTML = '<i class="fas fa-user-check" aria-hidden="true" title="Logged in"></i>';
                 if (btnEl) { btnEl.style.display = 'none'; }
                 logoutBtn && logoutBtn.classList.remove('hidden');
-                // refresh knowledge panel when admin logs in
                 setTimeout(() => updateKnowledgeStatus(), 200);
             } else {
-                statusEl.classList.remove('bg-green-500');
-                statusEl.classList.add('bg-white', 'bg-opacity-20');
-                statusEl.textContent = '';
+                if (authSign) authSign.innerHTML = '<i class="fas fa-user-lock" aria-hidden="true" title="Logged out"></i>';
                 if (btnEl) { btnEl.style.display = 'none'; }
                 logoutBtn && logoutBtn.classList.add('hidden');
             }
@@ -3709,7 +3733,6 @@
                             showToast('success', `✅ Contact page updated: ${list}`);
                         }
                     } catch (err) { console.warn('Failed to push footer to contact page', err && err.message ? err.message : err); }
-                    }
 
                 } else {
                     showToast('error', '❌ Failed: ' + (result.error || 'Unknown error'));
@@ -6050,13 +6073,10 @@
                 }
             });
             
-            // Make the entire admin status area open login when not authenticated
-            const adminStatusEl = document.getElementById('adminStatus');
-            if (adminStatusEl) {
-                adminStatusEl.addEventListener('click', function() {
-                    const token = getAdminToken();
-                    if (!token) openLoginModal();
-                });
+            // Ensure auth overlay's login button opens modal
+            const overlayLoginBtn = document.getElementById('authOverlayLogin');
+            if (overlayLoginBtn) {
+                overlayLoginBtn.addEventListener('click', openLoginModal);
             }
 
             const overlayLoginBtn = document.getElementById('authOverlayLogin');
