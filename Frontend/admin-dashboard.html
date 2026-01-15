@@ -91,6 +91,8 @@
         (function(){
             function robustOpenLogin(reason){
                 try{
+                    console.log('robustOpenLogin called with reason:', reason);
+                    alert('Opening login modal...');
                     const loginModal = document.getElementById('loginModal');
                     const overlay = document.getElementById('authOverlay');
                     if (!loginModal) return;
