@@ -73,8 +73,9 @@ jobs:
           ADMIN_PASSWORD: ${{ secrets.ADMIN_PASSWORD }}
           MONGODB_URI: mongodb://localhost:27017/zenrix_test
         run: |
-          npm run e2e
-          npm run e2e:admin
+          node scripts/e2e_contact_no_footer_sync.js
+          node scripts/e2e_footer_push_to_contact.js
+          node scripts/e2e_tab_isolation_test.js
 
       - name: Upload artifacts (on failure)
         if: failure()
