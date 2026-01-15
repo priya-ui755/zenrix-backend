@@ -245,7 +245,7 @@
                         <h2 id="authOverlayTitle" class="text-xl font-semibold text-gray-900">Sign in to continue</h2>
                         <p class="text-sm text-gray-600 mt-2 mb-4">Administrative access is required to view and manage site content. Enter your admin password to continue.</p>
                         <div class="flex items-center gap-3">
-                            <button id="authOverlayLogin" class="btn btn-primary">Login</button>
+                            <button id="authOverlayLogin" class="btn btn-primary" onclick="try{ openLoginModal(); }catch(e){}">Login</button>
                             <a href="/support.html" class="btn btn-ghost" id="contactSupport">Contact support</a>
                         </div>
                         <p class="text-xs text-gray-400 mt-4">Need an account or lost access? Contact your site admin via the support page.</p>
@@ -2046,6 +2046,9 @@
 
             if (!isAuthed) {
                 setTimeout(() => document.getElementById('authOverlayLogin')?.focus(), 120);
+                try { if (overlay) { overlay.style.zIndex = '12000'; overlay.style.display = 'block'; overlay.style.visibility = 'visible'; } } catch(e) {}
+            } else {
+                try { if (overlay) { overlay.style.zIndex = ''; overlay.style.display = ''; overlay.style.visibility = ''; } } catch(e) {}
             }
             try { document.body.classList.toggle('showing-auth', !isAuthed); } catch(e) {}
         }
