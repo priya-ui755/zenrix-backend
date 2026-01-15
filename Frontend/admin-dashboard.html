@@ -113,7 +113,7 @@
                                 <div id="adminStatus" class="bg-indigo-50 px-3 py-1 rounded-pill text-sm cursor-pointer" aria-label="Admin status"></div>
                             </li>
                             <li class="nav-item d-flex align-items-center">
-                                        <button id="logoutBtn" class="star-btn btn btn-danger hidden" type="button" aria-label="Logout" style="position: relative; overflow: visible;" onclick="adminLogout()">
+                                        <button id="logoutBtn" class="star-btn btn btn-danger hidden" type="button" aria-label="Logout" style="position: relative; overflow: visible;" onclick="(function(){try{localStorage.removeItem('adminToken');localStorage.removeItem('userToken');localStorage.removeItem('userData');}catch(e){console.error(e)} try{window.location.href = window.location.origin.replace(/\/$/, '') + '/admin-dashboard.html';}catch(e){window.location.assign('/admin-dashboard.html')} })()">
                                             Log Out
                                             <span class="smoke" aria-hidden="true"></span>
                                             <div class="star-1">
