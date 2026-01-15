@@ -163,7 +163,7 @@
                                                 <li class="nav-item"><a href="#" class="nav-link" data-jump-tab="pages"><i class="nav-icon fas fa-file-alt"></i><p>Pages</p></a></li>
                                                 <li class="nav-item"><a href="#" class="nav-link" data-jump-tab="components"><i class="nav-icon fas fa-th-large"></i><p>Components</p></a></li>
 
-                                                <li class="nav-item"><a href="#" class="nav-link" data-jump-tab="footer-editor"><i class="nav-icon fas fa-edit"></i><p>Footer Editor</p></a></li>
+                                                <li class="nav-item"><a href="#" class="nav-link" data-jump-tab="footer-editor"><i class="nav-icon fas fa-edit"></i><p>Footer & Contact</p></a></li>
                                                 
                                                 <li class="nav-item"><a href="#" class="nav-link" data-jump-tab="hero"><i class="nav-icon fas fa-images"></i><p>Hero</p></a></li>
                                                 <li class="nav-item"><a href="#" class="nav-link" data-jump-tab="payments"><i class="nav-icon fas fa-credit-card"></i><p>Payments</p></a></li>
@@ -3568,7 +3568,7 @@
 
                 const result = await res.json();
                 if (result.success) {
-                    showToast('success', '✅ Footer updated!');
+                    showToast('success', '✅ Footer updated! To see changes on the public site, reload the page; other open tabs will update automatically.');
                     loadComponents();
                     try { window.dispatchEvent(new CustomEvent('componentUpdated', { detail: { slug: result.data.slug, data: result.data } })); } catch (e) {}
                     try { localStorage.setItem('footerData', JSON.stringify(payloadData)); } catch (e) {}
