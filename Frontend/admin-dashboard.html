@@ -164,7 +164,7 @@
                                                 <li class="nav-item"><a href="#" class="nav-link" data-jump-tab="components"><i class="nav-icon fas fa-th-large"></i><p>Components</p></a></li>
 
                                                 <li class="nav-item"><a href="#" class="nav-link" data-jump-tab="footer-editor"><i class="nav-icon fas fa-edit"></i><p>Footer Editor</p></a></li>
-                                                <li class="nav-item"><a href="#" class="nav-link" data-jump-tab="contact-editor"><i class="nav-icon fas fa-address-book"></i><p>Contact Editor</p></a></li>
+                                                
                                                 <li class="nav-item"><a href="#" class="nav-link" data-jump-tab="hero"><i class="nav-icon fas fa-images"></i><p>Hero</p></a></li>
                                                 <li class="nav-item"><a href="#" class="nav-link" data-jump-tab="payments"><i class="nav-icon fas fa-credit-card"></i><p>Payments</p></a></li>
                                                 <li class="nav-item"><a href="#" class="nav-link" data-jump-tab="orders"><i class="nav-icon fas fa-shopping-cart"></i><p>Orders</p></a></li>
@@ -634,9 +634,9 @@
                                 <svg class="w-6 h-6 mr-2 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 17a1 1 0 001 1h1a1 1 0 001-1v-4a1 1 0 00-1-1h-1a1 1 0 00-1 1v4z"/>
                                 </svg>
-                                Footer Editor
+                                Footer & Contact Settings
                             </h2>
-                            <p class="text-sm text-gray-600 mt-1">Edit footer links, support contacts, social links, map and bottom text in one place.</p>
+                            <p class="text-sm text-gray-600 mt-1">Edit footer links, support contacts, social links, map, address and bottom text in one place. You can also push these values to the Contact page.</p>
                         </div>
                         <button id="refreshFooterEditor" class="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition">
                             Refresh
@@ -681,19 +681,25 @@
                             <p class="text-xs text-gray-500 mt-2">Use Google Maps 'Embed a map' iframe src URL.</p>
                         </div>
 
-n                        <div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Address (for Contact page)</label>
+                            <input type="text" name="address" placeholder="123 Commerce St, New York, NY 10001" class="w-full px-4 py-2 border border-gray-300 rounded-lg text-sm">
+                        </div>
+
+                        <div>
                             <label class="block text-sm font-medium text-gray-700 mb-2">Footer Bottom Text</label>
                             <input type="text" name="bottomText" placeholder="© 2026 Zenrix. All rights reserved." class="w-full px-4 py-2 border border-gray-300 rounded-lg text-sm">
                         </div>
 
-n                        <div class="flex items-center justify-between pt-4">
-                            <button type="button" id="previewFooterBtn" class="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition">Preview</button>
-                            <button type="submit" class="px-6 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition">Save Footer</button>
+                        <div class="flex items-center justify-between pt-4">
+                            <div class="flex items-center gap-4"><label class="inline-flex items-center text-sm text-gray-700"><input id="footerPushContact" type="checkbox" checked class="mr-2"> Also update Contact page with these values</label></div>
+                            <div class="flex items-center gap-3"><button type="button" id="previewFooterBtn" class="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition">Preview</button>
+                            <button type="submit" class="px-6 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition">Save</button></div>
                         </div>
                     </form>
                 </div>
 
-n                <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+                <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
                     <h3 class="text-lg font-semibold text-gray-800 mb-4">Footer Preview</h3>
                     <div id="footerEditorPreview" class="w-full rounded-lg p-4 border border-dashed border-gray-200 min-h-[120px]">
                         <p class="text-sm text-gray-500">Preview will be rendered here when you click Preview.</p>
@@ -701,63 +707,6 @@ n                <div class="bg-white rounded-xl shadow-sm border border-gray-20
                 </div>
             </div>
 
-            <!-- Contact Editor Tab -->
-            <div id="content-contact-editor" class="p-6 hidden">
-                <div class="mb-4 p-4 rounded-lg bg-yellow-50 border border-yellow-100 text-sm text-yellow-800">
-                    <strong>Note:</strong> Footer contact info (email, phone, map) is managed in the <em>Footer Editor</em>. Changes here update the Contact page only and will not modify the footer component.
-                </div>
-                <div class="bg-gradient-to-r from-green-50 to-teal-50 rounded-xl p-6 mb-6 border border-green-100">
-                    <div class="flex items-center justify-between mb-4">
-                        <div>
-                            <h2 class="text-2xl font-bold text-gray-800 flex items-center">
-                                <svg class="w-6 h-6 mr-2 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
-                                </svg>
-                                Contact Editor
-                            </h2>
-                            <p class="text-sm text-gray-600 mt-1">Edit contact page details, support info, address, and map embed.</p>
-                        </div>
-                        <button id="refreshContactEditor" class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition">
-                            Refresh
-                        </button>
-                    </div>
-
-                    <form id="contactEditorForm" class="space-y-4">
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-2">Support Email</label>
-                                <input type="email" name="supportEmail" placeholder="support@company.com" class="w-full px-4 py-2 border border-gray-300 rounded-lg text-sm">
-                            </div>
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-2">Support Phone</label>
-                                <input type="text" name="supportPhone" placeholder="+1 (555) 000-0000" class="w-full px-4 py-2 border border-gray-300 rounded-lg text-sm">
-                            </div>
-                        </div>
-
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">Address</label>
-                            <input type="text" name="address" placeholder="123 Commerce St, New York, NY 10001" class="w-full px-4 py-2 border border-gray-300 rounded-lg text-sm">
-                        </div>
-
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">Map Embed URL</label>
-                            <input type="url" name="mapEmbed" placeholder="https://www.google.com/maps/embed?pb=..." class="w-full px-4 py-2 border border-gray-300 rounded-lg text-sm">
-                            <p class="text-xs text-gray-500 mt-2">Use Google Maps 'Embed a map' iframe src URL.</p>
-                        </div>
-
-                        <div class="flex items-center justify-between pt-4">
-                            <button type="button" id="previewContactBtn" class="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition">Preview</button>
-                            <button type="submit" class="px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition">Save Contact</button>
-                        </div>
-                    </form>
-                </div>
-
-                <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-                    <h3 class="text-lg font-semibold text-gray-800 mb-4">Contact Preview</h3>
-                    <div id="contactEditorPreview" class="w-full rounded-lg p-4 border border-dashed border-gray-200 min-h-[120px]">
-                        <p class="text-sm text-gray-500">Preview will be rendered here when you click Preview.</p>
-                    </div>
-                </div>
             </div>
 
             <!-- Hero Settings Tab -->
@@ -2174,9 +2123,7 @@ n                <div class="bg-white rounded-xl shadow-sm border border-gray-20
             if (tab === 'footer-editor') {
                 loadFooterEditor();
             }
-            if (tab === 'contact-editor') {
-                loadContactEditor();
-            }
+
         }
 
         function setOrdersLoading(isLoading) {
@@ -3512,6 +3459,7 @@ n                <div class="bg-white rounded-xl shadow-sm border border-gray-20
                 form.querySelector('[name="chatLink"]').value = data.chatLink || '';
                 form.querySelector('[name="socialLinks"]').value = (data.socialLinks && Array.isArray(data.socialLinks)) ? data.socialLinks.map(l => `${l.label}|${l.url}`).join('\n') : (data.socialLinks || '');
                 form.querySelector('[name="mapEmbed"]').value = data.mapEmbed || '';
+                form.querySelector('[name="address"]').value = data.address || '';
                 form.querySelector('[name="bottomText"]').value = data.bottomText || '';
                 // Clear preview
                 document.getElementById('footerEditorPreview').innerHTML = '<p class="text-sm text-gray-500">Preview will be rendered here when you click Preview.</p>';
@@ -3525,42 +3473,6 @@ n                <div class="bg-white rounded-xl shadow-sm border border-gray-20
             showToast('success', 'Footer data refreshed');
         });
 
-        // Contact Editor
-        async function loadContactEditor() {
-            try {
-                // Fetch contact page
-                const pageRes = await fetch(`${API_URL}/pages/slug/contact`);
-                const pageResult = await pageRes.json();
-                if (!pageResult.success) {
-                    showToast('error', 'Failed to load contact page');
-                    return;
-                }
-                const page = pageResult.data;
-                const meta = page.meta || {};
-
-                // Fetch footer data for defaults
-                const footRes = await fetch(`${API_URL}/components/slug/footer`);
-                const footResult = await footRes.json();
-                const footData = footResult.success ? (footResult.data.data || {}) : {};
-
-                const form = document.getElementById('contactEditorForm');
-                form.querySelector('[name="supportEmail"]').value = footData.supportEmail || meta.supportEmail || 'support@zenrix.com';
-                form.querySelector('[name="supportPhone"]').value = footData.supportPhone || meta.supportPhone || '+977 9819922314';
-                form.querySelector('[name="address"]').value = footData.address || meta.address || '123 Commerce St, New York, NY 10001';
-                form.querySelector('[name="mapEmbed"]').value = meta.mapEmbed || footData.mapEmbed || '';
-
-                // Clear preview
-                document.getElementById('contactEditorPreview').innerHTML = '<p class="text-sm text-gray-500">Preview will be rendered here when you click Preview.</p>';
-            } catch (err) {
-                showToast('error', 'Failed to load contact editor');
-            }
-        }
-
-        document.getElementById('refreshContactEditor')?.addEventListener('click', () => {
-            loadContactEditor();
-            showToast('success', 'Contact data refreshed');
-        });
-
         document.getElementById('previewFooterBtn')?.addEventListener('click', () => {
             const form = document.getElementById('footerEditorForm');
             const shop = form.querySelector('[name="shopLinks"]').value.trim();
@@ -3571,11 +3483,12 @@ n                <div class="bg-white rounded-xl shadow-sm border border-gray-20
             const social = form.querySelector('[name="socialLinks"]').value.trim();
             const bottomText = form.querySelector('[name="bottomText"]').value.trim();
             const mapEmbed = form.querySelector('[name="mapEmbed"]').value.trim();
+            const address = form.querySelector('[name="address"]').value.trim();
 
             const previewDiv = document.getElementById('footerEditorPreview');
             const shopHtml = shop ? '<div><strong>Shop</strong><ul>' + shop.split('\n').map(l => { const parts = l.split('|'); return `<li><a href="${parts[1]||'#'}">${parts[0]||parts[1]||''}</a></li>`; }).join('') + '</ul></div>' : '';
             const companyHtml = company ? '<div><strong>Company</strong><ul>' + company.split('\n').map(l => { const parts = l.split('|'); return `<li><a href="${parts[1]||'#'}">${parts[0]||parts[1]||''}</a></li>`; }).join('') + '</ul></div>' : '';
-            const supportHtml = '<div><strong>Support</strong><div>' + (supportEmail ? `<div>Email: <a href="mailto:${supportEmail}">${supportEmail}</a></div>` : '') + (supportPhone ? `<div>Phone: <span>${supportPhone}</span></div>` : '') + (chatLink ? `<div>Chat: <a href="${chatLink}">Open chat</a></div>` : '') + '</div></div>';
+            const supportHtml = '<div><strong>Support</strong><div>' + (supportEmail ? `<div>Email: <a href="mailto:${supportEmail}">${supportEmail}</a></div>` : '') + (supportPhone ? `<div>Phone: <span>${supportPhone}</span></div>` : '') + (address ? `<div>Address: <span>${escapeHtml(address)}</span></div>` : '') + (chatLink ? `<div>Chat: <a href="${chatLink}">Open chat</a></div>` : '') + '</div></div>';
             const bottomHtml = bottomText ? `<div style="margin-top:10px;color:#374151;font-size:0.9rem">${escapeHtml(bottomText)}</div>` : '';
             const mapHtml = mapEmbed ? `<div style="margin-top:10px;">${'<iframe src="'+mapEmbed+'" width="100%" height="180" style="border:0;" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>'}</div>` : '';
             previewDiv.innerHTML = shopHtml + companyHtml + supportHtml + mapHtml + bottomHtml;
@@ -3600,6 +3513,7 @@ n                <div class="bg-white rounded-xl shadow-sm border border-gray-20
             const social = form.querySelector('[name="socialLinks"]').value.trim();
             const mapEmbed = form.querySelector('[name="mapEmbed"]').value.trim();
             const bottomText = form.querySelector('[name="bottomText"]').value.trim();
+            const address = form.querySelector('[name="address"]').value.trim();
 
             // Parse link lists into arrays [{label,url}]
             function parseLines(str) {
@@ -3618,6 +3532,7 @@ n                <div class="bg-white rounded-xl shadow-sm border border-gray-20
                 chatLink: chatLink || '',
                 socialLinks: parseLines(social),
                 mapEmbed: mapEmbed || '',
+                address: address || '',
                 bottomText: bottomText || ''
             };
 
@@ -3661,6 +3576,28 @@ n                <div class="bg-white rounded-xl shadow-sm border border-gray-20
                         try { window.dispatchEvent(new CustomEvent('footerMapUpdated', { detail: { mapEmbed: payloadData.mapEmbed } })); } catch (e) {}
                     }
                     try { window.dispatchEvent(new CustomEvent('footerDataUpdated', { detail: { data: payloadData } })); } catch (e) {}
+
+                    // Optionally push footer values to the contact page if requested
+                    const push = !!document.getElementById('footerPushContact')?.checked;
+                    if (push) {
+                        try {
+                            const pageRes = await fetch(`${API_URL}/pages/slug/contact`);
+                            const pageResult = await pageRes.json();
+                            if (pageResult && pageResult.success) {
+                                const page = pageResult.data;
+                                const contentHtml = `<h1>Contact Us</h1><p>Email: ${escapeHtml(supportEmail)}<br>Phone: ${escapeHtml(supportPhone)}<br>Address: ${escapeHtml(address)}<br><a href="https://maps.google.com/?q=${encodeURIComponent(address)}">Open map</a></p>${mapEmbed ? `<iframe src="${escapeHtml(mapEmbed)}" width="600" height="450" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>` : ''}`;
+                                const pageUpdateData = {
+                                    title: page.title || 'Contact Us',
+                                    content: contentHtml,
+                                    published: true,
+                                    meta: { ...(page.meta || {}), mapEmbed: mapEmbed || '', supportEmail, supportPhone, address }
+                                };
+                                await fetch(`${API_URL}/pages/${page._id}`, { method: 'PUT', headers: { 'Content-Type':'application/json', 'Authorization': `Bearer ${token}` }, body: JSON.stringify(pageUpdateData) });
+                                showToast('success', '✅ Contact page updated from Footer settings');
+                            }
+                        } catch (err) { console.warn('Failed to push footer to contact page', err && err.message ? err.message : err); }
+                    }
+
                 } else {
                     showToast('error', '❌ Failed: ' + (result.error || 'Unknown error'));
                 }
@@ -3669,81 +3606,9 @@ n                <div class="bg-white rounded-xl shadow-sm border border-gray-20
             }
         });
 
-        document.getElementById('previewContactBtn')?.addEventListener('click', () => {
-            const form = document.getElementById('contactEditorForm');
-            const supportEmail = form.querySelector('[name="supportEmail"]').value.trim();
-            const supportPhone = form.querySelector('[name="supportPhone"]').value.trim();
-            const address = form.querySelector('[name="address"]').value.trim();
-            const mapEmbed = form.querySelector('[name="mapEmbed"]').value.trim();
 
-            const previewDiv = document.getElementById('contactEditorPreview');
-            const contentHtml = `<h1>Contact Us</h1><p>Email: ${escapeHtml(supportEmail)}<br>Phone: ${escapeHtml(supportPhone)}<br>Address: ${escapeHtml(address)}<br><a href="https://maps.google.com/?q=${encodeURIComponent(address)}">Open map</a></p>${mapEmbed ? `<iframe src="${escapeHtml(mapEmbed)}" width="100%" height="300" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>` : ''}`;
-            previewDiv.innerHTML = contentHtml;
-            showToast('success', 'Contact preview updated');
-        });
 
-        document.getElementById('contactEditorForm')?.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const token = getAdminToken();
-            if (!token) {
-                showToast('error', 'Please login first');
-                openLoginModal();
-                return;
-            }
 
-            const form = document.getElementById('contactEditorForm');
-            const supportEmail = form.querySelector('[name="supportEmail"]').value.trim();
-            const supportPhone = form.querySelector('[name="supportPhone"]').value.trim();
-            const address = form.querySelector('[name="address"]').value.trim();
-            const mapEmbed = form.querySelector('[name="mapEmbed"]').value.trim();
-
-            try {
-                // Update contact page
-                const pageRes = await fetch(`${API_URL}/pages/slug/contact`);
-                const pageResult = await pageRes.json();
-                if (!pageResult.success) throw new Error('Failed to fetch contact page');
-                const page = pageResult.data;
-                const pageId = page._id;
-
-                const contentHtml = `<h1>Contact Us</h1><p>Email: ${escapeHtml(supportEmail)}<br>Phone: ${escapeHtml(supportPhone)}<br>Address: ${escapeHtml(address)}<br><a href="https://maps.google.com/?q=${encodeURIComponent(address)}">Open map</a></p>${mapEmbed ? `<iframe src="${escapeHtml(mapEmbed)}" width="600" height="450" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>` : ''}`;
-
-                const pageUpdateData = {
-                    title: page.title || 'Contact Us',
-                    content: contentHtml,
-                    published: true,
-                    meta: {
-                        description: page.meta?.description || 'Contact Zenrix',
-                        keywords: page.meta?.keywords || '',
-                        mapEmbed: mapEmbed || '',
-                        supportEmail,
-                        supportPhone,
-                        address
-                    }
-                };
-
-                const pagePutRes = await fetch(`${API_URL}/pages/${pageId}`, {
-                    method: 'PUT',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${token}`
-                    },
-                    body: JSON.stringify(pageUpdateData)
-                });
-                const pagePutResult = await pagePutRes.json();
-                if (!pagePutResult.success) throw new Error('Failed to update contact page');
-
-                // Update footer component data to sync
-                const footRes = await fetch(`${API_URL}/components/slug/footer`);
-                const footResult = await footRes.json();
-                // Footer updates are now managed centrally via the Footer Editor.
-                // Contact Editor updates the Contact Page only and will not modify the Footer component.
-                showToast('success', '✅ Contact updated! (Note: Footer contact info is managed in Footer Editor)');
-                loadComponents();
-                try { window.dispatchEvent(new CustomEvent('componentUpdated', { detail: { slug: 'footer', data: { data: { supportEmail, supportPhone, address, mapEmbed } } } })); } catch (e) {}
-            } catch (err) {
-                showToast('error', '❌ ' + err.message);
-            }
-        });
 
         function escapeHtml(unsafe) {
             const map = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;', '/': '&#47;' };
