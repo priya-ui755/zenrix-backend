@@ -2018,6 +2018,15 @@
         });
 
         function adminLogout() {
+            // Synchronous immediate logout to avoid timing/order issues
+            try {
+                console.debug('[adminLogout] invoked');
+            } catch (e) {}
+
+            // Immediately clear admin token and UI state
+            try { clearAdminToken(); } catch (e) { console.error('clearAdminToken failed', e); }
+            try { localStorage.removeItem('userToken'); localStorage.removeItem('userData'); } catch (e) {}
+
             const logoutBtnEl = document.getElementById('logoutBtn');
             if (logoutBtnEl) {
                 if (logoutBtnEl.dataset.loggingOut === '1') return; // guard against multi-clicks
@@ -2037,19 +2046,14 @@
 
             // give the smoke animation a short head start but keep UX snappy
             const SMOKE_PLAYOUT_MS = 350;
-            showToast('info', 'Logging you out...');
+            try { showToast('info', 'Logging you out...'); } catch (e) {}
             setTimeout(() => {
-                clearAdminToken();
-                try {
-                    localStorage.removeItem('userToken');
-                    localStorage.removeItem('userData');
-                } catch (e) {}
-                showToast('success', 'Redirecting to admin login…');
+                try { showToast('success', 'Redirecting to admin login…'); } catch (e) {}
                 if (typeof openLoginModal === 'function') {
-                    openLoginModal();
+                    try { openLoginModal(); } catch (e) {}
                 }
                 const target = `${window.location.origin.replace(/\/$/, '')}/admin-dashboard.html`;
-                window.location.href = target;
+                try { window.location.href = target; } catch (e) { window.location.assign(target); }
             }, SMOKE_PLAYOUT_MS);
 
             // safety re-enable in case navigation is blocked
