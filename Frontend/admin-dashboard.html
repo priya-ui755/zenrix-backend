@@ -43,6 +43,24 @@
                 }
             };
         }
+        // Global image error fallback: replace missing uploads with a placeholder
+        (function(){
+            function imgErrorHandler(e){
+                try {
+                    const el = e.target;
+                    if (!el || el.tagName !== 'IMG') return;
+                    const src = el.getAttribute('src') || '';
+                    if (!src.includes('/uploads/')) return;
+                    // prevent looping
+                    if (el.dataset.__placeholderApplied) return;
+                    el.dataset.__placeholderApplied = '1';
+                    // prefer site-level placeholder if available
+                    el.src = '/assets/placeholder.svg';
+                } catch(err){}
+            }
+            // Attach early (capture) so it fires before other handlers
+            document.addEventListener('error', imgErrorHandler, true);
+        })();
         // Centralized logout helper to avoid inline onclick duplication and failures
         window.performLogout = function() {
             try { clearAdminToken(); } catch(e) {}
