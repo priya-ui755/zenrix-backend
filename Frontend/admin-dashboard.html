@@ -233,7 +233,7 @@
 
 
                 <!-- Main Content -->
-                <div id="authOverlay" class="fixed inset-0 bg-white bg-opacity-70 backdrop-blur-sm z-50 hidden" aria-hidden="true">
+                <div id="authOverlay" class="fixed inset-0 bg-white bg-opacity-70 backdrop-blur-sm hidden" aria-hidden="true" style="z-index:12000;">
         <div class="auth-overlay flex items-center justify-center w-full h-full px-4">
             <div class="auth-card bg-white rounded-xl shadow-xl p-8 max-w-md w-full text-center" role="dialog" aria-modal="true" aria-labelledby="authOverlayTitle">
                 <div class="flex items-start gap-6">
@@ -245,7 +245,7 @@
                         <h2 id="authOverlayTitle" class="text-xl font-semibold text-gray-900">Sign in to continue</h2>
                         <p class="text-sm text-gray-600 mt-2 mb-4">Administrative access is required to view and manage site content. Enter your admin password to continue.</p>
                         <div class="flex items-center gap-3">
-                            <button id="authOverlayLogin" class="btn btn-primary" onclick="try{ openLoginModal(); }catch(e){}">Login</button>
+                            <button id="authOverlayLogin" class="btn btn-primary" onclick="(function(){ try{ if(typeof openLoginModal==='function'){ openLoginModal(); } else { document.getElementById('loginModal')?.classList.remove('hidden'); document.getElementById('adminPassword')?.focus(); } }catch(e){} })()">Login</button>
                             <a href="/support.html" class="btn btn-ghost" id="contactSupport">Contact support</a>
                         </div>
                         <p class="text-xs text-gray-400 mt-4">Need an account or lost access? Contact your site admin via the support page.</p>
