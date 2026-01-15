@@ -2055,7 +2055,8 @@
         // Login functionality
         function openLoginModal() {
             try { setAuthGuard(false); } catch (e) {}
-            try { document.getElementById('loginModal').classList.remove('hidden'); } catch(e) {}
+            try { document.getElementById('authOverlay')?.classList.add('hidden'); } catch(e) {}
+            try { document.getElementById('loginModal')?.classList.remove('hidden'); } catch(e) {}
             try { document.getElementById('adminPassword')?.focus(); } catch(e) {}
         }
 
