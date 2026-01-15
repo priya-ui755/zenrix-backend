@@ -35,7 +35,7 @@ body.adminlte-enabled .main-header #adminStatus{
 	border:1px solid rgba(15,23,42,0.08);
 }
 body.adminlte-enabled .main-header #adminStatus:hover{background:#e5e7eb !important}
-body.adminlte-enabled .main-header #adminStatus #adminLoginBtn{color:inherit !important}
+body.adminlte-enabled .main-header #adminStatus{color:inherit !important}
 body.adminlte-enabled .main-sidebar{background:#ffffff;color:#0f172a}
 body.adminlte-enabled .nav-sidebar .nav-link{color:#374151}
 body.adminlte-enabled .nav-sidebar .nav-link.active{background:linear-gradient(90deg,#4f46e5,#6366f1);color:#fff}

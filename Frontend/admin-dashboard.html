@@ -110,12 +110,10 @@
                                 </button>
                             </li>
                             <li class="nav-item mr-2 d-flex align-items-center">
-                                <div id="adminStatus" class="bg-indigo-50 px-3 py-1 rounded-pill text-sm cursor-pointer">
-                                    <span id="adminLoginBtn">Click to Login</span>
-                                </div>
+                                <div id="adminStatus" class="bg-indigo-50 px-3 py-1 rounded-pill text-sm cursor-pointer" aria-label="Admin status"></div>
                             </li>
                             <li class="nav-item d-flex align-items-center">
-                                        <button id="logoutBtn" class="star-btn btn btn-danger hidden" type="button" aria-label="Logout" style="position: relative; overflow: visible;">
+                                        <button id="logoutBtn" class="star-btn btn btn-danger hidden" type="button" aria-label="Logout" style="position: relative; overflow: visible;" onclick="adminLogout()">
                                             Log Out
                                             <span class="smoke" aria-hidden="true"></span>
                                             <div class="star-1">
@@ -1958,16 +1956,16 @@
             if (token) {
                 statusEl.classList.add('bg-green-500');
                 statusEl.classList.remove('bg-white', 'bg-opacity-20');
-                btnEl.textContent = 'Logged In ✓';
-                btnEl.style.display = 'none';
+                statusEl.textContent = 'Logged In ✓';
+                if (btnEl) { btnEl.style.display = 'none'; }
                 logoutBtn && logoutBtn.classList.remove('hidden');
                 // refresh knowledge panel when admin logs in
                 setTimeout(() => updateKnowledgeStatus(), 200);
             } else {
                 statusEl.classList.remove('bg-green-500');
                 statusEl.classList.add('bg-white', 'bg-opacity-20');
-                btnEl.textContent = 'Click to Login';
-                btnEl.style.display = '';
+                statusEl.textContent = '';
+                if (btnEl) { btnEl.style.display = 'none'; }
                 logoutBtn && logoutBtn.classList.add('hidden');
             }
         }
@@ -5957,15 +5955,12 @@
                 }
             });
             
-            // Attach admin login button
-            const adminLoginBtn = document.getElementById('adminLoginBtn');
-            if (adminLoginBtn) {
-                adminLoginBtn.addEventListener('click', function() {
+            // Make the entire admin status area open login when not authenticated
+            const adminStatusEl = document.getElementById('adminStatus');
+            if (adminStatusEl) {
+                adminStatusEl.addEventListener('click', function() {
                     const token = getAdminToken();
-                    if (!token) {
-                        openLoginModal();
-                    }
-                    // when logged in, the status is non-interactive (logout via star button)
+                    if (!token) openLoginModal();
                 });
             }
 
