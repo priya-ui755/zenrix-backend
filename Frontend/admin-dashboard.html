@@ -92,7 +92,6 @@
             function robustOpenLogin(reason){
                 try{
                     console.log('robustOpenLogin called with reason:', reason);
-                    alert('Opening login modal...');
                     const loginModal = document.getElementById('loginModal');
                     const overlay = document.getElementById('authOverlay');
                     if (!loginModal) return;
@@ -356,7 +355,7 @@
 
 
                 <!-- Main Content -->
-                <div id="authOverlay" class="fixed inset-0 bg-white bg-opacity-70 backdrop-blur-sm hidden" aria-hidden="true" style="z-index:12000; pointer-events:auto;" onclick="robustOpenLogin('overlay-click')">
+                <div id="authOverlay" class="fixed inset-0 bg-white bg-opacity-70 backdrop-blur-sm hidden" aria-hidden="true" style="z-index:12000; pointer-events:auto;">
         <div class="auth-overlay flex items-center justify-center w-full h-full px-4">
             <div class="auth-card bg-white rounded-xl shadow-xl p-8 max-w-md w-full text-center" role="dialog" aria-modal="true" aria-labelledby="authOverlayTitle">
                 <div class="flex items-start gap-6">
