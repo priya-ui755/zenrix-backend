@@ -6,7 +6,7 @@
     <title>My Profile | Zenrix</title>
     <link rel="stylesheet" href="/css/tailwind-site.css">
     <link rel="stylesheet" href="style.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css">
     <script src="script.js?v=20251230" defer></script>
 </head>
 <body class="surface text">
@@ -144,8 +144,7 @@
                             <div id="sidebarTier" class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 border border-white/10 text-sm text-slate-100">
                                 <i class="fas fa-crown"></i>
                                 <span>Bronze Member</span>
-                            </div>
-                            <p class="text-slate-300 text-sm">Your account, orders, and saved items in one place.</p>
+                            </div>                            <p id="memberSince" class="text-xs text-slate-400 mt-1">Member since —</p>                            <p class="text-slate-300 text-sm">Your account, orders, and saved items in one place.</p>
                         </div>
                     </div>
                     <div class="grid grid-cols-3 gap-3">
@@ -402,7 +401,7 @@
                     </div>
                     <a href="addresses.html" class="text-indigo-200 text-sm font-semibold hover:text-white">Manage</a>
                 </div>
-                <div id="addressesList" class="grid grid-cols-1 md:grid-cols-2 gap-3 text-slate-100">
+                <div id="addressesPreview" class="grid grid-cols-1 md:grid-cols-2 gap-3 text-slate-100">
                     <p class="text-slate-300">No addresses added yet.</p>
                 </div>
             </div>
@@ -612,7 +611,7 @@
                     loadWishlistCount();
 
                     const joinDate = new Date(user.createdAt);
-                    document.getElementById('memberSince').textContent = joinDate.toLocaleDateString('en-US', { year: 'numeric', month: 'short' });
+                    setText('memberSince', joinDate.toLocaleDateString('en-US', { year: 'numeric', month: 'short' }));
                 } else {
                     throw new Error(data.error);
                 }
@@ -630,7 +629,8 @@
                 });
                 const data = await res.json();
                 if (data.success) {
-                    document.getElementById('wishlistCount').textContent = data.data.length;
+                    // Update visible KPI if present
+                    setText('kpiWishlist', data.data.length || 0);
                     renderWishlistItems(data.data);
                 }
             } catch (err) {
@@ -639,7 +639,8 @@
         }
 
         function renderWishlistItems(items) {
-            const container = document.getElementById('wishlistItems');
+            const container = document.getElementById('wishlistItemsPreview');
+            if (!container) return;
             if (!items || items.length === 0) {
                 container.innerHTML = '<p class="text-slate-300">No items in wishlist.</p>';
                 return;
@@ -675,8 +676,9 @@
             }
         }
 
-        function renderAddresses(addresses) {
-            const container = document.getElementById('addressesList');
+        function renderAddressesPreview(addresses) {
+            const container = document.getElementById('addressesPreview');
+            if (!container) return;
             if (!addresses || addresses.length === 0) {
                 container.innerHTML = '<p class="text-slate-300">No addresses added yet.</p>';
                 return;

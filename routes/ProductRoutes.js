@@ -257,16 +257,19 @@ router.post('/', requireAdmin,
             const saleEnd = req.body.saleEnd ? new Date(req.body.saleEnd) : undefined;
             const parsedSaleEnd = saleEnd && !isNaN(saleEnd) ? saleEnd : undefined;
 
+            const parsedSalePrice = (typeof req.body.salePrice !== 'undefined' && req.body.salePrice !== '') ? parseFloat(req.body.salePrice) : undefined;
+            const parsedStock = Number.isFinite(parseInt(req.body.stock, 10)) ? parseInt(req.body.stock, 10) : 0;
+
             const product = new Product({
                 name: req.body.name,
                 price: parseFloat(req.body.price),
-                salePrice: req.body.salePrice === '' ? undefined : parseFloat(req.body.salePrice),
+                salePrice: parsedSalePrice,
                 onSale: req.body.onSale === 'on' || req.body.onSale === true,
                 saleLabel: req.body.saleLabel,
                 saleEnd: parsedSaleEnd,
                 description: req.body.description,
                 category: req.body.category,
-                stock: parseInt(req.body.stock, 10),
+                stock: parsedStock,
                 featured: req.body.featured === 'on' || req.body.featured === true,
                 image: imagePath || undefined,
                 images: imagesPaths.length ? imagesPaths : []

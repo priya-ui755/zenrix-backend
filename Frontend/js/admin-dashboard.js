@@ -3,11 +3,51 @@
   document.addEventListener('DOMContentLoaded', async () => {
     // Ensure product list loads when Products tab is shown
     function showTab(tab) {
-      document.querySelectorAll('[id^="content-"]').forEach(el => el.classList.add('hidden'));
+      // Hide all content sections robustly
+      document.querySelectorAll('[id^="content-"]').forEach(el => { el.classList.add('hidden'); try { el.style.display = 'none'; } catch(e){} });
+
+      // Close common modals/overlays so they don't persist across tabs
+      const modalIds = ['#ticketDetailsModal','#editProductModal','#editCareerModal','#editPageModal','#editComponentModal','#orderDetailsModal'];
+      modalIds.forEach(sel => { try { const m = document.querySelector(sel); if (m) { m.classList.add('hidden'); } } catch(e){} });
+
+      // Show requested content
       const el = document.getElementById('content-' + tab);
-      if (el) el.classList.remove('hidden');
+      if (el) {
+        el.classList.remove('hidden');
+        try { el.style.display = ''; } catch(e){}
+        markLoading(el);
+        // scroll top for better UX
+        try { window.scrollTo({ top: 0, behavior: 'smooth' }); } catch(e){}
+      }
+
+      // Update sidebar nav active states
+      document.querySelectorAll('[data-jump-tab]').forEach(a => {
+        try { a.classList.toggle('active', a.getAttribute('data-jump-tab') === tab); } catch(e){}
+      });
+
+      // Update top tab buttons
+      document.querySelectorAll('[data-tab]').forEach(btn => {
+        try {
+          const t = btn.getAttribute('data-tab');
+          btn.classList.toggle('border-blue-600', t === tab);
+          btn.classList.toggle('text-blue-600', t === tab);
+        } catch(e){}
+      });
+
+      // Per-tab loaders
       if (tab === 'products' && typeof loadProducts === 'function') {
-        loadProducts();
+        loadProducts().then(() => { markLoaded(document.getElementById('content-products')); }).catch(()=>{ markLoaded(document.getElementById('content-products')); });
+      }
+      if (tab === 'testimonials' && typeof loadTestimonials === 'function') {
+        loadTestimonials().then(() => { markLoaded(document.getElementById('content-testimonials')); }).catch(()=>{ markLoaded(document.getElementById('content-testimonials')); });
+      }
+
+      // Some tabs need additional refreshes
+      if (tab === 'tickets' && typeof loadTickets === 'function') {
+        try { loadTickets(); } catch(e){}
+      }
+      if (tab === 'subscribers' && typeof loadSubscribers === 'function') {
+        try { loadSubscribers({ silent: true }); } catch(e){}
       }
     }
     document.querySelectorAll('[data-jump-tab]').forEach(btn => {
@@ -48,6 +88,44 @@
     // ensure admin scope
     const root = document.querySelector('.admin-app');
     if (!root) return;
+
+    // keyboard navigation for sidebar (accessibility)
+    (function setupSidebarKeyboard(){
+      try {
+        const links = Array.from(document.querySelectorAll('#adminSidebar a.nav-link'));
+        if (!links.length) return;
+        links.forEach((a, idx) => {
+          a.setAttribute('tabindex', '0');
+          a.setAttribute('role', 'menuitem');
+          const tab = a.getAttribute('data-jump-tab');
+          if (tab) a.setAttribute('aria-controls', 'content-' + tab);
+          a.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowDown') {
+              e.preventDefault();
+              const next = links[(idx + 1) % links.length]; next.focus();
+            } else if (e.key === 'ArrowUp') {
+              e.preventDefault();
+              const prev = links[(idx - 1 + links.length) % links.length]; prev.focus();
+            } else if (e.key === 'Enter' || e.key === ' ') {
+              e.preventDefault();
+              a.click();
+            }
+          });
+          a.addEventListener('click', () => {
+            links.forEach(l => l.setAttribute('aria-current', 'false'));
+            a.setAttribute('aria-current', 'true');
+          });
+        });
+      } catch (e) { /* ignore */ }
+    })();
+
+    // lightweight skeleton helper: add .skeleton when switching tabs and remove after data loads
+    function markLoading(el) {
+      if (!el) return; el.classList.add('skeleton');
+    }
+    function markLoaded(el) {
+      if (!el) return; el.classList.remove('skeleton');
+    }
 
     // Chart utilities and dynamic loader
 
@@ -420,6 +498,416 @@
       window.attachProductEventListeners = attachProductEventListeners;
       window.startProductSaleCountdowns = startProductSaleCountdowns;
     } catch (e) {/* ignore in strict CSP contexts */}
+    
+    // --- Testimonials Management ---
+    async function loadTestimonials() {
+      try {
+        const token = localStorage.getItem('adminToken');
+        const headers = token ? { 'Authorization': 'Bearer ' + token } : {};
+        const res = await fetch(`${window.API_URL || '/api'}/testimonials/admin/all`, { headers });
+        const data = await res.json();
+        if (data && data.success) {
+          renderTestimonials(data.data);
+        } else {
+          console.error('Failed to load testimonials:', data);
+          if (typeof showToast === 'function') showToast('error', 'Failed to load testimonials');
+        }
+      } catch (err) {
+        console.error('Error loading testimonials:', err);
+        if (typeof showToast === 'function') showToast('error', 'Error loading testimonials: ' + (err.message || err));
+      }
+    }
+
+    function getStatusColor(status) {
+      switch (status) {
+        case 'approved': return 'bg-green-100 text-green-800';
+        case 'pending': return 'bg-yellow-100 text-yellow-800';
+        case 'rejected': return 'bg-red-100 text-red-800';
+        default: return 'bg-gray-100 text-gray-800';
+      }
+    }
+
+    function renderTestimonials(testimonials) {
+      const table = document.getElementById('testimonialsTable');
+      if (!table) return;
+
+      const html = testimonials.map(t => `
+        <tr class="hover:bg-gray-50" data-testimonial-id="${t._id}">
+          <td class="px-4 py-3 text-sm font-medium text-gray-900">${t.name}</td>
+          <td class="px-4 py-3 text-sm text-gray-500 max-w-xs truncate" title="${t.review}">${t.review}</td>
+          <td class="px-4 py-3 text-sm text-gray-500">
+            ${'★'.repeat(t.rating)}${'☆'.repeat(5 - t.rating)}
+          </td>
+          <td class="px-4 py-3 text-sm">
+            <span class="px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(t.status)} status-badge">
+              ${t.status}
+            </span>
+          </td>
+          <td class="px-4 py-3 text-sm text-gray-500">${new Date(t.createdAt).toLocaleDateString()}</td>
+          <td class="px-4 py-3 text-right text-sm font-medium space-x-2">
+            <button data-edit-testimonial="${t._id}" class="text-blue-600 hover:text-blue-900">Edit</button>
+            <button data-delete-testimonial="${t._id}" class="text-red-600 hover:text-red-900">Delete</button>
+            <button data-audit-testimonial="${t._id}" class="text-slate-600 hover:text-slate-900">Audit</button>
+            ${t.status === 'pending' ? `<button data-approve-testimonial="${t._id}" class="text-green-600 hover:text-green-900">Approve</button>
+            <button data-reject-testimonial="${t._id}" class="text-rose-600 hover:text-rose-900">Reject</button>` : (t.status === 'approved' ? `<button data-unapprove-testimonial="${t._id}" class="text-yellow-600 hover:text-yellow-900">Unapprove</button>` : `<button data-approve-testimonial="${t._id}" class="text-green-600 hover:text-green-900">Approve</button>`)}
+          </td>
+        </tr>
+      `).join('');
+
+      table.innerHTML = html;
+      attachTestimonialEventListeners();
+    }
+
+    function attachTestimonialEventListeners() {
+      // Add testimonial button
+      const addBtn = document.getElementById('addTestimonialBtn');
+      if (addBtn) {
+        addBtn.addEventListener('click', () => showTestimonialModal());
+      }
+
+      // Use event delegation on the testimonials table to handle actions
+      const table = document.getElementById('testimonialsTable');
+      if (!table) return;
+
+      // Remove existing delegated listener if present
+      if (table._testimonialListener) {
+        table.removeEventListener('click', table._testimonialListener);
+      }
+
+      table._testimonialListener = function (e) {
+        const target = e.target;
+        const editBtn = target.closest('[data-edit-testimonial]');
+        const deleteBtn = target.closest('[data-delete-testimonial]');
+        const approveBtn = target.closest('[data-approve-testimonial]');
+        const rejectBtn = target.closest('[data-reject-testimonial]');
+        const unapproveBtn = target.closest('[data-unapprove-testimonial]');
+
+        if (editBtn) {
+          e.preventDefault();
+          const id = editBtn.getAttribute('data-edit-testimonial');
+          editTestimonial(id);
+          return;
+        }
+        if (deleteBtn) {
+          e.preventDefault();
+          const id = deleteBtn.getAttribute('data-delete-testimonial');
+          deleteTestimonial(id);
+          return;
+        }
+        if (approveBtn) {
+          e.preventDefault();
+          const id = approveBtn.getAttribute('data-approve-testimonial');
+          approveTestimonial(id);
+          return;
+        }
+        if (rejectBtn) {
+          e.preventDefault();
+          const id = rejectBtn.getAttribute('data-reject-testimonial');
+          rejectTestimonial(id);
+          return;
+        }
+        if (unapproveBtn) {
+          e.preventDefault();
+          const id = unapproveBtn.getAttribute('data-unapprove-testimonial');
+          unapproveTestimonial(id);
+          return;
+        }
+        const auditBtn = target.closest('[data-audit-testimonial]');
+        if (auditBtn) {
+          e.preventDefault();
+          const id = auditBtn.getAttribute('data-audit-testimonial');
+          if (typeof window.showTestimonialAuditModal === 'function') window.showTestimonialAuditModal(id);
+          else alert('Audit view not available');
+          return;
+        }
+      };
+
+      table.addEventListener('click', table._testimonialListener);
+    }
+
+    function updateTestimonialRow(id, updated) {
+      const row = document.querySelector(`[data-testimonial-id="${id}"]`);
+      if (!row) return;
+      const badge = row.querySelector('.status-badge');
+      if (badge) {
+        badge.textContent = updated.status;
+        badge.className = 'px-2 py-1 rounded-full text-xs font-medium ' + getStatusColor(updated.status) + ' status-badge';
+      }
+      const actionsTd = row.querySelector('td:last-child');
+      if (actionsTd) {
+        let actionsHtml = `<button data-edit-testimonial="${id}" class="text-blue-600 hover:text-blue-900">Edit</button>`;
+        actionsHtml += ` <button data-delete-testimonial="${id}" class="text-red-600 hover:text-red-900">Delete</button>`;
+        if (updated.status === 'pending') {
+          actionsHtml += ` <button data-approve-testimonial="${id}" class="text-green-600 hover:text-green-900">Approve</button> <button data-reject-testimonial="${id}" class="text-rose-600 hover:text-rose-900">Reject</button>`;
+        } else if (updated.status === 'approved') {
+          actionsHtml += ` <button data-unapprove-testimonial="${id}" class="text-yellow-600 hover:text-yellow-900">Unapprove</button>`;
+        } else if (updated.status === 'rejected') {
+          actionsHtml += ` <button data-approve-testimonial="${id}" class="text-green-600 hover:text-green-900">Approve</button>`;
+        }
+        actionsTd.innerHTML = actionsHtml;
+      }
+
+      // Visual highlight for updated row
+      row.classList.add('row-flash');
+      setTimeout(() => row.classList.remove('row-flash'), 1200);
+    }
+
+    async function approveTestimonial(id) {
+      if (!confirm('Approve this testimonial and publish it publicly?')) return;
+      const row = document.querySelector(`[data-testimonial-id="${id}"]`);
+      const prevStatus = row?.querySelector('.status-badge')?.textContent || 'pending';
+      try {
+        const token = localStorage.getItem('adminToken');
+        const headers = {
+          'Content-Type': 'application/json',
+          ...(token ? { 'Authorization': 'Bearer ' + token } : {})
+        };
+        const res = await fetch(`${window.API_URL || '/api'}/testimonials/admin/${id}`, {
+          method: 'PUT',
+          headers,
+          body: JSON.stringify({ status: 'approved', isActive: true })
+        });
+        const data = await res.json();
+        if (data && data.success) {
+          updateTestimonialRow(id, data.data);
+          showErrorBanner('Testimonial approved', { actionText: 'Undo', actionCallback: async () => {
+            try {
+              const revRes = await fetch(`${window.API_URL || '/api'}/testimonials/admin/${id}`, {
+                method: 'PUT',
+                headers,
+                body: JSON.stringify({ status: prevStatus, isActive: prevStatus === 'approved' })
+              });
+              const rev = await revRes.json();
+              if (rev && rev.success) {
+                updateTestimonialRow(id, rev.data);
+                if (typeof showToast === 'function') showToast('success', 'Reverted');
+              }
+            } catch (e) { console.error('Undo approve failed', e); }
+          } });
+        } else {
+          alert('Failed to approve testimonial: ' + (data && data.error ? data.error : 'Unknown error'));
+        }
+      } catch (err) {
+        console.error('Error approving testimonial:', err);
+        alert('Error approving testimonial: ' + (err.message || err));
+      }
+    }
+
+    async function rejectTestimonial(id) {
+      if (!confirm('Reject this testimonial? It will not be published.')) return;
+      const row = document.querySelector(`[data-testimonial-id="${id}"]`);
+      const prevStatus = row?.querySelector('.status-badge')?.textContent || 'pending';
+      try {
+        const token = localStorage.getItem('adminToken');
+        const headers = {
+          'Content-Type': 'application/json',
+          ...(token ? { 'Authorization': 'Bearer ' + token } : {})
+        };
+        const res = await fetch(`${window.API_URL || '/api'}/testimonials/admin/${id}`, {
+          method: 'PUT',
+          headers,
+          body: JSON.stringify({ status: 'rejected', isActive: false })
+        });
+        const data = await res.json();
+        if (data && data.success) {
+          updateTestimonialRow(id, data.data);
+          showErrorBanner('Testimonial rejected', { actionText: 'Undo', actionCallback: async () => {
+            try {
+              const revRes = await fetch(`${window.API_URL || '/api'}/testimonials/admin/${id}`, {
+                method: 'PUT',
+                headers,
+                body: JSON.stringify({ status: prevStatus, isActive: prevStatus === 'approved' })
+              });
+              const rev = await revRes.json();
+              if (rev && rev.success) {
+                updateTestimonialRow(id, rev.data);
+                if (typeof showToast === 'function') showToast('success', 'Reverted');
+              }
+            } catch (e) { console.error('Undo reject failed', e); }
+          } });
+        } else {
+          alert('Failed to reject testimonial: ' + (data && data.error ? data.error : 'Unknown error'));
+        }
+      } catch (err) {
+        console.error('Error rejecting testimonial:', err);
+        alert('Error rejecting testimonial: ' + (err.message || err));
+      }
+    }
+
+    async function unapproveTestimonial(id) {
+      if (!confirm('Unapprove this testimonial (move back to pending)?')) return;
+      const row = document.querySelector(`[data-testimonial-id="${id}"]`);
+      const prevStatus = row?.querySelector('.status-badge')?.textContent || 'approved';
+      try {
+        const token = localStorage.getItem('adminToken');
+        const headers = {
+          'Content-Type': 'application/json',
+          ...(token ? { 'Authorization': 'Bearer ' + token } : {})
+        };
+        const res = await fetch(`${window.API_URL || '/api'}/testimonials/admin/${id}`, {
+          method: 'PUT',
+          headers,
+          body: JSON.stringify({ status: 'pending', isActive: false })
+        });
+        const data = await res.json();
+        if (data && data.success) {
+          updateTestimonialRow(id, data.data);
+          showErrorBanner('Testimonial moved to pending', { actionText: 'Undo', actionCallback: async () => {
+            try {
+              const revRes = await fetch(`${window.API_URL || '/api'}/testimonials/admin/${id}`, {
+                method: 'PUT',
+                headers,
+                body: JSON.stringify({ status: prevStatus, isActive: prevStatus === 'approved' })
+              });
+              const rev = await revRes.json();
+              if (rev && rev.success) {
+                updateTestimonialRow(id, rev.data);
+                if (typeof showToast === 'function') showToast('success', 'Reverted');
+              }
+            } catch (e) { console.error('Undo unapprove failed', e); }
+          } });
+        } else {
+          alert('Failed to unapprove testimonial: ' + (data && data.error ? data.error : 'Unknown error'));
+        }
+      } catch (err) {
+        console.error('Error unapproving testimonial:', err);
+        alert('Error unapproving testimonial: ' + (err.message || err));
+      }
+    }
+
+    function showTestimonialModal(testimonial = null) {
+      const modal = document.createElement('div');
+      modal.className = 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50';
+      modal.innerHTML = `
+        <div class="bg-white rounded-lg p-6 w-full max-w-md mx-4">
+          <h3 class="text-lg font-semibold mb-4">${testimonial ? 'Edit' : 'Add'} Testimonial</h3>
+          <form id="testimonialForm">
+            <div class="mb-4">
+              <label class="block text-sm font-medium text-gray-700 mb-1">Name</label>
+              <input type="text" id="testimonialName" class="w-full px-3 py-2 border border-gray-300 rounded-md" required value="${testimonial?.name || ''}">
+            </div>
+            <div class="mb-4">
+              <label class="block text-sm font-medium text-gray-700 mb-1">Review</label>
+              <textarea id="testimonialReview" class="w-full px-3 py-2 border border-gray-300 rounded-md" rows="3" required>${testimonial?.review || ''}</textarea>
+            </div>
+            <div class="mb-4">
+              <label class="block text-sm font-medium text-gray-700 mb-1">Rating (1-5)</label>
+              <input type="number" id="testimonialRating" class="w-full px-3 py-2 border border-gray-300 rounded-md" min="1" max="5" value="${testimonial?.rating || 5}">
+            </div>
+            <div class="mb-4">
+              <label class="block text-sm font-medium text-gray-700 mb-1">Status</label>
+              <select id="testimonialStatus" class="w-full px-3 py-2 border border-gray-300 rounded-md">
+                <option value="pending" ${testimonial?.status === 'pending' ? 'selected' : ''}>Pending</option>
+                <option value="approved" ${testimonial?.status === 'approved' ? 'selected' : ''}>Approved</option>
+                <option value="rejected" ${testimonial?.status === 'rejected' ? 'selected' : ''}>Rejected</option>
+              </select>
+            </div>
+            <div class="flex justify-end space-x-2">
+              <button type="button" class="cancelBtn px-4 py-2 text-gray-600 hover:text-gray-800">Cancel</button>
+              <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">Save</button>
+            </div>
+          </form>
+        </div>
+      `;
+      
+      document.body.appendChild(modal);
+      
+      const form = modal.querySelector('#testimonialForm');
+      form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const name = modal.querySelector('#testimonialName').value.trim();
+        const review = modal.querySelector('#testimonialReview').value.trim();
+        const rating = parseInt(modal.querySelector('#testimonialRating').value);
+        const status = modal.querySelector('#testimonialStatus').value;
+        
+        if (!name || !review) {
+          alert('Name and review are required');
+          return;
+        }
+        
+        try {
+          const token = localStorage.getItem('adminToken');
+          const headers = {
+            'Content-Type': 'application/json',
+            ...(token ? { 'Authorization': 'Bearer ' + token } : {})
+          };
+          
+          const method = testimonial ? 'PUT' : 'POST';
+          const url = testimonial 
+            ? `${window.API_URL || '/api'}/testimonials/admin/${testimonial._id}`
+            : `${window.API_URL || '/api'}/testimonials/admin`;
+          
+          const res = await fetch(url, {
+            method,
+            headers,
+            body: JSON.stringify({ name, review, rating, status })
+          });
+          
+          const data = await res.json();
+          if (data && data.success) {
+            document.body.removeChild(modal);
+            loadTestimonials();
+            if (typeof showToast === 'function') showToast('success', `Testimonial ${testimonial ? 'updated' : 'added'} successfully`);
+          } else {
+            alert('Failed to save testimonial: ' + (data.error || 'Unknown error'));
+          }
+        } catch (err) {
+          console.error('Error saving testimonial:', err);
+          alert('Error saving testimonial: ' + (err.message || err));
+        }
+      });
+      
+      modal.querySelector('.cancelBtn').addEventListener('click', () => {
+        document.body.removeChild(modal);
+      });
+    }
+
+    async function editTestimonial(id) {
+      try {
+        const token = localStorage.getItem('adminToken');
+        const headers = token ? { 'Authorization': 'Bearer ' + token } : {};
+        const res = await fetch(`${window.API_URL || '/api'}/testimonials/admin/all`, { headers });
+        const data = await res.json();
+        if (data && data.success) {
+          const testimonial = data.data.find(t => t._id === id);
+          if (testimonial) {
+            showTestimonialModal(testimonial);
+          }
+        }
+      } catch (err) {
+        console.error('Error fetching testimonial for edit:', err);
+      }
+    }
+
+    async function deleteTestimonial(id) {
+      if (!confirm('Are you sure you want to delete this testimonial?')) return;
+      
+      try {
+        const token = localStorage.getItem('adminToken');
+        const headers = token ? { 'Authorization': 'Bearer ' + token } : {};
+        const res = await fetch(`${window.API_URL || '/api'}/testimonials/admin/${id}`, {
+          method: 'DELETE',
+          headers
+        });
+        
+        const data = await res.json();
+        if (data && data.success) {
+          loadTestimonials();
+          if (typeof showToast === 'function') showToast('success', 'Testimonial deleted successfully');
+        } else {
+          alert('Failed to delete testimonial: ' + (data.error || 'Unknown error'));
+        }
+      } catch (err) {
+        console.error('Error deleting testimonial:', err);
+        alert('Error deleting testimonial: ' + (err.message || err));
+      }
+    }
+
+    // Expose testimonials functions
+    try {
+      window.loadTestimonials = loadTestimonials;
+    } catch (e) {/* ignore */}
+    
     function loadScript(src){
       return new Promise((resolve, reject) => {
         if (document.querySelector(`script[src="${src}"]`)) return resolve();

@@ -68,7 +68,7 @@ const TEMPLATE_HTML = String.raw`<!-- FOOTER TEMPLATE (editable sections) -->
   <div class="column-title">Support</div>
   <div class="contact-lines">
     <div><span>Email</span> support@zenrix.com</div>
-    <div><span>Phone</span> +1 (800) 123-4567</div>
+    <div><span>Phone</span> <span data-footer-phone>+977 9819922314</span></div>
     <div><span>Chat</span> Live chat 9am-9pm</div>
   </div>
   <a href="/support.html" class="support-btn" style="text-decoration: none;">Open support</a>

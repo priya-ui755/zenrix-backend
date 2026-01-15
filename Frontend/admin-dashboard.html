@@ -27,6 +27,23 @@
         .card-hover { transition: all 0.3s; }
         .card-hover:hover { transform: translateY(-2px); box-shadow: 0 10px 25px rgba(0,0,0,0.1); }
         .image-preview { max-width: 100px; max-height: 100px; object-fit: cover; }
+
+        /* Lightweight skeleton loading UI */
+        .skeleton { position: relative; overflow: hidden; }
+        .skeleton > * { color: transparent !important; }
+        .skeleton::after {
+            content: '';
+            position: absolute; inset: 0; z-index: 6;
+            background: linear-gradient(90deg, rgba(255,255,255,0.02) 0%, rgba(255,255,255,0.06) 50%, rgba(255,255,255,0.02) 100%);
+            transform: translateX(-100%);
+            animation: shimmer 1.2s infinite;
+            pointer-events: none;
+        }
+        @keyframes shimmer { to { transform: translateX(100%); } }
+
+        .skeleton .value { background: rgba(255,255,255,0.06); border-radius: 6px; min-height: 18px; display:inline-block }
+        .skeleton .card { opacity: 0.9 }
+
         [data-toggle-slider] {
             position: relative;
             cursor: pointer;
@@ -146,12 +163,15 @@
                                                 <li class="nav-item"><a href="#" class="nav-link" data-jump-tab="pages"><i class="nav-icon fas fa-file-alt"></i><p>Pages</p></a></li>
                                                 <li class="nav-item"><a href="#" class="nav-link" data-jump-tab="components"><i class="nav-icon fas fa-th-large"></i><p>Components</p></a></li>
                                                 <li class="nav-item"><a href="#" class="nav-link" data-jump-tab="footer-map"><i class="nav-icon fas fa-map-marked-alt"></i><p>Footer Map</p></a></li>
+                                                <li class="nav-item"><a href="#" class="nav-link" data-jump-tab="footer-editor"><i class="nav-icon fas fa-edit"></i><p>Footer Editor</p></a></li>
+                                                <li class="nav-item"><a href="#" class="nav-link" data-jump-tab="contact-editor"><i class="nav-icon fas fa-address-book"></i><p>Contact Editor</p></a></li>
                                                 <li class="nav-item"><a href="#" class="nav-link" data-jump-tab="hero"><i class="nav-icon fas fa-images"></i><p>Hero</p></a></li>
                                                 <li class="nav-item"><a href="#" class="nav-link" data-jump-tab="payments"><i class="nav-icon fas fa-credit-card"></i><p>Payments</p></a></li>
                                                 <li class="nav-item"><a href="#" class="nav-link" data-jump-tab="orders"><i class="nav-icon fas fa-shopping-cart"></i><p>Orders</p></a></li>
                                                 <li class="nav-item"><a href="#" class="nav-link" data-jump-tab="careers"><i class="nav-icon fas fa-user-tie"></i><p>Careers</p></a></li>
                                                 <li class="nav-item"><a href="#" class="nav-link" data-jump-tab="staff"><i class="nav-icon fas fa-users"></i><p>Staff</p></a></li>
                                                 <li class="nav-item"><a href="#" class="nav-link" data-jump-tab="subscribers"><i class="nav-icon fas fa-envelope-open-text"></i><p>Subscribers</p></a></li>
+                                                <li class="nav-item"><a href="#" class="nav-link" data-jump-tab="testimonials"><i class="nav-icon fas fa-comments"></i><p>Testimonials</p></a></li>
                                                 <li class="nav-item"><a href="#" class="nav-link" data-jump-tab="tickets"><i class="nav-icon fas fa-life-ring"></i><p>Support Tickets</p></a></li>
                                                 <li class="nav-item"><a href="/index.html" target="_blank" class="nav-link"><i class="nav-icon fas fa-external-link-alt"></i><p>View Store</p></a></li>
                                         </ul>
@@ -187,6 +207,16 @@
                 <main id="adminContent" class="container-fluid px-3 py-6 admin-main">
                     <div class="gradient-bg text-white shadow-lg rounded-xl mb-6">
                         <div class="px-6 py-4 flex justify-between items-start">
+
+    <style>
+      /* Quick row flash animation for status updates */
+      .row-flash { animation: rowFlash 1.1s ease-in-out; }
+      @keyframes rowFlash {
+        0% { background-color: rgba(34,197,94,0.1); }
+        40% { background-color: transparent; }
+        100% { background-color: transparent; }
+      }
+    </style>
                             <div class="flex items-center space-x-3">
                                 <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"/>
@@ -382,6 +412,9 @@
                     </button>
                     <button data-tab="subscribers" id="tab-subscribers" class="py-4 px-2 border-b-2 border-transparent text-gray-500 hover:text-gray-700 font-medium whitespace-nowrap">
                         Subscribers
+                    </button>
+                    <button data-tab="testimonials" id="tab-testimonials" class="py-4 px-2 border-b-2 border-transparent text-gray-500 hover:text-gray-700 font-medium whitespace-nowrap">
+                        Testimonials
                     </button>
                     <button data-tab="tickets" id="tab-tickets" class="py-4 px-2 border-b-2 border-transparent text-gray-500 hover:text-gray-700 font-medium whitespace-nowrap">
                         Support Tickets
@@ -646,6 +679,138 @@
                             </svg>
                             <p class="text-sm" style="color:rgba(255,255,255,0.92)">Map preview will appear here</p>
                         </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Footer Editor Tab -->
+            <div id="content-footer-editor" class="p-6 hidden">
+                <div class="bg-gradient-to-r from-indigo-50 to-purple-50 rounded-xl p-6 mb-6 border border-indigo-100">
+                    <div class="flex items-center justify-between mb-4">
+                        <div>
+                            <h2 class="text-2xl font-bold text-gray-800 flex items-center">
+                                <svg class="w-6 h-6 mr-2 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 17a1 1 0 001 1h1a1 1 0 001-1v-4a1 1 0 00-1-1h-1a1 1 0 00-1 1v4z"/>
+                                </svg>
+                                Footer Editor
+                            </h2>
+                            <p class="text-sm text-gray-600 mt-1">Edit footer links, support contacts, social links, map and bottom text in one place.</p>
+                        </div>
+                        <button id="refreshFooterEditor" class="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition">
+                            Refresh
+                        </button>
+                    </div>
+
+                    <form id="footerEditorForm" class="space-y-4">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Shop Links (one per line, label|url)</label>
+                                <textarea name="shopLinks" rows="4" placeholder="Shop|/products.html\nSale|/sale.html" class="w-full px-4 py-2 border border-gray-300 rounded-lg text-sm"></textarea>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Company Links (one per line, label|url)</label>
+                                <textarea name="companyLinks" rows="4" placeholder="About|/about.html\nCareers|/careers.html" class="w-full px-4 py-2 border border-gray-300 rounded-lg text-sm"></textarea>
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Support Email</label>
+                                <input type="email" name="supportEmail" placeholder="support@company.com" class="w-full px-4 py-2 border border-gray-300 rounded-lg text-sm">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Support Phone</label>
+                                <input type="text" name="supportPhone" placeholder="+1 (555) 000-0000" class="w-full px-4 py-2 border border-gray-300 rounded-lg text-sm">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Live Chat Link</label>
+                                <input type="text" name="chatLink" placeholder="/index.html#chat" class="w-full px-4 py-2 border border-gray-300 rounded-lg text-sm">
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Social Links (one per line, label|url)</label>
+                            <textarea name="socialLinks" rows="2" placeholder="Twitter|https://twitter.com/xyz\nFacebook|https://facebook.com/xyz" class="w-full px-4 py-2 border border-gray-300 rounded-lg text-sm"></textarea>
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Map Embed URL</label>
+                            <input type="url" name="mapEmbed" placeholder="https://www.google.com/maps/embed?pb=..." class="w-full px-4 py-2 border border-gray-300 rounded-lg text-sm">
+                            <p class="text-xs text-gray-500 mt-2">Use Google Maps 'Embed a map' iframe src URL.</p>
+                        </div>
+
+n                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Footer Bottom Text</label>
+                            <input type="text" name="bottomText" placeholder="© 2026 Zenrix. All rights reserved." class="w-full px-4 py-2 border border-gray-300 rounded-lg text-sm">
+                        </div>
+
+n                        <div class="flex items-center justify-between pt-4">
+                            <button type="button" id="previewFooterBtn" class="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition">Preview</button>
+                            <button type="submit" class="px-6 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition">Save Footer</button>
+                        </div>
+                    </form>
+                </div>
+
+n                <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+                    <h3 class="text-lg font-semibold text-gray-800 mb-4">Footer Preview</h3>
+                    <div id="footerEditorPreview" class="w-full rounded-lg p-4 border border-dashed border-gray-200 min-h-[120px]">
+                        <p class="text-sm text-gray-500">Preview will be rendered here when you click Preview.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Contact Editor Tab -->
+            <div id="content-contact-editor" class="p-6 hidden">
+                <div class="bg-gradient-to-r from-green-50 to-teal-50 rounded-xl p-6 mb-6 border border-green-100">
+                    <div class="flex items-center justify-between mb-4">
+                        <div>
+                            <h2 class="text-2xl font-bold text-gray-800 flex items-center">
+                                <svg class="w-6 h-6 mr-2 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+                                </svg>
+                                Contact Editor
+                            </h2>
+                            <p class="text-sm text-gray-600 mt-1">Edit contact page details, support info, address, and map embed.</p>
+                        </div>
+                        <button id="refreshContactEditor" class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition">
+                            Refresh
+                        </button>
+                    </div>
+
+                    <form id="contactEditorForm" class="space-y-4">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Support Email</label>
+                                <input type="email" name="supportEmail" placeholder="support@company.com" class="w-full px-4 py-2 border border-gray-300 rounded-lg text-sm">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Support Phone</label>
+                                <input type="text" name="supportPhone" placeholder="+1 (555) 000-0000" class="w-full px-4 py-2 border border-gray-300 rounded-lg text-sm">
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Address</label>
+                            <input type="text" name="address" placeholder="123 Commerce St, New York, NY 10001" class="w-full px-4 py-2 border border-gray-300 rounded-lg text-sm">
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Map Embed URL</label>
+                            <input type="url" name="mapEmbed" placeholder="https://www.google.com/maps/embed?pb=..." class="w-full px-4 py-2 border border-gray-300 rounded-lg text-sm">
+                            <p class="text-xs text-gray-500 mt-2">Use Google Maps 'Embed a map' iframe src URL.</p>
+                        </div>
+
+                        <div class="flex items-center justify-between pt-4">
+                            <button type="button" id="previewContactBtn" class="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition">Preview</button>
+                            <button type="submit" class="px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition">Save Contact</button>
+                        </div>
+                    </form>
+                </div>
+
+                <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+                    <h3 class="text-lg font-semibold text-gray-800 mb-4">Contact Preview</h3>
+                    <div id="contactEditorPreview" class="w-full rounded-lg p-4 border border-dashed border-gray-200 min-h-[120px]">
+                        <p class="text-sm text-gray-500">Preview will be rendered here when you click Preview.</p>
                     </div>
                 </div>
             </div>
@@ -1318,6 +1483,42 @@
                 </div>
             </div>
 
+            <!-- Testimonials Tab -->
+            <div id="content-testimonials" class="p-6 hidden">
+                <div class="flex justify-between items-center mb-6">
+                    <h2 class="text-2xl font-bold text-gray-900">Testimonials Management</h2>
+                    <button id="addTestimonialBtn" class="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition">
+                        <i class="fas fa-plus"></i>
+                        Add Testimonial
+                    </button>
+                </div>
+
+                <div class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+                    <div class="px-6 py-4 border-b border-gray-200">
+                        <h3 class="text-lg font-semibold text-gray-900">All Testimonials</h3>
+                        <p class="text-sm text-gray-600">Manage customer testimonials displayed on the contact page.</p>
+                    </div>
+
+                    <div class="p-6">
+                        <div class="overflow-x-auto">
+                            <table class="min-w-full divide-y divide-gray-200">
+                                <thead class="bg-gray-50">
+                                    <tr>
+                                        <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Name</th>
+                                        <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Review</th>
+                                        <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Rating</th>
+                                        <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Status</th>
+                                        <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Date</th>
+                                        <th class="px-4 py-3 text-right text-xs font-semibold text-gray-600 uppercase tracking-wider">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="testimonialsTable" class="divide-y divide-gray-100"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <!-- Support Tickets Tab -->
             <div id="content-tickets" class="p-6 hidden">
                 <div class="flex items-center justify-between mb-4">
@@ -1471,6 +1672,13 @@
                         <input type="text" name="meta_keywords" placeholder="keyword1, keyword2, keyword3" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent">
                     </div>
                 </div>
+                <div id="editPageMapSection" class="hidden mt-4">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Map Embed URL</label>
+                    <input type="url" name="map_embed" placeholder="https://www.google.com/maps/embed?..." class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent">
+                    <p class="text-xs text-gray-500 mt-1">Optional: Add a Google Maps embed URL (used for contact map & footer). Leaving empty will not change map.</p>
+                </div>
+
+
                 <div>
                     <label class="flex items-center space-x-2">
                         <input type="checkbox" name="published" class="w-4 h-4 text-purple-600 rounded focus:ring-2 focus:ring-purple-500">
@@ -1697,7 +1905,7 @@
         }
 
         // Error banner helper (fixed to bottom-right of the screen)
-        function showErrorBanner(msg, opts = { autoHide: true }){
+        function showErrorBanner(msg, opts = { autoHide: true, actionText: null, actionCallback: null }){
             try{
                 let banner = document.getElementById('errorBanner');
                 if (!banner) {
@@ -1706,7 +1914,7 @@
                     banner.className = 'error-banner hidden';
                     banner.setAttribute('role', 'alert');
                     banner.setAttribute('aria-live', 'assertive');
-                    banner.innerHTML = `<div class="error-banner-inner"><span id="errorBannerText"></span><button id="errorBannerClose" class="btn btn-ghost" aria-label="Dismiss message">Dismiss</button></div>`;
+                    banner.innerHTML = `<div class="error-banner-inner"><span id="errorBannerText"></span><div class="ml-4" id="errorBannerButtons"><button id="errorBannerClose" class="btn btn-ghost" aria-label="Dismiss message">Dismiss</button></div></div>`;
                     document.body.appendChild(banner);
                     document.getElementById('errorBannerClose')?.addEventListener('click', () => {
                         banner.classList.remove('show');
@@ -1718,6 +1926,35 @@
 
                 const txt = document.getElementById('errorBannerText');
                 if (txt) txt.textContent = msg;
+
+                // Manage action button
+                const buttonsWrap = document.getElementById('errorBannerButtons');
+                if (buttonsWrap) {
+                  // remove existing action button if any
+                  const existing = document.getElementById('errorBannerAction');
+                  if (existing) existing.remove();
+
+                  if (opts.actionText && typeof opts.actionCallback === 'function') {
+                    const btn = document.createElement('button');
+                    btn.id = 'errorBannerAction';
+                    btn.className = 'btn btn-primary ml-2';
+                    btn.textContent = opts.actionText;
+                    btn.addEventListener('click', async () => {
+                      try {
+                        // hide banner first
+                        banner.classList.remove('show');
+                        banner.classList.add('hidden');
+                        banner.setAttribute('aria-hidden','true');
+                        if (banner._hideTimeout) clearTimeout(banner._hideTimeout);
+                        await opts.actionCallback();
+                      } catch (err) {
+                        console.error('Error running banner action', err);
+                      }
+                    });
+                    buttonsWrap.insertBefore(btn, buttonsWrap.firstChild);
+                  }
+                }
+
                 banner.classList.remove('hidden');
                 banner.classList.add('show');
                 banner.setAttribute('aria-hidden','false');
@@ -1988,6 +2225,12 @@
             }
             if (tab === 'products') {
                 loadProducts();
+            }
+            if (tab === 'footer-editor') {
+                loadFooterEditor();
+            }
+            if (tab === 'contact-editor') {
+                loadContactEditor();
             }
         }
 
@@ -2828,7 +3071,8 @@
                 published: formData.get('published') === 'on',
                 meta: {
                     description: formData.get('meta_description') || '',
-                    keywords: formData.get('meta_keywords') || ''
+                    keywords: formData.get('meta_keywords') || '',
+                    mapEmbed: formData.get('map_embed') || ''
                 }
             };
 
@@ -2849,6 +3093,25 @@
                     e.target.reset();
                     if (quillAdd) quillAdd.root.innerHTML = '';
                     loadPages();
+
+                    // If a contact page was created, propagate its map embed if present
+                    try {
+                        const created = result.data;
+                        if (created && created.slug === 'contact') {
+                            let mapEmbed = (created.meta && created.meta.mapEmbed) ? created.meta.mapEmbed : '';
+                            if (!mapEmbed) {
+                                const tmp = document.createElement('div');
+                                tmp.innerHTML = created.content || '';
+                                const iframe = tmp.querySelector('iframe[src*="maps"]');
+                                const a = tmp.querySelector('a[href*="maps.google"], a[href*="google.com/maps"]');
+                                mapEmbed = iframe ? iframe.src : (a ? a.href : mapEmbed);
+                            }
+                            if (mapEmbed) {
+                                localStorage.setItem('footerMapEmbed', mapEmbed);
+                                window.dispatchEvent(new CustomEvent('footerMapUpdated', { detail: { mapEmbed } }));
+                            }
+                        }
+                    } catch (e) { /* ignore */ }
                 } else {
                     showToast('error', '❌ Failed: ' + (result.error || 'Unknown error'));
                 }
@@ -2913,6 +3176,19 @@
                     });
                 }
                 quillEdit.root.innerHTML = page.content || '';
+
+                // If this is the contact page, show the map embed input and prefill it
+                try {
+                    const mapSection = document.getElementById('editPageMapSection');
+                    const mapInput = document.querySelector('#editPageForm [name="map_embed"]');
+                    if (page.slug === 'contact') {
+                        if (mapSection) mapSection.classList.remove('hidden');
+                        if (mapInput) mapInput.value = (page.meta && page.meta.mapEmbed) ? page.meta.mapEmbed : '';
+                    } else {
+                        if (mapSection) mapSection.classList.add('hidden');
+                        if (mapInput) mapInput.value = '';
+                    }
+                } catch (e) { /* ignore */ }
             }, 100);
 
             document.getElementById('editPageModal').classList.remove('hidden');
@@ -2947,7 +3223,8 @@
                 published: formData.get('published') === 'on',
                 meta: {
                     description: formData.get('meta_description') || '',
-                    keywords: formData.get('meta_keywords') || ''
+                    keywords: formData.get('meta_keywords') || '',
+                    mapEmbed: formData.get('map_embed') || ''
                 }
             };
 
@@ -2967,6 +3244,69 @@
                     showToast('success', '✅ Page updated!');
                     closeEditPageModal();
                     loadPages();
+
+                    // If contact page updated, propagate map embed to footer if provided
+                    try {
+                        const updated = result.data;
+                        if (updated && updated.slug === 'contact') {
+                            let mapEmbed = (updated.meta && updated.meta.mapEmbed) ? updated.meta.mapEmbed : '';
+                            if (!mapEmbed) {
+                                // Fallback: try to extract iframe src or anchor href from content
+                                const tmp = document.createElement('div');
+                                tmp.innerHTML = updated.content || '';
+                                const iframe = tmp.querySelector('iframe[src*="maps"]');
+                                const a = tmp.querySelector('a[href*="maps.google"], a[href*="google.com/maps"]');
+                                mapEmbed = iframe ? iframe.src : (a ? a.href : mapEmbed);
+                            }
+                            if (mapEmbed) {
+                                localStorage.setItem('footerMapEmbed', mapEmbed);
+                                window.dispatchEvent(new CustomEvent('footerMapUpdated', { detail: { mapEmbed } }));
+                            }
+
+                            // Also try to extract contact email / phone from content and optionally sync to footer component
+                            try {
+                                const tmp = document.createElement('div');
+                                tmp.innerHTML = updated.content || '';
+                                const text = tmp.textContent || '';
+                                // simple email regex
+                                const emailMatch = text.match(/[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}/i);
+                                // loose phone regex (captures +country or digit sequences)
+                                const phoneMatch = text.match(/(\+?\d[\d\-\s()]{6,}\d)/);
+                                const supportEmail = emailMatch ? emailMatch[0].trim() : '';
+                                const supportPhone = phoneMatch ? phoneMatch[0].trim() : '';
+
+                                if (supportEmail || supportPhone) {
+                                    // Fetch current footer component to update its data
+                                    (async () => {
+                                        try {
+                                            const getRes = await fetch(`${API_URL}/components/slug/footer`);
+                                            const getData = await getRes.json();
+                                            if (!getData.success) return;
+                                            const footerComponent = getData.data;
+                                            const updateData = { data: { ...(footerComponent.data || {}) } };
+                                            if (supportEmail) updateData.data.supportEmail = supportEmail;
+                                            if (supportPhone) updateData.data.supportPhone = supportPhone;
+                                            // Call API to update footer component (use admin token)
+                                            const token = getAdminToken();
+                                            if (!token) return;
+                                            const res = await fetch(`${API_URL}/components/${footerComponent._id}`, {
+                                                method: 'PUT',
+                                                headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                                                body: JSON.stringify(updateData)
+                                            });
+                                            const result = await res.json();
+                                            if (result && result.success) {
+                                                // Persist to localStorage and notify running pages
+                                                try { localStorage.setItem('footerData', JSON.stringify(result.data.data)); } catch (e) {}
+                                                try { window.dispatchEvent(new CustomEvent('componentUpdated', { detail: { slug: result.data.slug, data: result.data } })); } catch (e) {}
+                                                try { window.dispatchEvent(new CustomEvent('footerDataUpdated', { detail: { data: result.data.data } })); } catch (e) {}
+                                            }
+                                        } catch (e) { /* ignore */ }
+                                    })();
+                                }
+                            } catch (e) { /* ignore */ }
+                        }
+                    } catch (e) { /* ignore */ }
                 } else {
                     showToast('error', '❌ Failed: ' + (result.error || 'Unknown error'));
                 }
@@ -3119,7 +3459,7 @@
             form.querySelector('[name="html"]').value = component.html || '';
             form.querySelector('[name="published"]').checked = component.published;
 
-            // Show map embed field only for footer component
+            // Show map embed field only for footer component (keep edit modal simple)
             const footerMapSection = document.getElementById('footerMapSection');
             const mapEmbedInput = form.querySelector('[name="mapEmbed"]');
             if (component.slug === 'footer') {
@@ -3180,6 +3520,21 @@
                     showToast('success', '✅ Component updated!');
                     closeEditComponentModal();
                     loadComponents();
+                    // Notify running pages that a component changed so live UI can update
+                    try {
+                        window.dispatchEvent(new CustomEvent('componentUpdated', { detail: { slug: result.data.slug, data: result.data } }));
+                    } catch (e) { /* ignore */ }
+
+                    // If footer component updated with a map embed, also notify footer map listeners
+                    try {
+                        if (result.data && result.data.slug === 'footer') {
+                            const mapEmbed = result.data.data && (result.data.data.mapEmbed || result.data.data.footerMap || result.data.data.map_embed) ? (result.data.data.mapEmbed || result.data.data.footerMap || result.data.data.map_embed) : '';
+                            if (mapEmbed) {
+                                try { localStorage.setItem('footerMapEmbed', mapEmbed); } catch (e) {}
+                                window.dispatchEvent(new CustomEvent('footerMapUpdated', { detail: { mapEmbed } }));
+                            }
+                        }
+                    } catch (e) { /* ignore */ }
                 } else {
                     showToast('error', '❌ Failed: ' + (result.error || 'Unknown error'));
                 }
@@ -3226,11 +3581,284 @@
             showToast('success', 'Footer map settings refreshed');
         });
 
+        // Quick actions for components panel
+
+
         document.getElementById('previewMapBtn')?.addEventListener('click', () => {
             const embedUrl = document.querySelector('#footerMapForm [name="mapEmbed"]').value.trim();
             updateMapPreview(embedUrl);
             showToast('success', 'Map preview updated');
         });
+
+        
+
+        // Footer Editor (new dedicated form)
+        async function loadFooterEditor() {
+            try {
+                const res = await fetch(`${API_URL}/components/slug/footer`);
+                const result = await res.json();
+                if (!result.success) {
+                    showToast('error', 'Failed to load footer component');
+                    return;
+                }
+                const footer = result.data;
+                const data = footer.data || {};
+                const form = document.getElementById('footerEditorForm');
+                form.querySelector('[name="shopLinks"]').value = (data.shopLinks && Array.isArray(data.shopLinks)) ? data.shopLinks.map(l => `${l.label}|${l.url}`).join('\n') : (data.shopLinks || '');
+                form.querySelector('[name="companyLinks"]').value = (data.companyLinks && Array.isArray(data.companyLinks)) ? data.companyLinks.map(l => `${l.label}|${l.url}`).join('\n') : (data.companyLinks || '');
+                form.querySelector('[name="supportEmail"]').value = data.supportEmail || '';
+                form.querySelector('[name="supportPhone"]').value = data.supportPhone || '';
+                form.querySelector('[name="chatLink"]').value = data.chatLink || '';
+                form.querySelector('[name="socialLinks"]').value = (data.socialLinks && Array.isArray(data.socialLinks)) ? data.socialLinks.map(l => `${l.label}|${l.url}`).join('\n') : (data.socialLinks || '');
+                form.querySelector('[name="mapEmbed"]').value = data.mapEmbed || '';
+                form.querySelector('[name="bottomText"]').value = data.bottomText || '';
+                // Clear preview
+                document.getElementById('footerEditorPreview').innerHTML = '<p class="text-sm text-gray-500">Preview will be rendered here when you click Preview.</p>';
+            } catch (err) {
+                showToast('error', 'Failed to load footer editor');
+            }
+        }
+
+        document.getElementById('refreshFooterEditor')?.addEventListener('click', () => {
+            loadFooterEditor();
+            showToast('success', 'Footer data refreshed');
+        });
+
+        // Contact Editor
+        async function loadContactEditor() {
+            try {
+                // Fetch contact page
+                const pageRes = await fetch(`${API_URL}/pages/slug/contact`);
+                const pageResult = await pageRes.json();
+                if (!pageResult.success) {
+                    showToast('error', 'Failed to load contact page');
+                    return;
+                }
+                const page = pageResult.data;
+                const meta = page.meta || {};
+
+                // Fetch footer data for defaults
+                const footRes = await fetch(`${API_URL}/components/slug/footer`);
+                const footResult = await footRes.json();
+                const footData = footResult.success ? (footResult.data.data || {}) : {};
+
+                const form = document.getElementById('contactEditorForm');
+                form.querySelector('[name="supportEmail"]').value = footData.supportEmail || meta.supportEmail || 'support@zenrix.com';
+                form.querySelector('[name="supportPhone"]').value = footData.supportPhone || meta.supportPhone || '+977 9819922314';
+                form.querySelector('[name="address"]').value = footData.address || meta.address || '123 Commerce St, New York, NY 10001';
+                form.querySelector('[name="mapEmbed"]').value = meta.mapEmbed || footData.mapEmbed || '';
+
+                // Clear preview
+                document.getElementById('contactEditorPreview').innerHTML = '<p class="text-sm text-gray-500">Preview will be rendered here when you click Preview.</p>';
+            } catch (err) {
+                showToast('error', 'Failed to load contact editor');
+            }
+        }
+
+        document.getElementById('refreshContactEditor')?.addEventListener('click', () => {
+            loadContactEditor();
+            showToast('success', 'Contact data refreshed');
+        });
+
+        document.getElementById('previewFooterBtn')?.addEventListener('click', () => {
+            const form = document.getElementById('footerEditorForm');
+            const shop = form.querySelector('[name="shopLinks"]').value.trim();
+            const company = form.querySelector('[name="companyLinks"]').value.trim();
+            const supportEmail = form.querySelector('[name="supportEmail"]').value.trim();
+            const supportPhone = form.querySelector('[name="supportPhone"]').value.trim();
+            const chatLink = form.querySelector('[name="chatLink"]').value.trim();
+            const social = form.querySelector('[name="socialLinks"]').value.trim();
+            const bottomText = form.querySelector('[name="bottomText"]').value.trim();
+            const mapEmbed = form.querySelector('[name="mapEmbed"]').value.trim();
+
+            const previewDiv = document.getElementById('footerEditorPreview');
+            const shopHtml = shop ? '<div><strong>Shop</strong><ul>' + shop.split('\n').map(l => { const parts = l.split('|'); return `<li><a href="${parts[1]||'#'}">${parts[0]||parts[1]||''}</a></li>`; }).join('') + '</ul></div>' : '';
+            const companyHtml = company ? '<div><strong>Company</strong><ul>' + company.split('\n').map(l => { const parts = l.split('|'); return `<li><a href="${parts[1]||'#'}">${parts[0]||parts[1]||''}</a></li>`; }).join('') + '</ul></div>' : '';
+            const supportHtml = '<div><strong>Support</strong><div>' + (supportEmail ? `<div>Email: <a href="mailto:${supportEmail}">${supportEmail}</a></div>` : '') + (supportPhone ? `<div>Phone: <span>${supportPhone}</span></div>` : '') + (chatLink ? `<div>Chat: <a href="${chatLink}">Open chat</a></div>` : '') + '</div></div>';
+            const bottomHtml = bottomText ? `<div style="margin-top:10px;color:#374151;font-size:0.9rem">${escapeHtml(bottomText)}</div>` : '';
+            const mapHtml = mapEmbed ? `<div style="margin-top:10px;">${'<iframe src="'+mapEmbed+'" width="100%" height="180" style="border:0;" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>'}</div>` : '';
+            previewDiv.innerHTML = shopHtml + companyHtml + supportHtml + mapHtml + bottomHtml;
+            showToast('success', 'Preview updated');
+        });
+
+        document.getElementById('footerEditorForm')?.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const token = getAdminToken();
+            if (!token) {
+                showToast('error', 'Please login first');
+                openLoginModal();
+                return;
+            }
+
+            const form = document.getElementById('footerEditorForm');
+            const shop = form.querySelector('[name="shopLinks"]').value.trim();
+            const company = form.querySelector('[name="companyLinks"]').value.trim();
+            const supportEmail = form.querySelector('[name="supportEmail"]').value.trim();
+            const supportPhone = form.querySelector('[name="supportPhone"]').value.trim();
+            const chatLink = form.querySelector('[name="chatLink"]').value.trim();
+            const social = form.querySelector('[name="socialLinks"]').value.trim();
+            const mapEmbed = form.querySelector('[name="mapEmbed"]').value.trim();
+            const bottomText = form.querySelector('[name="bottomText"]').value.trim();
+
+            // Parse link lists into arrays [{label,url}]
+            function parseLines(str) {
+                if (!str) return [];
+                return str.split('\n').map(l => {
+                    const parts = l.split('|').map(s => s.trim());
+                    return { label: parts[0] || parts[1] || '', url: parts[1] || parts[0] || '#' };
+                }).filter(x => x.label || x.url);
+            }
+
+            const payloadData = {
+                shopLinks: parseLines(shop),
+                companyLinks: parseLines(company),
+                supportEmail: supportEmail || '',
+                supportPhone: supportPhone || '',
+                chatLink: chatLink || '',
+                socialLinks: parseLines(social),
+                mapEmbed: mapEmbed || '',
+                bottomText: bottomText || ''
+            };
+
+            try {
+                // get footer component to obtain id and current html
+                const getRes = await fetch(`${API_URL}/components/slug/footer`);
+                const getData = await getRes.json();
+                if (!getData.success) throw new Error('Failed to fetch footer component');
+                const footerComponent = getData.data;
+                const updateData = { data: { ...(footerComponent.data || {}), ...payloadData } };
+
+                // Also update the HTML to replace phone if changed
+                if (supportPhone && footerComponent.html) {
+                    let updatedHtml = footerComponent.html;
+                    // Replace display phone
+                    updatedHtml = updatedHtml.replace(/\+1 \(800\) 123-4567/g, supportPhone);
+                    // Replace tel phone
+                    const telOld = '+18001234567';
+                    const telNew = supportPhone.replace(/[^+\d]/g, '');
+                    updatedHtml = updatedHtml.replace(telOld, telNew);
+                    updateData.html = updatedHtml;
+                }
+
+                const res = await fetch(`${API_URL}/components/${footerComponent._id}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify(updateData)
+                });
+
+                const result = await res.json();
+                if (result.success) {
+                    showToast('success', '✅ Footer updated!');
+                    loadComponents();
+                    try { window.dispatchEvent(new CustomEvent('componentUpdated', { detail: { slug: result.data.slug, data: result.data } })); } catch (e) {}
+                    try { localStorage.setItem('footerData', JSON.stringify(payloadData)); } catch (e) {}
+                    if (payloadData.mapEmbed) {
+                        try { localStorage.setItem('footerMapEmbed', payloadData.mapEmbed); } catch (e) {}
+                        try { window.dispatchEvent(new CustomEvent('footerMapUpdated', { detail: { mapEmbed: payloadData.mapEmbed } })); } catch (e) {}
+                    }
+                    try { window.dispatchEvent(new CustomEvent('footerDataUpdated', { detail: { data: payloadData } })); } catch (e) {}
+                } else {
+                    showToast('error', '❌ Failed: ' + (result.error || 'Unknown error'));
+                }
+            } catch (err) {
+                showToast('error', '❌ ' + err.message);
+            }
+        });
+
+        document.getElementById('previewContactBtn')?.addEventListener('click', () => {
+            const form = document.getElementById('contactEditorForm');
+            const supportEmail = form.querySelector('[name="supportEmail"]').value.trim();
+            const supportPhone = form.querySelector('[name="supportPhone"]').value.trim();
+            const address = form.querySelector('[name="address"]').value.trim();
+            const mapEmbed = form.querySelector('[name="mapEmbed"]').value.trim();
+
+            const previewDiv = document.getElementById('contactEditorPreview');
+            const contentHtml = `<h1>Contact Us</h1><p>Email: ${escapeHtml(supportEmail)}<br>Phone: ${escapeHtml(supportPhone)}<br>Address: ${escapeHtml(address)}<br><a href="https://maps.google.com/?q=${encodeURIComponent(address)}">Open map</a></p>${mapEmbed ? `<iframe src="${escapeHtml(mapEmbed)}" width="100%" height="300" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>` : ''}`;
+            previewDiv.innerHTML = contentHtml;
+            showToast('success', 'Contact preview updated');
+        });
+
+        document.getElementById('contactEditorForm')?.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const token = getAdminToken();
+            if (!token) {
+                showToast('error', 'Please login first');
+                openLoginModal();
+                return;
+            }
+
+            const form = document.getElementById('contactEditorForm');
+            const supportEmail = form.querySelector('[name="supportEmail"]').value.trim();
+            const supportPhone = form.querySelector('[name="supportPhone"]').value.trim();
+            const address = form.querySelector('[name="address"]').value.trim();
+            const mapEmbed = form.querySelector('[name="mapEmbed"]').value.trim();
+
+            try {
+                // Update contact page
+                const pageRes = await fetch(`${API_URL}/pages/slug/contact`);
+                const pageResult = await pageRes.json();
+                if (!pageResult.success) throw new Error('Failed to fetch contact page');
+                const page = pageResult.data;
+                const pageId = page._id;
+
+                const contentHtml = `<h1>Contact Us</h1><p>Email: ${escapeHtml(supportEmail)}<br>Phone: ${escapeHtml(supportPhone)}<br>Address: ${escapeHtml(address)}<br><a href="https://maps.google.com/?q=${encodeURIComponent(address)}">Open map</a></p>${mapEmbed ? `<iframe src="${escapeHtml(mapEmbed)}" width="600" height="450" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>` : ''}`;
+
+                const pageUpdateData = {
+                    title: page.title || 'Contact Us',
+                    content: contentHtml,
+                    published: true,
+                    meta: {
+                        description: page.meta?.description || 'Contact Zenrix',
+                        keywords: page.meta?.keywords || '',
+                        mapEmbed: mapEmbed || '',
+                        supportEmail,
+                        supportPhone,
+                        address
+                    }
+                };
+
+                const pagePutRes = await fetch(`${API_URL}/pages/${pageId}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify(pageUpdateData)
+                });
+                const pagePutResult = await pagePutRes.json();
+                if (!pagePutResult.success) throw new Error('Failed to update contact page');
+
+                // Update footer component data to sync
+                const footRes = await fetch(`${API_URL}/components/slug/footer`);
+                const footResult = await footRes.json();
+                if (footResult.success) {
+                    const footerComponent = footResult.data;
+                    const footUpdateData = { data: { ...(footerComponent.data || {}), supportEmail, supportPhone, address, mapEmbed } };
+                    await fetch(`${API_URL}/components/${footerComponent._id}`, {
+                        method: 'PUT',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${token}`
+                        },
+                        body: JSON.stringify(footUpdateData)
+                    });
+                }
+
+                showToast('success', '✅ Contact updated!');
+                loadComponents();
+                try { window.dispatchEvent(new CustomEvent('componentUpdated', { detail: { slug: 'footer', data: { data: { supportEmail, supportPhone, address, mapEmbed } } } })); } catch (e) {}
+            } catch (err) {
+                showToast('error', '❌ ' + err.message);
+            }
+        });
+
+        function escapeHtml(unsafe) {
+            const map = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;', '/': '&#47;' };
+            return unsafe.replace(/[&<"'`=\/]/g, s => map[s]);
+        }
 
         document.getElementById('footerMapForm')?.addEventListener('submit', async (e) => {
             e.preventDefault();
@@ -5626,6 +6254,10 @@
                 ordersFilters.status = event.target.value;
                 renderOrdersList();
             });
+
+            // Load audit modal helper script
+            try { loadScript('/js/admin-dashboard-audit.js'); } catch(e) { /* ignore */ }
+
 
             const ordersPaymentFilter = document.getElementById('ordersPaymentFilter');
             ordersPaymentFilter?.addEventListener('change', (event) => {

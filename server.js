@@ -34,8 +34,8 @@ mongoose.connection.on('error', err => console.error('❌ Mongoose error:', err.
 mongoose.connection.once('open', async () => {
   try {
     await addSampleProducts();
-    await addSamplePages();
-    await addSampleComponents();
+    // await addSamplePages();
+    // await addSampleComponents();
   } catch (error) {
     console.error('Error during seeding:', error);
   }
@@ -50,8 +50,8 @@ app.use(helmet({
 app.use((req, res, next) => {
   res.setHeader('Content-Security-Policy', 
     "default-src 'self'; " +
-    "script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; " +
-    "style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://fonts.googleapis.com; " +
+    "script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://cdn.quilljs.com; " +
+    "style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://fonts.googleapis.com https://cdn.quilljs.com; " +
     "img-src 'self' data: https:; " +
     "connect-src 'self' https://cdn.jsdelivr.net; " +
     "font-src 'self' https://fonts.gstatic.com https://cdn.jsdelivr.net; " +
@@ -64,6 +64,13 @@ console.log('Minimal CSP set allowing jsdelivr');
 
 app.use(cors());
 app.use(express.json({ limit: '1mb' }));
+// Graceful JSON parse error handler (returns a 400 with a helpful message)
+app.use((err, req, res, next) => {
+  if (err && err instanceof SyntaxError && err.status === 400 && 'body' in err) {
+    return res.status(400).json({ success: false, error: 'Invalid JSON payload' });
+  }
+  return next(err);
+});
 app.use(express.urlencoded({ extended: true }));
 
 // Apply rate limiting to API routes only (not static assets).
@@ -114,29 +121,37 @@ const paymentSettingsRoutes = require('./routes/PaymentSettingsRoutes');
 const ticketRoutes = require('./routes/TicketRoutes');
 const knowledgeRoutes = require('./routes/KnowledgeRoutes');
 const staffRoutes = require('./routes/StaffRoutes');
+const testimonialRoutes = require('./routes/TestimonialRoutes');
 
 // Temporary staff route
 app.get('/api/employees', (req, res) => {
     res.end('OK');
 });
 
-app.use('/api/admin', adminRoutes);
-app.use('/api/auth', authRoutes);
+// app.use('/api/admin', adminRoutes);
+// app.use('/api/auth', authRoutes);
 
 // Debugging: log modifying requests to products to help diagnose admin UI issues
-app.use('/api/products', (req, res, next) => {
-  if (['PUT', 'DELETE', 'POST'].includes(req.method)) {
-    try {
-      console.log('[DEBUG] Product API request:', req.method, req.originalUrl, 'auth=', !!req.headers.authorization);
-      if (req.body && Object.keys(req.body).length) {
-        const preview = JSON.stringify(req.body).slice(0, 200);
-        console.log('[DEBUG] Body preview:', preview);
-      }
-    } catch (e) {}
-  }
-  next();
-});
+// app.use('/api/products', (req, res, next) => {
+//   if (['PUT', 'DELETE', 'POST'].includes(req.method)) {
+//     try {
+//       console.log('[DEBUG] Product API request:', req.method, req.originalUrl, 'auth=', !!req.headers.authorization);
+//       if (req.body && Object.keys(req.body).length) {
+//         const preview = JSON.stringify(req.body).slice(0, 200);
+//         console.log('[DEBUG] Body preview:', preview);
+//       }
+//     } catch (e) {}
+//   }
+//   next();
+// });
 
+// app.use('/api/products', productRoutes);
+// app.use('/api/pages', pageRoutes);
+// app.use('/api/components', componentRoutes);
+// app.use('/api/users', userRoutes);
+// app.use('/api/subscribers', subscriberRoutes);
+// app.use('/api/careers', careerRoutes);
+// app.use('/api/hero', heroRoutes);
 app.use('/api/products', productRoutes);
 app.use('/api/pages', pageRoutes);
 app.use('/api/components', componentRoutes);
@@ -149,11 +164,17 @@ app.use('/api/payment-settings', paymentSettingsRoutes);
 app.use('/api/tickets', ticketRoutes);
 app.use('/api/knowledge', knowledgeRoutes);
 app.use('/api/staff', staffRoutes);
+app.use('/api/testimonials', testimonialRoutes);
+console.log('Testimonials routes registered');
+
+// testimonialRoutes(app);
+
+app.use('/api/admin', adminRoutes);
 
 // Temporary staff route
-// app.get('/api/staff', (req, res) => {
-//     res.json({ success: true, count: 0, data: [] });
-// });
+app.get('/api/staff', (req, res) => {
+    res.json({ success: true, count: 0, data: [] });
+});
 
 app.get('/api/health', (_req, res) => {
   res.json({ success: true, status: 'ok', timestamp: Date.now() });
@@ -165,10 +186,10 @@ app.get('/', (_req, res) => {
 });
 
 // Return 404 for unknown API routes
-app.use('/api', (req, res, next) => {
-  if (res.headersSent) return next();
-  res.status(404).json({ success: false, error: 'API route not found' });
-});
+// app.use('/api', (req, res, next) => {
+//   if (res.headersSent) return next();
+//   res.status(404).json({ success: false, error: 'API route not found' });
+// });
 
 // Global error handler
 const fs = require('fs');
@@ -196,6 +217,7 @@ process.on('uncaughtException', (err) => {
 
 process.on('unhandledRejection', (reason, promise) => {
   console.error('Unhandled Rejection at:', promise, 'reason:', reason);
+  console.error(reason.stack || reason);
   process.exit(1);
 });
 

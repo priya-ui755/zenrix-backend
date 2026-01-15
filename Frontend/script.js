@@ -21,6 +21,8 @@ function sanitizeHtml(html) {
 // ==================== LOGOUT (GLOBAL) ====================
 function logout() {
     try {
+        // Remove both modern and legacy keys to ensure user is fully logged out
+        localStorage.removeItem('token');
         localStorage.removeItem('userToken');
         localStorage.removeItem('userData');
     } catch (e) {}
@@ -230,6 +232,74 @@ document.addEventListener('DOMContentLoaded', function() {
     // Load CMS page content if there is a placeholder
     loadPageContent();
     loadHeroContent();
+
+    // When admin updates footer data, ensure Contact page UI reflects it immediately
+    const applyFooterDataToContact = (data) => {
+        try {
+            if (!data) return;
+            const phone = (data.supportPhone || '').trim();
+            const email = (data.supportEmail || '').trim();
+
+            const heroPhoneLink = document.getElementById('contactHeroPhoneLink');
+            if (heroPhoneLink && phone) heroPhoneLink.href = `tel:${phone.replace(/[^+\d]/g, '')}`;
+
+            const contactPhoneValue = document.getElementById('contactPhoneValue');
+            if (contactPhoneValue && phone) contactPhoneValue.textContent = phone;
+
+            const contactPhoneLink = document.getElementById('contactPhoneLink');
+            if (contactPhoneLink && phone) contactPhoneLink.href = `tel:${phone.replace(/[^+\d]/g, '')}`;
+
+            const contactHeroPhoneLink = document.getElementById('contactHeroPhoneLink');
+            if (contactHeroPhoneLink && phone) contactHeroPhoneLink.href = `tel:${phone.replace(/[^+\d]/g, '')}`;
+
+            const contactEmailValue = document.getElementById('contactEmailValue');
+            if (contactEmailValue && email) contactEmailValue.textContent = email;
+
+            const contactEmailLink = document.getElementById('contactEmailLink');
+            if (contactEmailLink && email) contactEmailLink.href = '#contactMailtoForm';
+
+        } catch (e) { /* ignore */ }
+    };
+
+    // Listen for admin-side footer updates
+    window.addEventListener('footerDataUpdated', (e) => {
+        try { applyFooterDataToContact(e.detail && e.detail.data ? e.detail.data : {}); } catch (e) {}
+    });
+
+    window.addEventListener('componentUpdated', (e) => {
+        try {
+            if (!e.detail || e.detail.slug !== 'footer') return;
+            const data = e.detail.data && e.detail.data.data ? e.detail.data.data : {};
+            applyFooterDataToContact(data);
+        } catch (e) {}
+    });
+
+    window.addEventListener('storage', (e) => {
+        try {
+            if (!e || !e.key) return;
+            if (e.key === 'footerData' && e.newValue) {
+                const parsed = JSON.parse(e.newValue);
+                applyFooterDataToContact(parsed);
+            }
+        } catch (e) { /* ignore */ }
+    });
+
+    // Apply any existing footerData saved in localStorage (for immediate effect)
+    try {
+        const existing = localStorage.getItem('footerData');
+        if (existing) {
+            applyFooterDataToContact(JSON.parse(existing));
+        } else {
+            // Fallback: fetch current footer component and apply
+            (async () => {
+                try {
+                    const res = await fetch((window.API_URL || '/api') + '/components/slug/footer');
+                    const j = await res.json();
+                    if (j && j.success && j.data && j.data.data) applyFooterDataToContact(j.data.data);
+                } catch (e) { /* ignore */ }
+            })();
+        }
+    } catch (e) { /* ignore */ }
     
     if (window.location.pathname.includes('cart.html')) {
         initCartPage();
@@ -392,6 +462,31 @@ document.addEventListener('DOMContentLoaded', function() {
             console.warn('Star button binding failed', err && err.message);
         }
     })();
+
+    // Auto-open chat when URL hash is #chat (contact links point to /index.html#chat)
+    try {
+        if (window && window.location && window.location.hash === '#chat') {
+            setTimeout(() => {
+                const toggle = document.querySelector('#chatbot-toggle, #chatbotToggle, .chat-toggle');
+                const windowEl = document.querySelector('#chatbot-window, #chatbotWindow, .chat-window');
+                if (toggle && windowEl) {
+                    try { toggle.click(); } catch (e) { /* ignore */ }
+                } else {
+                    // If current page doesn't host the chat widget, redirect to index which does
+                    const path = window.location.pathname || '';
+                    if (!path.endsWith('/index.html') && !path.endsWith('/') && !path.endsWith('/index')) {
+                        window.location.href = '/index.html#chat';
+                    } else if (!toggle) {
+                        // If widget may load later, try again after a delay
+                        setTimeout(() => {
+                            const t = document.querySelector('#chatbot-toggle, #chatbotToggle, .chat-toggle');
+                            if (t) try { t.click(); } catch (e) {}
+                        }, 700);
+                    }
+                }
+            }, 200);
+        }
+    } catch (e) { /* ignore */ }
 });
 
 // ==================== PRODUCT FUNCTIONS ====================
@@ -1257,6 +1352,44 @@ async function loadPageContent() {
                             }
                         }
                     }
+
+                    // If admin set a dedicated map embed in page meta, prefer that for footer and contact link
+                    try {
+                        const mapEmbed = page.meta && page.meta.mapEmbed ? page.meta.mapEmbed : '';
+                        if (mapEmbed) {
+                            const contactAddressLink = document.getElementById('contactAddressLink');
+                            if (contactAddressLink) {
+                                let mapsHref = mapEmbed;
+                                // Normalize embed URL to a clickable maps URL
+                                if (mapEmbed.includes('output=embed')) {
+                                    mapsHref = mapEmbed.replace(/&?output=embed\b/, '');
+                                } else if (mapEmbed.includes('/maps/embed')) {
+                                    mapsHref = mapEmbed.replace('/maps/embed', '/maps').replace('/embed?', '/?');
+                                }
+                                // If it's still an embed-like URL with ?q=, remove output=embed if present
+                                contactAddressLink.href = mapsHref;
+                            }
+                            try {
+                                localStorage.setItem('footerMapEmbed', mapEmbed);
+                                window.dispatchEvent(new CustomEvent('footerMapUpdated', { detail: { mapEmbed } }));
+                            } catch (e) { /* ignore */ }
+                        }
+                    } catch (e) {}
+
+                    // Prefer the footer's map URL when available in localStorage (ensures contact link opens same map)
+                    try {
+                        const footerMap = localStorage.getItem('footerMapEmbed');
+                        if (footerMap) {
+                            const contactAddressLink = document.getElementById('contactAddressLink');
+                            if (contactAddressLink) {
+                                let mapsHref = footerMap;
+                                if (footerMap.includes('output=embed')) mapsHref = footerMap.replace(/&?output=embed\b/, '');
+                                else if (footerMap.includes('/maps/embed')) mapsHref = footerMap.replace('/maps/embed', '/maps').replace('/embed?', '/?');
+                                contactAddressLink.href = mapsHref;
+                            }
+                        }
+                    } catch (e) { /* ignore */ }
+
                 } catch (e) {
                     // ignore
                 }

@@ -277,7 +277,7 @@ async function seedDatabase() {
     const pages = await Page.insertMany([
       { slug: 'index', title: 'Home', content: '<h1>Welcome to Zenrix</h1><p>Your one-stop shop for quality products at affordable prices.</p>', published: true, meta: { description: 'Zenrix - Quality products at great prices' } },
       { slug: 'about', title: 'About Us', content: '<h1>About Zenrix</h1><p>We are committed to providing the best shopping experience with quality products and excellent customer service.</p>', published: true, meta: { description: 'About Zenrix' } },
-      { slug: 'contact', title: 'Contact Us', content: '<h1>Contact Us</h1><p>Email: support@zenrix.com<br>Phone: +1 (800) 123-4567<br>Address: 123 Commerce St, New York, NY 10001</p>', published: true, meta: { description: 'Contact Zenrix' } },
+      { slug: 'contact', title: 'Contact Us', content: '<h1>Contact Us</h1><p>Email: support@zenrix.com<br>Phone: +977 9819922314<br>Address: 123 Commerce St, New York, NY 10001</p>', published: true, meta: { description: 'Contact Zenrix' } },
       { slug: 'terms', title: 'Terms & Conditions', content: '<h1>Terms & Conditions</h1><p>By accessing this website, you agree to be bound by these terms and conditions.</p>', published: true, meta: { description: 'Terms and conditions' } },
       { slug: 'privacy', title: 'Privacy Policy', content: '<h1>Privacy Policy</h1><p>We respect your privacy and are committed to protecting your personal information.</p>', published: true, meta: { description: 'Privacy policy' } },
       { slug: 'careers', title: 'Careers', content: '<h1>Join Our Team</h1><p>We are always looking for talented individuals to join the Zenrix family.</p>', published: true, meta: { description: 'Careers at Zenrix' } },

@@ -10,6 +10,7 @@
     <!-- Load Tailwind first so style.css overrides are respected -->
     <link rel="stylesheet" href="/css/tailwind-site.css">
     <link rel="stylesheet" href="style.css">
+    <script src="/js/format-utils.js"></script>
     <script src="script.js" defer></script>
 </head>
 <body class="surface text relative home-page">
@@ -439,9 +440,10 @@
           maximumFractionDigits: 2
         });
 
-        function formatNpr(amount = 0) {
-          const value = Number(amount) || 0;
-          return `रु ${SEARCH_NPR_NUMBER_FORMATTER.format(value)}`;
+        // Use shared formatter
+        if (!window.formatNpr) {
+            window.NPR_NUMBER_FORMATTER = window.NPR_NUMBER_FORMATTER || new Intl.NumberFormat('en-IN');
+            window.formatNpr = function(amount = 0) { const value = Number(amount)||0; return `रु ${window.NPR_NUMBER_FORMATTER.format(value)}`; };
         }
 
         async function loadAllProducts() {
