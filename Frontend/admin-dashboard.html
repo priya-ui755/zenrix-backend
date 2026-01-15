@@ -33,11 +33,9 @@
         };
         // Centralized logout helper to avoid inline onclick duplication and failures
         window.performLogout = function() {
-            try {
-                try { localStorage.removeItem('adminToken'); } catch(e) {}
-                try { localStorage.removeItem('userToken'); } catch(e) {}
-                try { localStorage.removeItem('userData'); } catch(e) {}
-            } catch (e) {}
+            try { clearAdminToken(); } catch(e) {}
+            try { localStorage.removeItem('userToken'); } catch(e) {}
+            try { localStorage.removeItem('userData'); } catch(e) {}
             try {
                 const btn = document.getElementById('logoutBtn');
                 if (btn) {
@@ -50,12 +48,10 @@
                     btn.disabled = true;
                 }
             } catch (e) {}
-            try {
-                const sign = document.getElementById('adminAuthSign');
-                if (sign) { sign.innerHTML = '<i class="fas fa-user-lock"></i>'; }
-            } catch (e) {}
-            try { if (typeof openLoginModal === 'function') openLoginModal(); } catch (e) {}
-            try { window.location.href = window.location.origin.replace(/\/$/, '') + '/admin-dashboard.html'; } catch(e) { try { window.location.assign('/admin-dashboard.html'); } catch(e2){} }
+            try { const sign = document.getElementById('adminAuthSign'); if (sign) sign.innerHTML = '<i class="fas fa-user-lock"></i>'; } catch(e) {}
+            // Keep the overlay visible and allow the login flow to handle re-login.
+            try { setTimeout(() => { if (typeof openLoginModal === 'function') openLoginModal(); }, 120); } catch(e) {}
+            try { setTimeout(() => { window.location.href = window.location.origin.replace(/\/$/, '') + '/admin-dashboard.html'; }, 300); } catch(e) {}
         };
     </script>
     <meta charset="UTF-8">
@@ -2058,12 +2054,15 @@
 
         // Login functionality
         function openLoginModal() {
-            document.getElementById('loginModal').classList.remove('hidden');
+            try { setAuthGuard(false); } catch (e) {}
+            try { document.getElementById('loginModal').classList.remove('hidden'); } catch(e) {}
+            try { document.getElementById('adminPassword')?.focus(); } catch(e) {}
         }
 
         function closeLoginModal() {
-            document.getElementById('loginModal').classList.add('hidden');
-            document.getElementById('loginForm').reset();
+            try { document.getElementById('loginModal').classList.add('hidden'); } catch(e) {}
+            try { document.getElementById('loginForm').reset(); } catch(e) {}
+            try { setAuthGuard(true); } catch(e) {}
         }
 
         // keyboard: allow quick support when overlay is visible (press H for help)
