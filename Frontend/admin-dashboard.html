@@ -199,7 +199,20 @@ window.__inlineAdminLogin = async function(password){
                     }, 100);
 
                     // hide the overlay behind the modal (visual) but keep it interactive for accessibility
-                    try { if (overlay) { overlay.classList.add('hidden'); overlay.setAttribute('aria-hidden', 'true'); } } catch(e){}
+                    try {
+                        if (overlay) {
+                            // Avoid setting aria-hidden on an element that contains the currently focused element
+                            try {
+                                const active = document.activeElement;
+                                if (active && overlay.contains(active)) {
+                                    // Prefer focusing the password input inside the modal; otherwise blur the active element
+                                    try { document.getElementById('adminPassword')?.focus(); } catch(e) { try { active.blur(); } catch(_){} }
+                                }
+                            } catch(e){}
+                            overlay.classList.add('hidden');
+                            overlay.setAttribute('aria-hidden', 'true');
+                        }
+                    } catch(e){}
 
                     try {
                         const b = document.getElementById('adminJsErrorBanner');
