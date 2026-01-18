@@ -126,6 +126,7 @@ app.use('/uploads', (req, res, next) => {
     });
   } catch (e) {
     try { return res.sendFile(path.join(FRONTEND_DIR, 'assets', 'placeholder.svg')); } catch(_){ return res.status(404).end(); }
+  }
 });
 
 // Fallback static handler (keeps existing static serving for uploads directory)
