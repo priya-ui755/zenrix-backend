@@ -233,7 +233,6 @@ app.get('/', (_req, res) => {
 // });
 
 // Global error handler
-const fs = require('fs');
 app.use((err, req, res, _next) => {
   try {
     const entry = [`\n[${new Date().toISOString()}] Error: ${err.message}`, err.stack || 'no-stack'].join('\n') + '\n';
