@@ -107,10 +107,6 @@ app.get('/admin-dashboard.html', (req, res) => {
   }
 });
 
-app.use(express.static(FRONTEND_DIR));
-
-// Graceful fallback for missing uploads: serve site placeholder image instead of 404
-// Use a named glob param to avoid path parsing issues
 // Intercept uploads requests and serve placeholder for missing files (middleware style)
 app.use('/uploads', (req, res, next) => {
   try {
@@ -129,8 +125,10 @@ app.use('/uploads', (req, res, next) => {
   }
 });
 
-// Fallback static handler (keeps existing static serving for uploads directory)
+app.use(express.static(FRONTEND_DIR));
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+
+
 
 // Avoid noisy 404s for browsers requesting /favicon.ico.
 // Serve a tiny SVG favicon (works in modern browsers) instead of 404.
