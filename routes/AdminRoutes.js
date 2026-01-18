@@ -44,8 +44,9 @@ router.get('/ping', requireAdmin, (req, res) => { try { console.debug('[AdminRou
 // Logout - clears admin cookie
 router.post('/logout', (req, res) => {
   try {
-    res.clearCookie('adminToken');
-    try { res.clearCookie('adminTokenPublic'); } catch(e) {}
+    // Clear cookies using the same attributes as when they were set to ensure they are removed
+    try { res.clearCookie('adminToken', { path: '/', httpOnly: true, sameSite: 'lax', secure: process.env.NODE_ENV === 'production' }); } catch(e) {}
+    try { res.clearCookie('adminTokenPublic', { path: '/', httpOnly: false, sameSite: 'lax', secure: false }); } catch(e) {}
     return res.json({ success: true });
   } catch (e) {
     return res.status(500).json({ success: false, error: 'Logout failed' });

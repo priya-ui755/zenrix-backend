@@ -63,6 +63,14 @@
                     <a href="#" class="text-indigo-600 hover:text-indigo-700 font-medium">Forgot Password?</a>
                 </div>
 
+                <!-- Admin Login Toggle -->
+                <div class="flex items-center gap-2 text-sm mt-3">
+                    <label class="flex items-center gap-2 cursor-pointer">
+                        <input type="checkbox" id="adminLogin" class="w-4 h-4 text-red-600 rounded">
+                        <span class="text-gray-600">Admin Login (redirects to admin dashboard)</span>
+                    </label>
+                </div>
+
                 <!-- Error Message -->
                 <div id="errorMessage" class="hidden bg-red-50 border-2 border-red-200 rounded-xl p-4">
                     <div class="flex items-center gap-3">
@@ -118,33 +126,61 @@
         }
 
         document.addEventListener('DOMContentLoaded', () => {
+            const adminCheckbox = document.getElementById('adminLogin');
+            const emailInput = document.getElementById('email');
+            adminCheckbox?.addEventListener('change', (e) => {
+                if (e.target.checked) {
+                    emailInput?.setAttribute('disabled', 'disabled');
+                    emailInput?.classList.add('opacity-50', 'pointer-events-none');
+                } else {
+                    emailInput?.removeAttribute('disabled');
+                    emailInput?.classList.remove('opacity-50', 'pointer-events-none');
+                }
+            });
+
             document.getElementById('loginForm').addEventListener('submit', async (e) => {
                 e.preventDefault();
-                
+
                 const loginBtn = document.getElementById('loginBtn');
                 const originalText = loginBtn.innerHTML;
                 loginBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Logging in...';
                 loginBtn.disabled = true;
-                
+
                 try {
-                    const email = document.getElementById('email').value;
+                    const isAdmin = document.getElementById('adminLogin')?.checked;
                     const password = document.getElementById('password').value;
-                    
+
+                    if (isAdmin) {
+                        // Admin login: send password to /admin/login and redirect to admin dashboard
+                        const res = await fetch('/admin/login', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            credentials: 'include',
+                            body: JSON.stringify({ password })
+                        });
+                        const data = await res.json();
+                        if (!data.success) throw new Error(data.error || 'Admin login failed');
+                        try { localStorage.setItem('adminToken', data.token); } catch(e) {}
+                        window.location.href = '/admin/dashboard.html';
+                        return;
+                    }
+
+                    // Regular user login
+                    const email = document.getElementById('email').value;
+
                     const res = await fetch('/api/users/login', {
                         method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json'
-                        },
+                        headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({ email, password })
                     });
-                    
+
                     const data = await res.json();
-                    
+
                     if (data.success) {
                         // Store token and user data
                         localStorage.setItem('userToken', data.token);
                         localStorage.setItem('userData', JSON.stringify(data.user));
-                        
+
                         // Redirect to profile or dashboard
                         window.location.href = 'profile.html';
                     } else {

@@ -912,9 +912,25 @@
       });
     }
 
+    // Keep a weak map of canvas -> Chart instance so we can destroy prior instances
+    const _charts = new WeakMap();
+
     function createChart(ctx, type, data, options) {
       if (!window.Chart) return null;
-      return new Chart(ctx, { type, data, options: options || {} });
+      try {
+        const canvas = (ctx && ctx.canvas) ? ctx.canvas : ctx;
+        const prev = _charts.get(canvas);
+        if (prev && typeof prev.destroy === 'function') {
+          try { prev.destroy(); } catch (e) { /* ignore */ }
+          _charts.delete(canvas);
+        }
+        const chart = new Chart(ctx, { type, data, options: options || {} });
+        try { _charts.set(canvas, chart); } catch(e){}
+        return chart;
+      } catch (e) {
+        console.error('createChart error', e);
+        return null;
+      }
     }
 
     // Fallback sample data

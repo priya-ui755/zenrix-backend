@@ -152,9 +152,14 @@ window.__inlineAdminLogin = async function(password){
                 // Inform server to clear HttpOnly cookie
                 await fetch((window.API_URL || '/api') + '/admin/logout', { method: 'POST', credentials: 'include' });
             } catch (e) { console.warn('server logout failed', e); }
+
+            // Clear client-side tokens and fallback cookie to ensure a truly logged-out experience
             try { clearAdminToken(); } catch(e) {}
+            try { localStorage.removeItem('adminToken'); } catch(e) {}
             try { localStorage.removeItem('userToken'); } catch(e) {}
             try { localStorage.removeItem('userData'); } catch(e) {}
+            try { document.cookie = 'adminTokenPublic=; path=/; max-age=0'; } catch(e) {}
+
             try {
                 const btn = document.getElementById('logoutBtn');
                 if (btn) {
@@ -168,9 +173,11 @@ window.__inlineAdminLogin = async function(password){
                 }
             } catch (e) {}
             try { const sign = document.getElementById('adminAuthSign'); if (sign) sign.innerHTML = '<i class="fas fa-user-lock"></i>'; } catch(e) {}
+
             // Keep the overlay visible and allow the login flow to handle re-login.
             try { setTimeout(() => { if (typeof openLoginModal === 'function') openLoginModal(); }, 120); } catch(e) {}
-            try { setTimeout(() => { window.location.href = window.location.origin.replace(/\/$/, '') + '/admin-dashboard.html'; }, 300); } catch(e) {}
+            // Redirect to a known state; query param will open the login modal after navigation
+            try { setTimeout(() => { window.location.href = window.location.origin.replace(/\/$/, '') + '/admin-dashboard.html?login=1'; }, 300); } catch(e) {}
         };
 
         // Robust capture-phase handlers + observer to ensure clicking the auth overlay opens the login modal
@@ -297,6 +304,7 @@ window.__inlineAdminLogin = async function(password){
                 mo.observe(document.body, { childList: true, subtree: true });
             } catch(_) {}
         } catch(e) {}
+    </script>
 
     <title>Zenrix Admin Dashboard</title>
     <link rel="stylesheet" href="/css/tailwind-admin.css">
@@ -409,7 +417,7 @@ window.__inlineAdminLogin = async function(password){
                                 </div>
                             </li>
                             <li class="nav-item d-flex align-items-center">
-                                        <button id="logoutBtn" class="star-btn btn btn-danger hidden" type="button" aria-label="Logout" style="position: relative; overflow: visible;" onclick="adminLogout();">
+                                        <button id="logoutBtn" class="star-btn btn btn-danger hidden" type="button" aria-label="Logout" style="position: relative; overflow: visible;" onclick="performLogout();">
                                             Log Out
                                             <span class="smoke" aria-hidden="true"></span>
                                             <div class="star-1">
@@ -487,7 +495,7 @@ window.__inlineAdminLogin = async function(password){
                         <h2 id="authOverlayTitle" class="text-xl font-semibold text-gray-900">Sign in to continue</h2>
                         <p class="text-sm text-gray-600 mt-2 mb-4">Administrative access is required to view and manage site content. Enter your admin password to continue.</p>
                         <div class="flex items-center gap-3">
-                            <button id="authOverlayLogin" class="btn btn-primary" type="button" style="pointer-events:auto; position:relative; z-index:13002;" role="button" tabindex="0" aria-controls="loginModal">Login</button>
+                            <button id="authOverlayLogin" class="btn btn-primary" type="button" onclick="(function(){ try{ if (typeof openLoginModal === 'function') openLoginModal(); else document.getElementById('loginModal')?.classList.remove('hidden'); }catch(e){} })();" style="pointer-events:auto; position:relative; z-index:13002;" role="button" tabindex="0" aria-controls="loginModal">Login</button>
                             <a href="/support.html" class="btn btn-ghost" id="contactSupport">Contact support</a>
                         </div>
                         <p class="text-xs text-gray-400 mt-4">Need an account or lost access? Contact your site admin via the support page.</p>
@@ -2443,6 +2451,25 @@ window.__inlineAdminLogin = async function(password){
             e.preventDefault();
             try { window.__adminLoginHandled = true; } catch(e) {}
             const password = e.target.password.value;
+            const submitBtn = e.target.querySelector('button[type="submit"]');
+
+            // Friendly client-side feedback for empty password (avoids perceived "no-op")
+            if (!password) {
+                try { showToast('error', '❌ Please enter the admin password'); } catch(e) {}
+                try { document.getElementById('adminPassword')?.focus(); } catch(e) {}
+                return;
+            }
+
+            // Disable and show spinner while submitting so user gets clear feedback
+            let prevBtnHtml = null;
+            try {
+                if (submitBtn) {
+                    prevBtnHtml = submitBtn.innerHTML;
+                    submitBtn.disabled = true;
+                    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Logging in...';
+                }
+            } catch(e) {}
+
             try {
                 const res = await fetch(`${API_URL}/admin/login`, {
                     method: 'POST',
@@ -2497,6 +2524,8 @@ window.__inlineAdminLogin = async function(password){
                 }
             } catch (err) {
                 showToast('error', '❌ Login failed: ' + err.message);
+            } finally {
+                try { if (submitBtn) { submitBtn.disabled = false; if (prevBtnHtml) submitBtn.innerHTML = prevBtnHtml; } } catch(e) {}
             }
         });
 

@@ -2,6 +2,7 @@ const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
 const path = require('path');
+const fs = require('fs');
 const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
 const passport = require('passport');
@@ -107,6 +108,24 @@ app.get('/admin-dashboard.html', (req, res) => {
 });
 
 app.use(express.static(FRONTEND_DIR));
+
+// Graceful fallback for missing uploads: serve site placeholder image instead of 404
+app.get('/uploads/*', (req, res) => {
+  try {
+    const rel = req.params[0] || '';
+    const filePath = path.join(__dirname, 'uploads', rel);
+    fs.stat(filePath, (err, stat) => {
+      if (!err && stat && stat.isFile()) {
+        return res.sendFile(filePath);
+      }
+      // if missing, serve public placeholder (keeps console free of noisy 404s)
+      return res.sendFile(path.join(FRONTEND_DIR, 'assets', 'placeholder.svg'));
+    });
+  } catch (e) {
+    try { return res.sendFile(path.join(FRONTEND_DIR, 'assets', 'placeholder.svg')); } catch(_){ return res.status(404).end(); }
+  }
+});
+
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // Avoid noisy 404s for browsers requesting /favicon.ico.
