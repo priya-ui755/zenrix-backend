@@ -53,7 +53,7 @@
             };
             
             // ensure admin token
-            let token = localStorage.getItem('adminToken');
+            let token = (typeof getAdminToken === 'function' ? getAdminToken() : (localStorage ? localStorage.getItem('adminToken') : null));
             if (!token) {
                 const pw = prompt('Admin password required to add product:');
                 if (!pw) {
@@ -61,7 +61,7 @@
                     setTimeout(() => document.querySelector('#productList .p-2')?.remove(), 3000);
                     return;
                 }
-                const loginRes = await fetch(API + '/admin/login', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({ password: pw }) });
+                const loginRes = await fetch(API + '/admin/login', { method: 'POST', credentials: 'include', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({ password: pw }) });
                 const loginJson = await loginRes.json();
                 if (!loginJson.success) {
                     document.getElementById('productList').insertAdjacentHTML('afterbegin', '<div class="p-2 bg-red-100 text-red-800 rounded mb-2">Login failed</div>');
@@ -69,7 +69,7 @@
                     return;
                 }
                 token = loginJson.token;
-                localStorage.setItem('adminToken', token);
+                if (typeof setAdminToken === 'function') setAdminToken(token); else try { localStorage.setItem('adminToken', token); } catch(e) {}
             }
 
             const res = await fetch(API + '/products', {

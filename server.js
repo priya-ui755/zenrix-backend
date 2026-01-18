@@ -73,6 +73,10 @@ app.use((err, req, res, next) => {
 });
 app.use(express.urlencoded({ extended: true }));
 
+// Cookie parsing (needed for server-side session cookies)
+const cookieParser = require('cookie-parser');
+app.use(cookieParser());
+
 // Apply rate limiting to API routes only (not static assets).
 // Use a higher limit in non-production to avoid hampering local admin UI/E2E checks.
 const RATE_LIMIT_MAX = Number.parseInt(process.env.RATE_LIMIT_MAX || '', 10);
@@ -91,6 +95,17 @@ require('./config/passport');
 app.use(passport.initialize());
 
 // Static assets
+// Serve admin HTML with no-cache header to avoid sticky browser caches during development
+app.get('/admin-dashboard.html', (req, res) => {
+  try {
+    res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
+    res.sendFile(path.join(FRONTEND_DIR, 'admin-dashboard.html'));
+  } catch (err) {
+    console.error('Failed to serve admin-dashboard.html with no-cache header', err);
+    res.status(500).send('Server error');
+  }
+});
+
 app.use(express.static(FRONTEND_DIR));
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
@@ -166,6 +181,10 @@ app.use('/api/knowledge', knowledgeRoutes);
 app.use('/api/staff', staffRoutes);
 app.use('/api/testimonials', testimonialRoutes);
 console.log('Testimonials routes registered');
+
+// Site settings (global site-level configuration)
+const siteSettingsRoutes = require('./routes/SiteSettingsRoutes');
+app.use('/api/site-settings', siteSettingsRoutes);
 
 // testimonialRoutes(app);
 

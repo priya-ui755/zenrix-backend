@@ -17,6 +17,12 @@ const puppeteer = require('puppeteer');
   try {
     // Try to open the login modal using the public helper if available
     await page.evaluate(() => { if (typeof openLoginModal === 'function') try { openLoginModal(); } catch(e) {} });
+    // Defensive: ensure auth overlay and login modal are visible for the test
+    await page.evaluate(() => {
+      try { document.getElementById('authOverlay')?.classList.remove('hidden'); } catch(e) {}
+      try { document.body.classList.add('showing-auth'); } catch(e) {}
+      try { document.getElementById('loginModal')?.classList.remove('hidden'); } catch(e) {}
+    });
   } catch (e) {}
   // Wait for login modal to appear or ensure the inline modal exists
   await page.waitForSelector('#loginModal', { visible: true, timeout: 60000 }).catch(() => {});

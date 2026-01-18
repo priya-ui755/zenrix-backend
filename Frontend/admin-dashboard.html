@@ -1,39 +1,121 @@
-<!DOCTYPE html>
-<html lang="en">
+<script>
+// --- EARLY TOKEN/LOGIN HELPERS (must be first) ---
+function getToken() {
+    try {
+        const ls = (typeof localStorage !== 'undefined') ? localStorage.getItem('adminToken') : null;
+        if (ls) { return ls; }
+    } catch(e) {}
+    const c = (typeof document !== 'undefined' && document.cookie) ? (document.cookie.match(/adminTokenPublic=([^;]+)/) || [])[1] : null;
+    return c || null;
+}
+window.__inlineAdminLogin = async function(password){
+    try{
+        const endpoint = (window.API_URL || '/api') + '/admin/login';
+        const res = await fetch(endpoint, {
+            method: 'POST',
+            credentials: 'include',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ password: String(password || '') })
+        });
+        let data = null;
+        try { data = await res.json(); } catch(e) { data = null; }
+        if (data && data.success && data.token) {
+            try { localStorage.setItem('adminToken', data.token); } catch(e) {}
+            return true;
+        }
+        return false;
+    } catch (err) {
+        return false;
+    }
+};
+</script>
 <head>
-    <script>
-        window.API_URL = '/api';
-        // Robust inline admin login helper (early, so it's available even if other scripts fail)
-        window.__inlineAdminLogin = async function(password){
-            try{
-                const endpoint = (window.API_URL || '/api') + '/admin/login';
-                const res = await fetch(endpoint, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ password: String(password || '') })
-                });
-                let data = null;
-                try { data = await res.json(); } catch(e) { data = null; }
-                if (data && data.success && data.token) {
-                    try { localStorage.setItem('adminToken', data.token); } catch(e) {}
-                    try { if (typeof setAdminToken === 'function') setAdminToken(data.token); } catch(e) {}
-                    try { document.getElementById('loginModal')?.classList.add('hidden'); } catch(e) {}
-                    try { window.dispatchEvent(new CustomEvent('adminLoggedIn', { detail: {} })); } catch(e) {}
-                    try { if (typeof updateAdminUI === 'function') updateAdminUI(); } catch(e) {}
-                    try { location.reload(); } catch(e) {}
-                    return true;
-                }
-                try { alert('Login failed: ' + (data && data.error ? data.error : 'Invalid credentials')); } catch(e) {}
-                return false;
-            } catch (err) {
-                try { console.error('inlineAdminLogin error', err); } catch(e) {}
-                try { alert('Login failed: ' + (err && err.message ? err.message : String(err))); } catch(e) {}
-                return false;
-            }
-        };
-        // Version stamp (visible in console) to confirm the latest file is loaded
+    <title>Zenrix Admin Dashboard</title>
+    <link rel="stylesheet" href="/css/tailwind-admin.css">
+    <!-- AdminLTE + icon stack -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.15.4/css/all.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/admin-lte@4.0.0-rc6/dist/css/adminlte.min.css">
+    <link rel="stylesheet" href="/admin.css">
+    <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
+    <!-- admin styles; Chart.js is lazy-loaded by /js/admin-dashboard.js -->
+    <!-- favicon to avoid 404 and small site id -->
+    <link rel="icon" href="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><text y='28' font-size='28' font-family='Poppins' fill='%236674ee'>Z</text></svg>">
+    <script src="/js/admin-dashboard.js" defer></script>
+    <style>
+        @keyframes slideIn {
+            from { transform: translateY(-10px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        .slide-in { animation: slideIn 0.3s ease-out; }
+        .modal-backdrop { backdrop-filter: blur(4px); }
+        .gradient-bg { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); overflow: visible; }
+        .card-hover { transition: all 0.3s; }
+        .card-hover:hover { transform: translateY(-2px); box-shadow: 0 10px 25px rgba(0,0,0,0.1); }
+        .image-preview { max-width: 100px; max-height: 100px; object-fit: cover; }
+        /* Lightweight skeleton loading UI */
+        .skeleton { position: relative; overflow: hidden; }
+        .skeleton > * { color: transparent !important; }
+        .skeleton::after {
+            content: '';
+            position: absolute; inset: 0; z-index: 6;
+            background: linear-gradient(90deg, rgba(255,255,255,0.02) 0%, rgba(255,255,255,0.06) 50%, rgba(255,255,255,0.02) 100%);
+            transform: translateX(-100%);
+            animation: shimmer 1.2s infinite;
+            pointer-events: none;
+        }
+        @keyframes shimmer { to { transform: translateX(100%); } }
+        .skeleton .value { background: rgba(255,255,255,0.06); border-radius: 6px; min-height: 18px; display:inline-block }
+        .skeleton .card { opacity: 0.9 }
+        [data-toggle-slider] {
+            position: relative;
+            cursor: pointer;
+            padding: 0.1rem;
+            transition: background-color 0.2s ease, opacity 0.2s ease;
+            background-color: rgba(148, 163, 184, 0.6);
+        }
+        [data-toggle-slider] > span {
+            display: block;
+            transition: transform 0.2s ease;
+            transform: translateX(0);
+        }
+        [data-toggle-slider].is-active > span {
+            transform: translateX(1.1rem);
+        }
+        [data-toggle-slider].accent-indigo { background-color: rgba(99, 102, 241, 0.35); }
+        [data-toggle-slider].accent-indigo.is-active { background-color: #4f46e5; }
+        [data-toggle-slider].accent-emerald { background-color: rgba(16, 185, 129, 0.35); }
+        [data-toggle-slider].accent-emerald.is-active { background-color: #10b981; }
+        [data-toggle-slider].accent-fuchsia { background-color: rgba(217, 70, 239, 0.35); }
+        [data-toggle-slider].accent-fuchsia.is-active { background-color: #c026d3; }
+        [data-toggle-slider].accent-amber { background-color: rgba(245, 158, 11, 0.35); }
+        [data-toggle-slider].accent-amber.is-active { background-color: #d97706; }
+        [data-toggle-slider].is-active { opacity: 1; }
+        [data-toggle-slider]:not(.is-active) { opacity: 0.55; }
+        .field-disabled {
+            opacity: 0.5;
+        }
+        /* Notifications should not appear as pop-up boxes. */
+        #toastContainer { display: none !important; }
+        /* Fancy animated gradient for map preview */
+        .fancy-map-bg {
+            background: linear-gradient(135deg, #7c3aed 0%, #06b6d4 25%, #34d399 50%, #f97316 75%, #e11d48 100%);
+            background-size: 200% 200%;
+            animation: gradientShift 8s ease infinite;
+            border: 0;
+            color: #ffffff;
+            box-shadow: inset 0 0 0 2px rgba(255,255,255,0.06), 0 8px 24px rgba(15,23,42,0.12);
+        }
+        @keyframes gradientShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+    </style>
+</head>
+<body>
 
-
+<script>
         // Provide an early safeFetch fallback so deferred scripts can call it before full init
         if (typeof window.safeFetch !== 'function') {
             window.safeFetch = async function(input, init = {}, opts = { silent: true }){
@@ -65,7 +147,11 @@
             document.addEventListener('error', imgErrorHandler, true);
         })();
         // Centralized logout helper to avoid inline onclick duplication and failures
-        window.performLogout = function() {
+        window.performLogout = async function() {
+            try {
+                // Inform server to clear HttpOnly cookie
+                await fetch((window.API_URL || '/api') + '/admin/logout', { method: 'POST', credentials: 'include' });
+            } catch (e) { console.warn('server logout failed', e); }
             try { clearAdminToken(); } catch(e) {}
             try { localStorage.removeItem('userToken'); } catch(e) {}
             try { localStorage.removeItem('userData'); } catch(e) {}
@@ -97,9 +183,13 @@
                     if (!loginModal) return;
                     // remove hidden and force visible styles as a last-resort
                     loginModal.classList.remove('hidden');
-                    loginModal.style.zIndex = loginModal.style.zIndex || '99999';
+                    loginModal.style.zIndex = '99999';
                     loginModal.style.pointerEvents = 'auto';
-                    try { document.getElementById('adminPassword')?.focus(); } catch(e){}
+                    loginModal.style.display = 'flex';
+                    loginModal.style.visibility = 'visible';
+                    setTimeout(() => {
+                        try { document.getElementById('adminPassword')?.focus(); } catch(e){}
+                    }, 100);
 
                     // hide the overlay behind the modal (visual) but keep it interactive for accessibility
                     try { if (overlay) { overlay.classList.add('hidden'); overlay.setAttribute('aria-hidden', 'true'); } } catch(e){}
@@ -137,7 +227,7 @@
                         try {
                             const overlayVisible = !!(overlay && !overlay.classList.contains('hidden') && getComputedStyle(overlay).display !== 'none');
                             const modalHidden = !!(loginModal && loginModal.classList.contains('hidden'));
-                            if (overlayVisible && modalHidden && !localStorage.getItem('adminToken')) {
+                            if (overlayVisible && modalHidden && !getToken()) {
                                 robustOpenLogin('observer');
                             }
                         } catch(e){}
@@ -149,35 +239,65 @@
                 }
             } catch(e){}
         })();
-        // Ensure overlay Login button opens login modal even if other scripts fail.
+        // Ensure overlay Login button and main login button always open login modal and focus password
         (function attachOverlayLoginHandler(){
-            function install(){
+            function robustOpenLoginBtnHandler(e) {
                 try {
-                    const b = document.getElementById('authOverlayLogin');
-                    if (b) {
-                        b.setAttribute('type','button');
-                        b.removeEventListener('click', window.__overlayLoginHandler);
-                        window.__overlayLoginHandler = function(){ try { if (typeof openLoginModal === 'function') openLoginModal(); else { document.getElementById('loginModal')?.classList.remove('hidden'); document.getElementById('adminPassword')?.focus(); } } catch(e){} };
-                        b.addEventListener('click', window.__overlayLoginHandler);
-                        return true;
-                    }
-                } catch(e){}
-                return false;
+                    e.preventDefault();
+                    e.stopImmediatePropagation();
+                } catch(_){}
+                if (typeof openLoginModal === 'function') openLoginModal();
             }
-            if (!install()) {
-                // retry until DOM ready
-                const iv = setInterval(() => { if (install()) clearInterval(iv); }, 150);
-                // give up after 10s
-                setTimeout(() => clearInterval(iv), 10000);
-            }
+            // Main login button (if present)
+            try {
+                var btn = document.getElementById('adminLoginBtn');
+                if (btn) {
+                    btn.onclick = robustOpenLoginBtnHandler;
+                    btn.addEventListener('click', robustOpenLoginBtnHandler, true);
+                }
+            } catch(e){}
+            // Overlay login button
+            try {
+                var overlayBtn = document.getElementById('authOverlayLogin');
+                if (overlayBtn) {
+                    overlayBtn.onclick = robustOpenLoginBtnHandler;
+                    overlayBtn.addEventListener('click', robustOpenLoginBtnHandler, true);
+                }
+            } catch(e){}
         })();
 
-        /* Debug helper removed - was used for headless diagnostics */
+        // Fallback: capture-clicks on login buttons in the capture phase and open modal if needed (production-safe)
+        try {
+            document.addEventListener('click', function(e){
+                try {
+                    const clicked = e.target && e.target.closest && e.target.closest('#adminLoginBtn, #authOverlayLogin');
+                    if (clicked) {
+                        try { if (e.preventDefault) e.preventDefault(); if (e.stopImmediatePropagation) e.stopImmediatePropagation(); } catch(_){}
+                        if (typeof openLoginModal === 'function') openLoginModal();
+                    }
+                } catch(_) {}
+            }, true);
 
-        /* Forced-login debug helper removed */
-    </script>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            // Ensure handlers re-attach if DOM mutates (buttons may be replaced)
+            try {
+                const mo = new MutationObserver(function(){
+                    try {
+                        const overlayBtn = document.getElementById('authOverlayLogin');
+                        if (overlayBtn && typeof overlayBtn.addEventListener === 'function') {
+                            overlayBtn.removeEventListener('click', robustOpenLoginBtnHandler, true);
+                            overlayBtn.addEventListener('click', robustOpenLoginBtnHandler, true);
+                        }
+                        const mainBtn = document.getElementById('adminLoginBtn');
+                        if (mainBtn && typeof mainBtn.addEventListener === 'function') {
+                            mainBtn.removeEventListener('click', robustOpenLoginBtnHandler, true);
+                            mainBtn.addEventListener('click', robustOpenLoginBtnHandler, true);
+                        }
+                    } catch(_) {}
+                });
+                mo.observe(document.body, { childList: true, subtree: true });
+            } catch(_) {}
+        } catch(e) {}
+
     <title>Zenrix Admin Dashboard</title>
     <link rel="stylesheet" href="/css/tailwind-admin.css">
     <!-- AdminLTE + icon stack -->
@@ -367,7 +487,7 @@
                         <h2 id="authOverlayTitle" class="text-xl font-semibold text-gray-900">Sign in to continue</h2>
                         <p class="text-sm text-gray-600 mt-2 mb-4">Administrative access is required to view and manage site content. Enter your admin password to continue.</p>
                         <div class="flex items-center gap-3">
-                            <button id="authOverlayLogin" class="btn btn-primary" type="button" style="pointer-events:auto;">Login</button>
+                            <button id="authOverlayLogin" class="btn btn-primary" type="button" style="pointer-events:auto; position:relative; z-index:13002;" role="button" tabindex="0" aria-controls="loginModal">Login</button>
                             <a href="/support.html" class="btn btn-ghost" id="contactSupport">Contact support</a>
                         </div>
                         <p class="text-xs text-gray-400 mt-4">Need an account or lost access? Contact your site admin via the support page.</p>
@@ -1613,12 +1733,13 @@
             </div>
         </div>
     </div>
+</script>
 
     <!-- Login Modal -->
-    <div id="loginModal" class="fixed inset-0 bg-black bg-opacity-50 modal-backdrop hidden flex items-center justify-center" style="z-index:11111;">
+    <div id="loginModal" class="fixed inset-0 bg-black bg-opacity-50 modal-backdrop hidden flex items-center justify-center" style="z-index:13001;">
         <div class="bg-white rounded-2xl shadow-2xl p-8 w-full max-w-md slide-in">
             <h2 class="text-2xl font-bold text-gray-800 mb-6">Admin Login</h2>
-            <form id="loginForm" class="space-y-4" onsubmit="(async function(ev){ try{ ev.preventDefault(); console.debug('inline-login-submitted'); const btn = (ev.target && ev.target.querySelector('[type=submit]')) || document.querySelector('#loginForm button[type=submit]'); if(btn){ try{ btn.disabled=true; btn.dataset.origText = btn.innerText || btn.textContent; btn.innerText = 'Logging in...'; }catch(e){} } const pwd = (document.getElementById('adminPassword')||{}).value || ''; const res = await fetch((window.API_URL||'/api') + '/admin/login',{ method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify({ password: pwd }) }); let data = null; try { data = await res.json(); } catch(e){ data = null; } if (data && data.success && data.token){ try { localStorage.setItem('adminToken', data.token); } catch(e){} try { if (typeof setAdminToken === 'function') setAdminToken(data.token); } catch(e){} try { document.getElementById('loginModal')?.classList.add('hidden'); } catch(e){} try{ const evt = new CustomEvent('adminLoggedIn',{detail:{}}); window.dispatchEvent(evt);}catch(e){} try{ console.debug('inline-login-success'); }catch(e){} } else { try { window.alert('Login failed: ' + (data && data.error ? data.error : 'Invalid credentials')); } catch(e){} try{ console.debug('inline-login-failed', data); }catch(e){} } if(btn){ try{ btn.disabled=false; if(btn.dataset && btn.dataset.origText) btn.innerText = btn.dataset.origText; }catch(e){} } } catch(e){ try { console.error('inline login fallback error', e); } catch(e){} } })(event)">
+            <form id="loginForm" class="space-y-4">
                 <input type="text" name="username" value="admin" style="display:none;" autocomplete="username">
                 <div>
                     <label for="adminPassword" class="block text-sm font-medium text-gray-700 mb-2">Password</label>
@@ -1942,12 +2063,28 @@
         (function(){
             try {
                 // If no admin token present, make the auth overlay visible so users don't get stuck
-                if (!localStorage.getItem('adminToken')) {
+                try { console.debug('[INIT] initial token present=', !!getToken()); } catch(e){}
+                if (!getToken()) {
                     var o = document.getElementById('authOverlay');
                     if (o) { o.classList.remove('hidden'); o.setAttribute('aria-hidden', 'false'); }
                     var app = document.getElementById('adminContent');
                     if (app) { app.classList.add('admin-content-visible'); }
+                } else {
+                    // If token exists, ensure overlay is hidden
+                    var o = document.getElementById('authOverlay');
+                    if (o) { o.classList.add('hidden'); o.setAttribute('aria-hidden', 'true'); }
                 }
+
+                // Extra defensive step: if a token is present at initial load, proactively hide the login modal
+                try {
+                    const token = getToken();
+                    if (token) {
+                        console.debug('[INIT] token present at early init; hiding login modal & overlay');
+                        try { document.getElementById('loginModal')?.classList.add('hidden'); } catch(e){}
+                        try { document.getElementById('loginModal').style.display = 'none'; } catch(e){}
+                        try { const ov = document.getElementById('authOverlay'); if (ov) { ov.classList.add('hidden'); ov.style.display = 'none'; ov.setAttribute('aria-hidden','true'); } } catch(e){}
+                    }
+                } catch(e){}
             } catch (e) { /* ignore */ }
         })();
 
@@ -2111,20 +2248,91 @@
 
         // Token management
         function getAdminToken() {
-            return localStorage.getItem('adminToken');
+            return getToken();
         }
 
+        // Server-side validation flag: true when /api/admin/ping validated the HttpOnly cookie
+        window.__adminServerValidated = false;
+
         function setAdminToken(token) {
-            localStorage.setItem('adminToken', token);
+            setToken(token);
             updateAdminUI();
             setAuthGuard(true);
         }
 
         function clearAdminToken() {
-            localStorage.removeItem('adminToken');
+            clearToken();
+            try { window.__adminServerValidated = false; } catch(e) {}
+            try { localStorage.removeItem('adminLoggedInLocal'); } catch(e) {}
+            // Remove any public fallback cookie
+            try { document.cookie = 'adminTokenPublic=; path=/; max-age=0'; } catch(e) {}
             updateAdminUI();
             setAuthGuard(false);
         }
+
+        // Boot-time rehydration: prefer server-side validation via HttpOnly cookie
+        try {
+            // First, synchronously apply a non-HttpOnly public cookie fallback (dev/test only)
+            try {
+                // DEV: If a localStorage admin token exists (from prior login), rehydrate the UI immediately
+                try {
+                    const localToken = (function(){ try { return localStorage.getItem('adminToken'); } catch(e){ return null; } })();
+                    const host = (location && location.hostname) ? location.hostname : '';
+                    const isLocalHost = host === 'localhost' || host === '127.0.0.1' || host === '0.0.0.0';
+                    if (localToken && isLocalHost) {
+                        console.debug('[INIT] rehydrating admin session from localStorage (dev)');
+                        try { localStorage.setItem('adminLoggedInLocal', '1'); } catch(e){}
+                        try { setAdminToken(localToken); } catch(e){}
+                    }
+                } catch(e){}
+
+                const pub = getCookie('adminTokenPublic');
+                if (pub) {
+                    console.debug('[INIT] synchronous adminTokenPublic detected; applying client fallback');
+                    try { localStorage.setItem('adminToken', pub); } catch(e){}
+                    try { localStorage.setItem('adminLoggedInLocal', '1'); } catch(e){}
+                    try { setAdminToken(pub); } catch(e){}
+                }
+            } catch(e){}
+
+            // Then asynchronously validate server-side session (HttpOnly cookie) and update state
+            (async function doBootPing(){
+                try {
+                    console.debug('[INIT] boot ping starting, document.cookie=', document.cookie);
+                    const res = await fetch((window.API_URL || '/api') + '/admin/ping', { method: 'GET', credentials: 'include' });
+                    console.debug('[INIT] boot ping response status=', res && res.status);
+                    if (res && res.ok) {
+                        console.debug('[INIT] server-side admin session validated');
+                        try { window.__adminServerValidated = true; } catch(e){}
+                        try { document.body.classList.add('admin'); } catch(e){}
+                        try { setAuthGuard(true); } catch(e){}
+                        try { updateAdminUI(); } catch(e){}
+                        try { window.dispatchEvent(new CustomEvent('adminLoggedIn', { detail: {} })); } catch(e){}
+                        // Always hide login modal and overlay if session is valid
+                        try { document.getElementById('loginModal')?.classList.add('hidden'); } catch(e){}
+                        try { document.getElementById('authOverlay')?.classList.add('hidden'); } catch(e){}
+                    } else {
+                        console.debug('[INIT] no server-side session after ping');
+                    }
+                } catch (e) { console.warn('boot rehydrate server check failed', e); }
+            })();
+
+            // Ensure any external login triggers rehydration as well
+            window.addEventListener('adminLoggedIn', async () => {
+                try {
+                    console.debug('[adminLoggedIn] ping starting, document.cookie=', document.cookie);
+                    const pingRes = await fetch((window.API_URL || '/api') + '/admin/ping', { method: 'GET', credentials: 'include' });
+                    console.debug('[adminLoggedIn] ping status=', pingRes && pingRes.status);
+                    if (pingRes && pingRes.ok) {
+                        try { window.__adminServerValidated = true; } catch(e){}
+                        try { document.body.classList.add('admin'); } catch(e){}
+                        try { setAuthGuard(true); } catch(e){}
+                        try { updateAdminUI(); } catch(e){}
+                    }
+                } catch(e){}
+            });
+        } catch(e) {}
+
 
         function setAuthGuard(isAuthed) {
             const overlay = document.getElementById('authOverlay');
@@ -2179,16 +2387,23 @@
 
         function updateAdminUI() {
             const token = getAdminToken();
+            const serverValidated = (typeof window.__adminServerValidated !== 'undefined') ? !!window.__adminServerValidated : false;
+            const isAuthed = !!token || serverValidated;
             const authSign = document.getElementById('adminAuthSign');
             const btnEl = document.getElementById('adminLoginBtn');
             const logoutBtn = document.getElementById('logoutBtn');
-
-            if (token) {
+            if (isAuthed) {
+                console.debug('[UI] updateAdminUI: authed=true; hiding login modal and overlay');
                 if (authSign) authSign.innerHTML = '<i class="fas fa-user-check" aria-hidden="true" title="Logged in"></i>';
                 if (btnEl) { btnEl.style.display = 'none'; }
                 logoutBtn && logoutBtn.classList.remove('hidden');
+                // Ensure login modal & overlay are not visible when authed
+                try { document.getElementById('loginModal')?.classList.add('hidden'); } catch(e) {}
+                try { document.getElementById('loginModal').style.display = 'none'; } catch(e) {}
+                try { const overlay = document.getElementById('authOverlay'); if (overlay) { overlay.classList.add('hidden'); overlay.style.display = 'none'; overlay.setAttribute('aria-hidden','true'); } } catch(e) {}
                 setTimeout(() => updateKnowledgeStatus(), 200);
             } else {
+                console.debug('[UI] updateAdminUI: authed=false; ensuring overlay active');
                 if (authSign) authSign.innerHTML = '<i class="fas fa-user-lock" aria-hidden="true" title="Logged out"></i>';
                 if (btnEl) { btnEl.style.display = 'none'; }
                 logoutBtn && logoutBtn.classList.add('hidden');
@@ -2197,10 +2412,12 @@
 
         // Login functionality
         function openLoginModal() {
-            try { setAuthGuard(false); } catch (e) {}
-            try { document.getElementById('authOverlay')?.classList.add('hidden'); } catch(e) {}
+            try { setAuthGuard && setAuthGuard(false); } catch (e) {}
+            try { document.getElementById('authOverlay')?.classList.remove('hidden'); } catch(e) {}
             try { document.getElementById('loginModal')?.classList.remove('hidden'); } catch(e) {}
-            try { document.getElementById('adminPassword')?.focus(); } catch(e) {}
+            setTimeout(function(){
+                try { document.getElementById('adminPassword')?.focus(); } catch(e) {}
+            }, 100);
         }
 
         function closeLoginModal() {
@@ -2208,6 +2425,8 @@
             try { document.getElementById('loginForm').reset(); } catch(e) {}
             try { setAuthGuard(true); } catch(e) {}
         }
+
+
 
         // keyboard: allow quick support when overlay is visible (press H for help)
         document.addEventListener('keydown', (e) => {
@@ -2222,22 +2441,57 @@
 
         document.getElementById('loginForm').addEventListener('submit', async (e) => {
             e.preventDefault();
+            try { window.__adminLoginHandled = true; } catch(e) {}
             const password = e.target.password.value;
-            
             try {
                 const res = await fetch(`${API_URL}/admin/login`, {
                     method: 'POST',
+                    credentials: 'include',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ password })
                 });
                 
                 const data = await res.json();
+                try { console.debug('[LOGIN] response', res && res.status, data); } catch(e) {}
+                try { console.debug('[LOGIN] document.cookie after login=', document.cookie); } catch(e) {}
                 
-                if (data.success && data.token) {
-                    setAdminToken(data.token);
-                    closeLoginModal();
-                    showToast('success', '✅ Login successful!');
-                    loadAllData();
+                    if (data && data.success && data.token) {
+                    try { window.__adminLoginHandled = true; } catch(e) {}
+                    try { setAdminToken(data.token); } catch(e) {}
+                    try { localStorage.setItem('adminLoggedInLocal', '1'); } catch(e) {}
+                    try { localStorage.setItem('adminToken', data.token); } catch(e) {}
+                    // For dev/local environments, also set a non-HttpOnly public cookie immediately so a quick reload doesn't lose client-side session
+                    try {
+                        if (location && (location.hostname === 'localhost' || location.hostname === '127.0.0.1' || location.hostname === '0.0.0.0')) {
+                            document.cookie = `adminTokenPublic=${data.token}; path=/; max-age=${2*60*60}`;
+                        }
+                    } catch(e) {}
+                    try { closeLoginModal(); } catch(e) {}
+                    // Robust fallback: ensure modal + overlay are hidden and UI updated
+                    try {
+                        const modal = document.getElementById('loginModal');
+                        if (modal) {
+                            modal.classList.add('hidden');
+                            modal.style.display = 'none';
+                            modal.style.visibility = 'hidden';
+                        }
+                    } catch(e) {}
+                    try {
+                        const overlay = document.getElementById('authOverlay');
+                        if (overlay) {
+                            overlay.classList.add('hidden');
+                            overlay.style.display = 'none';
+                            overlay.style.visibility = 'hidden';
+                            overlay.setAttribute('aria-hidden', 'true');
+                        }
+                    } catch(e) {}
+                    try { document.body.classList.add('admin'); } catch(e) {}
+                    try { const sign = document.getElementById('adminAuthSign'); if (sign) sign.innerHTML = '<i class="fas fa-user-check" aria-hidden="true" title="Logged in"></i>'; } catch(e) {}
+                    try { const btn = document.getElementById('adminLoginBtn'); if (btn) btn.style.display = 'none'; } catch(e) {}
+                    try { const logoutBtn = document.getElementById('logoutBtn'); if (logoutBtn) { logoutBtn.classList.remove('hidden'); logoutBtn.style.display = ''; logoutBtn.style.visibility = 'visible'; } } catch(e) {}
+                    try { window.dispatchEvent(new CustomEvent('adminLoggedIn', { detail: {} })); } catch(e) {}
+                    try { showToast('success', '✅ Login successful!'); } catch(e) {}
+                    try { loadAllData(); } catch(e) {}
                 } else {
                     showToast('error', '❌ Invalid password');
                 }
@@ -2246,27 +2500,7 @@
             }
         });
 
-        // Backup handler: if the main login handler fails to run for any reason,
-        // ensure the form still submits using the robust inline helper defined early.
-        try {
-            const _loginForm = document.getElementById('loginForm');
-            if (_loginForm) {
-                _loginForm.addEventListener('submit', function(evt){
-                    // If previous handlers ran and prevented default, skip.
-                    try {
-                        // allow async handlers to run first; queue a fallback shortly after
-                        setTimeout(async () => {
-                            try {
-                                const token = localStorage.getItem('adminToken');
-                                if (token) return; // already logged in by primary handler
-                                const pw = (document.getElementById('adminPassword')||{}).value || '';
-                                await window.__inlineAdminLogin(pw);
-                            } catch(e) { /* ignore */ }
-                        }, 250);
-                    } catch (e) {}
-                }, { capture: false });
-            }
-        } catch (e) {}
+        // (Removed backup fallback to avoid double-submit races with the inline helper)
 
         function adminLogout() {
             // Synchronous immediate logout to avoid timing/order issues
@@ -3809,9 +4043,10 @@
 
                 const res = await fetch(`${API_URL}/components/${footerComponent._id}`, {
                     method: 'PUT',
+                    credentials: 'include',
                     headers: {
                         'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${token}`
+                        'Authorization': token ? `Bearer ${token}` : undefined
                     },
                     body: JSON.stringify(updateData)
                 });
@@ -3945,10 +4180,17 @@
 
                 // Check for token expiration
                 if (res.status === 401 && result && result.error === 'Invalid token') {
-                    clearAdminToken();
-                    showToast('error', 'Session expired. Please login again.');
-                    openLoginModal();
-                    return;
+                    // Don't immediately clear client-side state until we've given the boot ping
+                    // a chance to validate a possible HttpOnly server cookie. Only clear after
+                    // server validation has already occurred; otherwise defer to boot rehydration.
+                    if (window.__adminServerValidated) {
+                        clearAdminToken();
+                        showToast('error', 'Session expired. Please login again.');
+                        openLoginModal();
+                        return;
+                    } else {
+                        console.debug('Received 401 Invalid token but boot validation not complete; deferring clear.');
+                    }
                 }
 
                 if (result.success) {
@@ -5883,9 +6125,8 @@
                 setUploadButtonState(field, true);
                 const res = await fetch(`${API_URL}/payment-settings/upload`, {
                     method: 'POST',
-                    headers: {
-                        'Authorization': `Bearer ${token}`
-                    },
+                    credentials: 'include',
+                    headers: token ? { 'Authorization': `Bearer ${token}` } : undefined,
                     body: formData
                 });
 
@@ -5894,10 +6135,14 @@
                 // If the token is expired/invalid (common after restarts or secret changes),
                 // clear it and force a re-login so uploads can proceed.
                 if (res.status === 401 && data && data.error === 'Invalid token') {
-                    clearAdminToken();
-                    showToast('error', 'Session expired. Please login again.');
-                    openLoginModal();
-                    return;
+                    if (window.__adminServerValidated) {
+                        clearAdminToken();
+                        showToast('error', 'Session expired. Please login again.');
+                        openLoginModal();
+                        return;
+                    } else {
+                        console.debug('Received 401 Invalid token during upload but boot validation not complete; deferring clear.');
+                    }
                 }
 
                 if (!res.ok || !data.success) {

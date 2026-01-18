@@ -1,4 +1,5 @@
-const fetch = require('node-fetch');
+// node-fetch v3 uses ESM default export; wrap require to work in CJS
+const fetch = (...args) => import('node-fetch').then(m => m.default(...args));
 
 (async () => {
   const API = process.env.API_URL || 'http://localhost:3000/api';

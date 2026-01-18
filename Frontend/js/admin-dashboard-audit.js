@@ -20,7 +20,7 @@
     modal.querySelector('#auditCloseBtn').addEventListener('click', ()=> modal.remove());
 
     try{
-      const token = localStorage.getItem('adminToken');
+      const token = (typeof getAdminToken === 'function' ? getAdminToken() : (localStorage ? localStorage.getItem('adminToken') : null));
       const headers = token ? { Authorization: 'Bearer ' + token } : {};
       const res = await fetch(`${window.API_URL || '/api'}/testimonials/admin/${testimonialId}/audits`, { headers });
       const json = await res.json();

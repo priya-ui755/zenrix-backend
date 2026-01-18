@@ -65,7 +65,7 @@
         reprocessBtn.disabled = true;
         reprocessBtn.textContent = 'Processing...';
         try {
-          const token = localStorage.getItem('adminToken');
+          const token = (typeof getAdminToken === 'function' ? getAdminToken() : (localStorage ? localStorage.getItem('adminToken') : null));
           const headers = token ? { 'Authorization': 'Bearer ' + token } : {};
           const res = await fetch('/api/products/reprocess-images', {
             method: 'POST',
@@ -205,7 +205,7 @@
     function editProduct(id) {
       const product = productsCache[id];
       if (!product) return alert('Product not found');
-      try { console.debug('[UI DEBUG] editProduct called, id=', id, 'adminToken=', localStorage.getItem('adminToken')); } catch(e) {}
+      try { console.debug('[UI DEBUG] editProduct called, id=', id, 'adminToken=', (typeof getAdminToken === 'function' ? getAdminToken() : (localStorage ? localStorage.getItem('adminToken') : null))); } catch(e) {}
       const modal = document.getElementById('editProductModal');
       const form = document.getElementById('editProductForm');
       if (!modal || !form) return alert('Edit modal not found');
@@ -233,7 +233,7 @@
         form.onsubmit = async function(e) {
           e.preventDefault();
           const id = form.elements['id'].value;
-          try { console.debug('[UI DEBUG] submit edit form, id=', id, 'adminToken=', localStorage.getItem('adminToken')); } catch(e) {}
+          try { console.debug('[UI DEBUG] submit edit form, id=', id, 'adminToken=', (typeof getAdminToken === 'function' ? getAdminToken() : (localStorage ? localStorage.getItem('adminToken') : null))); } catch(e) {}
           const data = {
             name: form.elements['name'].value,
             price: form.elements['price'].value,
@@ -249,7 +249,7 @@
             saleLabel: form.elements['saleLabel'].value
           };
           try {
-            const token = localStorage.getItem('adminToken');
+            const token = (typeof getAdminToken === 'function' ? getAdminToken() : (localStorage ? localStorage.getItem('adminToken') : null));
             try { console.debug('[UI DEBUG] sending PUT /api/products/' + id + ' tokenExists=' + !!token); } catch(e) {}
             const res = await fetch(`/api/products/${id}`, {
               method: 'PUT',
@@ -279,10 +279,10 @@
 
     // Delete product
     async function deleteProduct(id) {
-      try { console.debug('[UI DEBUG] deleteProduct called, id=', id, 'adminToken=', localStorage.getItem('adminToken')); } catch(e) {}
+      try { console.debug('[UI DEBUG] deleteProduct called, id=', id, 'adminToken=', (typeof getAdminToken === 'function' ? getAdminToken() : (localStorage ? localStorage.getItem('adminToken') : null))); } catch(e) {}
       if (!confirm('Delete this product? This cannot be undone.')) return;
       try {
-        const token = localStorage.getItem('adminToken');
+        const token = (typeof getAdminToken === 'function' ? getAdminToken() : (localStorage ? localStorage.getItem('adminToken') : null));
         try { console.debug('[UI DEBUG] sending DELETE /api/products/' + id + ' tokenExists=' + !!token); } catch(e) {}
         const res = await fetch(`/api/products/${id}`, {
           method: 'DELETE',
@@ -502,9 +502,9 @@
     // --- Testimonials Management ---
     async function loadTestimonials() {
       try {
-        const token = localStorage.getItem('adminToken');
+        const token = (typeof getAdminToken === 'function' ? getAdminToken() : (localStorage ? localStorage.getItem('adminToken') : null));
         const headers = token ? { 'Authorization': 'Bearer ' + token } : {};
-        const res = await fetch(`${window.API_URL || '/api'}/testimonials/admin/all`, { headers });
+        const res = await fetch(`${window.API_URL || '/api'}/testimonials/admin/all`, { headers, credentials: 'include' });
         const data = await res.json();
         if (data && data.success) {
           renderTestimonials(data.data);
@@ -657,7 +657,7 @@
       const row = document.querySelector(`[data-testimonial-id="${id}"]`);
       const prevStatus = row?.querySelector('.status-badge')?.textContent || 'pending';
       try {
-        const token = localStorage.getItem('adminToken');
+        const token = (typeof getAdminToken === 'function' ? getAdminToken() : (localStorage ? localStorage.getItem('adminToken') : null));
         const headers = {
           'Content-Type': 'application/json',
           ...(token ? { 'Authorization': 'Bearer ' + token } : {})
@@ -665,6 +665,7 @@
         const res = await fetch(`${window.API_URL || '/api'}/testimonials/admin/${id}`, {
           method: 'PUT',
           headers,
+          credentials: 'include',
           body: JSON.stringify({ status: 'approved', isActive: true })
         });
         const data = await res.json();
@@ -698,7 +699,7 @@
       const row = document.querySelector(`[data-testimonial-id="${id}"]`);
       const prevStatus = row?.querySelector('.status-badge')?.textContent || 'pending';
       try {
-        const token = localStorage.getItem('adminToken');
+        const token = (typeof getAdminToken === 'function' ? getAdminToken() : (localStorage ? localStorage.getItem('adminToken') : null));
         const headers = {
           'Content-Type': 'application/json',
           ...(token ? { 'Authorization': 'Bearer ' + token } : {})
@@ -739,7 +740,7 @@
       const row = document.querySelector(`[data-testimonial-id="${id}"]`);
       const prevStatus = row?.querySelector('.status-badge')?.textContent || 'approved';
       try {
-        const token = localStorage.getItem('adminToken');
+        const token = (typeof getAdminToken === 'function' ? getAdminToken() : (localStorage ? localStorage.getItem('adminToken') : null));
         const headers = {
           'Content-Type': 'application/json',
           ...(token ? { 'Authorization': 'Bearer ' + token } : {})
@@ -826,7 +827,7 @@
         }
         
         try {
-          const token = localStorage.getItem('adminToken');
+          const token = (typeof getAdminToken === 'function' ? getAdminToken() : (localStorage ? localStorage.getItem('adminToken') : null));
           const headers = {
             'Content-Type': 'application/json',
             ...(token ? { 'Authorization': 'Bearer ' + token } : {})
@@ -837,12 +838,8 @@
             ? `${window.API_URL || '/api'}/testimonials/admin/${testimonial._id}`
             : `${window.API_URL || '/api'}/testimonials/admin`;
           
-          const res = await fetch(url, {
-            method,
-            headers,
-            body: JSON.stringify({ name, review, rating, status })
-          });
-          
+          const res = await fetch(url, { headers, credentials: 'include', method, body: JSON.stringify({ name, review, rating, status }) });
+
           const data = await res.json();
           if (data && data.success) {
             document.body.removeChild(modal);
@@ -864,7 +861,7 @@
 
     async function editTestimonial(id) {
       try {
-        const token = localStorage.getItem('adminToken');
+        const token = (typeof getAdminToken === 'function' ? getAdminToken() : (localStorage ? localStorage.getItem('adminToken') : null));
         const headers = token ? { 'Authorization': 'Bearer ' + token } : {};
         const res = await fetch(`${window.API_URL || '/api'}/testimonials/admin/all`, { headers });
         const data = await res.json();
@@ -883,7 +880,7 @@
       if (!confirm('Are you sure you want to delete this testimonial?')) return;
       
       try {
-        const token = localStorage.getItem('adminToken');
+        const token = (typeof getAdminToken === 'function' ? getAdminToken() : (localStorage ? localStorage.getItem('adminToken') : null));
         const headers = token ? { 'Authorization': 'Bearer ' + token } : {};
         const res = await fetch(`${window.API_URL || '/api'}/testimonials/admin/${id}`, {
           method: 'DELETE',
@@ -927,7 +924,7 @@
     // try fetch live metrics (safe: will not throw if blocked)
     async function fetchOrdersChartData(){
       try{
-        const token = localStorage.getItem('adminToken');
+        const token = (typeof getAdminToken === 'function' ? getAdminToken() : (localStorage ? localStorage.getItem('adminToken') : null));
         if (!token) return sampleOrders;
         const headers = token ? { 'Authorization': 'Bearer ' + token } : {};
         const res = await safeFetch('/api/admin/orders?limit=500', { headers }, { silent: true });
@@ -965,7 +962,7 @@
 
     async function fetchRevenueByDay(){
       try{
-        const token = localStorage.getItem('adminToken');
+        const token = (typeof getAdminToken === 'function' ? getAdminToken() : (localStorage ? localStorage.getItem('adminToken') : null));
         if (!token) throw new Error('No admin token');
         const headers = token ? { 'Authorization': 'Bearer ' + token } : {};
         const res = await safeFetch('/api/admin/orders?limit=1000', { headers }, { silent: true });
@@ -983,7 +980,7 @@
 
     async function fetchPaymentBreakdown(){
       try{
-        const token = localStorage.getItem('adminToken');
+        const token = (typeof getAdminToken === 'function' ? getAdminToken() : (localStorage ? localStorage.getItem('adminToken') : null));
         if (!token) throw new Error('No admin token');
         const headers = token ? { 'Authorization': 'Bearer ' + token } : {};
         const res = await safeFetch('/api/admin/orders?limit=1000', { headers }, { silent: true });
@@ -1069,7 +1066,7 @@
       }
 
       try{
-        const token = localStorage.getItem('adminToken');
+        const token = (typeof getAdminToken === 'function' ? getAdminToken() : (localStorage ? localStorage.getItem('adminToken') : null));
         if (!token) throw new Error('No admin token');
         const headers = token ? { 'Authorization': 'Bearer ' + token } : {};
         const res = await fetch('/api/admin/orders?limit=10', { headers });
@@ -1094,7 +1091,7 @@
       }catch(e){/* ignore */}
 
       try{
-        const token = localStorage.getItem('adminToken');
+        const token = (typeof getAdminToken === 'function' ? getAdminToken() : (localStorage ? localStorage.getItem('adminToken') : null));
         if (!token) throw new Error('No admin token');
         const headers = token ? { 'Authorization': 'Bearer ' + token } : {};
         const res = await fetch('/api/admin/orders?limit=1000', { headers });
