@@ -2321,6 +2321,29 @@ window.__inlineAdminLogin = async function(password){
                         try { document.getElementById('authOverlay')?.classList.add('hidden'); } catch(e){}
                     } else {
                         console.debug('[INIT] no server-side session after ping');
+                        // DEV-FRIENDLY FALLBACK: if a local token exists (saved from prior dev login), try validating
+                        // with an Authorization header. This helps headless runners and localhost reloads where
+                        // the HttpOnly cookie may not persist across navigations.
+                        try {
+                            const localToken = (function(){ try { return localStorage.getItem('adminToken'); } catch(e){ return null; } })();
+                            const host = (location && location.hostname) ? location.hostname : '';
+                            const isLocalHost = host === 'localhost' || host === '127.0.0.1' || host === '0.0.0.0';
+                            if (localToken && isLocalHost) {
+                                try {
+                                    const hdrRes = await fetch((window.API_URL || '/api') + '/admin/ping', { method: 'GET', headers: { 'Authorization': 'Bearer ' + localToken }, credentials: 'include' });
+                                    if (hdrRes && hdrRes.ok) {
+                                        console.debug('[INIT] local token validated via Authorization header (dev fallback)');
+                                        try { window.__adminServerValidated = true; } catch(e){}
+                                        try { document.body.classList.add('admin'); } catch(e){}
+                                        try { setAuthGuard(true); } catch(e){}
+                                        try { updateAdminUI(); } catch(e){}
+                                        try { window.dispatchEvent(new CustomEvent('adminLoggedIn', { detail: { via: 'local-fallback' } })); } catch(e){}
+                                    } else {
+                                        console.debug('[INIT] local token fallback did not validate');
+                                    }
+                                } catch(e) { console.debug('[INIT] local token ping failed', e); }
+                            }
+                        } catch(e){ }
                     }
                 } catch (e) { console.warn('boot rehydrate server check failed', e); }
             })();
