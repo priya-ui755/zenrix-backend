@@ -111,7 +111,7 @@ app.get('/admin-dashboard.html', (req, res) => {
 app.use('/uploads', (req, res, next) => {
   try {
     const rel = req.path.replace(/^\//, ''); // remove leading slash
-    console.debug('[uploads-fallback] requested rel=', rel);
+    console.log('[uploads-fallback] requested rel=', rel);
     const filePath = path.join(__dirname, 'uploads', rel);
     fs.stat(filePath, (err, stat) => {
       if (!err && stat && stat.isFile()) {
