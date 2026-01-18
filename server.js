@@ -110,9 +110,10 @@ app.get('/admin-dashboard.html', (req, res) => {
 app.use(express.static(FRONTEND_DIR));
 
 // Graceful fallback for missing uploads: serve site placeholder image instead of 404
-app.get('/uploads/*', (req, res) => {
+// Use a named glob param to avoid path parsing issues
+app.get('/uploads/:filePath(*)', (req, res) => {
   try {
-    const rel = req.params[0] || '';
+    const rel = req.params.filePath || '';
     const filePath = path.join(__dirname, 'uploads', rel);
     fs.stat(filePath, (err, stat) => {
       if (!err && stat && stat.isFile()) {
