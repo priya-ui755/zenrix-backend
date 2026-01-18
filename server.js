@@ -110,14 +110,17 @@ app.get('/admin-dashboard.html', (req, res) => {
 // Intercept uploads requests and serve placeholder for missing files (middleware style)
 app.use('/uploads', (req, res, next) => {
   try {
+    console.log('[uploads-fallback] req.url=', req.url, ' req.path=', req.path);
     const rel = req.path.replace(/^\//, ''); // remove leading slash
     console.log('[uploads-fallback] requested rel=', rel);
     const filePath = path.join(__dirname, 'uploads', rel);
     fs.stat(filePath, (err, stat) => {
       if (!err && stat && stat.isFile()) {
+        console.log('[uploads-fallback] serving file from uploads:', filePath);
         return res.sendFile(filePath);
       }
       // missing: serve public placeholder
+      console.log('[uploads-fallback] file missing, serving placeholder');
       return res.sendFile(path.join(FRONTEND_DIR, 'assets', 'placeholder.svg'));
     });
   } catch (e) {
