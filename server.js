@@ -142,6 +142,16 @@ app.get('/favicon.ico', (_req, res) => {
   );
 });
 
+// Diagnostic: list routes
+app.get('/__routes', (_req, res) => {
+  try {
+    const routes = (app._router && app._router.stack) ? app._router.stack.filter(l => l && l.route).map(l => ({ path: l.route.path, methods: Object.keys(l.route.methods) })) : [];
+    return res.json({ success: true, routes });
+  } catch (e) {
+    return res.status(500).json({ success: false, error: e.message });
+  }
+});
+
 // API routes
 const adminRoutes = require('./routes/AdminRoutes');
 const authRoutes = require('./routes/AuthRoutes');
