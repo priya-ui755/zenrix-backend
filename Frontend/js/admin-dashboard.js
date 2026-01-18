@@ -920,10 +920,22 @@
       try {
         const canvas = (ctx && ctx.canvas) ? ctx.canvas : ctx;
         // Chart.js exposes a getter to retrieve a chart instance attached to a canvas element
+        // Try Chart.js API first
         const existing = (typeof Chart.getChart === 'function') ? Chart.getChart(canvas) : null;
         if (existing && typeof existing.destroy === 'function') {
           try { existing.destroy(); } catch(e) { /* ignore */ }
         }
+        // Also attempt to find chart by canvas id or by iterating instances (compat)
+        try {
+          const canvasId = (canvas && canvas.id) ? canvas.id : null;
+          if (canvasId && typeof Chart.getChart === 'function') {
+            const byId = Chart.getChart(document.getElementById(canvasId));
+            if (byId && typeof byId.destroy === 'function') try { byId.destroy(); } catch(e){}
+          }
+          if (typeof Chart.instances !== 'undefined') {
+            Object.values(Chart.instances).forEach(inst => { try { if (inst && inst.canvas === canvas && typeof inst.destroy === 'function') inst.destroy(); } catch(e){} });
+          }
+        } catch(e){}
         // Also check our local tracking map as a fallback
         const prev = _charts.get(canvas);
         if (prev && typeof prev.destroy === 'function') {
