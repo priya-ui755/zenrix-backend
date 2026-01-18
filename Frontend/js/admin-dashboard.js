@@ -919,6 +919,12 @@
       if (!window.Chart) return null;
       try {
         const canvas = (ctx && ctx.canvas) ? ctx.canvas : ctx;
+        // Chart.js exposes a getter to retrieve a chart instance attached to a canvas element
+        const existing = (typeof Chart.getChart === 'function') ? Chart.getChart(canvas) : null;
+        if (existing && typeof existing.destroy === 'function') {
+          try { existing.destroy(); } catch(e) { /* ignore */ }
+        }
+        // Also check our local tracking map as a fallback
         const prev = _charts.get(canvas);
         if (prev && typeof prev.destroy === 'function') {
           try { prev.destroy(); } catch (e) { /* ignore */ }

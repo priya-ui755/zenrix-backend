@@ -111,23 +111,24 @@ app.use(express.static(FRONTEND_DIR));
 
 // Graceful fallback for missing uploads: serve site placeholder image instead of 404
 // Use a named glob param to avoid path parsing issues
-app.get(/^\/uploads\/(.*)$/ , (req, res) => {
+// Intercept uploads requests and serve placeholder for missing files (middleware style)
+app.use('/uploads', (req, res, next) => {
   try {
-    const rel = (req.params && req.params[0]) ? req.params[0] : '';
+    const rel = req.path.replace(/^\//, ''); // remove leading slash
     console.debug('[uploads-fallback] requested rel=', rel);
     const filePath = path.join(__dirname, 'uploads', rel);
     fs.stat(filePath, (err, stat) => {
       if (!err && stat && stat.isFile()) {
         return res.sendFile(filePath);
       }
-      // if missing, serve public placeholder (keeps console free of noisy 404s)
+      // missing: serve public placeholder
       return res.sendFile(path.join(FRONTEND_DIR, 'assets', 'placeholder.svg'));
     });
   } catch (e) {
     try { return res.sendFile(path.join(FRONTEND_DIR, 'assets', 'placeholder.svg')); } catch(_){ return res.status(404).end(); }
-  }
 });
 
+// Fallback static handler (keeps existing static serving for uploads directory)
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // Avoid noisy 404s for browsers requesting /favicon.ico.
