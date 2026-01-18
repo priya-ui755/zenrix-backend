@@ -114,6 +114,7 @@ app.use(express.static(FRONTEND_DIR));
 app.get(/^\/uploads\/(.*)$/ , (req, res) => {
   try {
     const rel = (req.params && req.params[0]) ? req.params[0] : '';
+    console.debug('[uploads-fallback] requested rel=', rel);
     const filePath = path.join(__dirname, 'uploads', rel);
     fs.stat(filePath, (err, stat) => {
       if (!err && stat && stat.isFile()) {
