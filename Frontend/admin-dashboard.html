@@ -415,7 +415,8 @@ window.__inlineAdminLogin = async function(password){
                         <button class="btn btn-link text-secondary pr-3" id="sidebarToggle" aria-label="Toggle sidebar" aria-controls="adminSidebar" aria-expanded="true">
                             <i class="fas fa-bars"></i>
                         </button>
-                        <span class="brand-text font-weight-bold text-indigo-800" style="letter-spacing:0.5px">Zenrix Admin</span>
+                        <span id="adminTopBrand" class="brand-text font-weight-bold text-indigo-800" style="letter-spacing:0.5px">Zenrix Admin</span>
+                        <span id="adminTopCompany" class="ml-2 badge badge-light text-indigo-800 border border-indigo-200" style="letter-spacing:0.2px">Zenrix</span>
                     </div>
                         <ul class="navbar-nav ml-auto" role="list" style="overflow: visible; align-items: center;">
                             <li class="nav-item mr-2 d-flex align-items-center">
@@ -468,7 +469,8 @@ window.__inlineAdminLogin = async function(password){
 
                 <aside id="adminSidebar" class="main-sidebar sidebar-dark-primary elevation-4">
                         <a href="#" class="brand-link text-center">
-                                <span class="brand-text font-weight-light">Zenrix AdminLTE</span>
+                        <span id="adminSidebarBrand" class="brand-text font-weight-light">Zenrix AdminLTE</span>
+                        <div id="adminSidebarCompany" class="small text-white-50 mt-1">Zenrix</div>
                         </a>
                         <div class="sidebar">
                                 <nav class="mt-2">
@@ -479,6 +481,7 @@ window.__inlineAdminLogin = async function(password){
                                                 <li class="nav-item"><a href="#" class="nav-link" data-jump-tab="components"><i class="nav-icon fas fa-th-large"></i><p>Components</p></a></li>
 
                                                 <li class="nav-item"><a href="#" class="nav-link" data-jump-tab="footer-editor"><i class="nav-icon fas fa-edit"></i><p>Footer & Contact</p></a></li>
+                                                <li class="nav-item"><a href="#" class="nav-link" data-jump-tab="site-settings"><i class="nav-icon fas fa-cogs"></i><p>Site Settings</p></a></li>
                                                 
                                                 <li class="nav-item"><a href="#" class="nav-link" data-jump-tab="hero"><i class="nav-icon fas fa-images"></i><p>Hero</p></a></li>
                                                 <li class="nav-item"><a href="#" class="nav-link" data-jump-tab="payments"><i class="nav-icon fas fa-credit-card"></i><p>Payments</p></a></li>
@@ -1023,6 +1026,89 @@ window.__inlineAdminLogin = async function(password){
                 </div>
             </div>
 
+            </div>
+
+            <!-- Site Settings Tab -->
+            <div id="content-site-settings" class="p-6 hidden">
+                <div class="bg-gradient-to-r from-slate-50 to-indigo-50 rounded-xl p-6 mb-6 border border-slate-100">
+                    <div class="flex items-center justify-between mb-4">
+                        <div>
+                            <h2 class="text-2xl font-bold text-gray-800 flex items-center">
+                                <svg class="w-6 h-6 mr-2 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.591 1.052c1.527-.94 3.31.842 2.371 2.37a1.724 1.724 0 001.052 2.592c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.052 2.591c.94 1.527-.842 3.31-2.37 2.371a1.724 1.724 0 00-2.592 1.052c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.591-1.052c-1.527.94-3.31-.842-2.371-2.37a1.724 1.724 0 00-1.052-2.592c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.052-2.591c-.94-1.527.842-3.31 2.37-2.371.958.593 2.208.07 2.592-1.052z"/>
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                                </svg>
+                                Site Settings
+                            </h2>
+                            <p class="text-sm text-gray-600 mt-1">Restore the missing branding controls here. Company name and site title are edited in this section.</p>
+                        </div>
+                        <button id="refreshSiteSettings" class="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition">
+                            Refresh
+                        </button>
+                    </div>
+
+                    <form id="siteSettingsForm" class="space-y-4">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Site Title</label>
+                                <input type="text" name="siteTitle" placeholder="Zenrix" class="w-full px-4 py-2 border border-gray-300 rounded-lg text-sm">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Company Name</label>
+                                <input type="text" name="companyName" placeholder="Zenrix" class="w-full px-4 py-2 border border-gray-300 rounded-lg text-sm">
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Logo URL</label>
+                                <input type="url" name="logoUrl" placeholder="/assets/logo.png" class="w-full px-4 py-2 border border-gray-300 rounded-lg text-sm">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Favicon URL</label>
+                                <input type="url" name="faviconUrl" placeholder="/assets/favicon.ico" class="w-full px-4 py-2 border border-gray-300 rounded-lg text-sm">
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Primary Color</label>
+                                <input type="text" name="primaryColor" placeholder="#4f46e5" class="w-full px-4 py-2 border border-gray-300 rounded-lg text-sm">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Secondary Color</label>
+                                <input type="text" name="secondaryColor" placeholder="#2563eb" class="w-full px-4 py-2 border border-gray-300 rounded-lg text-sm">
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Support Hours</label>
+                                <input type="text" name="supportHours" placeholder="Mon-Fri 9am-6pm" class="w-full px-4 py-2 border border-gray-300 rounded-lg text-sm">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Legal Email</label>
+                                <input type="email" name="legalEmail" placeholder="legal@zenrix.com.np" class="w-full px-4 py-2 border border-gray-300 rounded-lg text-sm">
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Footer HTML</label>
+                            <textarea name="footerHtml" rows="4" placeholder="Optional footer HTML snippet" class="w-full px-4 py-2 border border-gray-300 rounded-lg text-sm"></textarea>
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Hero Text Overrides (JSON)</label>
+                            <textarea name="heroTextOverrides" rows="5" placeholder='{"title":"Welcome to Zenrix","subtitle":"Your digital marketplace"}' class="w-full px-4 py-2 border border-gray-300 rounded-lg text-sm font-mono"></textarea>
+                            <p class="text-xs text-gray-500 mt-2">Use valid JSON to override homepage hero text fields.</p>
+                        </div>
+
+                        <div class="flex items-center justify-between pt-4">
+                            <div class="text-xs text-gray-500">This restores the branding fields that were removed from the old Site Settings panel.</div>
+                            <button type="submit" class="px-6 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition">Save Site Settings</button>
+                        </div>
+                    </form>
+                </div>
             </div>
 
             <!-- Hero Settings Tab -->
@@ -2631,7 +2717,7 @@ window.__inlineAdminLogin = async function(password){
 
         // Tab switching
         function switchTab(tab) {
-            ['dashboard', 'products', 'pages', 'components', 'hero', 'payments', 'orders', 'careers', 'staff', 'subscribers', 'tickets'].forEach(t => {
+            ['dashboard', 'products', 'pages', 'components', 'footer-editor', 'site-settings', 'hero', 'payments', 'orders', 'careers', 'staff', 'subscribers', 'testimonials', 'tickets'].forEach(t => {
                 const tabBtn = document.getElementById(`tab-${t}`);
                 const content = document.getElementById(`content-${t}`);
                 if (tabBtn) {
@@ -2672,6 +2758,9 @@ window.__inlineAdminLogin = async function(password){
             }
             if (tab === 'footer-editor') {
                 loadFooterEditor();
+            }
+            if (tab === 'site-settings') {
+                loadSiteSettings();
             }
 
         }
@@ -4018,9 +4107,54 @@ window.__inlineAdminLogin = async function(password){
             }
         }
 
+        async function loadSiteSettings() {
+            try {
+                const res = await fetch(`${API_URL}/site-settings`);
+                const result = await res.json();
+                if (!result.success) {
+                    showToast('error', 'Failed to load site settings');
+                    return;
+                }
+                const data = result.data || {};
+                const form = document.getElementById('siteSettingsForm');
+                if (!form) return;
+                form.querySelector('[name="siteTitle"]').value = data.siteTitle || '';
+                form.querySelector('[name="companyName"]').value = data.companyName || '';
+                form.querySelector('[name="logoUrl"]').value = data.logoUrl || '';
+                form.querySelector('[name="faviconUrl"]').value = data.faviconUrl || '';
+                form.querySelector('[name="primaryColor"]').value = data.primaryColor || '';
+                form.querySelector('[name="secondaryColor"]').value = data.secondaryColor || '';
+                form.querySelector('[name="supportHours"]').value = data.supportHours || '';
+                form.querySelector('[name="legalEmail"]').value = data.legalEmail || '';
+                form.querySelector('[name="footerHtml"]').value = data.footerHtml || '';
+                form.querySelector('[name="heroTextOverrides"]').value = data.heroTextOverrides ? JSON.stringify(data.heroTextOverrides, null, 2) : '';
+                syncAdminBranding(data);
+            } catch (err) {
+                showToast('error', 'Failed to load site settings');
+            }
+        }
+
+        function syncAdminBranding(siteSettings) {
+            const company = (siteSettings && (siteSettings.companyName || siteSettings.siteTitle)) ? String(siteSettings.companyName || siteSettings.siteTitle).trim() : 'Zenrix';
+            const siteTitle = (siteSettings && siteSettings.siteTitle) ? String(siteSettings.siteTitle).trim() : 'Zenrix Admin';
+            const topBrand = document.getElementById('adminTopBrand');
+            const topCompany = document.getElementById('adminTopCompany');
+            const sidebarBrand = document.getElementById('adminSidebarBrand');
+            const sidebarCompany = document.getElementById('adminSidebarCompany');
+            if (topBrand) topBrand.textContent = siteTitle;
+            if (topCompany) topCompany.textContent = company;
+            if (sidebarBrand) sidebarBrand.textContent = `${siteTitle}`;
+            if (sidebarCompany) sidebarCompany.textContent = company;
+        }
+
         document.getElementById('refreshFooterEditor')?.addEventListener('click', () => {
             loadFooterEditor();
             showToast('success', 'Footer data refreshed');
+        });
+
+        document.getElementById('refreshSiteSettings')?.addEventListener('click', () => {
+            loadSiteSettings();
+            showToast('success', 'Site settings refreshed');
         });
 
         document.getElementById('previewFooterBtn')?.addEventListener('click', () => {
@@ -4174,6 +4308,63 @@ window.__inlineAdminLogin = async function(password){
                         }
                     } catch (err) { console.warn('Failed to push footer to contact page', err && err.message ? err.message : err); }
 
+                } else {
+                    showToast('error', '❌ Failed: ' + (result.error || 'Unknown error'));
+                }
+            } catch (err) {
+                showToast('error', '❌ ' + err.message);
+            }
+        });
+
+        document.getElementById('siteSettingsForm')?.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const token = getAdminToken();
+            if (!token) {
+                showToast('error', 'Please login first');
+                openLoginModal();
+                return;
+            }
+
+            const form = document.getElementById('siteSettingsForm');
+            const heroTextOverridesRaw = form.querySelector('[name="heroTextOverrides"]').value.trim();
+            let heroTextOverrides = {};
+            if (heroTextOverridesRaw) {
+                try {
+                    heroTextOverrides = JSON.parse(heroTextOverridesRaw);
+                } catch (err) {
+                    showToast('error', 'Hero Text Overrides must be valid JSON');
+                    return;
+                }
+            }
+
+            const payload = {
+                siteTitle: form.querySelector('[name="siteTitle"]').value.trim(),
+                companyName: form.querySelector('[name="companyName"]').value.trim(),
+                logoUrl: form.querySelector('[name="logoUrl"]').value.trim(),
+                faviconUrl: form.querySelector('[name="faviconUrl"]').value.trim(),
+                primaryColor: form.querySelector('[name="primaryColor"]').value.trim(),
+                secondaryColor: form.querySelector('[name="secondaryColor"]').value.trim(),
+                supportHours: form.querySelector('[name="supportHours"]').value.trim(),
+                legalEmail: form.querySelector('[name="legalEmail"]').value.trim(),
+                footerHtml: form.querySelector('[name="footerHtml"]').value.trim(),
+                heroTextOverrides
+            };
+
+            try {
+                const res = await fetch(`${API_URL}/site-settings`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify(payload)
+                });
+                const result = await res.json();
+                if (result.success) {
+                    syncAdminBranding(result.data || payload);
+                    try { localStorage.setItem('siteSettings', JSON.stringify(result.data || payload)); } catch (e) {}
+                    try { window.dispatchEvent(new CustomEvent('siteSettingsUpdated', { detail: result.data || payload })); } catch (e) {}
+                    showToast('success', '✅ Site settings updated');
                 } else {
                     showToast('error', '❌ Failed: ' + (result.error || 'Unknown error'));
                 }
@@ -6295,6 +6486,7 @@ window.__inlineAdminLogin = async function(password){
                 loadProducts(),
                 loadPages(),
                 loadComponents(),
+                loadSiteSettings(),
 
                 loadHero(),
                 loadCarousel(),
