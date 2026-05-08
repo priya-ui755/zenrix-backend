@@ -12,6 +12,15 @@
     <link rel="stylesheet" href="style.css">
     <script src="/js/format-utils.js"></script>
     <script src="script.js" defer></script>
+    <script>
+        // Apply theme IMMEDIATELY before any components load
+        (function() {
+            const stored = localStorage.getItem('zenrix_theme');
+            const theme = (stored === 'light' || stored === 'dark') ? stored : 'light';
+            const themeClass = theme === 'light' ? 'theme-light' : 'theme-dark';
+            document.documentElement.classList.add(themeClass);
+        })();
+    </script>
 </head>
 <body class="surface text relative home-page">
     <div class="absolute inset-0 opacity-70" aria-hidden="true" style="background-image: radial-gradient(circle at 20% 20%, rgba(99,102,241,0.25), transparent 45%), radial-gradient(circle at 80% 0%, rgba(8,145,178,0.25), transparent 40%), radial-gradient(circle at 50% 80%, rgba(244,114,182,0.2), transparent 45%);"></div>

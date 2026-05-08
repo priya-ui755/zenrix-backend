@@ -20,6 +20,11 @@ const siteSettingsSchema = new mongoose.Schema({
   footerHtml: { type: String, default: '' },
   footerBottomText: { type: String, default: '© 2026 Zenrix. All rights reserved.' },
   heroTextOverrides: { type: Object, default: {} },
+  // New branding fields
+  logoUrl: { type: String, default: '' },
+  faviconUrl: { type: String, default: '' },
+  primaryColor: { type: String, default: '#4f46e5' },
+  secondaryColor: { type: String, default: '#2563eb' },
   updatedBy: { type: String, default: '' }
 }, { timestamps: true });
 

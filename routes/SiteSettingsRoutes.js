@@ -36,7 +36,7 @@ router.put('/', requireAdmin, async (req, res) => {
     const settings = await SiteSettings.getOrCreate();
     const body = req.body || {};
     // Allow updating the core fields - keep it permissive but safe
-    const allowed = ['siteTitle','companyName','supportEmail','supportPhone','supportChatLink','supportHours','legalEmail','address','mapEmbedUrl','socialLinks','footerHtml','footerBottomText','heroTextOverrides','updatedBy'];
+    const allowed = ['siteTitle','companyName','supportEmail','supportPhone','supportChatLink','supportHours','legalEmail','address','mapEmbedUrl','socialLinks','footerHtml','footerBottomText','heroTextOverrides','logoUrl','faviconUrl','primaryColor','secondaryColor','updatedBy'];
     let changed = false;
     for (const k of allowed) {
       if (typeof body[k] !== 'undefined') {

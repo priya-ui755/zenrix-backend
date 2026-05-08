@@ -1,5 +1,6 @@
 /* Base Styles */
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Clash+Display:wght@500;600;700&family=Space+Grotesk:wght@400;500;600&display=swap');
 
 * {
     margin: 0;
@@ -49,6 +50,21 @@ h1, h2, h3, h4, h5, h6, .display-font {
     --chat-blur: 12px;
 }
 
+/* About page — ensure CMS/about images show the full photo inside a fixed height */
+#companyContent img, .prose img {
+    width: 100%;
+    height: var(--about-image-height, 420px); /* change this value to adjust the visible image height */
+    object-fit: contain; /* show full photo (no cropping) */
+    object-position: center center;
+    display: block;
+    border-radius: 12px; /* subtle rounding to match site cards */
+}
+@media (max-width: 768px) {
+    #companyContent img, .prose img {
+        height: var(--about-image-height-mobile, 240px);
+    }
+}
+
 /* Semantic utility helpers (use these in templates instead of hard-coded dark utilities) */
 .text { color: var(--text) !important; }
 .surface { background: var(--surface) !important; color: var(--text) !important; }
@@ -58,6 +74,7 @@ h1, h2, h3, h4, h5, h6, .display-font {
 
 /* small helpers */
 .muted { color: var(--muted) !important; }
+.text-accent { color: var(--accent) !important; }
 
 
 /* Theme base */
@@ -2508,4 +2525,388 @@ html.theme-light .bg-gradient-to-r.from-indigo-500 {
     color: #ffffff !important;
 }
 
+/* ==================== PREMIUM & MODERN ENHANCEMENTS ==================== */
+
+/* Refined button animations for premium feel */
+button, a[class*="btn"], input[type="button"], input[type="submit"] {
+    transition: all 0.3s cubic-bezier(0.23, 1, 0.320, 1);
+    position: relative;
+    overflow: hidden;
+}
+
+/* Premium button hover states */
+.btn-primary:hover {
+    box-shadow: 0 20px 50px rgba(79,70,229,0.25), 0 8px 16px rgba(79,70,229,0.15) !important;
+    transform: translateY(-2px) !important;
+}
+
+.btn-primary:active {
+    transform: translateY(0px) !important;
+    box-shadow: 0 8px 20px rgba(79,70,229,0.15) !important;
+}
+
+/* Enhanced form input styling */
+input:not([type="checkbox"]):not([type="radio"]):not([type="range"]),
+textarea, select {
+    transition: all 0.3s ease;
+    border-radius: 12px;
+    position: relative;
+}
+
+input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):focus,
+textarea:focus, select:focus {
+    box-shadow: 0 0 0 4px rgba(99,102,241,0.15), inset 0 1px 2px rgba(0,0,0,0.06) !important;
+    transform: translateY(-1px);
+}
+
+input::placeholder {
+    transition: color 0.3s ease;
+    color: rgba(94,109,126,0.6);
+}
+
+input:focus::placeholder {
+    color: rgba(94,109,126,0.3);
+}
+
+/* Modern card elevation and interactivity */
+.card, .glass-panel, [class*="card"], [class*="panel"] {
+    transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), 
+                box-shadow 0.3s ease, 
+                border-color 0.3s ease;
+}
+
+/* Premium link styling with sophisticated underline animation */
+a {
+    position: relative;
+    text-decoration: none;
+}
+
+a::after {
+    content: '';
+    position: absolute;
+    bottom: -2px;
+    left: 0;
+    width: 0;
+    height: 2px;
+    background: linear-gradient(90deg, var(--accent), transparent);
+    transition: width 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+a:hover::after {
+    width: 100%;
+}
+
+/* Remove underline from non-text links */
+a[class*="btn"]::after, a.card::after, a.chip::after {
+    display: none !important;
+}
+
+/* Refined loading state animation */
+.skeleton {
+    animation: shimmer 2s infinite;
+    background: linear-gradient(90deg, 
+        var(--surface-2) 0%, 
+        rgba(255,255,255,0.08) 50%, 
+        var(--surface-2) 100%);
+    background-size: 200% 100%;
+}
+
+@keyframes shimmer {
+    0% { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
+}
+
+/* Premium badge and pill styles */
+.badge, .pill, .badge-row span {
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    transition: all 0.25s ease;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+}
+
+.badge:hover, .pill:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 30px rgba(0,0,0,0.15);
+}
+
+/* Enhanced CTA styling */
+[class*="cta"], [class*="primary-action"] {
+    position: relative;
+    z-index: 1;
+    overflow: hidden;
+}
+
+/* Smooth page transitions */
+html {
+    scroll-behavior: smooth;
+}
+
+/* Refined focus ring for accessibility */
+*:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 3px;
+    border-radius: 4px;
+}
+
+button:focus-visible {
+    outline-offset: 2px;
+}
+
+/* Premium text selection */
+::selection {
+    background: linear-gradient(135deg, var(--accent), var(--accent-600));
+    color: #ffffff;
+    text-shadow: none;
+}
+
+/* Enhanced images with modern transitions */
+img {
+    transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.product-media img:hover {
+    transform: scale(1.05);
+    filter: brightness(1.08);
+}
+
+/* Refined section spacing for premium layout */
+section {
+    transition: all 0.5s ease;
+}
+
+section:hover {
+    box-shadow: 0 0 0 1px rgba(99,102,241,0.05);
+}
+
+/* Premium animation keyframes */
+@keyframes slideInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 100%;
+        transform: translateY(0);
+    }
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes scaleIn {
+    from { 
+        opacity: 0;
+        transform: scale(0.95);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+/* Apply animations with stagger effect */
+.product-card, .card, [class*="grid"] > * {
+    animation: slideInUp 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) backwards;
+}
+
+.product-card:nth-child(1) { animation-delay: 0.1s; }
+.product-card:nth-child(2) { animation-delay: 0.15s; }
+.product-card:nth-child(3) { animation-delay: 0.2s; }
+.product-card:nth-child(4) { animation-delay: 0.25s; }
+.product-card:nth-child(n+5) { animation-delay: 0.3s; }
+
+/* Modern scrollbar styling */
+::-webkit-scrollbar {
+    width: 12px;
+    height: 12px;
+}
+
+::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+    background: linear-gradient(180deg, var(--accent), var(--accent-600));
+    border-radius: 6px;
+    border: 3px solid transparent;
+    background-clip: content-box;
+    transition: all 0.3s ease;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(180deg, var(--accent-600), var(--accent));
+    background-clip: content-box;
+}
+
+/* Refined input styling with premium feel */
+input[type="range"] {
+    appearance: none;
+    width: 100%;
+    height: 6px;
+    border-radius: 3px;
+    background: linear-gradient(90deg, var(--accent), var(--accent-600));
+    outline: none;
+    -webkit-appearance: none;
+}
+
+input[type="range"]::-webkit-slider-thumb {
+    appearance: none;
+    -webkit-appearance: none;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--accent), var(--accent-600));
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(99,102,241,0.3);
+    transition: all 0.3s ease;
+    border: 2px solid #ffffff;
+}
+
+input[type="range"]::-webkit-slider-thumb:hover {
+    transform: scale(1.25);
+    box-shadow: 0 8px 24px rgba(99,102,241,0.4);
+}
+
+input[type="range"]::-moz-range-thumb {
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--accent), var(--accent-600));
+    cursor: pointer;
+    border: 2px solid #ffffff;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 12px rgba(99,102,241,0.3);
+}
+
+/* Premium checkbox and radio styling */
+input[type="checkbox"], input[type="radio"] {
+    appearance: none;
+    -webkit-appearance: none;
+    width: 20px;
+    height: 20px;
+    border: 2px solid var(--accent);
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    background: linear-gradient(135deg, rgba(255,255,255,0.05), rgba(255,255,255,0.02));
+    position: relative;
+}
+
+input[type="radio"] {
+    border-radius: 50%;
+}
+
+input[type="checkbox"]:checked, input[type="radio"]:checked {
+    background: linear-gradient(135deg, var(--accent), var(--accent-600));
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px rgba(99,102,241,0.2);
+}
+
+input[type="checkbox"]:hover, input[type="radio"]:hover {
+    border-color: var(--accent-600);
+}
+
+/* Modern text effects */
+h1, h2, h3, h4, h5, h6 {
+    background: linear-gradient(135deg, var(--text), rgba(var(--text-rgb), 0.85));
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+html.theme-light h1, 
+html.theme-light h2, 
+html.theme-light h3, 
+html.theme-light h4, 
+html.theme-light h5, 
+html.theme-light h6 {
+    background: linear-gradient(135deg, #0f172a, #1f2937);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+/* Back to text rendering to avoid accessibility issues */
+h1, h2, h3, h4, h5, h6 {
+    background: none;
+    -webkit-text-fill-color: unset;
+    color: var(--text);
+}
+
+html.theme-light h1, 
+html.theme-light h2, 
+html.theme-light h3, 
+html.theme-light h4, 
+html.theme-light h5, 
+html.theme-light h6 {
+    color: #0f172a;
+    font-weight: 800;
+}
+
+/* Premium table styling */
+table {
+    border-collapse: collapse;
+    width: 100%;
+}
+
+th {
+    background: linear-gradient(135deg, rgba(99,102,241,0.1), rgba(168,85,247,0.06));
+    padding: 16px;
+    text-align: left;
+    font-weight: 700;
+    border-bottom: 2px solid var(--accent);
+    transition: background 0.3s ease;
+}
+
+tr:hover {
+    background: rgba(99,102,241,0.05);
+}
+
+td {
+    padding: 14px 16px;
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+    transition: all 0.3s ease;
+}
+
+/* Modern divider styling */
+hr, .divider {
+    border: none;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--accent), transparent);
+    margin: 2rem 0;
+    transition: all 0.3s ease;
+}
+
+/* Refined list styling */
+ul, ol {
+    list-style: none;
+    padding-left: 0;
+}
+
+li {
+    padding-left: 28px;
+    position: relative;
+    margin-bottom: 12px;
+    transition: all 0.3s ease;
+}
+
+li::before {
+    content: '→';
+    position: absolute;
+    left: 0;
+    color: var(--accent);
+    font-weight: 700;
+    opacity: 0.7;
+    transition: all 0.3s ease;
+}
+
+li:hover::before {
+    opacity: 1;
+    transform: translateX(4px);
+}
+
+/* ================================================================== */
 /* End of normalization block */

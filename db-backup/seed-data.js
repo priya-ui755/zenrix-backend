@@ -302,10 +302,68 @@ async function seedDatabase() {
       {
         slug: 'footer',
         name: 'Main Footer',
-        html: `<div class="footer-about">
-          <a href="/" class="footer-logo">Zenrix</a>
-          <p>Your one-stop shop for quality products at affordable prices.</p>
-        </div>`,
+        html: `<!-- FOOTER TEMPLATE (editable sections) -->
+<div class="footer-about">
+  <a class="brand" href="/"><span class="orb"></span>Zenrix</a>
+  <p class="lede">Your one-stop shop for quality products at affordable prices.</p>
+
+  <div class="cta-row" data-footer-cta>
+    <a class="btn primary" href="/products.html">Zenrix</a>
+    <a class="btn ghost" href="/contact.html">Talk to us</a>
+  </div>
+</div>
+
+<div class="footer-stayclose">
+  <div class="column-title">Stay close</div>
+  <p class="lede" style="max-width: 320px; margin: 0;">New drops, back-in-stock notes, and launches without the noise.</p>
+  <div class="social">
+    <a href="#" aria-label="Facebook">Facebook</a>
+    <a href="#" aria-label="Twitter">Twitter</a>
+    <a href="#" aria-label="Instagram">Instagram</a>
+    <a href="#" aria-label="YouTube">YouTube</a>
+  </div>
+</div>
+
+<div class="footer-shop">
+  <div class="column-title">Shop</div>
+  <ul class="links-list">
+    <li><a href="/products.html">All Products</a></li>
+    <li><a href="/products.html?category=electronics">Electronics</a></li>
+    <li><a href="/products.html?category=fashion">Fashion</a></li>
+    <li><a href="/products.html?category=home">Home &amp; Kitchen</a></li>
+    <li><a href="/products.html?category=beauty">Beauty</a></li>
+  </ul>
+</div>
+
+<div class="footer-company">
+  <div class="column-title">Company</div>
+  <ul class="links-list">
+    <li><a href="/about.html">About</a></li>
+    <li><a href="/careers.html">Careers</a></li>
+    <li><a href="/blog.html">Blog</a></li>
+    <li><a href="/privacy.html">Privacy</a></li>
+    <li><a href="/terms.html">Terms</a></li>
+  </ul>
+</div>
+
+<div class="footer-support">
+  <div class="column-title">Support</div>
+  <div class="contact-lines">
+    <div><span>Email</span> support@zenrix.com</div>
+    <div><span>Phone</span> <span data-footer-phone>+977 9819922314</span></div>
+    <div><span>Chat</span> Live chat 9am-9pm</div>
+  </div>
+  <a href="/support.html" class="support-btn" style="text-decoration: none;">Open support</a>
+</div>
+
+<div class="footer-bottom">
+  <span>&copy; <span data-footer-year></span> Zenrix. Built for modern shoppers.</span>
+  <div class="badge-row">
+    <span class="mini-badge">Secure checkout</span>
+    <span class="mini-badge">48h support</span>
+    <span class="mini-badge">Tracked shipping</span>
+  </div>
+</div>`,
         published: true
       }
     ]);

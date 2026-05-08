@@ -149,9 +149,11 @@ class CustomNavbar extends HTMLElement {
                     opacity: 1;
                 }
                 :host-context(.theme-light) .brand {
-                    background: none;
-                    -webkit-text-fill-color: #0f172a;
-                    color: #0f172a;
+                    background: linear-gradient(135deg, #4f46e5, #2563eb, #1d4ed8);
+                    -webkit-background-clip: text;
+                    -webkit-text-fill-color: transparent;
+                    background-clip: text;
+                    color: #4f46e5;
                 }
                 :host-context(.theme-light) .nav-links a { color: #1f2937; }
                 :host-context(.theme-light) .nav-links a:hover { background: rgba(15,23,42,0.06); color: #0f172a; }
@@ -581,24 +583,15 @@ class CustomNavbar extends HTMLElement {
         // About dropdown removed — keep a simple About link in the navbar only.
         // Any advanced preview behavior is now available on the dedicated About page.
 
-        // Theme toggle
+        // Theme toggle — use global theme system from script.js
         const themeBtn = this.shadowRoot.getElementById('themeToggleBtn');
         const iconSpan = themeBtn?.querySelector('.theme-icon');
         const labelSpan = themeBtn?.querySelector('.theme-label');
 
-        const getCurrentTheme = () => {
-            // Prefer an explicit stored preference; otherwise default to light (dark is secondary)
+        const getGlobalTheme = () => {
             const stored = localStorage.getItem('zenrix_theme');
             if (stored === 'dark' || stored === 'light') return stored;
             return 'light';
-        };
-
-        const setTheme = (theme) => {
-            const next = theme === 'light' ? 'theme-light' : 'theme-dark';
-            document.documentElement.classList.remove('theme-light', 'theme-dark');
-            document.documentElement.classList.add(next);
-            localStorage.setItem('zenrix_theme', theme === 'light' ? 'light' : 'dark');
-            window.dispatchEvent(new CustomEvent('zenrix-theme-changed', { detail: { theme } }));
         };
 
         const syncThemeButton = (theme) => {
@@ -613,19 +606,28 @@ class CustomNavbar extends HTMLElement {
         };
 
         if (themeBtn) {
-            // Apply stored/system theme at startup so the page renders correctly
-            setTheme(getCurrentTheme());
-            syncThemeButton(getCurrentTheme());
+            // Sync button display on page load
+            syncThemeButton(getGlobalTheme());
+            
+            // Call global toggleTheme() if available, otherwise fallback to local implementation
             themeBtn.addEventListener('click', () => {
-                const current = getCurrentTheme();
-                const next = current === 'light' ? 'dark' : 'light';
-                // Apply immediately in case global listener is missing
-                setTheme(next);
-                // Notify any global listeners (script.js) to stay in sync
-                window.dispatchEvent(new CustomEvent('zenrix-theme-toggle', { detail: { theme: next }, bubbles: true, composed: true }));
+                if (typeof window.toggleTheme === 'function') {
+                    window.toggleTheme();
+                } else {
+                    // Fallback for pages without script.js loaded
+                    const current = getGlobalTheme();
+                    const next = current === 'light' ? 'dark' : 'light';
+                    const nextClass = next === 'light' ? 'theme-light' : 'theme-dark';
+                    document.documentElement.classList.remove('theme-light', 'theme-dark');
+                    document.documentElement.classList.add(nextClass);
+                    localStorage.setItem('zenrix_theme', next);
+                    window.dispatchEvent(new CustomEvent('zenrix-theme-changed', { detail: { theme: next } }));
+                }
             });
+            
+            // Listen for theme changes from anywhere (script.js or other components)
             window.addEventListener('zenrix-theme-changed', (e) => {
-                syncThemeButton(e.detail?.theme || getCurrentTheme());
+                syncThemeButton(e.detail?.theme || getGlobalTheme());
             });
         }
 

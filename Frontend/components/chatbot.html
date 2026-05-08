@@ -44,6 +44,25 @@
   .bubble.user { background:linear-gradient(90deg,#0f172a,#111827); color:#fff; align-self:flex-end; }
   .bubble img { width:48px; height:48px; border-radius:8px; object-fit:cover; }
 
+  /* Typing indicator */
+  .bubble.typing-indicator { background: #eef6f6; }
+  .typing-dot { width: 8px; height: 8px; border-radius: 50%; background: #0f172a; display: inline-block; margin: 0 2px; animation: typing 1.4s infinite; }
+  .typing-dot:nth-child(2) { animation-delay: 0.2s; }
+  .typing-dot:nth-child(3) { animation-delay: 0.4s; }
+  @keyframes typing { 0%, 60%, 100% { transform: translateY(0); } 30% { transform: translateY(-10px); } }
+
+  /* Rating buttons */
+  .rating-buttons { font-size: 12px; }
+  .rating-btn { padding: 4px 8px; border: 1px solid #ccc; border-radius: 4px; background: white; cursor: pointer; transition: all 0.2s; font-size: 12px; }
+  .rating-btn:hover { background: #f0f0f0; border-color: #999; }
+  .rating-btn:active { transform: scale(0.95); }
+
+  /* Quick replies */
+  .quick-replies { font-size: 12px; }
+  .quick-reply-btn { padding: 6px 10px; border: 1px solid #0ea5a9; border-radius: 6px; background: white; color: #0f172a; cursor: pointer; transition: all 0.2s; font-size: 12px; font-weight: 500; }
+  .quick-reply-btn:hover { background: #0ea5a9; color: white; }
+  .quick-reply-btn:active { transform: scale(0.95); }
+
   .chat-footer { display:flex; gap:8px; padding:10px; border-top:1px solid #eee; }
   .chat-footer input { flex:1; padding:10px 12px; border-radius:10px; border:1px solid #e6eef0; outline:none; }
   .chat-footer button { padding:8px 12px; border-radius:10px; border:none; background:#0f172a; color:#fff; cursor:pointer; }

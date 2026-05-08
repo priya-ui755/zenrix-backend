@@ -9,6 +9,14 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css">
     <script src="/js/format-utils.js"></script>
     <script src="script.js" defer></script>
+    <script>
+        (function() {
+            const stored = localStorage.getItem('zenrix_theme');
+            const theme = (stored === 'light' || stored === 'dark') ? stored : 'light';
+            const themeClass = theme === 'light' ? 'theme-light' : 'theme-dark';
+            document.documentElement.classList.add(themeClass);
+        })();
+    </script>
 </head>
 <body class="surface text min-h-screen">
     <custom-navbar></custom-navbar>
