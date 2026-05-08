@@ -3,7 +3,13 @@ const router = express.Router();
 const passport = require('passport');
 const jwt = require('jsonwebtoken');
 
-const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key-change-this';
+const JWT_SECRET = process.env.JWT_SECRET || 'zenrix-secret';
+
+function safeJsonForInlineScript(value) {
+  // Prevent breaking out of <script> context (e.g. via </script>)
+  // and keep the payload valid JS.
+  return JSON.stringify(value).replace(/</g, '\\u003c');
+}
 
 // Google OAuth Routes
 router.get('/google', passport.authenticate('google', {
@@ -15,6 +21,15 @@ router.get('/google/callback',
   (req, res) => {
     // Generate JWT token
     const token = jwt.sign({ userId: req.user._id }, JWT_SECRET, { expiresIn: '30d' });
+
+    const userPayload = {
+      id: req.user._id,
+      firstName: req.user.firstName,
+      lastName: req.user.lastName,
+      email: req.user.email,
+      membershipTier: req.user.membershipTier,
+      avatar: req.user.avatar
+    };
     
     // Redirect to a page that will set the token in localStorage
     res.send(`
@@ -24,14 +39,8 @@ router.get('/google/callback',
         <title>Authentication Successful</title>
         <script>
           localStorage.setItem('userToken', '${token}');
-          localStorage.setItem('userData', '${JSON.stringify({
-            id: req.user._id,
-            firstName: req.user.firstName,
-            lastName: req.user.lastName,
-            email: req.user.email,
-            membershipTier: req.user.membershipTier,
-            avatar: req.user.avatar
-          })}');
+          const userData = ${safeJsonForInlineScript(userPayload)};
+          localStorage.setItem('userData', JSON.stringify(userData));
           window.location.href = '/profile.html';
         </script>
       </head>
@@ -53,6 +62,15 @@ router.get('/facebook/callback',
   (req, res) => {
     // Generate JWT token
     const token = jwt.sign({ userId: req.user._id }, JWT_SECRET, { expiresIn: '30d' });
+
+    const userPayload = {
+      id: req.user._id,
+      firstName: req.user.firstName,
+      lastName: req.user.lastName,
+      email: req.user.email,
+      membershipTier: req.user.membershipTier,
+      avatar: req.user.avatar
+    };
     
     // Redirect to a page that will set the token in localStorage
     res.send(`
@@ -62,14 +80,8 @@ router.get('/facebook/callback',
         <title>Authentication Successful</title>
         <script>
           localStorage.setItem('userToken', '${token}');
-          localStorage.setItem('userData', '${JSON.stringify({
-            id: req.user._id,
-            firstName: req.user.firstName,
-            lastName: req.user.lastName,
-            email: req.user.email,
-            membershipTier: req.user.membershipTier,
-            avatar: req.user.avatar
-          })}');
+          const userData = ${safeJsonForInlineScript(userPayload)};
+          localStorage.setItem('userData', JSON.stringify(userData));
           window.location.href = '/profile.html';
         </script>
       </head>

@@ -5,10 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Wishlist | Zenrix</title>
     <link rel="stylesheet" href="style.css">
-    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="/css/tailwind-site.css">
+    <script src="/js/format-utils.js"></script>
     <script src="script.js" defer></script>
 </head>
-<body class="bg-slate-950 text-slate-100">
+<body class="surface text">
     <custom-navbar></custom-navbar>
     <main class="relative">
         <section class="relative overflow-hidden bg-gradient-to-br from-indigo-900 via-slate-900 to-slate-950 py-14">
@@ -99,7 +100,7 @@
 
         function buildWishlistCard(item) {
             const pid = getProductId(item) || '';
-            const image = item.image || (Array.isArray(item.images) && item.images[0]) || 'https://via.placeholder.com/600x600?text=Zenrix';
+            const image = item.image || (Array.isArray(item.images) && item.images[0]) || '/assets/placeholder.svg';
             const name = item.name || item.title || 'Saved item';
             const sale = typeof isSaleActive === 'function' && isSaleActive(item);
             const effectivePrice = typeof getEffectivePrice === 'function' ? getEffectivePrice(item) : (item.price || 0);

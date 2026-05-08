@@ -5,8 +5,16 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Blog | ShopNest</title>
     <link rel="stylesheet" href="style.css">
-    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="/css/tailwind-site.css">
     <script src="script.js" defer></script>
+    <script>
+        (function() {
+            const stored = localStorage.getItem('zenrix_theme');
+            const theme = (stored === 'light' || stored === 'dark') ? stored : 'light';
+            const themeClass = theme === 'light' ? 'theme-light' : 'theme-dark';
+            document.documentElement.classList.add(themeClass);
+        })();
+    </script>
 </head>
 <body class="bg-gray-50">
     <custom-navbar></custom-navbar>

@@ -38,7 +38,7 @@ router.get('/:id', requireAuth, async (req, res, next) => {
 // Create new ticket (authenticated users)
 router.post('/', requireAuth, async (req, res, next) => {
   try {
-    const { subject, description, category, priority } = req.body;
+    const { subject, description, category, priority, source } = req.body;
     if (!subject || !description) {
       return res.status(400).json({ success: false, error: 'Subject and description are required' });
     }
@@ -49,6 +49,7 @@ router.post('/', requireAuth, async (req, res, next) => {
       description,
       category: category || 'other',
       priority: priority || 'medium',
+      source: source === 'api' ? 'api' : 'user',
       messages: [{
         sender: 'user',
         senderName: `${req.user.firstName || ''} ${req.user.lastName || ''}`.trim(),
@@ -117,6 +118,29 @@ router.post('/guest', guestTicketLimiter, async (req, res, next) => {
     }
     next(error);
   }
+});
+
+// Public view for guest tickets via id + guest_email query param
+router.get('/public/:id', async (req, res, next) => {
+  try {
+    const id = req.params.id;
+    const email = (req.query.email || '').trim();
+    if (!id || !email) return res.status(400).json({ success:false, error:'id and email query parameters are required' });
+
+    const ticket = await Ticket.findById(id).lean();
+    if (!ticket) return res.status(404).json({ success:false, error:'Ticket not found' });
+
+    if (!ticket.guestEmail || ticket.guestEmail.toLowerCase() !== email.toLowerCase()){
+      return res.status(403).json({ success:false, error:'Access denied' });
+    }
+
+    // Strip sensitive fields
+    const safe = Object.assign({}, ticket);
+    delete safe.guestEmail;
+    delete safe.guestName;
+    res.json({ success:true, data: safe });
+
+  } catch (err) { next(err); }
 });
 
 // Admin: mark ticket seen/unseen

@@ -4,12 +4,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>My Profile | Zenrix</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="/css/tailwind-site.css">
     <link rel="stylesheet" href="style.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css">
     <script src="script.js?v=20251230" defer></script>
 </head>
-<body class="bg-slate-950 text-slate-100">
+<body class="surface text">
     <custom-navbar></custom-navbar>
 
     <!-- Loading State -->
@@ -40,11 +40,91 @@
     </div>
 
     <!-- Main Profile Content -->
-    <main id="profileContent" class="hidden">
-                <div class="flex justify-end mb-6">
-                    <button type="button" id="logoutBtn" class="flex items-center gap-2 px-5 py-2 rounded-xl border border-red-500/30 bg-red-500/10 hover:bg-red-500/20 text-red-100 font-semibold">
-
-                        <i class="fas fa-sign-out-alt"></i> Log Out
+        <main id="profileContent" class="hidden pt-6">
+                    <div class="container mx-auto max-w-6xl px-4 flex justify-end pt-2 pb-6">
+                                        <!-- Star logout button -->
+                                        <button id="logoutBtn" class="star-btn profile-logout-btn" type="button" aria-label="Log out">
+                      Log Out
+                      <div class="star-1">
+                        <svg xmlns="http://www.w3.org/2000/svg" xml:space="preserve" version="1.1" style="shape-rendering:geometricPrecision; text-rendering:geometricPrecision; image-rendering:optimizeQuality; fill-rule:evenodd; clip-rule:evenodd" viewBox="0 0 784.11 815.53">
+                          <g id="Layer_x0020_1"><path class="fil0" d="M392.05 0c-20.9,210.08 -184.06,378.41 -392.05,407.78 207.96,29.37 371.12,197.68 392.05,407.74 20.93,-210.06 184.09,-378.37 392.05,-407.74 -207.98,-29.38 -371.16,-197.69 -392.06,-407.78z"></path></g>
+                        </svg>
+                      </div>
+                      <div class="star-2">
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          xml:space="preserve"
+                          version="1.1"
+                          style="shape-rendering:geometricPrecision; text-rendering:geometricPrecision; image-rendering:optimizeQuality; fill-rule:evenodd; clip-rule:evenodd"
+                          viewBox="0 0 784.11 815.53"
+                          xmlns:xlink="http://www.w3.org/1999/xlink"
+                        >
+                          <g id="Layer_x0020_1">
+                            <metadata id="CorelCorpID_0Corel-Layer"></metadata>
+                            <path class="fil0" d="M392.05 0c-20.9,210.08 -184.06,378.41 -392.05,407.78 207.96,29.37 371.12,197.68 392.05,407.74 20.93,-210.06 184.09,-378.37 392.05,-407.74 -207.98,-29.38 -371.16,-197.69 -392.06,-407.78z"></path>
+                          </g>
+                        </svg>
+                      </div>
+                      <div class="star-3">
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          xml:space="preserve"
+                          version="1.1"
+                          style="shape-rendering:geometricPrecision; text-rendering:geometricPrecision; image-rendering:optimizeQuality; fill-rule:evenodd; clip-rule:evenodd"
+                          viewBox="0 0 784.11 815.53"
+                          xmlns:xlink="http://www.w3.org/1999/xlink"
+                        >
+                          <g id="Layer_x0020_1">
+                            <metadata id="CorelCorpID_0Corel-Layer"></metadata>
+                            <path class="fil0" d="M392.05 0c-20.9,210.08 -184.06,378.41 -392.05,407.78 207.96,29.37 371.12,197.68 392.05,407.74 20.93,-210.06 184.09,-378.37 392.05,-407.74 -207.98,-29.38 -371.16,-197.69 -392.06,-407.78z"></path>
+                          </g>
+                        </svg>
+                      </div>
+                      <div class="star-4">
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          xml:space="preserve"
+                          version="1.1"
+                          style="shape-rendering:geometricPrecision; text-rendering:geometricPrecision; image-rendering:optimizeQuality; fill-rule:evenodd; clip-rule:evenodd"
+                          viewBox="0 0 784.11 815.53"
+                          xmlns:xlink="http://www.w3.org/1999/xlink"
+                        >
+                          <g id="Layer_x0020_1">
+                            <metadata id="CorelCorpID_0Corel-Layer"></metadata>
+                            <path class="fil0" d="M392.05 0c-20.9,210.08 -184.06,378.41 -392.05,407.78 207.96,29.37 371.12,197.68 392.05,407.74 20.93,-210.06 184.09,-378.37 392.05,-407.74 -207.98,-29.38 -371.16,-197.69 -392.06,-407.78z"></path>
+                          </g>
+                        </svg>
+                      </div>
+                      <div class="star-5">
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          xml:space="preserve"
+                          version="1.1"
+                          style="shape-rendering:geometricPrecision; text-rendering:geometricPrecision; image-rendering:optimizeQuality; fill-rule:evenodd; clip-rule:evenodd"
+                          viewBox="0 0 784.11 815.53"
+                          xmlns:xlink="http://www.w3.org/1999/xlink"
+                        >
+                          <g id="Layer_x0020_1">
+                            <metadata id="CorelCorpID_0Corel-Layer"></metadata>
+                            <path class="fil0" d="M392.05 0c-20.9,210.08 -184.06,378.41 -392.05,407.78 207.96,29.37 371.12,197.68 392.05,407.74 20.93,-210.06 184.09,-378.37 392.05,-407.74 -207.98,-29.38 -371.16,-197.69 -392.06,-407.78z"></path>
+                          </g>
+                        </svg>
+                      </div>
+                      <div class="star-6">
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          xml:space="preserve"
+                          version="1.1"
+                          style="shape-rendering:geometricPrecision; text-rendering:geometricPrecision; image-rendering:optimizeQuality; fill-rule:evenodd; clip-rule:evenodd"
+                          viewBox="0 0 784.11 815.53"
+                          xmlns:xlink="http://www.w3.org/1999/xlink"
+                        >
+                          <g id="Layer_x0020_1">
+                            <metadata id="CorelCorpID_0Corel-Layer"></metadata>
+                            <path class="fil0" d="M392.05 0c-20.9,210.08 -184.06,378.41 -392.05,407.78 207.96,29.37 371.12,197.68 392.05,407.74 20.93,-210.06 184.09,-378.37 392.05,-407.74 -207.98,-29.38 -371.16,-197.69 -392.06,-407.78z"></path>
+                          </g>
+                        </svg>
+                      </div>
                     </button>
                 </div>
         <section class="relative overflow-hidden bg-gradient-to-br from-slate-900 via-indigo-900 to-purple-900 py-12">
@@ -64,22 +144,21 @@
                             <div id="sidebarTier" class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 border border-white/10 text-sm text-slate-100">
                                 <i class="fas fa-crown"></i>
                                 <span>Bronze Member</span>
-                            </div>
-                            <p class="text-slate-300 text-sm">Your account, orders, and saved items in one place.</p>
+                            </div>                            <p id="memberSince" class="text-xs text-slate-400 mt-1">Member since —</p>                            <p class="text-slate-300 text-sm">Your account, orders, and saved items in one place.</p>
                         </div>
                     </div>
                     <div class="grid grid-cols-3 gap-3">
                         <div class="bg-white/5 border border-white/10 rounded-2xl p-4 text-white shadow">
                             <p class="text-xs uppercase tracking-[0.3em] text-indigo-100">Orders</p>
-                            <p id="ordersTotal" class="text-3xl font-bold mt-2">0</p>
+                            <p id="kpiOrders" class="text-3xl font-bold mt-2">0</p>
+                        </div>
+                        <div class="bg-white/5 border border-white/10 rounded-2xl p-4 text-white shadow">
+                            <p class="text-xs uppercase tracking-[0.3em] text-indigo-100">Pending</p>
+                            <p id="kpiPending" class="text-3xl font-bold mt-2">0</p>
                         </div>
                         <div class="bg-white/5 border border-white/10 rounded-2xl p-4 text-white shadow">
                             <p class="text-xs uppercase tracking-[0.3em] text-indigo-100">Wishlist</p>
-                            <p id="wishlistCount" class="text-3xl font-bold mt-2">0</p>
-                        </div>
-                        <div class="bg-white/5 border border-white/10 rounded-2xl p-4 text-white shadow">
-                            <p class="text-xs uppercase tracking-[0.3em] text-indigo-100">Member since</p>
-                            <p id="memberSince" class="text-xl font-semibold mt-2">&mdash;</p>
+                            <p id="kpiWishlist" class="text-3xl font-bold mt-2">0</p>
                         </div>
                     </div>
                 </div>
@@ -87,6 +166,85 @@
         </section>
 
         <section class="container mx-auto max-w-6xl px-4 py-10 space-y-8">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div class="bg-white/5 border border-white/10 rounded-2xl p-5 text-white shadow">
+                    <p class="text-sm text-indigo-100">Cart Items</p>
+                    <p id="kpiCartCount" class="text-2xl font-bold">0</p>
+                    <p class="text-xs text-slate-300 mt-1">Total <span id="kpiCartTotal" class="font-semibold">रु 0.00</span></p>
+                </div>
+                <div class="bg-white/5 border border-white/10 rounded-2xl p-5 text-white shadow">
+                    <p class="text-sm text-indigo-100">Member Tier</p>
+                    <p id="kpiTier" class="text-xl font-bold">—</p>
+                    <p id="kpiEmail" class="text-sm text-slate-300 mt-1">—</p>
+                </div>
+                <div class="bg-white/5 border border-white/10 rounded-2xl p-5 text-white shadow">
+                    <p class="text-sm text-indigo-100">Last Activity</p>
+                    <p id="kpiLastOrder" class="text-xl font-bold">No recent orders</p>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 xl:grid-cols-2 gap-6">
+                <div class="bg-white/5 border border-white/10 rounded-2xl p-6 shadow-xl">
+                    <div class="flex items-center justify-between mb-3">
+                        <div>
+                            <h3 class="text-lg font-semibold text-white">Recent Orders</h3>
+                            <p class="text-sm text-slate-300">Your latest purchases.</p>
+                        </div>
+                        <a href="orders.html" class="text-indigo-200 text-sm font-semibold hover:text-white">View all</a>
+                    </div>
+                    <div id="recentOrders" class="space-y-3 text-slate-100">
+                        <p class="text-slate-300">No orders yet.</p>
+                    </div>
+                </div>
+
+                <div class="bg-white/5 border border-white/10 rounded-2xl p-6 shadow-xl">
+                    <div class="flex items-center justify-between mb-3">
+                        <div>
+                            <h3 class="text-lg font-semibold text-white">Wishlist Items</h3>
+                            <p class="text-sm text-slate-300">Quick view of saved items.</p>
+                        </div>
+                        <a href="wishlist.html" class="text-indigo-200 text-sm font-semibold hover:text-white">View wishlist</a>
+                    </div>
+                    <div id="wishlistItems" class="grid grid-cols-1 md:grid-cols-2 gap-3 text-slate-100">
+                        <p class="text-slate-300">No items in wishlist.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 xl:grid-cols-3 gap-6">
+                <div class="xl:col-span-2 bg-white/5 border border-white/10 rounded-2xl p-6 shadow-xl">
+                    <div class="flex items-center justify-between mb-4">
+                        <div>
+                            <h3 class="text-lg font-semibold text-white">Saved Addresses</h3>
+                            <p class="text-slate-300 text-sm">Delivery locations.</p>
+                        </div>
+                        <a href="addresses.html" class="text-indigo-200 text-sm font-semibold hover:text-white">Manage</a>
+                    </div>
+                    <div id="addressesList" class="grid grid-cols-1 md:grid-cols-2 gap-3 text-slate-100">
+                        <p class="text-slate-300">No addresses added yet.</p>
+                    </div>
+                </div>
+                <div class="bg-white/5 border border-white/10 rounded-2xl p-6 shadow-xl space-y-3">
+                    <h3 class="text-lg font-semibold text-white">Quick Links</h3>
+                    <a href="orders.html" class="flex items-center justify-between p-3 rounded-xl border border-white/10 bg-white/5 hover:bg-white/10">
+                        <span class="font-medium text-white">Order History</span>
+                        <i class="fas fa-arrow-right text-slate-300"></i>
+                    </a>
+                    <a href="cart.html" class="flex items-center justify-between p-3 rounded-xl border border-white/10 bg-white/5 hover:bg-white/10">
+                        <span class="font-medium text-white">Go to Cart</span>
+                        <i class="fas fa-arrow-right text-slate-300"></i>
+                    </a>
+                    <a href="wishlist.html" class="flex items-center justify-between p-3 rounded-xl border border-white/10 bg-white/5 hover:bg-white/10">
+                        <span class="font-medium text-white">View Wishlist</span>
+                        <i class="fas fa-arrow-right text-slate-300"></i>
+                    </a>
+                    <a href="addresses.html" class="flex items-center justify-between p-3 rounded-xl border border-white/10 bg-white/5 hover:bg-white/10">
+                        <span class="font-medium text-white">Manage Addresses</span>
+                        <i class="fas fa-arrow-right text-slate-300"></i>
+                    </a>
+                </div>
+            </div>
+
             <div class="grid lg:grid-cols-[1.05fr_0.95fr] gap-5">
                 <div class="bg-white/5 border border-white/10 rounded-2xl p-6 shadow-xl">
                     <div class="flex items-center justify-between mb-4">
@@ -243,7 +401,7 @@
                     </div>
                     <a href="addresses.html" class="text-indigo-200 text-sm font-semibold hover:text-white">Manage</a>
                 </div>
-                <div id="addressesList" class="grid grid-cols-1 md:grid-cols-2 gap-3 text-slate-100">
+                <div id="addressesPreview" class="grid grid-cols-1 md:grid-cols-2 gap-3 text-slate-100">
                     <p class="text-slate-300">No addresses added yet.</p>
                 </div>
             </div>
@@ -300,6 +458,129 @@
             }
         }
 
+        function setText(id, text) {
+            const el = document.getElementById(id);
+            if (el) el.textContent = text;
+        }
+
+        function renderWishlist(items) {
+            const container = document.getElementById('wishlistItems');
+            if (!items || items.length === 0) {
+                container.innerHTML = '<p class="text-slate-300">No items in wishlist.</p>';
+                return;
+            }
+            container.innerHTML = items.slice(0, 4).map(item => {
+                const name = item.name || item.title || 'Item';
+                const price = item.price ? formatNpr(item.price) : '';
+                return `<div class="flex items-center gap-3 p-3 rounded-xl border border-white/10 bg-white/5">
+                    <div class="w-10 h-10 bg-white/10 rounded-lg flex items-center justify-center text-indigo-200"><i class="fas fa-heart"></i></div>
+                    <div class="flex-1"><p class="font-semibold text-white">${name}</p><p class="text-sm text-slate-300">${price}</p></div>
+                </div>`;
+            }).join('');
+        }
+
+        function renderAddresses(addresses) {
+            const container = document.getElementById('addressesList');
+            if (!addresses || addresses.length === 0) {
+                container.innerHTML = '<p class="text-slate-300">No addresses added yet.</p>';
+                return;
+            }
+            container.innerHTML = addresses.slice(0, 4).map(addr => {
+                const title = addr.type || 'Address';
+                const lines = [addr.addressLine1, addr.addressLine2, addr.city, addr.state, addr.zipCode, addr.country].filter(Boolean).join(', ');
+                const badge = addr.isDefault ? '<span class="ml-2 text-xs font-semibold text-emerald-100 bg-emerald-500/20 px-2 py-1 rounded-full border border-emerald-400/30">Default</span>' : '';
+                return `<div class="border border-white/10 bg-white/5 rounded-xl p-4 text-slate-100">
+                    <p class="font-semibold">${title}${badge}</p>
+                    <p class="text-sm text-slate-300 mt-1">${lines || 'No address details'}</p>
+                </div>`;
+            }).join('');
+        }
+
+        function renderOrders(orders) {
+            const container = document.getElementById('recentOrders');
+            if (!orders || orders.length === 0) {
+                container.innerHTML = '<p class="text-slate-300">No orders yet.</p>';
+                return;
+            }
+            container.innerHTML = orders.slice(0, 3).map(order => {
+                const created = order.createdAt ? new Date(order.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) : '';
+                return `<div class="border border-white/10 rounded-xl p-3 flex items-center justify-between bg-white/5">
+                    <div>
+                        <p class="font-semibold text-white">Order #${order._id?.slice(-6) || ''}</p>
+                        <p class="text-sm text-slate-300">${created} • ${order.items?.length || 0} items</p>
+                    </div>
+                    <div class="text-right">
+                        <p class="text-sm font-semibold text-white">${formatNpr(order.total || 0)}</p>
+                        <p class="text-xs text-slate-300">${order.status || ''}</p>
+                    </div>
+                </div>`;
+            }).join('');
+            const last = orders[0];
+            if (last) {
+                const created = last.createdAt ? new Date(last.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) : 'recently';
+                setText('kpiLastOrder', `Order ${created}`);
+            }
+        }
+
+        async function fetchJson(url, options = {}) {
+            const res = await fetch(url, options);
+            return res.json();
+        }
+
+        async function loadDashboard() {
+            const token = getAuthToken();
+            const headers = { 'Authorization': `Bearer ${token}` };
+
+            const [profileRes, wishlistRes, addressesRes, ordersSummaryRes, cartSummaryRes, ordersRes] = await Promise.all([
+                fetchJson('/api/users/profile', { headers }),
+                fetchJson('/api/users/wishlist', { headers }),
+                fetchJson('/api/users/addresses', { headers }),
+                fetchJson('/api/users/orders/summary', { headers }),
+                fetchJson('/api/users/cart/summary', { headers }),
+                fetchJson('/api/users/orders', { headers })
+            ]);
+
+            if (!profileRes.success) throw new Error(profileRes.error || 'Profile load failed');
+            const user = profileRes.data;
+            const fullName = `${user.firstName || ''} ${user.lastName || ''}`.trim();
+            setText('sidebarName', fullName || 'User');
+            setText('sidebarTier', `${user.membershipTier || 'Member'} Member`);
+            const joinDate = user.createdAt ? new Date(user.createdAt).toLocaleDateString('en-US', { year: 'numeric', month: 'short' }) : '';
+            setText('memberSince', `Member since ${joinDate || '—'}`);
+            const avatar = user.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(fullName || 'User')}&size=200&background=4f46e5&color=fff`;
+            const avatarEl = document.getElementById('sidebarAvatar');
+            if (avatarEl) avatarEl.src = avatar;
+            setText('kpiTier', user.membershipTier || 'Member');
+            setText('kpiEmail', user.email || '');
+
+            if (wishlistRes.success) {
+                setText('kpiWishlist', wishlistRes.data.length || 0);
+                renderWishlist(wishlistRes.data || []);
+            }
+
+            if (addressesRes.success) {
+                renderAddresses(addressesRes.data || []);
+            }
+
+            if (ordersSummaryRes.success) {
+                const s = ordersSummaryRes.data;
+                setText('kpiOrders', s.total);
+                setText('kpiPending', s.pending);
+                setText('kpiCompleted', s.completed);
+            }
+
+            if (cartSummaryRes.success) {
+                const c = cartSummaryRes.data;
+                setText('kpiCartCount', c.count || 0);
+                const total = c.total || 0;
+                setText('kpiCartTotal', formatNpr(total));
+            }
+
+            if (ordersRes.success) {
+                renderOrders(ordersRes.data || []);
+            }
+        }
+
         async function loadProfile() {
             try {
                 const token = getAuthToken();
@@ -330,7 +611,7 @@
                     loadWishlistCount();
 
                     const joinDate = new Date(user.createdAt);
-                    document.getElementById('memberSince').textContent = joinDate.toLocaleDateString('en-US', { year: 'numeric', month: 'short' });
+                    setText('memberSince', joinDate.toLocaleDateString('en-US', { year: 'numeric', month: 'short' }));
                 } else {
                     throw new Error(data.error);
                 }
@@ -348,7 +629,8 @@
                 });
                 const data = await res.json();
                 if (data.success) {
-                    document.getElementById('wishlistCount').textContent = data.data.length;
+                    // Update visible KPI if present
+                    setText('kpiWishlist', data.data.length || 0);
                     renderWishlistItems(data.data);
                 }
             } catch (err) {
@@ -357,7 +639,8 @@
         }
 
         function renderWishlistItems(items) {
-            const container = document.getElementById('wishlistItems');
+            const container = document.getElementById('wishlistItemsPreview');
+            if (!container) return;
             if (!items || items.length === 0) {
                 container.innerHTML = '<p class="text-slate-300">No items in wishlist.</p>';
                 return;
@@ -393,8 +676,9 @@
             }
         }
 
-        function renderAddresses(addresses) {
-            const container = document.getElementById('addressesList');
+        function renderAddressesPreview(addresses) {
+            const container = document.getElementById('addressesPreview');
+            if (!container) return;
             if (!addresses || addresses.length === 0) {
                 container.innerHTML = '<p class="text-slate-300">No addresses added yet.</p>';
                 return;
@@ -566,11 +850,9 @@
                 loadingState.classList.add('hidden');
                 notLoggedInState.classList.remove('hidden');
             } else {
-                loadProfile()
+                loadDashboard()
                     .then(() => {
-                        loadAddresses();
-                        loadOrdersSummary();
-                        loadCartSummary();
+                        loadProfile();
                         loadingState.classList.add('hidden');
                         profileContent.classList.remove('hidden');
                     })

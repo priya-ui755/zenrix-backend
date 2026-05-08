@@ -1,8 +1,28 @@
 // Ensure logout is always available globally
 window.logout = logout;
+// Simple HTML sanitizer to prevent XSS
+function sanitizeHtml(html) {
+    const temp = document.createElement('div');
+    temp.innerHTML = html;
+    // Remove script and style tags
+    const scripts = temp.querySelectorAll('script, style');
+    scripts.forEach(el => el.remove());
+    // Remove event handlers
+    const all = temp.querySelectorAll('*');
+    all.forEach(el => {
+        for (let attr of el.attributes) {
+            if (attr.name.startsWith('on')) {
+                el.removeAttribute(attr.name);
+            }
+        }
+    });
+    return temp.innerHTML;
+}
 // ==================== LOGOUT (GLOBAL) ====================
 function logout() {
     try {
+        // Remove both modern and legacy keys to ensure user is fully logged out
+        localStorage.removeItem('token');
         localStorage.removeItem('userToken');
         localStorage.removeItem('userData');
     } catch (e) {}
@@ -23,6 +43,9 @@ const API_URL = (() => {
     }
     return DEFAULT_API_URL;
 })();
+
+// Allows Admin-edited pages/components to override the support email used by the Contact form.
+window.ZENRIX_SUPPORT_EMAIL = window.ZENRIX_SUPPORT_EMAIL || 'support@zenrix.com';
 const CART_STORAGE_KEY = 'zenrix_cart';
 
 function normalizeCartItems(items = []) {
@@ -43,6 +66,9 @@ const saleCountdownRegistry = new Map();
 let productCountdownTimer = null;
 
 let heroConfig = null;
+let carouselConfig = null;
+let heroCarouselIndex = 0;
+let heroCarouselTimer = null;
 
 const catalogFilters = {
     products: [],
@@ -116,8 +142,8 @@ const THEME_STORAGE_KEY = 'zenrix_theme';
 function resolvePreferredTheme() {
     const stored = localStorage.getItem(THEME_STORAGE_KEY);
     if (stored === 'light' || stored === 'dark') return stored;
-    const prefersLight = window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches;
-    return prefersLight ? 'light' : 'dark';
+    // Default to light theme when no stored preference (dark is secondary)
+    return 'light';
 }
 
 function applyTheme(theme) {
@@ -206,6 +232,140 @@ document.addEventListener('DOMContentLoaded', function() {
     // Load CMS page content if there is a placeholder
     loadPageContent();
     loadHeroContent();
+
+    // When admin updates footer data, ensure Contact page UI reflects it immediately
+    const applyFooterDataToContact = (data) => {
+        try {
+            if (!data) return;
+            const phone = (data.supportPhone || '').trim();
+            const email = (data.supportEmail || '').trim();
+
+            const heroPhoneLink = document.getElementById('contactHeroPhoneLink');
+            if (heroPhoneLink && phone) heroPhoneLink.href = `tel:${phone.replace(/[^+\d]/g, '')}`;
+
+            const contactPhoneValue = document.getElementById('contactPhoneValue');
+            if (contactPhoneValue && phone) contactPhoneValue.textContent = phone;
+
+            const contactPhoneLink = document.getElementById('contactPhoneLink');
+            if (contactPhoneLink && phone) contactPhoneLink.href = `tel:${phone.replace(/[^+\d]/g, '')}`;
+
+            const contactHeroPhoneLink = document.getElementById('contactHeroPhoneLink');
+            if (contactHeroPhoneLink && phone) contactHeroPhoneLink.href = `tel:${phone.replace(/[^+\d]/g, '')}`;
+
+            const contactEmailValue = document.getElementById('contactEmailValue');
+            if (contactEmailValue && email) contactEmailValue.textContent = email;
+
+            const contactEmailLink = document.getElementById('contactEmailLink');
+            if (contactEmailLink && email) contactEmailLink.href = '#contactMailtoForm';
+
+        } catch (e) { /* ignore */ }
+    };
+
+    // Listen for admin-side footer updates
+    window.addEventListener('footerDataUpdated', (e) => {
+        try { applyFooterDataToContact(e.detail && e.detail.data ? e.detail.data : {}); } catch (e) {}
+    });
+
+    window.addEventListener('componentUpdated', (e) => {
+        try {
+            if (!e.detail || e.detail.slug !== 'footer') return;
+            const data = e.detail.data && e.detail.data.data ? e.detail.data.data : {};
+            applyFooterDataToContact(data);
+        } catch (e) {}
+    });
+
+    // Site settings (global) updates should also update contact UI and hero/footer shortcuts
+    window.addEventListener('siteSettingsUpdated', (e) => {
+        try {
+            const s = e.detail || (localStorage.getItem('siteSettings') ? JSON.parse(localStorage.getItem('siteSettings')) : null);
+            if (!s) return;
+            // Make support email available to other modules
+            try { window.ZENRIX_SUPPORT_EMAIL = s.supportEmail || window.ZENRIX_SUPPORT_EMAIL; } catch(e) {}
+            // Update contact page items
+            try {
+                const phone = (s.supportPhone || '').trim();
+                const email = (s.supportEmail || '').trim();
+                const heroPhoneLink = document.getElementById('contactHeroPhoneLink'); if (heroPhoneLink && phone) heroPhoneLink.href = `tel:${phone.replace(/[^+\d]/g, '')}`;
+                const contactPhoneValue = document.getElementById('contactPhoneValue'); if (contactPhoneValue && phone) contactPhoneValue.textContent = phone;
+                const contactPhoneLink = document.getElementById('contactPhoneLink'); if (contactPhoneLink && phone) contactPhoneLink.href = `tel:${phone.replace(/[^+\d]/g, '')}`;
+                const contactEmailValue = document.getElementById('contactEmailValue'); if (contactEmailValue && email) contactEmailValue.textContent = email;
+                const contactEmailLink = document.getElementById('contactEmailLink'); if (contactEmailLink && email) contactEmailLink.href = '#contactMailtoForm';
+            } catch (ee) { /* ignore */ }
+            // Update footer map embed if present
+            try { if (s.mapEmbedUrl) { localStorage.setItem('footerMapEmbed', s.mapEmbedUrl); window.dispatchEvent(new CustomEvent('footerMapUpdated', { detail: { mapEmbed: s.mapEmbedUrl } })); } } catch(e) {}
+        } catch (e) {}
+    });
+
+    window.addEventListener('storage', (e) => {
+        try {
+            if (!e || !e.key) return;
+            if (e.key === 'footerData' && e.newValue) {
+                const parsed = JSON.parse(e.newValue);
+                applyFooterDataToContact(parsed);
+            }
+        } catch (e) { /* ignore */ }
+    });
+
+    // Apply any existing footerData saved in localStorage (for immediate effect)
+    try {
+        const existing = localStorage.getItem('footerData');
+        if (existing) {
+            applyFooterDataToContact(JSON.parse(existing));
+        } else {
+            // Fallback: fetch current footer component and apply
+            (async () => {
+                try {
+                    const res = await fetch((window.API_URL || '/api') + '/components/slug/footer');
+                    const j = await res.json();
+                    if (j && j.success && j.data && j.data.data) applyFooterDataToContact(j.data.data);
+                } catch (e) { /* ignore */ }
+            })();
+        }
+
+        // Also load site settings (support email/phone/map/socials) so pages can render dynamic data
+        (async () => {
+            try {
+                const r = await fetch((window.API_URL || '/api') + '/site-settings');
+                const sj = await r.json();
+                if (sj && sj.success && sj.data) {
+                    try { localStorage.setItem('siteSettings', JSON.stringify(sj.data)); } catch(e){}
+                    try { window.ZENRIX_SUPPORT_EMAIL = sj.data.supportEmail || window.ZENRIX_SUPPORT_EMAIL; } catch(e){}
+                    try { window.dispatchEvent(new CustomEvent('siteSettingsUpdated', { detail: sj.data })); } catch(e){}
+                }
+            } catch (e) { /* ignore */ }
+        })();
+
+    } catch (e) { /* ignore */ }
+
+    // Live updates: listen to server-sent events to receive componentUpdated broadcasts
+    (function(){
+        try {
+            if (typeof EventSource === 'undefined') return;
+            const es = new EventSource('/api/updates/stream');
+            es.addEventListener('componentUpdated', function(evt){
+                try {
+                    const payload = JSON.parse(evt.data || '{}');
+                    // write structured data to localStorage for other tabs and trigger event
+                    try { if (payload && payload.data && payload.data.data) localStorage.setItem('footerData', JSON.stringify(payload.data.data)); } catch(e){}
+                    try { window.dispatchEvent(new CustomEvent('componentUpdated', { detail: payload })); } catch(e){}
+                } catch(e) { console.warn('SSE parse error', e); }
+            });
+
+            // Listen to site settings broadcasts (if admin updates them)
+            es.addEventListener('siteSettingsUpdated', function(evt){
+                try {
+                    const payload = JSON.parse(evt.data || '{}');
+                    const s = payload && payload.data ? payload.data : null;
+                    if (s) {
+                        try { localStorage.setItem('siteSettings', JSON.stringify(s)); } catch(e){}
+                        try { window.ZENRIX_SUPPORT_EMAIL = s.supportEmail || window.ZENRIX_SUPPORT_EMAIL; } catch(e){}
+                        try { window.dispatchEvent(new CustomEvent('siteSettingsUpdated', { detail: s })); } catch(e){}
+                    }
+                } catch(e) { console.warn('SSE parse error', e); }
+            });
+            es.addEventListener('error', function(e){ /* EventSource handles reconnect automatically */ });
+        } catch (e) {}
+    })();
     
     if (window.location.pathname.includes('cart.html')) {
         initCartPage();
@@ -213,6 +373,132 @@ document.addEventListener('DOMContentLoaded', function() {
 
     if (window.location.pathname.includes('checkout.html')) {
         initCheckoutPage();
+    }
+
+    // Contact page: clicking the email links should open the on-page form (no mailto app prompt)
+    try {
+        const form = document.getElementById('contactMailtoForm');
+        if (form) {
+            const focusTarget = () => {
+                const first = document.getElementById('contactName') || document.getElementById('contactSubject');
+                if (first && typeof first.focus === 'function') first.focus();
+            };
+            const scrollToForm = () => {
+                try {
+                    form.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                } catch (e) {
+                    form.scrollIntoView();
+                }
+                setTimeout(focusTarget, 150);
+            };
+
+            const heroEmailLink = document.getElementById('contactHeroEmailLink');
+            if (heroEmailLink) {
+                heroEmailLink.addEventListener('click', (ev) => {
+                    // allow normal anchor behavior too, but ensure smooth scroll + focus
+                    ev.preventDefault();
+                    scrollToForm();
+                    try { window.location.hash = 'contactMailtoForm'; } catch (e) {}
+                });
+            }
+
+            const contactEmailLink = document.getElementById('contactEmailLink');
+            if (contactEmailLink) {
+                contactEmailLink.addEventListener('click', (ev) => {
+                    ev.preventDefault();
+                    scrollToForm();
+                    try { window.location.hash = 'contactMailtoForm'; } catch (e) {}
+                });
+            }
+        }
+    } catch (e) {}
+
+    // Contact page mailto form (avoid inline onsubmit attribute for CSP)
+    const contactMailtoForm = document.getElementById('contactMailtoForm');
+    if (contactMailtoForm) {
+        const submitBtn = document.getElementById('contactSubmitBtn');
+        const statusEl = document.getElementById('contactNoteStatus');
+
+        const setStatus = (msg, type) => {
+            if (!statusEl) return;
+            statusEl.textContent = msg || '';
+            statusEl.classList.remove('hidden', 'text-emerald-200', 'text-rose-200');
+            statusEl.classList.add(type === 'success' ? 'text-emerald-200' : 'text-rose-200');
+        };
+
+        const clearStatus = () => {
+            if (!statusEl) return;
+            statusEl.textContent = '';
+            statusEl.classList.add('hidden');
+            statusEl.classList.remove('text-emerald-200', 'text-rose-200');
+        };
+
+        contactMailtoForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            clearStatus();
+
+            const fd = new FormData(contactMailtoForm);
+            const name = String(fd.get('name') || '').trim();
+            const email = String(fd.get('email') || '').trim();
+            const subject = String(fd.get('subject') || '').trim();
+            const message = String(fd.get('message') || '').trim();
+
+            if (!subject || !message) {
+                setStatus('Please fill in subject and message.', 'error');
+                return;
+            }
+
+            const token = (() => {
+                try { return localStorage.getItem('userToken'); } catch (err) { return null; }
+            })();
+            const hasAuth = !!token;
+
+            const endpoint = hasAuth ? `${API_URL}/tickets` : `${API_URL}/tickets/guest`;
+            const payload = hasAuth
+                ? { subject, description: message, category: 'other', priority: 'medium', source: 'api' }
+                : { name, email, subject, description: message, category: 'other', priority: 'medium', source: 'api' };
+
+            if (!hasAuth && (!name || !email)) {
+                setStatus('Please fill in your name and email.', 'error');
+                return;
+            }
+
+            const previousBtnText = submitBtn ? submitBtn.textContent : '';
+            if (submitBtn) {
+                submitBtn.disabled = true;
+                submitBtn.textContent = 'Sending…';
+            }
+
+            try {
+                const resp = await fetch(endpoint, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        ...(hasAuth ? { 'Authorization': `Bearer ${token}` } : {})
+                    },
+                    body: JSON.stringify(payload)
+                });
+
+                let result = null;
+                try { result = await resp.json(); } catch (err) { /* ignore */ }
+
+                if (!resp.ok || !result || result.success !== true) {
+                    const msg = (result && (result.error || result.message)) || `Failed to submit. (${resp.status})`;
+                    setStatus(msg, 'error');
+                    return;
+                }
+
+                contactMailtoForm.reset();
+                setStatus('Thanks! Your message was sent to support as a ticket.', 'success');
+            } catch (err) {
+                setStatus('Network error. Please try again.', 'error');
+            } finally {
+                if (submitBtn) {
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = previousBtnText || 'Send note';
+                }
+            }
+        });
     }
 
     window.addEventListener('zenrix-theme-toggle', (e) => {
@@ -223,6 +509,50 @@ document.addEventListener('DOMContentLoaded', function() {
             toggleTheme();
         }
     });
+
+    // Star-button click animation: toggle .active briefly so click triggers same visual as hover
+    (function bindStarButtons(){
+        try {
+            document.addEventListener('click', (ev) => {
+                const btn = ev.target instanceof Element ? ev.target.closest('.star-btn') : null;
+                if (!btn) return;
+                // replay animation
+                btn.classList.remove('active');
+                // force reflow to allow restart
+                // eslint-disable-next-line no-unused-expressions
+                btn.offsetWidth;
+                btn.classList.add('active');
+                setTimeout(() => btn.classList.remove('active'), 700);
+            }, { capture: true });
+        } catch (err) {
+            console.warn('Star button binding failed', err && err.message);
+        }
+    })();
+
+    // Auto-open chat when URL hash is #chat (contact links point to /index.html#chat)
+    try {
+        if (window && window.location && window.location.hash === '#chat') {
+            setTimeout(() => {
+                const toggle = document.querySelector('#chatbot-toggle, #chatbotToggle, .chat-toggle');
+                const windowEl = document.querySelector('#chatbot-window, #chatbotWindow, .chat-window');
+                if (toggle && windowEl) {
+                    try { toggle.click(); } catch (e) { /* ignore */ }
+                } else {
+                    // If current page doesn't host the chat widget, redirect to index which does
+                    const path = window.location.pathname || '';
+                    if (!path.endsWith('/index.html') && !path.endsWith('/') && !path.endsWith('/index')) {
+                        window.location.href = '/index.html#chat';
+                    } else if (!toggle) {
+                        // If widget may load later, try again after a delay
+                        setTimeout(() => {
+                            const t = document.querySelector('#chatbot-toggle, #chatbotToggle, .chat-toggle');
+                            if (t) try { t.click(); } catch (e) {}
+                        }, 700);
+                    }
+                }
+            }, 200);
+        }
+    } catch (e) { /* ignore */ }
 });
 
 // ==================== PRODUCT FUNCTIONS ====================
@@ -425,7 +755,7 @@ function hydrateHeroSpotlight(products = []) {
     }
 
     container.innerHTML = shortlist.map(product => {
-        const image = product.image || 'https://via.placeholder.com/200x200?text=Zenrix';
+        const image = product.image || '/assets/placeholder.svg';
         const saleActive = isSaleActive(product);
         const effectivePrice = getEffectivePrice(product);
         const priceTag = saleActive
@@ -511,7 +841,7 @@ function hydrateSpotlightBundle(products = []) {
     const categorySummary = categoryLabels.slice(0, 2).join(' • ');
 
     listEl.innerHTML = bundleItems.map(item => {
-        const image = item.image || 'https://via.placeholder.com/160?text=Zenrix';
+        const image = item.image || '/assets/placeholder.svg';
         const category = (item.category || 'Essentials').replace(/\b\w/g, char => char.toUpperCase());
         return `
             <li class="flex items-center gap-3 p-3 border-b border-gray-100 last:border-b-0">
@@ -577,7 +907,7 @@ function displayProducts(products, container) {
     container.innerHTML = products.map(product => {
         const saleActive = isSaleActive(product);
         const effectivePrice = getEffectivePrice(product);
-        const imageSrc = product.image || (Array.isArray(product.images) && product.images[0]) || 'https://via.placeholder.com/400x400?text=Zenrix';
+        const imageSrc = product.image || (Array.isArray(product.images) && product.images[0]) || '/assets/placeholder.svg';
         const saleEndTs = product?.saleEnd ? new Date(product.saleEnd).getTime() : null;
         const showCountdown = saleActive && saleEndTs && saleEndTs > Date.now();
         const badge = saleActive
@@ -585,10 +915,10 @@ function displayProducts(products, container) {
             : (product.featured ? '<span class="pill">Featured</span>' : '');
         const priceBlock = saleActive ? `
             <div class="price-stack">
-                <span class="text-lg font-semibold text-emerald-400">${formatNpr(effectivePrice)}</span>
-                <span class="text-xs line-through text-slate-400">${formatNpr(product.price)}</span>
+                <span class="product-price">${formatNpr(effectivePrice)}</span>
+                <span class="product-price-old">${formatNpr(product.price)}</span>
             </div>
-        ` : `<span class="text-lg font-semibold text-white">${formatNpr(effectivePrice)}</span>`;
+        ` : `<span class="product-price">${formatNpr(effectivePrice)}</span>`;
 
         return `
         <article class="product-card">
@@ -608,10 +938,10 @@ function displayProducts(products, container) {
                     </div>
                     <p class="product-desc">${(product.description || '').slice(0, 96)}${(product.description || '').length > 96 ? '…' : ''}</p>
                     ${showCountdown ? `<p class="text-xs text-emerald-400 mt-2" data-sale-countdown="${product._id}">⏱️ Loading...</p>` : ''}
-                    <div class="flex items-center justify-between pt-2">
+                    <div class="pt-2">
                         ${priceBlock}
-                        <span class="pill ghost">${product.stock > 0 ? 'In stock' : 'Back soon'}</span>
                     </div>
+                    <span class="pill ghost">${product.stock > 0 ? 'In stock' : 'Back soon'}</span>
                 </div>
             </a>
         </article>
@@ -736,7 +1066,7 @@ function hydrateProduct(product) {
                 <div class="flex items-center gap-3 flex-wrap">
                     <span class="text-4xl font-semibold text-white tracking-tight">${formatNpr(effectivePrice)}</span>
                     <span class="text-lg line-through text-slate-500">${formatNpr(priceValue)}</span>
-                    <span class="px-3 py-1 text-xs font-semibold rounded-full bg-rose-500/20 text-rose-200 border border-rose-300/30">${product.saleLabel || 'On Sale'}</span>
+                    <span class="sale-pill">${product.saleLabel || 'On Sale'}</span>
                 </div>
                 ${showCountdown ? `<p class="text-sm text-emerald-400 mt-3" data-sale-countdown="${product._id}">⏱️ Loading...</p>` : ''}
             `;
@@ -806,7 +1136,7 @@ function getGallerySources(product) {
     const baseImage = product.image ? [product.image] : [];
     const combined = [...baseImage, ...gallery].filter(Boolean);
     if (!combined.length) {
-        combined.push('https://via.placeholder.com/1000x1000?text=Zenrix');
+        combined.push('/assets/placeholder.svg');
     }
     return [...new Set(combined)];
 }
@@ -954,25 +1284,182 @@ function updateStockBadge(product) {
 
 // Load CMS page content (generic)
 async function loadPageContent() {
+    let slug = '';
     try {
         const container = document.getElementById('pageContent');
         if (!container) return; // not a CMS page
 
         // derive slug from URL (e.g., about.html -> about)
-        let slug = window.location.pathname.split('/').pop() || '';
+        slug = window.location.pathname.split('/').pop() || '';
         slug = slug.replace('.html','') || 'index';
+
+        // Home page uses the Hero section; avoid rendering CMS page content here.
+        if (slug === 'index') {
+            container.remove();
+            return;
+        }
+
+        // Product listing page is not a CMS page; remove the placeholder without calling the CMS API.
+        if (slug === 'products') {
+            container.remove();
+            return;
+        }
 
         const res = await fetch(`${API_URL}/pages/slug/${slug}`);
         const json = await res.json();
         if (json.success && json.data) {
             const page = json.data;
             document.title = `${page.title} | Zenrix`;
-            container.innerHTML = page.content || '<p class="text-gray-600">No content yet.</p>';
-            return;
-        }
-        // If CMS page missing, hide the placeholder for product listing pages
-        if (slug === 'products') {
-            container.remove();
+
+            const sanitized = sanitizeHtml(page.content) || '';
+            container.innerHTML = sanitized || '<p class="text-gray-600">No content yet.</p>';
+
+            // If this is the Contact page, derive support email from CMS content so updates reflect
+            // in the mailto form helper + submit behavior, and also update the visible
+            // Contact sections (email/phone/address) on contact.html.
+            if (slug === 'contact') {
+                try {
+                    const temp = document.createElement('div');
+                    temp.innerHTML = sanitized;
+
+                    // If the CMS content includes mailto: links, rewrite them to jump to the
+                    // on-page "Send a note" form (avoids OS email-app chooser prompts).
+                    try {
+                        const mailtoLinks = container.querySelectorAll('a[href^="mailto:"]');
+                        mailtoLinks.forEach(a => a.setAttribute('href', '#contactMailtoForm'));
+                    } catch (e) {}
+
+                    const mailto = temp.querySelector('a[href^="mailto:"]');
+                    let email = '';
+                    if (mailto) {
+                        const href = mailto.getAttribute('href') || '';
+                        email = href.replace(/^mailto:/i, '').split('?')[0].trim();
+                    }
+
+                    if (!email) {
+                        const text = (temp.textContent || '').trim();
+                        const match = text.match(/[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,6}\b/i);
+                        email = match ? match[0] : '';
+                    }
+
+                    if (email) {
+                        email = String(email).trim().replace(/[),.;:!?]+$/g, '');
+                    }
+
+                    if (email) {
+                        window.ZENRIX_SUPPORT_EMAIL = email;
+                        const emailTextEl = document.getElementById('supportEmailText');
+                        if (emailTextEl) emailTextEl.textContent = email;
+
+                        const heroEmailLink = document.getElementById('contactHeroEmailLink');
+                        if (heroEmailLink) heroEmailLink.href = '#contactMailtoForm';
+
+                        const contactEmailValue = document.getElementById('contactEmailValue');
+                        if (contactEmailValue) contactEmailValue.textContent = email;
+
+                        const contactEmailLink = document.getElementById('contactEmailLink');
+                        if (contactEmailLink) contactEmailLink.href = '#contactMailtoForm';
+                    }
+
+                    // Phone (prefer explicit tel: links)
+                    let phoneDisplay = '';
+                    let phoneTel = '';
+                    const telLink = temp.querySelector('a[href^="tel:"]');
+                    if (telLink) {
+                        const href = (telLink.getAttribute('href') || '').trim();
+                        phoneTel = href.replace(/^tel:/i, '').trim();
+                        phoneDisplay = phoneTel;
+                    }
+                    if (!phoneTel) {
+                        const text = (temp.textContent || '').replace(/\s+/g, ' ').trim();
+                        // Match common phone patterns including country code.
+                        const match = text.match(/\+?\d[\d\s().-]{7,}\d/);
+                        if (match) {
+                            phoneDisplay = match[0].trim();
+                            phoneTel = phoneDisplay.replace(/[^+\d]/g, '');
+                        }
+                    }
+
+                    if (phoneTel) {
+                        const heroPhoneLink = document.getElementById('contactHeroPhoneLink');
+                        if (heroPhoneLink) heroPhoneLink.href = `tel:${phoneTel}`;
+
+                        const contactPhoneValue = document.getElementById('contactPhoneValue');
+                        if (contactPhoneValue) contactPhoneValue.textContent = phoneDisplay || phoneTel;
+
+                        const contactPhoneLink = document.getElementById('contactPhoneLink');
+                        if (contactPhoneLink) contactPhoneLink.href = `tel:${phoneTel}`;
+                    }
+
+                    // Address (prefer a dedicated element; fallback to "Address:" label in text)
+                    let address = '';
+                    const addressEl = temp.querySelector('[data-contact-address], .contact-address');
+                    if (addressEl) {
+                        address = (addressEl.textContent || '').trim();
+                    }
+                    if (!address) {
+                        const text = (temp.textContent || '').replace(/\s+/g, ' ').trim();
+                        const match = text.match(/Address\s*:\s*(.+)$/i);
+                        if (match) address = (match[1] || '').trim();
+                    }
+
+                    if (address) {
+                        const contactAddressValue = document.getElementById('contactAddressValue');
+                        if (contactAddressValue) contactAddressValue.textContent = address;
+
+                        const contactAddressLink = document.getElementById('contactAddressLink');
+                        if (contactAddressLink) {
+                            // If CMS provides a maps link, use it; otherwise build a query.
+                            const mapsLink = temp.querySelector('a[href*="maps.google"], a[href*="google.com/maps"]');
+                            if (mapsLink) {
+                                contactAddressLink.href = mapsLink.getAttribute('href') || contactAddressLink.href;
+                            } else {
+                                contactAddressLink.href = `https://maps.google.com/?q=${encodeURIComponent(address)}`;
+                            }
+                        }
+                    }
+
+                    // If admin set a dedicated map embed in page meta, prefer that for footer and contact link
+                    try {
+                        const mapEmbed = page.meta && page.meta.mapEmbed ? page.meta.mapEmbed : '';
+                        if (mapEmbed) {
+                            const contactAddressLink = document.getElementById('contactAddressLink');
+                            if (contactAddressLink) {
+                                let mapsHref = mapEmbed;
+                                // Normalize embed URL to a clickable maps URL
+                                if (mapEmbed.includes('output=embed')) {
+                                    mapsHref = mapEmbed.replace(/&?output=embed\b/, '');
+                                } else if (mapEmbed.includes('/maps/embed')) {
+                                    mapsHref = mapEmbed.replace('/maps/embed', '/maps').replace('/embed?', '/?');
+                                }
+                                // If it's still an embed-like URL with ?q=, remove output=embed if present
+                                contactAddressLink.href = mapsHref;
+                            }
+                            try {
+                                localStorage.setItem('footerMapEmbed', mapEmbed);
+                                window.dispatchEvent(new CustomEvent('footerMapUpdated', { detail: { mapEmbed } }));
+                            } catch (e) { /* ignore */ }
+                        }
+                    } catch (e) {}
+
+                    // Prefer the footer's map URL when available in localStorage (ensures contact link opens same map)
+                    try {
+                        const footerMap = localStorage.getItem('footerMapEmbed');
+                        if (footerMap) {
+                            const contactAddressLink = document.getElementById('contactAddressLink');
+                            if (contactAddressLink) {
+                                let mapsHref = footerMap;
+                                if (footerMap.includes('output=embed')) mapsHref = footerMap.replace(/&?output=embed\b/, '');
+                                else if (footerMap.includes('/maps/embed')) mapsHref = footerMap.replace('/maps/embed', '/maps').replace('/embed?', '/?');
+                                contactAddressLink.href = mapsHref;
+                            }
+                        }
+                    } catch (e) { /* ignore */ }
+
+                } catch (e) {
+                    // ignore
+                }
+            }
             return;
         }
         if (slug === 'index') {
@@ -992,13 +1479,15 @@ async function loadPageContent() {
 }
 
 async function loadHeroContent() {
+    const heroSectionEl = document.getElementById('heroSection');
+    const carouselSectionEl = document.getElementById('heroCarouselSection');
     const heroTitleEl = document.getElementById('heroTitle');
     const heroSubtitleEl = document.getElementById('heroSubtitle');
     const heroCtaEl = document.getElementById('heroPrimaryCta');
     const heroBgEl = document.getElementById('heroBackgroundImage');
     const heroBadgeEl = document.getElementById('heroBadgeText');
     const spotlightImgEl = document.getElementById('spotlightBundleImage');
-    if (!heroTitleEl && !heroSubtitleEl && !heroCtaEl && !heroBgEl) return;
+    if (!heroSectionEl && !carouselSectionEl && !heroTitleEl && !heroSubtitleEl && !heroCtaEl && !heroBgEl) return;
 
     try {
         const response = await fetch(`${API_URL}/hero`);
@@ -1007,6 +1496,28 @@ async function loadHeroContent() {
 
         const hero = result.data;
         heroConfig = hero;
+
+        const heroEnabled = hero && hero.enabled !== false;
+        console.log('🎬 Hero Config:', { heroEnabled, enabled: hero.enabled });
+        if (heroSectionEl) {
+            heroSectionEl.classList.toggle('hidden', !heroEnabled);
+            console.log('👁️ Hero Section visibility toggled:', heroSectionEl.classList.contains('hidden') ? 'hidden' : 'visible');
+        }
+        if (carouselSectionEl) {
+            carouselSectionEl.classList.toggle('carousel-hidden', heroEnabled);
+            if (!heroEnabled) {
+                carouselSectionEl.style.display = 'block';
+                carouselSectionEl.style.visibility = 'visible';
+                carouselSectionEl.style.opacity = '1';
+                carouselSectionEl.classList.remove('hidden');
+            }
+            console.log('🎠 Carousel Section:', {
+                visible: !carouselSectionEl.classList.contains('carousel-hidden'),
+                classList: carouselSectionEl.className,
+                display: carouselSectionEl.style.display,
+                computed: window.getComputedStyle(carouselSectionEl).display
+            });
+        }
         if (hero.title && heroTitleEl) {
             heroTitleEl.textContent = hero.title;
         }
@@ -1036,27 +1547,261 @@ async function loadHeroContent() {
 
         // Apply spotlight overrides if provided
         hydrateSpotlightBundle();
+
+        // If hero is disabled, render the fallback carousel.
+        if (!heroEnabled) {
+            await loadHeroCarouselContent();
+        }
     } catch (error) {
         console.warn('Failed to load hero content', error);
     }
 }
 
+async function loadHeroCarouselContent() {
+    const carouselSectionEl = document.getElementById('heroCarouselSection');
+    const slidesEl = document.getElementById('heroCarouselSlides');
+    if (!carouselSectionEl || !slidesEl) return;
+
+    try {
+        const response = await fetch(`${API_URL}/carousel`);
+        const result = await response.json();
+        if (!result.success || !result.data) return;
+
+        const carousel = result.data;
+        carouselConfig = carousel;
+        renderHeroCarousel(carousel);
+    } catch (error) {
+        console.warn('Failed to load carousel content', error);
+    }
+}
+
+function renderHeroCarousel(carousel) {
+    const slidesRoot = document.getElementById('heroCarouselSlides');
+    const dotsRoot = document.getElementById('heroCarouselDots');
+    const prevBtn = document.getElementById('heroCarouselPrev');
+    const nextBtn = document.getElementById('heroCarouselNext');
+    if (!slidesRoot || !dotsRoot) return;
+    console.log('renderHeroCarousel: slidesRoot, prevBtn, nextBtn present?', !!slidesRoot, !!prevBtn, !!nextBtn);
+
+    const slides = Array.isArray(carousel?.slides) ? carousel.slides.filter(s => s && s.enabled !== false) : [];
+    console.log('renderHeroCarousel: slides.length =', slides.length);
+    if (!slides.length) {
+        slidesRoot.innerHTML = `
+            <div class="h-full grid place-items-center px-8">
+              <div class="max-w-2xl text-center">
+                <p class="text-sm uppercase tracking-[0.4em] text-white/60">Zenrix</p>
+                <h2 class="text-3xl lg:text-4xl font-black mt-3">Hero is disabled</h2>
+                <p class="text-white/75 mt-3">Add slides from the Admin Dashboard to show a modern carousel here.</p>
+                <a href="products.html" class="inline-flex items-center justify-center mt-6 px-7 py-3 rounded-2xl bg-white text-slate-900 font-semibold shadow-xl shadow-slate-900/20 hover:-translate-y-0.5 transition">Browse products</a>
+              </div>
+            </div>
+        `;
+        dotsRoot.innerHTML = '';
+        if (prevBtn) prevBtn.classList.add('hidden');
+        if (nextBtn) nextBtn.classList.add('hidden');
+        return;
+    }
+
+    heroCarouselIndex = Math.min(Math.max(0, heroCarouselIndex), slides.length - 1);
+
+    function render() {
+        const slide = slides[heroCarouselIndex];
+        const previous = slidesRoot.firstElementChild;
+
+        const wrapper = document.createElement('div');
+        wrapper.className = 'absolute inset-0';
+        wrapper.style.opacity = '0';
+        wrapper.style.transform = 'translateX(18px) scale(1.01)';
+        wrapper.style.transition = 'opacity 420ms ease, transform 420ms ease';
+
+        // Use a semantic picture/img for better performance and responsive sources
+        const bgWrap = document.createElement('div');
+        bgWrap.className = 'absolute inset-0 bg-cover bg-center';
+        bgWrap.setAttribute('aria-hidden', 'true');
+
+        if (slide.image) {
+            const picture = document.createElement('picture');
+            // If the slide provides variants, use them. Otherwise fall back to single image.
+            // Admin may provide `imageSrcSet` with comma-separated srcset entries.
+            if (slide.imageSrcSet) {
+                const srcsetArr = String(slide.imageSrcSet).split(',').map(s => s.trim());
+                // create a webp source first when possible
+                const webp = document.createElement('source');
+                webp.type = 'image/webp';
+                webp.srcset = srcsetArr.join(', ');
+                picture.appendChild(webp);
+            }
+
+            const img = document.createElement('img');
+            img.className = 'w-full h-full object-cover';
+            img.loading = 'lazy';
+            img.alt = slide.alt || '';
+            img.decoding = 'async';
+            img.src = slide.image;
+            if (slide.imageSrcSet) img.srcset = slide.imageSrcSet;
+            picture.appendChild(img);
+            bgWrap.appendChild(picture);
+        } else {
+            // Fallback gradient overlay if no image
+            bgWrap.style.backgroundImage = 'linear-gradient(135deg, rgba(30,41,59,0.85), rgba(49,46,129,0.75))';
+        }
+
+        const content = document.createElement('div');
+        content.className = 'relative h-full grid items-center px-8 lg:px-14';
+
+        const inner = document.createElement('div');
+        inner.className = 'max-w-3xl space-y-6';
+
+        if (slide.badgeText) {
+            const badge = document.createElement('div');
+            badge.className = 'inline-flex items-center gap-2 px-5 py-2 border border-white/20 rounded-full bg-white/5 backdrop-blur';
+            const dot = document.createElement('span');
+            dot.className = 'w-2 h-2 rounded-full bg-emerald-300';
+            const text = document.createElement('span');
+            text.className = 'text-sm font-semibold tracking-wide text-white';
+            text.textContent = slide.badgeText;
+            badge.appendChild(dot);
+            badge.appendChild(text);
+            inner.appendChild(badge);
+        }
+
+        const title = document.createElement('h2');
+        title.className = 'hero-title text-white';
+        title.textContent = slide.title || 'Zenrix';
+        inner.appendChild(title);
+
+        if (slide.subtitle) {
+            const sub = document.createElement('p');
+            sub.className = 'text-lg text-white/85 max-w-2xl';
+            sub.textContent = slide.subtitle;
+            inner.appendChild(sub);
+        }
+
+        if (slide.buttonText) {
+            const ctaWrap = document.createElement('div');
+            ctaWrap.className = 'flex flex-wrap gap-3';
+            const a = document.createElement('a');
+            a.className = 'px-7 py-3 rounded-2xl bg-white text-slate-900 font-semibold shadow-xl shadow-slate-900/20 hover:-translate-y-0.5 transition';
+            a.textContent = slide.buttonText;
+            a.href = slide.link || 'products.html';
+            ctaWrap.appendChild(a);
+            inner.appendChild(ctaWrap);
+        }
+
+        content.appendChild(inner);
+        wrapper.appendChild(bgWrap);
+        wrapper.appendChild(content);
+
+        // Subtle fade in
+        wrapper.style.opacity = '0';
+        wrapper.style.transition = 'opacity 220ms ease';
+        // Remove the static fallback only after we successfully create a slide
+        const fallbackEl = document.getElementById('heroCarouselFallback');
+        if (fallbackEl) fallbackEl.remove();
+        slidesRoot.appendChild(wrapper);
+        requestAnimationFrame(() => {
+            wrapper.style.opacity = '1';
+            wrapper.style.transform = 'translateX(0) scale(1)';
+        });
+        if (previous) {
+            previous.style.transition = 'opacity 360ms ease, transform 360ms ease';
+            previous.style.opacity = '0';
+            previous.style.transform = 'translateX(-12px) scale(0.995)';
+            setTimeout(() => {
+                if (previous.parentNode === slidesRoot) previous.remove();
+            }, 420);
+        }
+
+        // Dots
+        dotsRoot.innerHTML = '';
+        slides.forEach((_, idx) => {
+            const dotBtn = document.createElement('button');
+            dotBtn.type = 'button';
+            dotBtn.className = `w-2.5 h-2.5 rounded-full border border-white/30 transition ${idx === heroCarouselIndex ? 'bg-white' : 'bg-white/20 hover:bg-white/35'}`;
+            dotBtn.setAttribute('aria-label', `Go to slide ${idx + 1}`);
+            dotBtn.addEventListener('click', () => {
+                heroCarouselIndex = idx;
+                render();
+            });
+            dotsRoot.appendChild(dotBtn);
+        });
+
+        if (prevBtn) prevBtn.classList.toggle('hidden', slides.length < 2);
+        if (nextBtn) nextBtn.classList.toggle('hidden', slides.length < 2);
+    }
+
+    // Wire nav buttons (idempotent)
+    if (prevBtn && !prevBtn.dataset.bound) {
+        prevBtn.dataset.bound = '1';
+        prevBtn.addEventListener('click', () => {
+            heroCarouselIndex = (heroCarouselIndex - 1 + slides.length) % slides.length;
+            render();
+        });
+    }
+    if (nextBtn && !nextBtn.dataset.bound) {
+        nextBtn.dataset.bound = '1';
+        nextBtn.addEventListener('click', () => {
+            heroCarouselIndex = (heroCarouselIndex + 1) % slides.length;
+            render();
+        });
+    }
+
+    // Autoplay with reset on interaction
+    if (heroCarouselTimer) {
+        clearInterval(heroCarouselTimer);
+        heroCarouselTimer = null;
+    }
+
+    // Autoplay with respect for prefers-reduced-motion and pause on interaction
+    const shouldAutoplay = slides.length > 1 && !window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (heroCarouselTimer) {
+        clearInterval(heroCarouselTimer);
+        heroCarouselTimer = null;
+    }
+    if (shouldAutoplay) {
+        heroCarouselTimer = setInterval(() => {
+            heroCarouselIndex = (heroCarouselIndex + 1) % slides.length;
+            render();
+        }, 4000);
+    }
+
+    // Pause autoplay on hover/focus to improve accessibility
+    [slidesRoot, prevBtn, nextBtn, dotsRoot].forEach(el => {
+        if (!el) return;
+        el.addEventListener('mouseenter', () => { if (heroCarouselTimer) clearInterval(heroCarouselTimer); });
+        el.addEventListener('mouseleave', () => {
+            if (!shouldAutoplay) return;
+            if (heroCarouselTimer) clearInterval(heroCarouselTimer);
+            heroCarouselTimer = setInterval(() => {
+                heroCarouselIndex = (heroCarouselIndex + 1) % slides.length;
+                render();
+            }, 4000);
+        });
+        el.addEventListener('focusin', () => { if (heroCarouselTimer) clearInterval(heroCarouselTimer); });
+        el.addEventListener('focusout', () => {
+            if (!shouldAutoplay) return;
+            if (heroCarouselTimer) clearInterval(heroCarouselTimer);
+            heroCarouselTimer = setInterval(() => {
+                heroCarouselIndex = (heroCarouselIndex + 1) % slides.length;
+                render();
+            }, 4000);
+        });
+    });
+
+    render();
+}
+
 // Star rating helper
 function getStarRating(rating) {
-    const full = '<svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-yellow-400 inline-block mr-0.5" viewBox="0 0 20 20" fill="currentColor"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.286 3.955a1 1 0 00.95.69h4.162c.969 0 1.371 1.24.588 1.81l-3.37 2.455a1 1 0 00-.364 1.118l1.287 3.955c.3.921-.755 1.688-1.54 1.118L10 13.347l-3.448 2.441c-.784.57-1.838-.197-1.539-1.118l1.287-3.955a1 1 0 00-.364-1.118L2.568 9.382c-.783-.57-.38-1.81.588-1.81h4.162a1 1 0 00.95-.69L9.049 2.927z"/></svg>';
-    const half = '<svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-yellow-400 inline-block mr-0.5" viewBox="0 0 20 20" fill="currentColor"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.286 3.955a1 1 0 00.95.69h4.162c.969 0 1.371 1.24.588 1.81l-3.37 2.455a1 1 0 00-.364 1.118l1.287 3.955c.3.921-.755 1.688-1.54 1.118L10 13.347V2.927z"/></svg>';
-    const empty = '<svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-yellow-300 inline-block mr-0.5" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.286 3.955a1 1 0 00.95.69h4.162c.969 0 1.371 1.24.588 1.81l-3.37 2.455a1 1 0 00-.364 1.118l1.287 3.955c.3.921-.755 1.688-1.54 1.118L10 13.347l-3.448 2.441c-.784.57-1.838-.197-1.539-1.118l1.287-3.955a1 1 0 00-.364-1.118L2.568 9.382c-.783-.57-.38-1.81.588-1.81h4.162a1 1 0 00.95-.69L9.049 2.927z"/></svg>';
+    const r = rating || 0;
+    const fullStars = Math.floor(r);
+    const hasHalf = r - fullStars >= 0.5;
+    const emptyStars = 5 - fullStars - (hasHalf ? 1 : 0);
     let stars = '';
-    for (let i = 1; i <= 5; i++) {
-        if (i <= Math.floor(rating)) {
-            stars += full;
-        } else if (i - 0.5 <= rating) {
-            stars += half;
-        } else {
-            stars += empty;
-        }
-    }
-    return stars;
+    for (let i = 0; i < fullStars; i++) stars += '★';
+    if (hasHalf) stars += '★';
+    for (let i = 0; i < emptyStars; i++) stars += '☆';
+    return `<span class="star-display">${stars}</span>`;
 }
 
 // ==================== CART FUNCTIONS ====================
@@ -1178,7 +1923,7 @@ function renderCartPage(items) {
     container.innerHTML = items.map(item => {
         const key = item.key || `${item.id || 'item'}__${item.color || 'default'}`;
         const encodedKey = encodeURIComponent(key);
-        const img = item.image || 'https://via.placeholder.com/120x120?text=Product';
+        const img = item.image || '/assets/placeholder.svg';
         const price = item.price || 0;
         const qty = item.quantity || 1;
         const subtotal = price * qty;
@@ -1505,7 +2250,7 @@ function handlePaymentMethodChange(method) {
         content += `<p class="text-xs text-gray-500 mt-2">${paymentSettingsCache.instructions}</p>`;
     }
 
-    details.innerHTML = content;
+    details.innerHTML = sanitizeHtml(content);
 
     if (method === 'cod') {
         extras?.classList.add('hidden');

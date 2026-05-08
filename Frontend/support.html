@@ -8,17 +8,17 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
-    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="/css/tailwind-site.css">
     <script src="script.js" defer></script>
 </head>
-<body class="bg-slate-950 text-slate-100" style="font-family: 'Space Grotesk', 'Poppins', sans-serif;">
+<body class="surface text">
     <custom-navbar></custom-navbar>
 
     <main class="px-4 py-12">
         <section class="max-w-6xl mx-auto">
-            <div class="bg-gradient-to-br from-slate-900 via-slate-950 to-[#071521] rounded-3xl border border-white/10 p-8 shadow-2xl mb-8">
-                <h1 class="text-3xl font-bold text-white mb-2">Support Center</h1>
-                <p class="text-slate-300">Get help with your orders, products, or account</p>
+            <div class="surface-2 rounded-3xl border p-8 shadow-2xl mb-8">
+                <h1 class="text-3xl font-bold text mb-2">Support Center</h1>
+                <p class="muted">Get help with your orders, products, or account</p>
             </div>
 
             <div id="authNotice" class="bg-yellow-500/10 border border-yellow-500/30 rounded-2xl p-6 mb-8 hidden">
@@ -27,19 +27,19 @@
 
             <div id="ticketsSection">
                 <!-- Create New Ticket -->
-                <div class="bg-slate-900/70 border border-white/8 rounded-3xl p-8 shadow-xl mb-8">
-                    <h2 class="text-2xl font-semibold mb-6 text-white">Create New Ticket</h2>
+                <div class="surface-2 border rounded-3xl p-8 shadow-xl mb-8">
+                    <h2 class="text-2xl font-semibold mb-6 text">Create New Ticket</h2>
                     <form id="createTicketForm" class="space-y-4">
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div>
-                                <label class="block text-sm font-medium text-slate-300 mb-2">Subject *</label>
+                                <label class="block text-sm font-medium muted mb-2">Subject *</label>
                                 <input type="text" name="subject" required maxlength="200" 
-                                    class="w-full px-4 py-3 rounded-lg border border-white/10 bg-slate-800 text-white focus:ring-2 focus:ring-emerald-500 focus:border-transparent">
+                                    class="w-full px-4 py-3 rounded-lg border surface-3 text focus:ring-2 focus:ring-emerald-500 focus:border-transparent">
                             </div>
                             <div>
-                                <label class="block text-sm font-medium text-slate-300 mb-2">Category *</label>
+                                <label class="block text-sm font-medium muted mb-2">Category *</label>
                                 <select name="category" required
-                                    class="w-full px-4 py-3 rounded-lg border border-white/10 bg-slate-800 text-white focus:ring-2 focus:ring-emerald-500 focus:border-transparent">
+                                    class="w-full px-4 py-3 rounded-lg border surface-3 text focus:ring-2 focus:ring-emerald-500 focus:border-transparent">
                                     <option value="order">Order Issue</option>
                                     <option value="product">Product Question</option>
                                     <option value="payment">Payment Issue</option>
@@ -49,33 +49,33 @@
                             </div>
                         </div>
                         <div>
-                            <label class="block text-sm font-medium text-slate-300 mb-2">Priority</label>
+                            <label class="block text-sm font-medium muted mb-2">Priority</label>
                             <select name="priority"
-                                class="w-full px-4 py-3 rounded-lg border border-white/10 bg-slate-800 text-white focus:ring-2 focus:ring-emerald-500 focus:border-transparent">
+                                class="w-full px-4 py-3 rounded-lg border surface-3 text focus:ring-2 focus:ring-emerald-500 focus:border-transparent">
                                 <option value="low">Low</option>
                                 <option value="medium" selected>Medium</option>
                                 <option value="high">High</option>
                             </select>
                         </div>
                         <div>
-                            <label class="block text-sm font-medium text-slate-300 mb-2">Description *</label>
+                            <label class="block text-sm font-medium muted mb-2">Description *</label>
                             <textarea name="description" required rows="5" maxlength="2000"
-                                class="w-full px-4 py-3 rounded-lg border border-white/10 bg-slate-800 text-white focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+                                class="w-full px-4 py-3 rounded-lg border surface-3 text focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
                                 placeholder="Describe your issue in detail..."></textarea>
                         </div>
                         <button type="submit" 
-                            class="w-full md:w-auto px-6 py-3 bg-gradient-to-r from-emerald-500 to-cyan-500 text-white rounded-lg font-semibold shadow-lg shadow-emerald-500/30 transition hover:scale-[1.02]">
+                            class="w-full md:w-auto px-6 py-3 bg-accent rounded-lg font-semibold shadow-lg transition hover:scale-[1.02]">
                             Submit Ticket
                         </button>
                     </form>
                 </div>
 
                 <!-- My Tickets -->
-                <div class="bg-slate-900/70 border border-white/8 rounded-3xl p-8 shadow-xl">
+                <div class="surface-2 border rounded-3xl p-8 shadow-xl">
                     <div class="flex items-center justify-between mb-6">
-                        <h2 class="text-2xl font-semibold text-white">My Tickets</h2>
+                        <h2 class="text-2xl font-semibold text">My Tickets</h2>
                         <button id="refreshTickets" 
-                            class="px-4 py-2 bg-slate-800 text-white rounded-lg border border-white/10 hover:bg-slate-700 transition">
+                            class="px-4 py-2 surface-3 text rounded-lg border hover:opacity-95 transition">
                             Refresh
                         </button>
                     </div>
@@ -87,13 +87,13 @@
 
     <!-- Ticket Details Modal -->
     <div id="ticketModal" class="fixed inset-0 bg-black/80 modal-backdrop hidden flex items-center justify-center z-50 p-4">
-        <div class="bg-slate-900 rounded-2xl shadow-2xl w-full max-w-3xl max-h-[90vh] overflow-y-auto border border-white/10">
-            <div class="sticky top-0 bg-slate-900 border-b border-white/10 p-6 flex items-center justify-between">
+        <div class="surface rounded-2xl shadow-2xl w-full max-w-3xl max-h-[90vh] overflow-y-auto border">
+            <div class="sticky top-0 surface-2 border-b p-6 flex items-center justify-between">
                 <div>
-                    <p class="text-xs uppercase tracking-wider text-slate-400">Support Ticket</p>
-                    <h2 class="text-2xl font-bold text-white" id="modalTicketTitle">#0000</h2>
+                    <p class="text-xs uppercase tracking-wider muted">Support Ticket</p>
+                    <h2 class="text-2xl font-bold text" id="modalTicketTitle">#0000</h2>
                 </div>
-                <button id="closeTicketModal" class="text-slate-400 hover:text-white text-2xl leading-none">&times;</button>
+                <button id="closeTicketModal" class="muted hover:text">&times;</button>
             </div>
             <div id="ticketModalBody" class="p-6 space-y-6"></div>
         </div>
@@ -125,6 +125,7 @@
                 alert('Please login to create a ticket');
                 return;
             }
+
 
             const token = localStorage.getItem('userToken');
             const formData = new FormData(e.target);
@@ -219,7 +220,7 @@
                 const hasAdminReply = lastMessage?.sender === 'admin';
 
                 return `
-                <div class="bg-slate-800/50 border border-white/10 rounded-xl p-6 hover:bg-slate-800 transition cursor-pointer" onclick="openTicketModal('${ticket._id}')">
+                <div class="bg-slate-800/50 border border-white/10 rounded-xl p-6 hover:bg-slate-800 transition cursor-pointer" data-support-ticket-open="1" data-ticket-id="${ticket._id}">
                     <div class="flex items-start justify-between mb-3">
                         <div class="flex-1">
                             <div class="flex items-center gap-2 mb-2">
@@ -241,7 +242,7 @@
             }).join('');
         }
 
-        // Open ticket details modal
+        // Open ticket details modal (auth required)
         async function openTicketModal(ticketId) {
             const token = localStorage.getItem('userToken');
             try {
@@ -259,6 +260,76 @@
                 alert('Error loading ticket: ' + err.message);
             }
         }
+
+        // Public ticket view (guest access) from URL params: ?ticket_id=...&guest_email=...
+        async function tryLoadPublicTicketFromUrl(){
+            const params = new URLSearchParams(location.search);
+            const id = params.get('ticket_id');
+            const guest = params.get('guest_email');
+            if (!id || !guest) return;
+            try{
+                const res = await fetch(`${API_URL}/tickets/public/${id}?email=${encodeURIComponent(guest)}`);
+                const json = await res.json();
+                if (json.success && json.data){
+                    showTicketDetailsPublic(json.data);
+                }else{
+                    console.warn('Public ticket lookup failed', json);
+                }
+            }catch(e){ console.warn('Public ticket lookup error', e.message); }
+        }
+
+        // Public view helper (guest) — similar to showTicketDetails but read-only
+        function showTicketDetailsPublic(ticket){
+            const modal = document.getElementById('ticketModal');
+            const title = document.getElementById('modalTicketTitle');
+            const body = document.getElementById('ticketModalBody');
+
+            title.textContent = `#${ticket._id.slice(-6).toUpperCase()} - ${ticket.subject}`;
+
+            const statusColors = {
+                'open': 'bg-blue-500/20 text-blue-400 border-blue-500/30',
+                'in-progress': 'bg-yellow-500/20 text-yellow-400 border-yellow-500/30',
+                'solved': 'bg-green-500/20 text-green-400 border-green-500/30',
+                'closed': 'bg-slate-500/20 text-slate-400 border-slate-500/30'
+            };
+
+            const messagesHtml = (ticket.messages || []).map(msg => {
+                const isAdmin = msg.sender === 'admin';
+                return `
+                <div class="${isAdmin ? 'bg-blue-500/10 border-l-4 border-blue-500' : 'bg-slate-800/50 border-l-4 border-slate-600'} p-4 rounded-lg">
+                    <div class="flex items-center gap-2 mb-2">
+                        <span class="text-sm font-semibold ${isAdmin ? 'text-blue-400' : 'text-slate-300'}">${msg.senderName || (isAdmin ? 'Support Team' : 'Guest')}</span>
+                        <span class="text-xs text-slate-500">${new Date(msg.timestamp).toLocaleString()}</span>
+                    </div>
+                    <p class="text-sm text-slate-200 whitespace-pre-wrap">${msg.message}</p>
+                </div>
+                `;
+            }).join('');
+
+            body.innerHTML = `
+                <div class="bg-slate-800/50 rounded-xl border border-white/10 p-4 space-y-3">
+                    <div class="flex items-center justify-between">
+                        <span class="px-3 py-1 text-sm font-semibold rounded-full border ${statusColors[ticket.status]}">${ticket.status}</span>
+                        <div class="text-xs text-slate-400">
+                            <span>Category: ${ticket.category}</span> • 
+                            <span>Priority: ${ticket.priority}</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="space-y-3">
+                    <p class="text-xs uppercase tracking-wider text-slate-400">Messages</p>
+                    ${messagesHtml}
+                </div>
+
+                <div class="text-center text-slate-400 text-sm py-4 bg-slate-800/50 rounded-xl">This is a public view of your ticket. For privacy, limited details are shown. If you want to reply, please login to your account or reply via the email confirmation we sent.</div>
+            `;
+
+            modal.classList.remove('hidden');
+        }
+
+        // Run on load
+        tryLoadPublicTicketFromUrl();
 
         function showTicketDetails(ticket) {
             const modal = document.getElementById('ticketModal');
@@ -310,7 +381,7 @@
                         class="w-full px-4 py-3 rounded-lg border border-white/10 bg-slate-900 text-white focus:ring-2 focus:ring-emerald-500 focus:border-transparent mb-3"
                         placeholder="Type your message..."></textarea>
                     <div class="flex items-center gap-3">
-                        <button id="sendReplyBtn" onclick="sendReply('${ticket._id}')" 
+                        <button id="sendReplyBtn" type="button" data-support-ticket-reply="1" data-ticket-id="${ticket._id}"
                             class="px-4 py-2 bg-gradient-to-r from-emerald-500 to-cyan-500 text-white rounded-lg font-semibold hover:scale-[1.02] transition">
                             Send Reply
                         </button>
@@ -318,7 +389,7 @@
                             try {
                                 const currentUser = JSON.parse(localStorage.getItem('userData') || 'null');
                                 const isOwner = currentUser && ticket.user && ((ticket.user._id && ticket.user._id === currentUser._id) || (ticket.user === currentUser._id));
-                                return isOwner ? `<button id="markSolvedBtn" onclick="markTicketSolved('${ticket._id}')" class="px-4 py-2 bg-emerald-600 text-white rounded-lg font-semibold hover:scale-[1.02] transition">Mark as Solved</button>` : '';
+                                return isOwner ? `<button id="markSolvedBtn" type="button" data-support-ticket-solved="1" data-ticket-id="${ticket._id}" class="px-4 py-2 bg-emerald-600 text-white rounded-lg font-semibold hover:scale-[1.02] transition">Mark as Solved</button>` : '';
                             } catch (e) { return ''; }
                         })()}
                     </div>
@@ -390,8 +461,28 @@
             document.getElementById('ticketModal').classList.add('hidden');
         }
 
-        window.openTicketModal = openTicketModal;
-        window.sendReply = sendReply;
+        // Delegate clicks (avoids inline onclick attributes; improves CSP posture)
+        document.addEventListener('click', (e) => {
+            const openEl = e.target.closest('[data-support-ticket-open="1"][data-ticket-id]');
+            if (openEl) {
+                const id = openEl.getAttribute('data-ticket-id');
+                if (id) openTicketModal(id);
+                return;
+            }
+
+            const replyEl = e.target.closest('[data-support-ticket-reply="1"][data-ticket-id]');
+            if (replyEl) {
+                const id = replyEl.getAttribute('data-ticket-id');
+                if (id) sendReply(id);
+                return;
+            }
+
+            const solvedEl = e.target.closest('[data-support-ticket-solved="1"][data-ticket-id]');
+            if (solvedEl) {
+                const id = solvedEl.getAttribute('data-ticket-id');
+                if (id) markTicketSolved(id);
+            }
+        });
 
         // Event listeners
         document.getElementById('closeTicketModal').addEventListener('click', closeTicketModal);

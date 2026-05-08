@@ -2,6 +2,7 @@ const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
 const path = require('path');
+const fs = require('fs');
 const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
 const passport = require('passport');
@@ -31,41 +32,128 @@ mongoose.connect(MONGO_URI, { autoIndex: true })
   .catch(err => console.error('❌ MongoDB connection error:', err));
 
 mongoose.connection.on('error', err => console.error('❌ Mongoose error:', err.message));
-mongoose.connection.once('open', () => {
-  addSampleProducts();
-  addSamplePages();
-  addSampleComponents();
+mongoose.connection.once('open', async () => {
+  try {
+    await addSampleProducts();
+    // await addSamplePages();
+    // await addSampleComponents();
+  } catch (error) {
+    console.error('Error during seeding:', error);
+  }
 });
 
 // Security middleware first
 app.use(helmet({
-  contentSecurityPolicy: {
-    directives: {
-      defaultSrc: ["'self'"],
-      scriptSrc: ["'self'", "'unsafe-inline'", 'https://cdn.quilljs.com', 'https://cdn.tailwindcss.com', 'https://cdn.jsdelivr.net'],
-      // Allow inline event handlers in legacy admin/front-end pages that use onclick attributes
-      // Note: enabling this is less secure than using nonces/hashes; consider refactoring inline handlers later.
-      scriptSrcAttr: ["'unsafe-inline'"],
-      styleSrc: ["'self'", "'unsafe-inline'", 'https://cdn.quilljs.com', 'https://cdn.tailwindcss.com', 'https://fonts.googleapis.com', 'https://cdnjs.cloudflare.com'],
-      imgSrc: ["'self'", 'data:', 'https://images.unsplash.com', 'https://ui-avatars.com'],
-      connectSrc: ["'self'"],
-      fontSrc: ["'self'", 'https://fonts.gstatic.com', 'https://cdnjs.cloudflare.com'],
-      objectSrc: ["'none'"]
-    }
-  }
+  contentSecurityPolicy: false // Disable Helmet's CSP
 }));
+
+// Set minimal CSP that allows the required resources
+app.use((req, res, next) => {
+  res.setHeader('Content-Security-Policy', 
+    "default-src 'self'; " +
+    "script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://cdn.quilljs.com; " +
+    "style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://fonts.googleapis.com https://cdn.quilljs.com; " +
+    "img-src 'self' data: https:; " +
+    "connect-src 'self' https://cdn.jsdelivr.net; " +
+    "font-src 'self' https://fonts.gstatic.com https://cdn.jsdelivr.net; " +
+    "frame-src 'self' https://www.google.com https://maps.google.com https://www.google.com/maps https://maps.app.goo.gl; " +
+    "object-src 'none'"
+  );
+  next();
+});
+console.log('Minimal CSP set allowing jsdelivr');
 
 app.use(cors());
 app.use(express.json({ limit: '1mb' }));
+// Graceful JSON parse error handler (returns a 400 with a helpful message)
+app.use((err, req, res, next) => {
+  if (err && err instanceof SyntaxError && err.status === 400 && 'body' in err) {
+    return res.status(400).json({ success: false, error: 'Invalid JSON payload' });
+  }
+  return next(err);
+});
 app.use(express.urlencoded({ extended: true }));
-app.use(rateLimit({ windowMs: 60 * 1000, max: 100 }));
+
+// Cookie parsing (needed for server-side session cookies)
+const cookieParser = require('cookie-parser');
+app.use(cookieParser());
+
+// Apply rate limiting to API routes only (not static assets).
+// Use a higher limit in non-production to avoid hampering local admin UI/E2E checks.
+const RATE_LIMIT_MAX = Number.parseInt(process.env.RATE_LIMIT_MAX || '', 10);
+const apiLimiter = rateLimit({
+  windowMs: 60 * 1000,
+  max: Number.isFinite(RATE_LIMIT_MAX)
+    ? RATE_LIMIT_MAX
+    : (process.env.NODE_ENV === 'production' ? 100 : 500),
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { success: false, error: 'Too many requests, try again later.' },
+});
+app.use('/api', apiLimiter);
 
 require('./config/passport');
 app.use(passport.initialize());
 
 // Static assets
+// Serve admin HTML with no-cache header to avoid sticky browser caches during development
+app.get('/admin-dashboard.html', (req, res) => {
+  try {
+    res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
+    res.sendFile(path.join(FRONTEND_DIR, 'admin-dashboard.html'));
+  } catch (err) {
+    console.error('Failed to serve admin-dashboard.html with no-cache header', err);
+    res.status(500).send('Server error');
+  }
+});
+
+// Intercept uploads requests and serve placeholder for missing files (middleware style)
+app.use('/uploads', (req, res, next) => {
+  try {
+    console.log('[uploads-fallback] req.url=', req.url, ' req.path=', req.path);
+    const rel = req.path.replace(/^\//, ''); // remove leading slash
+    console.log('[uploads-fallback] requested rel=', rel);
+    const filePath = path.join(__dirname, 'uploads', rel);
+    fs.stat(filePath, (err, stat) => {
+      if (!err && stat && stat.isFile()) {
+        console.log('[uploads-fallback] serving file from uploads:', filePath);
+        return res.sendFile(filePath);
+      }
+      // missing: serve public placeholder
+      console.log('[uploads-fallback] file missing, serving placeholder');
+      return res.sendFile(path.join(FRONTEND_DIR, 'assets', 'placeholder.svg'));
+    });
+  } catch (e) {
+    try { return res.sendFile(path.join(FRONTEND_DIR, 'assets', 'placeholder.svg')); } catch(_){ return res.status(404).end(); }
+  }
+});
+
 app.use(express.static(FRONTEND_DIR));
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+
+
+
+// Avoid noisy 404s for browsers requesting /favicon.ico.
+// Serve a tiny SVG favicon (works in modern browsers) instead of 404.
+app.get('/favicon.ico', (_req, res) => {
+  res.type('image/svg+xml');
+  res.status(200).send(
+    "<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'>" +
+      "<rect width='32' height='32' rx='8' fill='#667eea'/>" +
+      "<text x='16' y='22' text-anchor='middle' font-size='18' font-family='Arial, sans-serif' fill='white'>Z</text>" +
+    "</svg>"
+  );
+});
+
+// Diagnostic: list routes
+app.get('/__routes', (_req, res) => {
+  try {
+    const routes = (app._router && app._router.stack) ? app._router.stack.filter(l => l && l.route).map(l => ({ path: l.route.path, methods: Object.keys(l.route.methods) })) : [];
+    return res.json({ success: true, routes });
+  } catch (e) {
+    return res.status(500).json({ success: false, error: e.message });
+  }
+});
 
 // API routes
 const adminRoutes = require('./routes/AdminRoutes');
@@ -77,12 +165,42 @@ const userRoutes = require('./routes/UserRoutes');
 const subscriberRoutes = require('./routes/SubscriberRoutes');
 const careerRoutes = require('./routes/CareerRoutes');
 const heroRoutes = require('./routes/HeroRoutes');
+const carouselRoutes = require('./routes/CarouselRoutes');
 const paymentSettingsRoutes = require('./routes/PaymentSettingsRoutes');
 const ticketRoutes = require('./routes/TicketRoutes');
 const knowledgeRoutes = require('./routes/KnowledgeRoutes');
+const staffRoutes = require('./routes/StaffRoutes');
+const testimonialRoutes = require('./routes/TestimonialRoutes');
 
-app.use('/api/admin', adminRoutes);
-app.use('/api/auth', authRoutes);
+// Temporary staff route
+app.get('/api/employees', (req, res) => {
+    res.end('OK');
+});
+
+// app.use('/api/admin', adminRoutes);
+// app.use('/api/auth', authRoutes);
+
+// Debugging: log modifying requests to products to help diagnose admin UI issues
+// app.use('/api/products', (req, res, next) => {
+//   if (['PUT', 'DELETE', 'POST'].includes(req.method)) {
+//     try {
+//       console.log('[DEBUG] Product API request:', req.method, req.originalUrl, 'auth=', !!req.headers.authorization);
+//       if (req.body && Object.keys(req.body).length) {
+//         const preview = JSON.stringify(req.body).slice(0, 200);
+//         console.log('[DEBUG] Body preview:', preview);
+//       }
+//     } catch (e) {}
+//   }
+//   next();
+// });
+
+// app.use('/api/products', productRoutes);
+// app.use('/api/pages', pageRoutes);
+// app.use('/api/components', componentRoutes);
+// app.use('/api/users', userRoutes);
+// app.use('/api/subscribers', subscriberRoutes);
+// app.use('/api/careers', careerRoutes);
+// app.use('/api/hero', heroRoutes);
 app.use('/api/products', productRoutes);
 app.use('/api/pages', pageRoutes);
 app.use('/api/components', componentRoutes);
@@ -90,9 +208,29 @@ app.use('/api/users', userRoutes);
 app.use('/api/subscribers', subscriberRoutes);
 app.use('/api/careers', careerRoutes);
 app.use('/api/hero', heroRoutes);
+app.use('/api/carousel', carouselRoutes);
 app.use('/api/payment-settings', paymentSettingsRoutes);
 app.use('/api/tickets', ticketRoutes);
 app.use('/api/knowledge', knowledgeRoutes);
+app.use('/api/staff', staffRoutes);
+app.use('/api/testimonials', testimonialRoutes);
+console.log('Testimonials routes registered');
+
+// Site settings (global site-level configuration)
+const siteSettingsRoutes = require('./routes/SiteSettingsRoutes');
+app.use('/api/site-settings', siteSettingsRoutes);
+
+// testimonialRoutes(app);
+
+app.use('/api/admin', adminRoutes);
+
+// Live updates stream (SSE) for client-side auto-refresh
+app.use('/api/updates', require('./routes/UpdatesRoutes'));
+
+// Temporary staff route
+app.get('/api/staff', (req, res) => {
+    res.json({ success: true, count: 0, data: [] });
+});
 
 app.get('/api/health', (_req, res) => {
   res.json({ success: true, status: 'ok', timestamp: Date.now() });
@@ -104,13 +242,12 @@ app.get('/', (_req, res) => {
 });
 
 // Return 404 for unknown API routes
-app.use('/api', (req, res, next) => {
-  if (res.headersSent) return next();
-  res.status(404).json({ success: false, error: 'API route not found' });
-});
+// app.use('/api', (req, res, next) => {
+//   if (res.headersSent) return next();
+//   res.status(404).json({ success: false, error: 'API route not found' });
+// });
 
 // Global error handler
-const fs = require('fs');
 app.use((err, req, res, _next) => {
   try {
     const entry = [`\n[${new Date().toISOString()}] Error: ${err.message}`, err.stack || 'no-stack'].join('\n') + '\n';
@@ -124,15 +261,28 @@ app.use((err, req, res, _next) => {
   res.status(err.status || 500).json({ success: false, error: err.message || 'Internal Server Error' });
 });
 
+process.on('exit', (code) => {
+  console.log('Process exiting with code:', code);
+});
+
+process.on('uncaughtException', (err) => {
+  console.error('Uncaught Exception:', err);
+  process.exit(1);
+});
+
+process.on('unhandledRejection', (reason, promise) => {
+  console.error('Unhandled Rejection at:', promise, 'reason:', reason);
+  console.error(reason.stack || reason);
+  process.exit(1);
+});
+
 const PORT = process.env.PORT || 3000;
-if (require.main === module) {
-  app.listen(PORT, () => {
-    console.log('=================================');
-    console.log('✅ Zenrix Server Started!');
-    console.log(`📡 http://localhost:${PORT}`);
-    console.log('=================================');
-  });
-}
+app.listen(PORT, () => {
+  console.log('=================================');
+  console.log('✅ Zenrix Server Started!');
+  console.log(`📡 http://localhost:${PORT}`);
+  console.log('=================================');
+});
 
 module.exports = app;
 
@@ -323,8 +473,69 @@ async function addSampleComponents() {
 
     console.log('🧩 Adding sample components...');
     const samples = [
-      { slug: 'navbar', name: 'Main Navbar', html: '<div class="nav-links"><a href="/">Home</a><a href="/products.html">Products</a><a href="/account.html">Account</a><a href="/contact.html">Contact</a></div>', published: true },
-      { slug: 'footer', name: 'Main Footer', html: '<div class="footer-about"><a href="/" class="footer-logo">Zenrix</a><p>One place for all your needs. High quality products at affordable prices.</p></div>', published: true }
+      { slug: 'navbar', name: 'Main Navbar', html: '<div class="nav-links"><a href="/">Home</a><a href="/products.html">Products</a><a href="/profile.html">Account</a><a href="/contact.html">Contact</a></div>', published: true },
+      { slug: 'footer', name: 'Main Footer', html: `<!-- FOOTER TEMPLATE (editable sections) -->
+<div class="footer-about">
+  <a class="brand" href="/"><span class="orb"></span>Zenrix</a>
+  <p class="lede">Your one-stop shop for quality products at affordable prices.</p>
+
+  <div class="cta-row" data-footer-cta>
+    <a class="btn primary" href="/products.html">Zenrix</a>
+    <a class="btn ghost" href="/contact.html">Talk to us</a>
+  </div>
+</div>
+
+<div class="footer-stayclose">
+  <div class="column-title">Stay close</div>
+  <p class="lede" style="max-width: 320px; margin: 0;">New drops, back-in-stock notes, and launches without the noise.</p>
+  <div class="social">
+    <a href="#" aria-label="Facebook">Facebook</a>
+    <a href="#" aria-label="Twitter">Twitter</a>
+    <a href="#" aria-label="Instagram">Instagram</a>
+    <a href="#" aria-label="YouTube">YouTube</a>
+  </div>
+</div>
+
+<div class="footer-shop">
+  <div class="column-title">Shop</div>
+  <ul class="links-list">
+    <li><a href="/products.html">All Products</a></li>
+    <li><a href="/products.html?category=electronics">Electronics</a></li>
+    <li><a href="/products.html?category=fashion">Fashion</a></li>
+    <li><a href="/products.html?category=home">Home &amp; Kitchen</a></li>
+    <li><a href="/products.html?category=beauty">Beauty</a></li>
+  </ul>
+</div>
+
+<div class="footer-company">
+  <div class="column-title">Company</div>
+  <ul class="links-list">
+    <li><a href="/about.html">About</a></li>
+    <li><a href="/careers.html">Careers</a></li>
+    <li><a href="/blog.html">Blog</a></li>
+    <li><a href="/privacy.html">Privacy</a></li>
+    <li><a href="/terms.html">Terms</a></li>
+  </ul>
+</div>
+
+<div class="footer-support">
+  <div class="column-title">Support</div>
+  <div class="contact-lines">
+    <div><span>Email</span> support@zenrix.com</div>
+    <div><span>Phone</span> <span data-footer-phone>+977 9819922314</span></div>
+    <div><span>Chat</span> Live chat 9am-9pm</div>
+  </div>
+  <a href="/support.html" class="support-btn" style="text-decoration: none;">Open support</a>
+</div>
+
+<div class="footer-bottom">
+  <span>&copy; <span data-footer-year></span> Zenrix. Built for modern shoppers.</span>
+  <div class="badge-row">
+    <span class="mini-badge">Secure checkout</span>
+    <span class="mini-badge">48h support</span>
+    <span class="mini-badge">Tracked shipping</span>
+  </div>
+</div>`, published: true }
     ];
 
     await Component.insertMany(samples);

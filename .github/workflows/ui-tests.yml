@@ -27,6 +27,11 @@ jobs:
           CI: true
         run: npm run test:ui
 
+      - name: Run KB feature toggle check
+        env:
+          ADMIN_PASSWORD: ${{ secrets.ADMIN_PASSWORD }}
+        run: npm run test:kb:toggle
+
       - name: Run accessibility checks (axe)
         env:
           CI: true

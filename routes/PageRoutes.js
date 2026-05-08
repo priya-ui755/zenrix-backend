@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const Page = require('../models/Page');
+const Component = require('../models/Component');
 const { requireAdmin } = require('../middleware/auth');
 
 // GET all pages (ordered)
@@ -94,6 +95,30 @@ router.put('/:id', requireAdmin, async (req, res) => {
   try {
     const page = await Page.findByIdAndUpdate(req.params.id, req.body, { new: true, runValidators: true });
     if (!page) return res.status(404).json({ success: false, error: 'Page not found' });
+
+    // After updating the contact page, attempt to sync common contact fields into the footer component so front-facing UI stays consistent
+    if (page.slug === 'contact') {
+      try {
+        const content = page.content || '';
+        const emailMatch = content.match(/[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}/i);
+        const phoneMatch = content.match(/(\+?\d[\d\-\s()]{6,}\d)/);
+        const supportEmail = emailMatch ? emailMatch[0].trim() : null;
+        const supportPhone = phoneMatch ? phoneMatch[0].trim() : null;
+        if (supportEmail || supportPhone) {
+          const footer = await Component.findOne({ slug: 'footer' });
+          if (footer) {
+            footer.data = footer.data || {};
+            if (supportEmail) footer.data.supportEmail = supportEmail;
+            if (supportPhone) footer.data.supportPhone = supportPhone;
+            await footer.save();
+            console.info('Synced contact page fields to footer component', { supportEmail, supportPhone });
+          }
+        }
+      } catch (e) {
+        console.error('Failed to sync contact page to footer component:', e);
+      }
+    }
+
     res.json({ success: true, data: page });
   } catch (err) {
     res.status(400).json({ success: false, error: err.message });

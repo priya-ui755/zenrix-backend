@@ -4,12 +4,20 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Contact Us | Zenrix</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="/css/tailwind-site.css">
     <link rel="stylesheet" href="style.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css">
     <script src="script.js" defer></script>
+    <script>
+        (function() {
+            const stored = localStorage.getItem('zenrix_theme');
+            const theme = (stored === 'light' || stored === 'dark') ? stored : 'light';
+            const themeClass = theme === 'light' ? 'theme-light' : 'theme-dark';
+            document.documentElement.classList.add(themeClass);
+        })();
+    </script>
 </head>
-<body class="bg-slate-950 text-slate-100">
+<body class="surface text">
     <custom-navbar></custom-navbar>
 
     <main>
@@ -21,8 +29,8 @@
                     <h1 class="text-3xl md:text-4xl font-bold">Contact Zenrix Support</h1>
                     <p class="text-slate-200 text-lg">Reach us anytime for orders, returns, or product help. Expect a reply within one business day.</p>
                     <div class="flex flex-wrap gap-3">
-                        <a href="mailto:support@zenrix.com" class="inline-flex items-center gap-2 px-5 py-3 rounded-xl bg-white text-slate-900 font-semibold shadow hover:-translate-y-0.5 transition"><i class="fas fa-envelope"></i>Email support</a>
-                        <a href="tel:+18001234567" class="inline-flex items-center gap-2 px-5 py-3 rounded-xl border border-white/20 text-white font-semibold hover:bg-white/10 transition"><i class="fas fa-phone"></i>Call us</a>
+                        <a id="contactHeroEmailLink" href="#contactMailtoForm" class="inline-flex items-center gap-2 px-5 py-3 rounded-xl bg-white text-slate-900 font-semibold shadow hover:-translate-y-0.5 transition"><i class="fas fa-envelope"></i>Email support</a>
+                        <a id="contactHeroPhoneLink" href="tel:+9779819922314" class="inline-flex items-center gap-2 px-5 py-3 rounded-xl border border-white/20 text-white font-semibold hover:bg-white/10 transition"><i class="fas fa-phone"></i>Call us</a>
                     </div>
                 </div>
                 <div class="grid grid-cols-2 gap-4 w-full lg:w-[420px]">
@@ -40,7 +48,7 @@
                         <p class="text-sm text-indigo-100">Need quick help?</p>
                         <p class="text-xl font-semibold">Check orders, wishlist, and addresses in your dashboard.</p>
                         <div class="flex gap-2 mt-3">
-                            <a href="account.html" class="px-4 py-2 rounded-lg bg-indigo-500 text-white font-semibold hover:-translate-y-0.5 transition">Open dashboard</a>
+                            <a href="profile.html" class="px-4 py-2 rounded-lg bg-indigo-500 text-white font-semibold hover:-translate-y-0.5 transition">Open dashboard</a>
                             <a href="terms.html" class="px-4 py-2 rounded-lg border border-white/20 text-white hover:bg-white/10 transition">Policies</a>
                         </div>
                     </div>
@@ -59,36 +67,48 @@
                         <span class="px-3 py-1 rounded-full bg-indigo-500/20 text-indigo-100 text-xs font-semibold">Support</span>
                     </div>
                     <div class="grid sm:grid-cols-2 gap-4">
+                        <!-- Email -->
                         <div class="p-4 rounded-xl bg-white/5 border border-white/10 flex gap-3 items-start">
-                            <div class="w-10 h-10 rounded-lg bg-indigo-500/20 border border-indigo-400/30 flex items-center justify-center text-indigo-100"><i class="fas fa-envelope"></i></div>
+                            <div class="w-10 h-10 rounded-lg bg-indigo-500/20 border border-indigo-400/30 flex items-center justify-center text-indigo-100">
+                                <i class="fas fa-envelope"></i>
+                            </div>
                             <div>
                                 <p class="font-semibold text-white">Email</p>
-                                <p class="text-sm text-slate-300">support@zenrix.com</p>
-                                <a href="mailto:support@zenrix.com" class="text-indigo-200 text-sm font-semibold hover:text-white">Send a message</a>
+                                <p id="contactEmailValue" class="text-sm text-slate-300">support@zenrix.com</p>
+                                <a id="contactEmailLink" href="#contactMailtoForm" class="text-indigo-200 text-sm font-semibold hover:text-white">Send a message</a>
                             </div>
                         </div>
+                        <!-- Phone -->
                         <div class="p-4 rounded-xl bg-white/5 border border-white/10 flex gap-3 items-start">
-                            <div class="w-10 h-10 rounded-lg bg-emerald-500/20 border border-emerald-400/30 flex items-center justify-center text-emerald-100"><i class="fas fa-phone"></i></div>
+                            <div class="w-10 h-10 rounded-lg bg-emerald-500/20 border border-emerald-400/30 flex items-center justify-center text-emerald-100">
+                                <i class="fas fa-phone"></i>
+                            </div>
                             <div>
                                 <p class="font-semibold text-white">Phone</p>
-                                <p class="text-sm text-slate-300">+1 (800) 123-4567</p>
-                                <a href="tel:+18001234567" class="text-emerald-100 text-sm font-semibold hover:text-white">Call now</a>
+                                <p id="contactPhoneValue" class="text-sm text-slate-300">+977 9819922314</p>
+                                <a id="contactPhoneLink" href="tel:+9779819922314" class="text-emerald-100 text-sm font-semibold hover:text-white">Call now</a>
                             </div>
                         </div>
+                        <!-- Live Chat -->
                         <div class="p-4 rounded-xl bg-white/5 border border-white/10 flex gap-3 items-start">
-                            <div class="w-10 h-10 rounded-lg bg-pink-500/20 border border-pink-400/30 flex items-center justify-center text-pink-100"><i class="fas fa-comment-dots"></i></div>
+                            <div class="w-10 h-10 rounded-lg bg-pink-500/20 border border-pink-400/30 flex items-center justify-center text-pink-100">
+                                <i class="fas fa-comment-dots"></i>
+                            </div>
                             <div>
                                 <p class="font-semibold text-white">Live chat</p>
                                 <p class="text-sm text-slate-300">Chat with our team during support hours.</p>
-                                <span class="text-pink-100 text-sm font-semibold">Coming soon</span>
+                                <a id="contactLiveChatLink" href="/index.html#chat" class="text-pink-100 text-sm font-semibold hover:text-white">Start chat</a>
                             </div>
                         </div>
+                        <!-- Visit -->
                         <div class="p-4 rounded-xl bg-white/5 border border-white/10 flex gap-3 items-start">
-                            <div class="w-10 h-10 rounded-lg bg-amber-500/20 border border-amber-400/30 flex items-center justify-center text-amber-100"><i class="fas fa-store"></i></div>
+                            <div class="w-10 h-10 rounded-lg bg-amber-500/20 border border-amber-400/30 flex items-center justify-center text-amber-100">
+                                <i class="fas fa-store"></i>
+                            </div>
                             <div>
                                 <p class="font-semibold text-white">Visit</p>
-                                <p class="text-sm text-slate-300">123 Commerce St, New York, NY 10001</p>
-                                <a href="https://maps.google.com/?q=123+Commerce+St+New+York+NY+10001" target="_blank" rel="noopener" class="text-amber-100 text-sm font-semibold hover:text-white">Open map</a>
+                                <p id="contactAddressValue" class="text-sm text-slate-300">123 Commerce St, New York, NY 10001</p>
+                                <a id="contactAddressLink" href="https://maps.google.com/?q=123+Commerce+St+New+York+NY+10001" target="_blank" rel="noopener" class="text-amber-100 text-sm font-semibold hover:text-white">Open map</a>
                             </div>
                         </div>
                     </div>
@@ -100,29 +120,30 @@
                             <h2 class="text-2xl font-semibold text-white">Send a note</h2>
                             <p class="text-slate-300">Drop your query and we will email back.</p>
                         </div>
-                        <span class="px-3 py-1 rounded-full bg-white/10 text-white text-xs font-semibold">Email form</span>
+                        <span class="px-3 py-1 rounded-full bg-white/10 text-white text-xs font-semibold">Support form</span>
                     </div>
-                    <form class="space-y-3" onsubmit="event.preventDefault(); window.location.href='mailto:support@zenrix.com';">
+                    <form id="contactMailtoForm" class="space-y-3">
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                             <div>
                                 <label class="block text-sm text-slate-200 mb-1">Full name</label>
-                                <input type="text" class="w-full px-4 py-3 rounded-xl bg-white/10 border border-white/15 text-white placeholder:text-slate-400 focus:outline-none focus:border-indigo-400" placeholder="Your name" required>
+                                <input id="contactName" name="name" type="text" class="w-full px-4 py-3 rounded-xl bg-white/10 border border-white/15 text-white placeholder:text-slate-400 focus:outline-none focus:border-indigo-400" placeholder="Your name" required autocomplete="name">
                             </div>
                             <div>
                                 <label class="block text-sm text-slate-200 mb-1">Email</label>
-                                <input type="email" class="w-full px-4 py-3 rounded-xl bg-white/10 border border-white/15 text-white placeholder:text-slate-400 focus:outline-none focus:border-indigo-400" placeholder="you@example.com" required>
+                                <input id="contactEmail" name="email" type="email" class="w-full px-4 py-3 rounded-xl bg-white/10 border border-white/15 text-white placeholder:text-slate-400 focus:outline-none focus:border-indigo-400" placeholder="you@example.com" required autocomplete="email">
                             </div>
                         </div>
                         <div>
                             <label class="block text-sm text-slate-200 mb-1">Subject</label>
-                            <input type="text" class="w-full px-4 py-3 rounded-xl bg-white/10 border border-white/15 text-white placeholder:text-slate-400 focus:outline-none focus:border-indigo-400" placeholder="Order help, return, feedback" required>
+                            <input id="contactSubject" name="subject" type="text" class="w-full px-4 py-3 rounded-xl bg-white/10 border border-white/15 text-white placeholder:text-slate-400 focus:outline-none focus:border-indigo-400" placeholder="Order help, return, feedback" required>
                         </div>
                         <div>
                             <label class="block text-sm text-slate-200 mb-1">Message</label>
-                            <textarea rows="4" class="w-full px-4 py-3 rounded-xl bg-white/10 border border-white/15 text-white placeholder:text-slate-400 focus:outline-none focus:border-indigo-400" placeholder="Tell us how we can help" required></textarea>
+                            <textarea id="contactMessage" name="message" rows="4" class="w-full px-4 py-3 rounded-xl bg-white/10 border border-white/15 text-white placeholder:text-slate-400 focus:outline-none focus:border-indigo-400" placeholder="Tell us how we can help" required></textarea>
                         </div>
-                        <button type="submit" class="w-full px-6 py-3 rounded-xl bg-gradient-to-r from-indigo-500 to-purple-500 text-white font-semibold shadow hover:-translate-y-0.5 transition">Send email</button>
-                        <p class="text-xs text-slate-400">This form opens your email client to send a message to support@zenrix.com.</p>
+                        <button id="contactSubmitBtn" type="submit" class="w-full px-6 py-3 rounded-xl bg-gradient-to-r from-indigo-500 to-purple-500 text-white font-semibold shadow hover:-translate-y-0.5 transition">Send note</button>
+                        <p class="text-xs text-slate-400">This form sends your message to our support team. We typically reply within one business day.</p>
+                        <p id="contactNoteStatus" class="text-sm hidden" role="status" aria-live="polite"></p>
                     </form>
                 </div>
             </div>
@@ -130,19 +151,202 @@
             <div class="bg-white/5 border border-white/10 rounded-2xl p-6 shadow-xl">
                 <div class="flex items-center justify-between mb-4">
                     <div>
-                        <h3 class="text-lg font-semibold text-white">More information</h3>
-                        <p class="text-slate-300 text-sm">FAQs, policies, and company info.</p>
+                        <h3 class="text-lg font-semibold text-white">What Our Customers Say</h3>
+                        <p class="text-slate-300 text-sm">Hear from our satisfied shoppers.</p>
                     </div>
-                    <span class="px-3 py-1 rounded-full bg-white/10 text-white text-xs font-semibold">CMS</span>
+                    <span class="px-3 py-1 rounded-full bg-white/10 text-white text-xs font-semibold">Testimonials</span>
                 </div>
-                <div id="pageContent" class="prose prose-invert max-w-none">
-                    Loading page content…
+                <div id="testimonialsContainer" class="space-y-4">
+                    <!-- Testimonials will be loaded here -->
                 </div>
+            </div>
+
+            <!-- Review Submission Form -->
+            <div class="bg-white/5 border border-white/10 rounded-2xl p-6 shadow-xl">
+                <div class="flex items-center justify-between mb-4">
+                    <div>
+                        <h3 class="text-lg font-semibold text-white">Share Your Experience</h3>
+                        <p class="text-slate-300 text-sm">Help others by sharing your feedback.</p>
+                    </div>
+                    <span class="px-3 py-1 rounded-full bg-white/10 text-white text-xs font-semibold">Write a Review</span>
+                </div>
+                <form id="reviewForm" class="space-y-4">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-slate-200 mb-1">Name *</label>
+                            <input type="text" id="reviewName" class="w-full px-3 py-2 bg-white/10 border border-white/20 rounded-lg text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500" placeholder="Your name" required>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-slate-200 mb-1">Email (optional)</label>
+                            <input type="email" id="reviewEmail" class="w-full px-3 py-2 bg-white/10 border border-white/20 rounded-lg text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500" placeholder="your@email.com">
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-slate-200 mb-1">Rating *</label>
+                        <div class="flex space-x-1">
+                            <input type="radio" id="rating5" name="rating" value="5" class="hidden">
+                            <label for="rating5" class="cursor-pointer text-2xl text-gray-400 hover:text-yellow-400">★</label>
+                            <input type="radio" id="rating4" name="rating" value="4" class="hidden">
+                            <label for="rating4" class="cursor-pointer text-2xl text-gray-400 hover:text-yellow-400">★</label>
+                            <input type="radio" id="rating3" name="rating" value="3" class="hidden" checked>
+                            <label for="rating3" class="cursor-pointer text-2xl text-gray-400 hover:text-yellow-400">★</label>
+                            <input type="radio" id="rating2" name="rating" value="2" class="hidden">
+                            <label for="rating2" class="cursor-pointer text-2xl text-gray-400 hover:text-yellow-400">★</label>
+                            <input type="radio" id="rating1" name="rating" value="1" class="hidden">
+                            <label for="rating1" class="cursor-pointer text-2xl text-gray-400 hover:text-yellow-400">★</label>
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-slate-200 mb-1">Your Review *</label>
+                        <textarea id="reviewText" rows="4" class="w-full px-3 py-2 bg-white/10 border border-white/20 rounded-lg text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500" placeholder="Tell us about your experience..." required></textarea>
+                    </div>
+                    <button type="submit" class="w-full md:w-auto px-6 py-3 bg-indigo-600 text-white font-semibold rounded-lg hover:bg-indigo-700 transition focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                        Submit Review
+                    </button>
+                </form>
+                <div id="reviewMessage" class="mt-4 text-sm"></div>
             </div>
         </section>
     </main>
 
     <custom-footer></custom-footer>
+
+    <script>
+        (async () => {
+            try {
+                const API = window.API_URL || (location.origin + '/api');
+                const res = await fetch(API + '/components/slug/footer');
+                const json = await res.json();
+                if (!json || !json.success || !json.data || !json.data.data) return;
+                const data = json.data.data || {};
+                const phone = (data.supportPhone || '').trim();
+                const email = (data.supportEmail || '').trim();
+                const phoneTel = phone.replace(/[^+\d]/g, '');
+
+                const heroPhoneLink = document.getElementById('contactHeroPhoneLink');
+                if (heroPhoneLink && phoneTel) heroPhoneLink.href = `tel:${phoneTel}`;
+
+                const contactPhoneValue = document.getElementById('contactPhoneValue');
+                if (contactPhoneValue && phone) contactPhoneValue.textContent = phone;
+
+                const contactPhoneLink = document.getElementById('contactPhoneLink');
+                if (contactPhoneLink && phoneTel) contactPhoneLink.href = `tel:${phoneTel}`;
+
+                const contactEmailValue = document.getElementById('contactEmailValue');
+                if (contactEmailValue && email) contactEmailValue.textContent = email;
+
+                const contactEmailLink = document.getElementById('contactEmailLink');
+                if (contactEmailLink && email) contactEmailLink.href = '#contactMailtoForm';
+            } catch (e) { /* ignore */ }
+        })();
+
+        // Load testimonials
+        (async () => {
+            try {
+                const API = window.API_URL || (location.origin + '/api');
+                const res = await fetch(API + '/testimonials');
+                const json = await res.json();
+                if (!json || !json.success || !Array.isArray(json.data)) return;
+                
+                const container = document.getElementById('testimonialsContainer');
+                if (!container) return;
+                
+                const testimonials = json.data.slice(0, 3); // Show up to 3 testimonials
+                
+                if (testimonials.length === 0) {
+                    container.innerHTML = '<p class="text-slate-300 text-sm">No testimonials available yet.</p>';
+                    return;
+                }
+                
+                container.innerHTML = testimonials.map(t => `
+                    <div class="bg-white/10 border border-white/20 rounded-xl p-4">
+                        <p class="text-slate-200 text-sm italic">"${t.review}"</p>
+                        <div class="flex items-center justify-between mt-2">
+                            <p class="text-indigo-200 text-xs">- ${t.name}</p>
+                            <div class="text-yellow-400 text-xs">
+                                ${'★'.repeat(t.rating)}${'☆'.repeat(5 - t.rating)}
+                            </div>
+                        </div>
+                    </div>
+                `).join('');
+            } catch (e) { 
+                console.error('Error loading testimonials:', e);
+                const container = document.getElementById('testimonialsContainer');
+                if (container) {
+                    container.innerHTML = '<p class="text-slate-300 text-sm">Unable to load testimonials.</p>';
+                }
+            }
+        })();
+        
+        // Handle review form submission
+        const reviewForm = document.getElementById('reviewForm');
+        if (reviewForm) {
+            reviewForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                
+                const formData = new FormData(reviewForm);
+                const data = {
+                    name: formData.get('name'),
+                    email: formData.get('email'),
+                    rating: parseInt(formData.get('rating')),
+                    review: formData.get('review')
+                };
+                
+                // Basic validation
+                if (!data.name || !data.email || !data.rating || !data.review) {
+                    alert('Please fill in all fields.');
+                    return;
+                }
+                
+                if (data.rating < 1 || data.rating > 5) {
+                    alert('Please select a rating between 1 and 5 stars.');
+                    return;
+                }
+                
+                try {
+                    const API = window.API_URL || (location.origin + '/api');
+                    const res = await fetch(API + '/testimonials', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(data)
+                    });
+                    
+                    const result = await res.json();
+                    
+                    if (result.success) {
+                        alert('Thank you for your review! It will be reviewed by our team before being published.');
+                        reviewForm.reset();
+                        // Reset star rating
+                        document.querySelectorAll('.star-rating input').forEach(input => input.checked = false);
+                    } else {
+                        alert('Error submitting review: ' + (result.message || 'Unknown error'));
+                    }
+                } catch (error) {
+                    console.error('Error submitting review:', error);
+                    alert('Error submitting review. Please try again later.');
+                }
+            });
+        }
+        
+        // Handle star rating clicks
+        document.querySelectorAll('.star-rating input').forEach(input => {
+            input.addEventListener('change', function() {
+                const rating = this.value;
+                const stars = this.closest('.star-rating').querySelectorAll('label');
+                stars.forEach((star, index) => {
+                    if (index < rating) {
+                        star.classList.add('text-yellow-400');
+                        star.classList.remove('text-slate-400');
+                    } else {
+                        star.classList.remove('text-yellow-400');
+                        star.classList.add('text-slate-400');
+                    }
+                });
+            });
+        });
+    </script>
 
     <script src="components/navbar.js"></script>
     <script src="components/footer.js"></script>

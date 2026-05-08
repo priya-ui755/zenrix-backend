@@ -1,5 +1,6 @@
 const express = require('express');
 const jwt = require('jsonwebtoken');
+const crypto = require('crypto');
 const Order = require('../models/Order');
 const { requireAdmin } = require('../middleware/auth');
 const router = express.Router();
@@ -7,15 +8,49 @@ const router = express.Router();
 // Simple admin login - returns a short-lived JWT
 router.post('/login', (req, res) => {
   const { password } = req.body;
+  console.debug('[AdminRoutes] login attempt');
   if (!password) return res.status(400).json({ success: false, error: 'Password required' });
 
   const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'admin';
   const JWT_SECRET = process.env.JWT_SECRET || 'zenrix-secret';
 
-  if (password !== ADMIN_PASSWORD) return res.status(401).json({ success: false, error: 'Invalid credentials' });
+  // Timing-safe compare to reduce password oracle leakage.
+  const a = Buffer.from(String(password));
+  const b = Buffer.from(String(ADMIN_PASSWORD));
+  const sameLen = a.length === b.length;
+  const ok = sameLen && crypto.timingSafeEqual(a, b);
+  if (!ok) return res.status(401).json({ success: false, error: 'Invalid credentials' });
 
   const token = jwt.sign({ isAdmin: true }, JWT_SECRET, { expiresIn: '2h' });
+  // Set an HttpOnly cookie for admin session (works across reloads and avoids client storage issues)
+  try {
+    res.cookie('adminToken', token, { httpOnly: true, sameSite: 'lax', secure: process.env.NODE_ENV === 'production', maxAge: 2 * 60 * 60 * 1000 });
+    // For local/dev environments where browsers or headless runners may not persist HttpOnly cookies
+    // reliably across navigation, also set a non-HttpOnly fallback cookie so the client can
+    // detect an authenticated session for UX rehydration. This is intentionally only set in
+    // non-production to avoid exposing tokens to JS in production environments.
+    // Allow enabling a public (non-HttpOnly) fallback cookie for test/dev environments
+    // Set when ADMIN_PUBLIC_COOKIE=1 or when NODE_ENV is not 'production'
+    if (process.env.ADMIN_PUBLIC_COOKIE === '1' || process.env.NODE_ENV !== 'production') {
+      try { res.cookie('adminTokenPublic', token, { httpOnly: false, sameSite: 'lax', secure: false, maxAge: 2 * 60 * 60 * 1000 }); } catch(e) {}
+    }
+  } catch (e) { console.warn('Failed to set admin cookie', e); }
+  try { console.debug('[AdminRoutes] login success, tokenLen=', token.length); } catch(e) {}
   res.json({ success: true, token });
+});
+
+router.get('/ping', requireAdmin, (req, res) => { try { console.debug('[AdminRoutes] ping validated'); return res.json({ success: true }); } catch (e) { return res.status(500).json({ success: false, error: 'Server error' }); } });
+
+// Logout - clears admin cookie
+router.post('/logout', (req, res) => {
+  try {
+    // Clear cookies using the same attributes as when they were set to ensure they are removed
+    try { res.clearCookie('adminToken', { path: '/', httpOnly: true, sameSite: 'lax', secure: process.env.NODE_ENV === 'production' }); } catch(e) {}
+    try { res.clearCookie('adminTokenPublic', { path: '/', httpOnly: false, sameSite: 'lax', secure: false }); } catch(e) {}
+    return res.json({ success: true });
+  } catch (e) {
+    return res.status(500).json({ success: false, error: 'Logout failed' });
+  }
 });
 
 router.get('/orders', requireAdmin, async (req, res) => {

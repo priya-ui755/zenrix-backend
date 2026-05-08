@@ -7,11 +7,20 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="/css/tailwind-site.css">
     <link rel="stylesheet" href="style.css">
+    <script src="/js/format-utils.js"></script>
     <script src="script.js" defer></script>
+    <script>
+        (function() {
+            const stored = localStorage.getItem('zenrix_theme');
+            const theme = (stored === 'light' || stored === 'dark') ? stored : 'light';
+            const themeClass = theme === 'light' ? 'theme-light' : 'theme-dark';
+            document.documentElement.classList.add(themeClass);
+        })();
+    </script>
     <style>
-        body { font-family: 'Space Grotesk', 'Poppins', sans-serif; }
+        body { font-family: var(--body-font); }
         .panel {
             border-radius: 1.5rem;
             border: 1px solid rgba(15, 23, 42, 0.08);
@@ -39,7 +48,7 @@
         }
     </style>
 </head>
-<body class="bg-gradient-to-br from-slate-900 via-slate-950 to-black text-slate-100 min-h-screen">
+<body class="surface text min-h-screen">
     <custom-navbar></custom-navbar>
 
     <main class="relative z-10">
@@ -103,39 +112,39 @@
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
                             <div>
                                 <label class="text-sm text-slate-400" for="fullName">Full Name *</label>
-                                <input id="fullName" name="fullName" class="input-field mt-1" placeholder="Aarav Shrestha" required>
+                                <input id="fullName" name="fullName" class="input-field mt-1" placeholder="Aarav Shrestha" required autocomplete="name">
                             </div>
                             <div>
                                 <label class="text-sm text-slate-400" for="email">Email</label>
-                                <input id="email" name="email" type="email" class="input-field mt-1" placeholder="you@zenrix.com.np">
+                                <input id="email" name="email" type="email" class="input-field mt-1" placeholder="you@zenrix.com.np" autocomplete="email">
                             </div>
                             <div>
                                 <label class="text-sm text-slate-400" for="phone">Phone *</label>
-                                <input id="phone" name="phone" class="input-field mt-1" placeholder="98XXXXXXXX" required>
+                                <input id="phone" name="phone" class="input-field mt-1" placeholder="98XXXXXXXX" required autocomplete="tel">
                             </div>
                             <div>
                                 <label class="text-sm text-slate-400" for="province">Province</label>
-                                <input id="province" name="province" class="input-field mt-1" placeholder="Bagmati">
+                                <input id="province" name="province" class="input-field mt-1" placeholder="Bagmati" autocomplete="address-level1">
                             </div>
                         </div>
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
                             <div>
                                 <label class="text-sm text-slate-400" for="address1">Street Address *</label>
-                                <input id="address1" name="address1" class="input-field mt-1" placeholder="House 12, Road 4" required>
+                                <input id="address1" name="address1" class="input-field mt-1" placeholder="House 12, Road 4" required autocomplete="address-line1">
                             </div>
                             <div>
                                 <label class="text-sm text-slate-400" for="address2">Apartment / Landmark</label>
-                                <input id="address2" name="address2" class="input-field mt-1" placeholder="Opp. Bhatbhateni">
+                                <input id="address2" name="address2" class="input-field mt-1" placeholder="Opp. Bhatbhateni" autocomplete="address-line2">
                             </div>
                         </div>
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
                             <div>
                                 <label class="text-sm text-slate-400" for="city">City *</label>
-                                <input id="city" name="city" class="input-field mt-1" placeholder="Kathmandu" required>
+                                <input id="city" name="city" class="input-field mt-1" placeholder="Kathmandu" required autocomplete="address-level2">
                             </div>
                             <div>
                                 <label class="text-sm text-slate-400" for="postalCode">Postal Code</label>
-                                <input id="postalCode" name="postalCode" class="input-field mt-1" placeholder="44600">
+                                <input id="postalCode" name="postalCode" class="input-field mt-1" placeholder="44600" autocomplete="postal-code">
                             </div>
                         </div>
                         <div>

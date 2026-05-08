@@ -1,53 +1,79 @@
-const path = require('path');
-const fs = require('fs');
+// Vectorstore built from TF-IDF doc freqs as a fallback semantic surface.
+// It computes simple cosine similarity between a query term vector and stored
+// doc term vectors derived from data/knowledge_tfidf.json.
 
-const DB_DIR = path.join(__dirname, '..', '..', 'data');
-if (!fs.existsSync(DB_DIR)) fs.mkdirSync(DB_DIR, { recursive: true });
-const STORE_PATH = path.join(DB_DIR, 'knowledge.json');
+const TF = require('./tfidf');
+let docs = []; // { id, source, vector: {term:weight}, norm }
 
-function init(){
-  if (!fs.existsSync(STORE_PATH)){
-    fs.writeFileSync(STORE_PATH, JSON.stringify({ docs: [] }, null, 2), 'utf8');
+function buildFromTF(){
+  docs = [];
+  const index = (TF && TF._rawIndex) ? TF._rawIndex : null;
+  // TF module currently exposes data via closure; allow fallback to reloading file
+  try{
+    // TF already loaded; use internal data by reading file again for stability
+    const fs = require('fs');
+    const path = require('path');
+    const raw = fs.readFileSync(path.join(__dirname,'..','data','knowledge_tfidf.json'),'utf8');
+    const json = JSON.parse(raw);
+    const entries = json.docs || {};
+    for (const id of Object.keys(entries)){
+      const doc = entries[id];
+      const vec = doc.freqs || {};
+      let sumSq = 0;
+      for (const t of Object.keys(vec)) sumSq += Math.pow(vec[t],2);
+      const norm = Math.sqrt(sumSq) || 1;
+      docs.push({ id, source: doc.source || id, vector: vec, norm });
+    }
+  }catch(e){
+    docs = [];
   }
 }
 
-function _read(){
-  try{ const raw = fs.readFileSync(STORE_PATH, 'utf8'); return JSON.parse(raw); } catch(e){ return { docs: [] }; }
-}
-function _write(data){ fs.writeFileSync(STORE_PATH, JSON.stringify(data, null, 2), 'utf8'); }
-
-function upsert(id, source, text, embedding, meta={}){
-  const data = _read();
-  const found = data.docs.find(d => d.id === id);
-  const entry = { id, source, text, embedding, meta };
-  if (found){
-    Object.assign(found, entry);
-  } else {
-    data.docs.push(entry);
+function dotQueryDoc(qTerms, doc){
+  let s = 0;
+  for (const t of Object.keys(qTerms)){
+    const dq = qTerms[t] || 0;
+    const dv = doc.vector[t] || 0;
+    s += dq * dv;
   }
-  _write(data);
+  return s;
 }
 
-function clearAll(){
-  _write({ docs: [] });
+function buildQueryVector(q){
+  // simple tokenization similar to tfidf.tokenize
+  const terms = String(q || '').toLowerCase().replace(/["'`.,:;()\[\]{}<>/?\\|@#%^&*=+~!-]/g,' ').split(/\s+/).filter(Boolean);
+  const counts = {};
+  for (const t of terms) counts[t] = (counts[t] || 0) + 1;
+  // apply raw frequency weighting (no idf here) then normalize
+  let sumSq = 0;
+  for (const t of Object.keys(counts)) sumSq += Math.pow(counts[t],2);
+  const norm = Math.sqrt(sumSq) || 1;
+  if (norm > 1){
+    for (const t of Object.keys(counts)) counts[t] = counts[t] / norm;
+  }
+  return counts;
 }
 
-function getAll(){
-  const data = _read();
-  return data.docs.map(d => ({ id: d.id, source: d.source, text: d.text, embedding: d.embedding, meta: d.meta || {} }));
+function searchByQuery(query, topK=4){
+  if (!docs || docs.length === 0) buildFromTF();
+  const qv = buildQueryVector(query);
+  const res = [];
+  for (const d of docs){
+    const score = dotQueryDoc(qv, d) / (d.norm || 1);
+    if (score > 0) res.push({ id: d.id, source: d.source, text: '', score, meta: {} });
+  }
+  res.sort((a,b)=> b.score - a.score);
+  return res.slice(0, topK);
 }
 
-function dot(a,b){ let s=0; for (let i=0;i<a.length;i++) s+=a[i]*b[i]; return s; }
-function norm(a){ return Math.sqrt(dot(a,a)); }
-function similarity(a,b){ const na=norm(a); const nb=norm(b); if(!na||!nb) return 0; return dot(a,b)/(na*nb); }
-
-function search(embedding, topK=5){
-  const rows = getAll();
-  const scored = rows.map(r => ({ ...r, score: similarity(embedding, r.embedding || []) }));
-  scored.sort((a,b)=>b.score - a.score);
-  return scored.slice(0, topK);
+function search(embedding, topK=4){
+  // If embedding is a string (query), do query search.
+  if (typeof embedding === 'string') return searchByQuery(embedding, topK);
+  // If an array of numbers given, not implemented — return empty to fallback.
+  return [];
 }
 
-init();
+function getAll(){ return docs.slice(); }
+function clearAll(){ docs = []; }
 
-module.exports = { init, upsert, clearAll, getAll, search };
+module.exports = { search, searchByQuery, getAll, clearAll, buildFromTF };

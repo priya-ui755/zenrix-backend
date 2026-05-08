@@ -3,12 +3,15 @@ const User = require('../models/User');
 
 // Middleware for regular user authentication
 async function requireAuth(req, res, next) {
-  const auth = req.headers.authorization;
-  if (!auth || !auth.startsWith('Bearer ')) {
+  // accept Authorization header or cookie
+  const authHeader = req.headers.authorization;
+  const cookieToken = (req.cookies && req.cookies.adminToken) ? req.cookies.adminToken : null;
+  const raw = (authHeader && authHeader.startsWith('Bearer ')) ? authHeader.split(' ')[1] : cookieToken;
+  if (!raw) {
     return res.status(401).json({ success: false, error: 'Missing authorization token' });
   }
 
-  const token = auth.split(' ')[1];
+  const token = raw;
   try {
     const JWT_SECRET = process.env.JWT_SECRET || 'zenrix-secret';
     const payload = jwt.verify(token, JWT_SECRET);
@@ -31,12 +34,17 @@ async function requireAuth(req, res, next) {
 }
 
 function requireAdmin(req, res, next) {
+  // accept Authorization header or cookie (for server-side admin session)
   const auth = req.headers.authorization;
-  if (!auth || !auth.startsWith('Bearer ')) {
+  const cookieToken = (req.cookies && (req.cookies.adminToken || req.cookies.adminTokenPublic)) ? (req.cookies.adminToken || req.cookies.adminTokenPublic) : null;
+  const usedPublic = (req.cookies && req.cookies.adminTokenPublic) ? true : false;
+  const raw = (auth && auth.startsWith('Bearer ')) ? auth.split(' ')[1] : cookieToken;
+  try { console.debug('[auth] requireAdmin token source header=', !!auth, 'cookie=', !!cookieToken, 'publicCookieUsed=', usedPublic); } catch(e) {}
+  if (!raw) {
     return res.status(401).json({ success: false, error: 'Missing authorization token' });
   }
 
-  const token = auth.split(' ')[1];
+  const token = raw;
   try {
     const JWT_SECRET = process.env.JWT_SECRET || 'zenrix-secret';
     const payload = jwt.verify(token, JWT_SECRET);

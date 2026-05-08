@@ -1,4 +1,3 @@
-version: '3.8'
 services:
   app:
     build: .
@@ -8,6 +7,8 @@ services:
       - .env
     environment:
       PORT: "3000"
+      # Force in-container Mongo hostname; do not rely on host-local .env values.
+      MONGODB_URI: "mongodb://mongo:27017/zenrix"
     depends_on:
       mongo:
         condition: service_healthy
@@ -26,15 +27,18 @@ services:
       retries: 5
     restart: unless-stopped
 
-  seeder:
-    build: .
-    env_file:
-      - .env
-    command: ["node", "db-backup/seed-data.js"]
-    depends_on:
-      mongo:
-        condition: service_healthy
-    restart: "no"
+  # seeder:
+  #   build: .
+  #   env_file:
+  #     - .env
+  #   environment:
+  #     # Ensure the one-off seeder also targets the compose mongo service.
+  #     MONGODB_URI: "mongodb://mongo:27017/zenrix"
+  #   command: ["node", "db-backup/seed-data.js"]
+  #   depends_on:
+  #     mongo:
+  #       condition: service_healthy
+  #   restart: "no"
 
   minio:
     image: minio/minio:latest
@@ -54,13 +58,13 @@ services:
       timeout: 5s
       retries: 5
 
-  minio-client:
-    image: minio/mc:latest
-    entrypoint: ["/bin/sh", "-c"]
-    depends_on:
-      minio:
-        condition: service_healthy
-    restart: "no"
+  # minio-client:
+  #   image: minio/mc:latest
+  #   entrypoint: ["/bin/sh", "-c"]
+  #   depends_on:
+  #     minio:
+  #       condition: service_healthy
+  #   restart: "no"
 
 volumes:
   mongo-data:

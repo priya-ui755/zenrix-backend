@@ -4,8 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login | Zenrix</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="/css/tailwind-site.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css">
 </head>
 <body class="bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50 min-h-screen flex items-center justify-center p-4">
     
@@ -33,7 +33,7 @@
                     <label class="block text-sm font-semibold text-gray-700 mb-2">
                         <i class="fas fa-envelope text-indigo-500 mr-2"></i>Email Address
                     </label>
-                    <input type="email" id="email" required 
+                    <input type="email" id="email" required autocomplete="email"
                         class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 transition"
                         placeholder="your@email.com">
                 </div>
@@ -44,7 +44,7 @@
                         <i class="fas fa-lock text-indigo-500 mr-2"></i>Password
                     </label>
                     <div class="relative">
-                        <input type="password" id="password" required minlength="6"
+                        <input type="password" id="password" required minlength="6" autocomplete="current-password"
                             class="w-full px-4 py-3 pr-12 border-2 border-gray-200 rounded-xl focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 transition"
                             placeholder="••••••••">
                         <button type="button" data-action="togglePassword" 
@@ -61,6 +61,14 @@
                         <span class="text-gray-600">Remember me</span>
                     </label>
                     <a href="#" class="text-indigo-600 hover:text-indigo-700 font-medium">Forgot Password?</a>
+                </div>
+
+                <!-- Admin Login Toggle -->
+                <div class="flex items-center gap-2 text-sm mt-3">
+                    <label class="flex items-center gap-2 cursor-pointer">
+                        <input type="checkbox" id="adminLogin" class="w-4 h-4 text-red-600 rounded">
+                        <span class="text-gray-600">Admin Login (redirects to admin dashboard)</span>
+                    </label>
                 </div>
 
                 <!-- Error Message -->
@@ -118,33 +126,61 @@
         }
 
         document.addEventListener('DOMContentLoaded', () => {
+            const adminCheckbox = document.getElementById('adminLogin');
+            const emailInput = document.getElementById('email');
+            adminCheckbox?.addEventListener('change', (e) => {
+                if (e.target.checked) {
+                    emailInput?.setAttribute('disabled', 'disabled');
+                    emailInput?.classList.add('opacity-50', 'pointer-events-none');
+                } else {
+                    emailInput?.removeAttribute('disabled');
+                    emailInput?.classList.remove('opacity-50', 'pointer-events-none');
+                }
+            });
+
             document.getElementById('loginForm').addEventListener('submit', async (e) => {
                 e.preventDefault();
-                
+
                 const loginBtn = document.getElementById('loginBtn');
                 const originalText = loginBtn.innerHTML;
                 loginBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Logging in...';
                 loginBtn.disabled = true;
-                
+
                 try {
-                    const email = document.getElementById('email').value;
+                    const isAdmin = document.getElementById('adminLogin')?.checked;
                     const password = document.getElementById('password').value;
-                    
+
+                    if (isAdmin) {
+                        // Admin login: send password to /admin/login and redirect to admin dashboard
+                        const res = await fetch('/admin/login', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            credentials: 'include',
+                            body: JSON.stringify({ password })
+                        });
+                        const data = await res.json();
+                        if (!data.success) throw new Error(data.error || 'Admin login failed');
+                        try { localStorage.setItem('adminToken', data.token); } catch(e) {}
+                        window.location.href = '/admin/dashboard.html';
+                        return;
+                    }
+
+                    // Regular user login
+                    const email = document.getElementById('email').value;
+
                     const res = await fetch('/api/users/login', {
                         method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json'
-                        },
+                        headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({ email, password })
                     });
-                    
+
                     const data = await res.json();
-                    
+
                     if (data.success) {
                         // Store token and user data
                         localStorage.setItem('userToken', data.token);
                         localStorage.setItem('userData', JSON.stringify(data.user));
-                        
+
                         // Redirect to profile or dashboard
                         window.location.href = 'profile.html';
                     } else {
