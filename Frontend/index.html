@@ -41,7 +41,7 @@
             <div class="space-y-8">
               <div class="inline-flex items-center gap-2 px-5 py-2 border border-white/20 rounded-full bg-white/5 backdrop-blur">
                 <span class="w-2 h-2 rounded-full bg-emerald-300 animate-pulse"></span>
-                <span id="heroBadgeText" class="text-sm font-semibold tracking-wide">Zenrix Spotlight • Winter 2025</span>
+                <span id="heroBadgeText" class="text-sm font-semibold tracking-wide" data-site-brand-template="{brand} Spotlight • Winter 2025">Zenrix Spotlight • Winter 2025</span>
               </div>
               <div class="space-y-4">
                 <h1 id="heroTitle" class="text-4xl lg:text-6xl font-black leading-tight tracking-tight">
@@ -143,7 +143,7 @@
             <div id="heroCarouselSlides" class="relative h-[420px] lg:h-[520px]">
               <div id="heroCarouselFallback" class="hero-carousel-fallback absolute inset-0 grid place-items-center px-8 lg:px-14">
                 <div class="max-w-3xl text-center space-y-4">
-                  <p class="text-xs uppercase tracking-[0.4em] text-emerald-300 font-semibold">Zenrix</p>
+                  <p class="text-xs uppercase tracking-[0.4em] text-emerald-300 font-semibold" data-site-brand-template="{brand}">Zenrix</p>
                   <h2 class="text-3xl lg:text-4xl font-black text-white">Hero carousel loading new drops…</h2>
                   <p class="text-base text-white/70">We’ll show curated offers here shortly. This fallback keeps the carousel visible while the data arrives.</p>
                 </div>
@@ -322,7 +322,7 @@
         <section class="mt-16 lg:mt-20 grid lg:grid-cols-[1.2fr_0.8fr] gap-8">
           <div class="rounded-[28px] p-8 space-y-6 hover:border-white/25 transition-all duration-300 home-light-card glass-panel">
             <div>
-              <p class="text-sm uppercase tracking-[0.35em] muted font-medium">Why shop with Zenrix</p>
+              <p class="text-sm uppercase tracking-[0.35em] muted font-medium" data-site-brand-template="Why shop with {brand}">Why shop with Zenrix</p>
               <h3 class="text-3xl font-bold text">Built for Nepal — fast, reliable, supported.</h3>
               <div class="mt-3 h-1 w-16 rounded-full bg-gradient-to-r from-sky-400 to-indigo-400"></div>
             </div>
@@ -611,9 +611,9 @@
   <div id="chatbot-window" class="fixed bottom-24 right-6 w-80 h-96 hidden flex flex-col z-50">
     <div class="chatbot-header p-3 rounded-t-[24px] flex justify-between items-center">
       <div class="flex items-center gap-3">
-        <img src="/uploads/avatars/chat-avatar.png?v=2" alt="Zenrix Assistant" style="width:32px;height:32px;border-radius:50%;object-fit:cover;" />
+        <img src="/uploads/avatars/chat-avatar.png?v=2" alt="Zenrix Assistant" data-site-brand-alt-template="{brand} Assistant" style="width:32px;height:32px;border-radius:50%;object-fit:cover;" />
         <div>
-          <div class="font-bold">Zenrix Assistant</div>
+          <div class="font-bold" data-site-brand-template="{brand} Assistant">Zenrix Assistant</div>
           <div class="text-xs opacity-80">Online • 24/7 Support</div>
         </div>
       </div>

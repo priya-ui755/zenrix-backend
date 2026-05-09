@@ -44,6 +44,107 @@ const API_URL = (() => {
     return DEFAULT_API_URL;
 })();
 
+function getSiteBrandName(fallback = 'Zenrix') {
+    try {
+        const raw = localStorage.getItem('siteSettings');
+        if (raw) {
+            const settings = JSON.parse(raw);
+            const name = (settings && (settings.siteTitle || settings.companyName)) ? String(settings.siteTitle || settings.companyName).trim() : '';
+            if (name) return name;
+        }
+    } catch (err) {}
+    return fallback;
+}
+
+function applyBrandToDocumentTitle(title) {
+    const brandName = getSiteBrandName();
+    const source = String(title || document.title || '').trim();
+    document.title = source ? source.replace(/Zenrix/g, brandName) : brandName;
+}
+
+function applyBrandText(value) {
+    return String(value || '').replace(/Zenrix/g, getSiteBrandName());
+}
+
+function applyBrandingEverywhere(root = document) {
+    if (!root) return;
+    if (typeof document !== 'undefined') {
+        const isAdminSurface = document.body && (document.body.classList.contains('adminlte-enabled') || document.body.classList.contains('admin'));
+        const isAdminPath = /(^|\/)admin(?:-dashboard)?\.html$/i.test(window.location.pathname || '');
+        if (isAdminSurface || isAdminPath) return;
+    }
+
+    const brandName = getSiteBrandName();
+    const scope = root === document ? document.documentElement : root;
+    if (!scope) return;
+
+    applyBrandToDocumentTitle(document.title);
+
+    try {
+        const walkerRoot = root === document ? document.body : root;
+        if (walkerRoot) {
+            const walker = document.createTreeWalker(walkerRoot, NodeFilter.SHOW_TEXT, {
+                acceptNode(node) {
+                    const parent = node.parentElement;
+                    if (!parent) return NodeFilter.FILTER_REJECT;
+                    const tag = parent.tagName;
+                    if (['SCRIPT', 'STYLE', 'NOSCRIPT', 'TEXTAREA', 'INPUT'].includes(tag)) return NodeFilter.FILTER_REJECT;
+                    return node.nodeValue && node.nodeValue.includes('Zenrix') ? NodeFilter.FILTER_ACCEPT : NodeFilter.FILTER_SKIP;
+                }
+            });
+
+            const textNodes = [];
+            while (walker.nextNode()) textNodes.push(walker.currentNode);
+            textNodes.forEach((node) => {
+                node.nodeValue = String(node.nodeValue).replace(/Zenrix/g, brandName);
+            });
+        }
+    } catch (err) {}
+
+    try {
+        const elements = scope.querySelectorAll ? scope.querySelectorAll('*') : [];
+        elements.forEach((el) => {
+            ['alt', 'title', 'placeholder', 'aria-label', 'data-original-title'].forEach((attr) => {
+                const current = el.getAttribute && el.getAttribute(attr);
+                if (current && current.includes('Zenrix')) {
+                    el.setAttribute(attr, current.replace(/Zenrix/g, brandName));
+                }
+            });
+        });
+    } catch (err) {}
+
+    try { applyBrandBindings(root); } catch (err) {}
+}
+
+function applyBrandBindings(root = document) {
+    const brandName = getSiteBrandName();
+    const scope = root || document;
+
+    scope.querySelectorAll('[data-site-brand-template]').forEach((el) => {
+        const template = el.getAttribute('data-site-brand-template') || '';
+        const newContent = template.replace(/\{brand\}/g, brandName);
+        el.textContent = newContent;
+        // Special handling for title tag
+        if (el.tagName === 'TITLE') {
+            document.title = newContent;
+        }
+    });
+
+    scope.querySelectorAll('[data-site-brand-alt-template]').forEach((el) => {
+        const template = el.getAttribute('data-site-brand-alt-template') || '';
+        el.setAttribute('alt', template.replace(/\{brand\}/g, brandName));
+    });
+
+    scope.querySelectorAll('[data-site-brand-title-template]').forEach((el) => {
+        const template = el.getAttribute('data-site-brand-title-template') || '';
+        el.setAttribute('title', template.replace(/\{brand\}/g, brandName));
+    });
+}
+
+window.ZENRIX_SITE_TITLE = getSiteBrandName();
+applyBrandingEverywhere(document);
+applyBrandBindings(document);
+
 // Allows Admin-edited pages/components to override the support email used by the Contact form.
 window.ZENRIX_SUPPORT_EMAIL = window.ZENRIX_SUPPORT_EMAIL || 'support@zenrix.com';
 const CART_STORAGE_KEY = 'zenrix_cart';
@@ -279,8 +380,12 @@ document.addEventListener('DOMContentLoaded', function() {
         try {
             const s = e.detail || (localStorage.getItem('siteSettings') ? JSON.parse(localStorage.getItem('siteSettings')) : null);
             if (!s) return;
+            window.ZENRIX_SITE_TITLE = (s.siteTitle || s.companyName) ? String(s.siteTitle || s.companyName).trim() : window.ZENRIX_SITE_TITLE;
             // Make support email available to other modules
             try { window.ZENRIX_SUPPORT_EMAIL = s.supportEmail || window.ZENRIX_SUPPORT_EMAIL; } catch(e) {}
+            try { applyBrandToDocumentTitle(document.title); } catch (ee) {}
+            try { applyBrandingEverywhere(document); } catch (ee) {}
+            try { applyBrandBindings(document); } catch (ee) {}
             // Update contact page items
             try {
                 const phone = (s.supportPhone || '').trim();
@@ -330,10 +435,25 @@ document.addEventListener('DOMContentLoaded', function() {
                 if (sj && sj.success && sj.data) {
                     try { localStorage.setItem('siteSettings', JSON.stringify(sj.data)); } catch(e){}
                     try { window.ZENRIX_SUPPORT_EMAIL = sj.data.supportEmail || window.ZENRIX_SUPPORT_EMAIL; } catch(e){}
+                    try { if (sj.data.mapEmbedUrl) localStorage.setItem('footerMapEmbed', sj.data.mapEmbedUrl); } catch(e){}
                     try { window.dispatchEvent(new CustomEvent('siteSettingsUpdated', { detail: sj.data })); } catch(e){}
                 }
             } catch (e) { /* ignore */ }
         })();
+
+        try {
+            if (!window.__zenrixBrandObserver && typeof MutationObserver !== 'undefined') {
+                let brandRaf = null;
+                window.__zenrixBrandObserver = new MutationObserver(() => {
+                    if (brandRaf) return;
+                    brandRaf = window.requestAnimationFrame(() => {
+                        brandRaf = null;
+                        applyBrandingEverywhere(document);
+                    });
+                });
+                window.__zenrixBrandObserver.observe(document.body || document.documentElement, { childList: true, subtree: true, characterData: true });
+            }
+        } catch (e) {}
 
     } catch (e) { /* ignore */ }
 
@@ -1052,7 +1172,7 @@ function hydrateProduct(product) {
     const saleActive = isSaleActive(product);
     const effectivePrice = getEffectivePrice(product) || priceValue;
 
-    document.title = `${name} | Zenrix`;
+    applyBrandToDocumentTitle(`${name} | Zenrix`);
 
     const titleEl = document.getElementById('productTitle');
     if (titleEl) titleEl.textContent = name;
@@ -1309,9 +1429,15 @@ async function loadPageContent() {
         const json = await res.json();
         if (json.success && json.data) {
             const page = json.data;
-            document.title = `${page.title} | Zenrix`;
+            applyBrandToDocumentTitle(`${page.title} | Zenrix`);
 
-            const sanitized = sanitizeHtml(page.content) || '';
+            let sanitized = sanitizeHtml(page.content) || '';
+            // Remove any footer markup that CMS content may include to avoid duplicate footers
+            try {
+                sanitized = sanitized.replace(/<custom-footer[\s\S]*?<\/custom-footer>/gi, '');
+                sanitized = sanitized.replace(/<footer[\s\S]*?<\/footer>/gi, '');
+            } catch (e) { /* ignore */ }
+
             container.innerHTML = sanitized || '<p class="text-gray-600">No content yet.</p>';
 
             // If this is the Contact page, derive support email from CMS content so updates reflect
@@ -1347,7 +1473,8 @@ async function loadPageContent() {
                     }
 
                     if (email) {
-                        window.ZENRIX_SUPPORT_EMAIL = email;
+                        // Do not overwrite the global support email used by footer/site-wide components.
+                        // Only update local Contact page elements so footer remains constant.
                         const emailTextEl = document.getElementById('supportEmailText');
                         if (emailTextEl) emailTextEl.textContent = email;
 
@@ -1519,13 +1646,13 @@ async function loadHeroContent() {
             });
         }
         if (hero.title && heroTitleEl) {
-            heroTitleEl.textContent = hero.title;
+            heroTitleEl.textContent = applyBrandText(hero.title);
         }
         if (hero.subtitle && heroSubtitleEl) {
-            heroSubtitleEl.textContent = hero.subtitle;
+            heroSubtitleEl.textContent = applyBrandText(hero.subtitle);
         }
         if (hero.badgeText && heroBadgeEl) {
-            heroBadgeEl.textContent = hero.badgeText;
+            heroBadgeEl.textContent = applyBrandText(hero.badgeText);
         }
         if (hero.ctaText && heroCtaEl) {
             heroCtaEl.textContent = hero.ctaText;
@@ -1589,7 +1716,7 @@ function renderHeroCarousel(carousel) {
         slidesRoot.innerHTML = `
             <div class="h-full grid place-items-center px-8">
               <div class="max-w-2xl text-center">
-                <p class="text-sm uppercase tracking-[0.4em] text-white/60">Zenrix</p>
+                <p class="text-sm uppercase tracking-[0.4em] text-white/60" data-site-brand-template="{brand}">Zenrix</p>
                 <h2 class="text-3xl lg:text-4xl font-black mt-3">Hero is disabled</h2>
                 <p class="text-white/75 mt-3">Add slides from the Admin Dashboard to show a modern carousel here.</p>
                 <a href="products.html" class="inline-flex items-center justify-center mt-6 px-7 py-3 rounded-2xl bg-white text-slate-900 font-semibold shadow-xl shadow-slate-900/20 hover:-translate-y-0.5 transition">Browse products</a>
@@ -1597,6 +1724,7 @@ function renderHeroCarousel(carousel) {
             </div>
         `;
         dotsRoot.innerHTML = '';
+        try { applyBrandBindings(slidesRoot); } catch (e) {}
         if (prevBtn) prevBtn.classList.add('hidden');
         if (nextBtn) nextBtn.classList.add('hidden');
         return;
@@ -1667,7 +1795,7 @@ function renderHeroCarousel(carousel) {
 
         const title = document.createElement('h2');
         title.className = 'hero-title text-white';
-        title.textContent = slide.title || 'Zenrix';
+        title.textContent = applyBrandText(slide.title || getSiteBrandName());
         inner.appendChild(title);
 
         if (slide.subtitle) {
@@ -1699,6 +1827,7 @@ function renderHeroCarousel(carousel) {
         const fallbackEl = document.getElementById('heroCarouselFallback');
         if (fallbackEl) fallbackEl.remove();
         slidesRoot.appendChild(wrapper);
+        try { applyBrandBindings(slidesRoot); } catch (e) {}
         requestAnimationFrame(() => {
             wrapper.style.opacity = '1';
             wrapper.style.transform = 'translateX(0) scale(1)';

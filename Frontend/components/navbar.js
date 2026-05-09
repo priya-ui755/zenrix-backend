@@ -275,7 +275,7 @@ class CustomNavbar extends HTMLElement {
             </style>
             <div class="shell">
                 <nav>
-                    <a href="/" class="brand"><span class="dot"></span>Zenrix</a>
+                    <a href="/" class="brand"><span class="dot"></span><span class="brand-name">Zenrix</span></a>
                     <div class="nav-links">
                         <a href="/" data-nav-icon="home">
                             <span>Home</span>
@@ -336,6 +336,29 @@ class CustomNavbar extends HTMLElement {
                 </div>
             </div>
         `;
+
+        const readSiteBrandName = () => {
+            try {
+                const raw = localStorage.getItem('siteSettings');
+                if (raw) {
+                    const settings = JSON.parse(raw);
+                    const name = (settings && (settings.siteTitle || settings.companyName)) ? String(settings.siteTitle || settings.companyName).trim() : '';
+                    if (name) return name;
+                }
+            } catch (err) {}
+            return 'Zenrix';
+        };
+
+        const applySiteBranding = () => {
+            const brandName = readSiteBrandName();
+            const brandEl = this.shadowRoot.querySelector('.brand-name');
+            if (brandEl) brandEl.textContent = brandName;
+        };
+
+        this._siteBrandingHandler = applySiteBranding;
+        window.addEventListener('siteSettingsUpdated', applySiteBranding);
+        window.addEventListener('storage', applySiteBranding);
+        applySiteBranding();
 
         const removeUnwantedLinks = (rootEl) => {
             if (!rootEl) return;
@@ -691,6 +714,10 @@ class CustomNavbar extends HTMLElement {
     }
 
     disconnectedCallback() {
+        if (this._siteBrandingHandler) {
+            window.removeEventListener('siteSettingsUpdated', this._siteBrandingHandler);
+            window.removeEventListener('storage', this._siteBrandingHandler);
+        }
         window.removeEventListener('cartUpdated', this._boundUpdate);
     }
 }
