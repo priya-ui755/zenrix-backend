@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Contact Us | Zenrix</title>
+    <title data-site-brand-template="Contact Us | {brand}">Contact Us | Zenrix</title>
     <link rel="stylesheet" href="/css/tailwind-site.css">
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css">
@@ -26,7 +26,7 @@
             <div class="container mx-auto px-4 relative flex flex-col gap-8 lg:flex-row lg:items-center lg:justify-between">
                 <div class="space-y-4 max-w-2xl">
                     <p class="text-sm uppercase tracking-[0.35em] text-indigo-100">We are here for you</p>
-                    <h1 class="text-3xl md:text-4xl font-bold">Contact Zenrix Support</h1>
+                    <h1 class="text-3xl md:text-4xl font-bold" data-site-brand-template="Contact {brand} Support">Contact Zenrix Support</h1>
                     <p class="text-slate-200 text-lg">Reach us anytime for orders, returns, or product help. Expect a reply within one business day.</p>
                     <div class="flex flex-wrap gap-3">
                         <a id="contactHeroEmailLink" href="#contactMailtoForm" class="inline-flex items-center gap-2 px-5 py-3 rounded-xl bg-white text-slate-900 font-semibold shadow hover:-translate-y-0.5 transition"><i class="fas fa-envelope"></i>Email support</a>
@@ -215,17 +215,22 @@
         (async () => {
             try {
                 const API = window.API_URL || (location.origin + '/api');
-                const res = await fetch(API + '/components/slug/footer');
+                // Get contact details from site settings (admin-editable)
+                const res = await fetch(API + '/site-settings');
                 const json = await res.json();
-                if (!json || !json.success || !json.data || !json.data.data) return;
-                const data = json.data.data || {};
+                if (!json || !json.success || !json.data) return;
+                const data = json.data || {};
                 const phone = (data.supportPhone || '').trim();
                 const email = (data.supportEmail || '').trim();
+                const address = (data.address || '123 Commerce St, New York, NY 10001').trim();
+                const mapEmbed = (data.mapEmbedUrl || '').trim();
                 const phoneTel = phone.replace(/[^+\d]/g, '');
 
+                // Update Hero section phone link
                 const heroPhoneLink = document.getElementById('contactHeroPhoneLink');
                 if (heroPhoneLink && phoneTel) heroPhoneLink.href = `tel:${phoneTel}`;
 
+                // Update Talk-to-us section
                 const contactPhoneValue = document.getElementById('contactPhoneValue');
                 if (contactPhoneValue && phone) contactPhoneValue.textContent = phone;
 
@@ -237,8 +242,61 @@
 
                 const contactEmailLink = document.getElementById('contactEmailLink');
                 if (contactEmailLink && email) contactEmailLink.href = '#contactMailtoForm';
+
+                // Update address
+                const contactAddressValue = document.getElementById('contactAddressValue');
+                if (contactAddressValue && address) contactAddressValue.textContent = address;
+
+                const contactAddressLink = document.getElementById('contactAddressLink');
+                if (contactAddressLink && mapEmbed) {
+                    // Use mapEmbedUrl from admin (proper maps link with coordinates)
+                    // Convert embed URL to regular maps URL by removing output=embed parameter
+                    const mapsUrl = mapEmbed.replace(/&?output=embed/, '');
+                    contactAddressLink.href = mapsUrl;
+                } else if (contactAddressLink && address) {
+                    // Fallback to address-based search if mapEmbed not available
+                    contactAddressLink.href = `https://maps.google.com/?q=${encodeURIComponent(address)}`;
+                }
+
+                // Update map iframe if mapEmbedUrl is provided
+                if (mapEmbed) {
+                    try { localStorage.setItem('footerMapEmbed', mapEmbed); } catch (e) { /* ignore */ }
+                    try { window.dispatchEvent(new CustomEvent('footerMapUpdated', { detail: { mapEmbed } })); } catch (e) { /* ignore */ }
+                }
             } catch (e) { /* ignore */ }
         })();
+
+        // Listen for site settings updates from admin
+        window.addEventListener('siteSettingsUpdated', (event) => {
+            try {
+                const data = event.detail || {};
+                const phone = (data.supportPhone || '').trim();
+                const email = (data.supportEmail || '').trim();
+                const address = (data.address || '').trim();
+                const mapEmbed = (data.mapEmbedUrl || '').trim();
+                const phoneTel = phone.replace(/[^+\\d]/g, '');
+
+                if (phone) {
+                    const contactPhoneValue = document.getElementById('contactPhoneValue');
+                    if (contactPhoneValue) contactPhoneValue.textContent = phone;
+                    const contactPhoneLink = document.getElementById('contactPhoneLink');
+                    if (contactPhoneLink) contactPhoneLink.href = `tel:${phoneTel}`;
+                }
+                if (email) {
+                    const contactEmailValue = document.getElementById('contactEmailValue');
+                    if (contactEmailValue) contactEmailValue.textContent = email;
+                }
+                if (address) {
+                    const contactAddressValue = document.getElementById('contactAddressValue');
+                    if (contactAddressValue) contactAddressValue.textContent = address;
+                    const contactAddressLink = document.getElementById('contactAddressLink');
+                    if (contactAddressLink) contactAddressLink.href = `https://maps.google.com/?q=${encodeURIComponent(address)}`;
+                }
+                if (mapEmbed) {
+                    try { window.dispatchEvent(new CustomEvent('footerMapUpdated', { detail: { mapEmbed } })); } catch (e) {}
+                }
+            } catch (e) { /* ignore */ }
+        });
 
         // Load testimonials
         (async () => {
