@@ -13,7 +13,7 @@
     if (from === 'bot'){
       const img = document.createElement('img');
       img.src = '/uploads/avatars/chat-avatar.png?v=1';
-      img.alt = 'Zenrix Assistant';
+      img.alt = 'Fashion Hub Assistant';
       img.onerror = function(){ this.onerror = null; this.src = '/uploads/avatars/chat-avatar.png?v=1'; };
       const text = document.createElement('div');
       text.innerHTML = content;

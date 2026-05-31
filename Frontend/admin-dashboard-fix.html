@@ -1,0 +1,64 @@
+<!-- TEMPORARY FILE - THIS IS JUST THE CORRECTED CSS SECTION -->
+
+        /* Sidebar collapsed: show icons only */
+        body.adminlte-enabled.sidebar-collapse .nav-sidebar .nav-link {
+            justify-content: center !important;
+            gap: 0 !important;
+            padding: 0.65rem 0.5rem !important;
+        }
+
+        /* Sidebar collapse - use .adminlte-enabled prefix for correct specificity */
+        body.adminlte-enabled.sidebar-collapse .nav-sidebar .nav-link {
+            justify-content: center !important;
+            gap: 0 !important;
+            padding: 0.65rem 0.5rem !important;
+        }
+        
+        body.adminlte-enabled.sidebar-collapse .nav-sidebar .nav-link .nav-icon {
+            width: 1.5rem !important;
+            height: 1.5rem !important;
+            font-size: 1.2rem !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            margin: 0 !important;
+            padding: 0 !important;
+            flex-shrink: 0 !important;
+        }
+        
+        body.adminlte-enabled.sidebar-collapse .nav-sidebar .nav-link p {
+            display: none !important;
+            width: 0 !important;
+            height: 0 !important;
+            overflow: hidden !important;
+            margin: 0 !important;
+            padding: 0 !important;
+        }
+        
+        /* Ensure sidebar itself is visible when collapsed */
+        body.adminlte-enabled.sidebar-collapse .main-sidebar {
+            width: 80px !important;
+            display: block !important;
+            visibility: visible !important;
+            background-color: #1e293b !important;
+            border-right: 1px solid rgba(99, 102, 241, 0.2) !important;
+        }
+        
+        body.adminlte-enabled.sidebar-collapse .nav-sidebar .nav-link {
+            color: #94a3b8 !important;
+        }
+        
+        body.adminlte-enabled.sidebar-collapse .nav-sidebar .nav-link:hover {
+            color: #e2e8f0 !important;
+            background-color: rgba(99, 102, 241, 0.15) !important;
+        }
+        
+        body.adminlte-enabled.sidebar-collapse .nav-sidebar .nav-link.active {
+            color: #6366f1 !important;
+            background-color: rgba(99, 102, 241, 0.2) !important;
+        }
+        
+        body.adminlte-enabled.sidebar-collapse .content-wrapper {
+            margin-left: 80px !important;
+            width: calc(100% - 80px) !important;
+        }

@@ -4,7 +4,7 @@ const Testimonial = require('../models/Testimonial');
 async function seedTestimonials() {
   try {
     // Connect to MongoDB
-    await mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/zenrix');
+    await mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/fashionhub');
 
     console.log('Connected to MongoDB');
 
@@ -19,7 +19,7 @@ async function seedTestimonials() {
     const testimonials = [
       {
         name: 'Sarah K.',
-        review: 'Zenrix has the best selection of electronics. Fast shipping and great prices!',
+        review: 'Fashion Hub has the best selection of electronics. Fast shipping and great prices!',
         rating: 5,
         isActive: true,
       },

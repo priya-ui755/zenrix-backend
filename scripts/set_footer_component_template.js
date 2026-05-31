@@ -14,11 +14,11 @@ const API = process.env.API_URL || 'http://localhost:3000/api';
 const TEMPLATE_HTML = String.raw`<!-- FOOTER TEMPLATE (editable sections) -->
 
 <div class="footer-about">
-  <a class="brand" href="/"><span class="orb"></span>Zenrix</a>
+  <a class="brand" href="/"><span class="orb"></span>Fashion Hub</a>
   <p class="lede">Your one-stop shop for quality products at affordable prices.</p>
 
   <div class="cta-row" data-footer-cta>
-    <a class="btn primary" href="/products.html">Zenrix</a>
+    <a class="btn primary" href="/products.html">Fashion Hub</a>
     <a class="btn ghost" href="/contact.html">Talk to us</a>
   </div>
 </div>
@@ -67,7 +67,7 @@ const TEMPLATE_HTML = String.raw`<!-- FOOTER TEMPLATE (editable sections) -->
 <div class="footer-support">
   <div class="column-title">Support</div>
   <div class="contact-lines">
-    <div><span>Email</span> support@zenrix.com</div>
+    <div><span>Email</span> support@fashionhub.com</div>
     <div><span>Phone</span> <span data-footer-phone>+977 9819922314</span></div>
     <div><span>Chat</span> Live chat 9am-9pm</div>
   </div>
@@ -75,7 +75,7 @@ const TEMPLATE_HTML = String.raw`<!-- FOOTER TEMPLATE (editable sections) -->
 </div>
 
 <div class="footer-bottom">
-  <span>&copy; <span data-footer-year></span> Zenrix. Built for modern shoppers.</span>
+  <span>&copy; <span data-footer-year></span> Fashion Hub. Built for modern shoppers.</span>
   <div class="badge-row">
     <span class="mini-badge">Secure checkout</span>
     <span class="mini-badge">48h support</span>

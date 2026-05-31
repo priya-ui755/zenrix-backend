@@ -22,7 +22,7 @@
     if (from === 'bot'){
       const img = document.createElement('img');
       img.src = '/uploads/avatars/chat-avatar.png?v=2';
-      img.alt = 'Zenrix Assistant';
+      img.alt = 'Fashion Hub Assistant';
       img.onerror = function(){ this.onerror = null; this.src = '/uploads/avatars/chat-avatar.png?v=2'; };
       img.width = 48; img.height = 48;
       const text = document.createElement('div');
@@ -86,7 +86,7 @@
 
   // Richer responses
   const canned = [
-    {p:/\b(hello|hi|hey|namaste|what can you do|help|faq)\b/i, r: "Namaste! 👋 I'm Zenrix Assistant (नमस्ते). I can help with:<br>📦 <strong>Orders</strong> - Track & manage your orders<br>🛍️ <strong>Products</strong> - Browse & find items<br>🚚 <strong>Delivery</strong> - Shipping info & timelines<br>🔄 <strong>Returns</strong> - Easy 30-day returns<br>💳 <strong>Payment</strong> - Payment methods & issues<br>🎟️ <strong>Support</strong> - Create tickets & reach our team<br><br>Just ask me anything or say 'open ticket' for support!"},
+    {p:/\b(hello|hi|hey|namaste|what can you do|help|faq)\b/i, r: "Namaste! 👋 I'm Fashion Hub Assistant (नमस्ते). I can help with:<br>📦 <strong>Orders</strong> - Track & manage your orders<br>🛍️ <strong>Products</strong> - Browse & find items<br>🚚 <strong>Delivery</strong> - Shipping info & timelines<br>🔄 <strong>Returns</strong> - Easy 30-day returns<br>💳 <strong>Payment</strong> - Payment methods & issues<br>🎟️ <strong>Support</strong> - Create tickets & reach our team<br><br>Just ask me anything or say 'open ticket' for support!"},
     {p:/\b(order status|track order|where is my order|my order|order id)\b/i, r: "📦 <strong>Track Your Order:</strong><br>1. Go to <a href=\"/orders.html\">My Orders</a><br>2. Click any order to see status<br>3. View delivery timeline & tracking<br><br>Need help? Tell me your Order ID and I'll assist. Or say 'open ticket' to contact support."},
     {p:/\b(return|refund|how to return|returns|exchange|send back)\b/i, r: "🔄 <strong>Easy 30-Day Returns:</strong><br>✓ <strong>Timeframe:</strong> 30 days from delivery<br>✓ <strong>How:</strong> Orders → Select item → 'Return'<br>✓ <strong>Refund:</strong> 5-7 business days after we receive it<br>✓ <strong>Condition:</strong> Unused, original packaging<br><br><strong>Exceptions:</strong> Customized items, opened electronics (some exclusions apply)<br><br>Ready to return? Go to <a href=\"/orders.html\">Orders</a> now."},
     {p:/\b(shipping|delivery|ship|delivery time|how long|when will|when arrives)\b/i, r: "🚚 <strong>Delivery Info:</strong><br>⏱️ <strong>Speed:</strong> 3–5 business days (standard)<br>📍 <strong>Remote Areas:</strong> 5–10 business days<br>🚀 <strong>Express:</strong> 1–2 days (selected items)<br>💰 <strong>Free Shipping:</strong> Orders over रु 7,500<br>🆓 <strong>Charges:</strong> रु 99 for standard on smaller orders<br><br>Track your shipment after it ships. Questions? Say 'open ticket'."},
@@ -97,15 +97,15 @@
     {p:/\b(contact|support|help|agent|human|speak|talk|representative|customer service)\b/i, r: "📞 <strong>Get Support:</strong><br>📧 <strong>Email:</strong> <a href=\"mailto:{supportEmail}\">{supportEmail}</a><br>🎟️ <strong>Support Ticket:</strong> Say 'open ticket' right now<br>⏰ <strong>Hours:</strong> Mon-Fri 9AM–6PM Nepal Time<br>🕐 <strong>Emergency:</strong> Contact by email with 'URGENT' tag<br><br>I can create a ticket for you instantly. Want to?"},
     {p:/\b(cancel order|cancel|cancellation)\b/i, r: "❌ <strong>Cancel Your Order:</strong><br><br><strong>Quick Cancel:</strong> Go to <a href=\"/orders.html\">Orders</a> → 'Cancel' (within 24 hours)<br><br><strong>After Shipped:</strong> Can't cancel, but easy returns!<br>• 🔄 Return within 30 days<br>• Get full refund (5-7 days)<br><br><strong>Having issues?</strong> Say 'open ticket' for help."},
     {p:/\b(warranty|guarantee|defective|broken|damage|not working)\b/i, r: "🛡️ <strong>Warranty & Defects:</strong><br>📋 Electronics: Usually 1-year manufacturer warranty<br>📋 Fashion: 6-month defect coverage<br>📋 Home: Varies by product<br><br><strong>Claim Process:</strong><br>1. Say 'open ticket' with proof (photo/video)<br>2. Describe the issue<br>3. We'll arrange replacement or repair<br><br>Check your product page for specific warranty terms."},
-    {p:/\b(career|jobs|work with|hiring|apply|join)\b/i, r: "💼 <strong>Careers at Zenrix:</strong><br>📄 Check our <a href=\"/careers.html\">Careers Page</a><br>📧 Email: <strong>hr@zenrix.com.np</strong><br><br>Include: CV + Position of Interest<br><br>We're always looking for talented people! 🚀"},
-    {p:/\b(privacy|data|gdpr|personal information|cookies)\b/i, r: "🔐 <strong>Privacy & Security:</strong><br>📖 Read our <a href=\"/privacy.html\">Privacy Policy</a><br>📧 Data requests: <strong>privacy@zenrix.com.np</strong><br><br>Your data is safe with us. Encrypted & secure. Questions? Contact us anytime."},
+    {p:/\b(career|jobs|work with|hiring|apply|join)\b/i, r: "💼 <strong>Careers at Fashion Hub:</strong><br>📄 Check our <a href=\"/careers.html\">Careers Page</a><br>📧 Email: <strong>hr@fashionhub.com</strong><br><br>Include: CV + Position of Interest<br><br>We're always looking for talented people! 🚀"},
+    {p:/\b(privacy|data|gdpr|personal information|cookies)\b/i, r: "🔐 <strong>Privacy & Security:</strong><br>📖 Read our <a href=\"/privacy.html\">Privacy Policy</a><br>📧 Data requests: <strong>privacy@fashionhub.com</strong><br><br>Your data is safe with us. Encrypted & secure. Questions? Contact us anytime."},
     {p:/\b(thank|thanks|thank you|appreciate|cool|great|awesome)\b/i, r: "😊 You're welcome! Happy to help. Anything else I can assist with?"}
   ];
 
   function resolvePlaceholders(t){
     if (!t || typeof t !== 'string') return t;
-    const support = (window.ZENRIX_SUPPORT_EMAIL || (localStorage.getItem('siteSettings') ? JSON.parse(localStorage.getItem('siteSettings')).supportEmail : null) || 'support@zenrix.com');
-    const legal = (localStorage.getItem('siteSettings') ? JSON.parse(localStorage.getItem('siteSettings')).legalEmail : null) || 'legal@zenrix.com.np';
+    const support = (window.FASHIONHUB_SUPPORT_EMAIL || (localStorage.getItem('siteSettings') ? JSON.parse(localStorage.getItem('siteSettings')).supportEmail : null) || 'support@fashionhub.com');
+    const legal = (localStorage.getItem('siteSettings') ? JSON.parse(localStorage.getItem('siteSettings')).legalEmail : null) || 'legal@fashionhub.com';
     return t.replace(/{supportEmail}/g, support).replace(/{legalEmail}/g, legal);
   }
 
@@ -467,7 +467,7 @@
         if (nextOpen && messages && messages.children.length === 0){
           setTimeout(() => {
             if (history.length === 0) {
-              appendMessage('नमस्ते! 👋 Welcome to Zenrix Support!<br><br>I\\'m your AI Assistant. I can help with:<br>📦 <strong>Orders</strong> • 🛍️ <strong>Products</strong> • 🚚 <strong>Delivery</strong><br>🔄 <strong>Returns</strong> • 💳 <strong>Payment</strong> • 🎟️ <strong>Support</strong><br><br>What can I help you with today?', 'bot');
+              appendMessage('नमस्ते! 👋 Welcome to Fashion Hub Support!<br><br>I\'m your AI Assistant. I can help with:<br>📦 <strong>Orders</strong> • 🛍️ <strong>Products</strong> • 🚚 <strong>Delivery</strong><br>🔄 <strong>Returns</strong> • 💳 <strong>Payment</strong> • 🎟️ <strong>Support</strong><br><br>What can I help you with today?', 'bot');
               setTimeout(()=> showQuickReplies(), 300);
             } else {
               appendMessage('Welcome back! 👋 How can I help you today?', 'bot');

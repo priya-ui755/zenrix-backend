@@ -1,4 +1,4 @@
-# Zenrix Backend
+# Fashion Hub Backend
 
 Local dev instructions:
 

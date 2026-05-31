@@ -10,7 +10,7 @@
     const id = page._id;
     // Try to source support contact details from the footer component (admin-managed)
     let supportPhone = '+977 9819922314';
-    let supportEmail = 'support@zenrix.com';
+    let supportEmail = 'support@fashionhub.com';
     let address = '123 Commerce St, New York, NY 10001';
     try {
       const footRes = await fetch(`${API}/components/slug/footer`);
@@ -31,7 +31,7 @@
       content: contentHtml,
       published: true,
       meta: {
-        description: 'Contact Zenrix',
+        description: 'Contact Fashion Hub',
         keywords: '',
         mapEmbed: `https://www.google.com/maps?q=${encodeURIComponent(address)}&output=embed`
       }

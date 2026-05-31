@@ -3,7 +3,7 @@ const router = express.Router();
 const passport = require('passport');
 const jwt = require('jsonwebtoken');
 
-const JWT_SECRET = process.env.JWT_SECRET || 'zenrix-secret';
+const JWT_SECRET = process.env.JWT_SECRET || 'fashionhub-secret';
 
 function safeJsonForInlineScript(value) {
   // Prevent breaking out of <script> context (e.g. via </script>)

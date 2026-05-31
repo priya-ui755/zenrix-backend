@@ -1,9 +1,11 @@
 #!/bin/bash
 
-# Zenrix Database Restore Script (Linux/Mac)
+#!/bin/bash
+
+# Fashion Hub Database Restore Script (Linux/Mac)
 # This script seeds the database with initial data
 
-echo "🌱 Restoring Zenrix database..."
+echo "🌱 Restoring Fashion Hub database..."
 echo ""
 
 # Check if .env exists

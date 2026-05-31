@@ -1,4 +1,4 @@
-# 📋 Zenrix Deployment Checklist
+# 📋 Fashion Hub Deployment Checklist
 
 Use this to track your deployment progress. Check items off as you complete them.
 
@@ -16,7 +16,7 @@ Use this to track your deployment progress. Check items off as you complete them
   - [ ] Create free cluster (M0)
   - [ ] Create database user
   - [ ] Get connection string
-  - [ ] Note: `mongodb+srv://username:password@cluster.mongodb.net/zenrix?retryWrites=true&w=majority`
+  - [ ] Note: `mongodb+srv://username:password@cluster.mongodb.net/fashionhub?retryWrites=true&w=majority`
 
 ## 🚀 Railway.app Deployment (Recommended)
 
@@ -35,7 +35,7 @@ Use this to track your deployment progress. Check items off as you complete them
 ### Railway Project Setup
 - [ ] **New Project** → "Deploy from GitHub"
 - [ ] **Connect GitHub** and authorize Railway
-- [ ] **Select this repository** (zenrix-backend)
+  - [ ] **Select this repository** (fashionhub-backend)
 - [ ] **Select branch:** main (or your default branch)
 - [ ] **Deploy:** Railway starts automatic deployment
 
@@ -45,7 +45,7 @@ Add these to Railway Dashboard → Variables:
 
 - [ ] **MONGODB_URI** 
   ```
-  mongodb+srv://zenrix_user:YOUR_PASSWORD@cluster.mongodb.net/zenrix?retryWrites=true&w=majority
+  mongodb+srv://fashionhub_user:YOUR_PASSWORD@cluster.mongodb.net/fashionhub?retryWrites=true&w=majority
   ```
 
 - [ ] **JWT_SECRET** (generate random string)
@@ -153,7 +153,7 @@ These tests verify your site works correctly on the public URL.
 
 After confirming everything works:
 
-- [ ] **Have a custom domain?** (e.g., zenrix.com)
+- [ ] **Have a custom domain?** (e.g., fashionhub.com)
 - [ ] **In Railway dashboard:** Settings → Domain
 - [ ] **Add custom domain** → Point DNS to Railway
 - [ ] **Wait 5-15 minutes** for DNS propagation
@@ -250,4 +250,4 @@ When you see these ✅, you've successfully deployed:
 
 ---
 
-**🎉 CONGRATULATIONS!** Your Zenrix website is now live and shareable! 🚀
+**🎉 CONGRATULATIONS!** Your Fashion Hub website is now live and shareable! 🚀

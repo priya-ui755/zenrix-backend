@@ -19,18 +19,30 @@ h1, h2, h3, h4, h5, h6, .display-font {
     font-family: var(--display-font, 'Clash Display', 'Space Grotesk', sans-serif);
 }
 
-/* Design tokens */
+/* Modern Premium Design System */
 :root {
-    --radius-lg: 28px;
+    --radius-sm: 8px;
+    --radius-md: 12px;
+    --radius-lg: 20px;
+    --radius-xl: 28px;
+    --transition-fast: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-slow: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
     --shadow-deep: 0 25px 80px rgba(15,23,42,0.45);
     --hero-gradient-overlay: linear-gradient(120deg, rgba(15,23,42,0.60), rgba(49,46,129,0.35));
+    --shadow-lg: 0 20px 60px rgba(0, 0, 0, 0.25);
+    --shadow-md: 0 10px 30px rgba(0, 0, 0, 0.15);
+    --shadow-sm: 0 4px 12px rgba(0, 0, 0, 0.08);
 
-    /* Theme tokens (defaults target dark mode look) */
-    --surface: rgba(7, 11, 23, 0.9);
-    --surface-2: rgba(15, 23, 42, 0.85);
+    /* Enhanced tokens */
+    --surface: rgba(7, 11, 23, 0.95);
+    --surface-2: rgba(15, 23, 42, 0.90);
+    --surface-3: rgba(30, 27, 75, 0.80);
     --text: #e2e8f0;
+    --text-secondary: #cbd5e1;
     --muted: #94a3b8;
-    --accent: #06b6d4; /* cyan for dark */
+    --accent: #06b6d4;
+    --accent-light: #22d3ee;
     --accent-600: #10b981;
     --glass: rgba(255, 255, 255, 0.06);
     --focus-ring: rgba(79,70,229,0.18);
@@ -48,6 +60,7 @@ h1, h2, h3, h4, h5, h6, .display-font {
     --chat-card: rgba(255, 255, 255, 0.06);
     --chat-border: rgba(255, 255, 255, 0.1);
     --chat-blur: 12px;
+}
 }
 
 /* About page — ensure CMS/about images show the full photo inside a fixed height */

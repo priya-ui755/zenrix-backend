@@ -1,7 +1,7 @@
 #!/usr/bin/env pwsh
 # Railway.app Quick Deploy Script for Windows PowerShell
 
-Write-Host "🚀 Zenrix Deployment to Railway.app" -ForegroundColor Green
+Write-Host "🚀 Fashion Hub Deployment to Railway.app" -ForegroundColor Green
 Write-Host "====================================`n" -ForegroundColor Green
 
 # Check if git is installed
@@ -23,7 +23,7 @@ Write-Host "Step 1️⃣: Initialize Git repository..." -ForegroundColor Cyan
 if (-not (Test-Path ".git")) {
     git init
     git add .
-    git commit -m "Initial commit for Zenrix deployment"
+    git commit -m "Initial commit for Fashion Hub deployment"
     Write-Host "✅ Git repository initialized`n" -ForegroundColor Green
 } else {
     Write-Host "✅ Git repository already exists`n" -ForegroundColor Green
@@ -58,7 +58,7 @@ Before deploying, you need a cloud database:
 2. Sign up (free)
 3. Create a free cluster
 4. Get your connection string:
-   mongodb+srv://USERNAME:PASSWORD@cluster.mongodb.net/zenrix?retryWrites=true&w=majority
+    mongodb+srv://USERNAME:PASSWORD@cluster.mongodb.net/fashionhub?retryWrites=true&w=majority
 
 5. Copy your connection string - you'll need it in Railway dashboard!
 
@@ -79,7 +79,7 @@ Now follow these steps:
 
 CONFIGURE: In Railway Dashboard → Variables tab, add:
 
-   MONGODB_URI=mongodb+srv://USERNAME:PASSWORD@cluster.mongodb.net/zenrix?retryWrites=true&w=majority
+    MONGODB_URI=mongodb+srv://USERNAME:PASSWORD@cluster.mongodb.net/fashionhub?retryWrites=true&w=majority
    JWT_SECRET=$(([System.Guid]::NewGuid().ToString() + [System.Guid]::NewGuid().ToString()).Replace('-','').Substring(0,32))
    SESSION_SECRET=$(([System.Guid]::NewGuid().ToString() + [System.Guid]::NewGuid().ToString()).Replace('-','').Substring(0,32))
    ADMIN_PASSWORD=set-a-strong-password-here

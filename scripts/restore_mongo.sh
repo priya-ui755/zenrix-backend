@@ -1,6 +1,6 @@
 #!/bin/sh
-# Restores a gzip mongodump archive into the 'zenrix' database
-# Usage: ./scripts/restore_mongo.sh ./db-backups/zenrix_YYYYMMDDHHMMSS.gz
+# Restores a gzip mongodump archive into the 'fashionhub' database
+# Usage: ./scripts/restore_mongo.sh ./db-backups/fashionhub_YYYYMMDDHHMMSS.gz
 set -e
 if [ -z "$1" ]; then
   echo "Usage: $0 <archive-file.gz>"

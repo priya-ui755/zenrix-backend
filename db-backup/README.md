@@ -1,6 +1,6 @@
-# Zenrix Database Backup & Restore
+# Fashion Hub Database Backup & Restore
 
-This folder contains the database seed script and restore utilities for the Zenrix e-commerce platform.
+This folder contains the database seed script and restore utilities for the Fashion Hub e-commerce platform.
 
 ## 📦 What's Included
 
@@ -13,7 +13,7 @@ This folder contains the database seed script and restore utilities for the Zenr
 
 ### Prerequisites
 - Node.js installed
-- MongoDB running locally (default: `mongodb://localhost:27017/zenrix`)
+- MongoDB running locally (default: `mongodb://localhost:27017/fashionhub`)
 - Project dependencies installed (`npm install`)
 
 ### Restore Database
@@ -60,19 +60,19 @@ After restoring the database, you can login with:
 - Password: `password123`
 
 **Admin User:**
-- Email: `admin@zenrix.com`
+- Email: `admin@fashionhub.com`
 - Password: (value from `ADMIN_PASSWORD` in `.env`, default: `admin123`)
 
 ## ⚙️ Configuration
 
 The seed script uses the `MONGODB_URI` from your `.env` file. If not found, it defaults to:
 ```
-mongodb://localhost:27017/zenrix
+mongodb://localhost:27017/fashionhub
 ```
 
 Make sure your `.env` file contains:
 ```env
-MONGODB_URI=mongodb://localhost:27017/zenrix
+MONGODB_URI=mongodb://localhost:27017/fashionhub
 ADMIN_PASSWORD=admin123
 JWT_SECRET=your-jwt-secret
 ```
@@ -121,4 +121,4 @@ If you want to keep existing data:
 ---
 
 **Last Updated:** December 2025  
-**Zenrix E-commerce Platform**
+**Fashion Hub E-commerce Platform**

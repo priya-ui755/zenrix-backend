@@ -63,7 +63,7 @@ async function normalizeUploadedImage(file, { size = 1200 } = {}) {
 }
 
 async function run() {
-  const mongoUrl = process.env.MONGO_URL || process.env.MONGO_URI || process.env.MONGODB_URI || 'mongodb://localhost:27017/zenrix';
+  const mongoUrl = process.env.MONGO_URL || process.env.MONGO_URI || process.env.MONGODB_URI || 'mongodb://localhost:27017/fashionhub';
   console.log('Using mongo URL:', mongoUrl);
   await mongoose.connect(mongoUrl);
   console.log('Connected to MongoDB');

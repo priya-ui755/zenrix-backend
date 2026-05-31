@@ -13,7 +13,7 @@ async function requireAuth(req, res, next) {
 
   const token = raw;
   try {
-    const JWT_SECRET = process.env.JWT_SECRET || 'zenrix-secret';
+    const JWT_SECRET = process.env.JWT_SECRET || 'fashionhub-secret';
     const payload = jwt.verify(token, JWT_SECRET);
     
     if (!payload || !payload.userId) {
@@ -38,7 +38,10 @@ function requireAdmin(req, res, next) {
   const auth = req.headers.authorization;
   const cookieToken = (req.cookies && (req.cookies.adminToken || req.cookies.adminTokenPublic)) ? (req.cookies.adminToken || req.cookies.adminTokenPublic) : null;
   const usedPublic = (req.cookies && req.cookies.adminTokenPublic) ? true : false;
-  const raw = (auth && auth.startsWith('Bearer ')) ? auth.split(' ')[1] : cookieToken;
+  const headerToken = (auth && auth.startsWith('Bearer ')) ? auth.split(' ')[1] : null;
+  // Prefer cookie-based admin session when available; stale localStorage/header tokens
+  // should not override a valid HttpOnly cookie after reload.
+  const raw = cookieToken || headerToken;
   try { console.debug('[auth] requireAdmin token source header=', !!auth, 'cookie=', !!cookieToken, 'publicCookieUsed=', usedPublic); } catch(e) {}
   if (!raw) {
     return res.status(401).json({ success: false, error: 'Missing authorization token' });
@@ -46,7 +49,7 @@ function requireAdmin(req, res, next) {
 
   const token = raw;
   try {
-    const JWT_SECRET = process.env.JWT_SECRET || 'zenrix-secret';
+    const JWT_SECRET = process.env.JWT_SECRET || 'fashionhub-secret';
     const payload = jwt.verify(token, JWT_SECRET);
     // simple check: token is valid and includes isAdmin flag
     if (!payload || !payload.isAdmin) {

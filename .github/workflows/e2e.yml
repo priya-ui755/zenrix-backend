@@ -49,7 +49,7 @@ jobs:
 
       - name: Start server
         env:
-          MONGODB_URI: mongodb://localhost:27017/zenrix_test
+          MONGODB_URI: mongodb://localhost:27017/fashionhub_test
           NODE_ENV: test
           ADMIN_PASSWORD: ${{ secrets.ADMIN_PASSWORD }}
         run: |
@@ -71,7 +71,7 @@ jobs:
         env:
           API_URL: http://localhost:3000/api
           ADMIN_PASSWORD: ${{ secrets.ADMIN_PASSWORD }}
-          MONGODB_URI: mongodb://localhost:27017/zenrix_test
+          MONGODB_URI: mongodb://localhost:27017/fashionhub_test
         run: |
           node scripts/e2e_contact_no_footer_sync.js
           node scripts/e2e_footer_push_to_contact.js

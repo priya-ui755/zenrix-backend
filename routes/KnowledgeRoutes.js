@@ -60,7 +60,7 @@ router.post('/query', async (req,res,next) => {
       try{
         if (hf.isAvailable()){
           const ctx = snippets.map((s,i)=> `Context ${i+1} (source: ${s.source}):\n${s.text}`).join('\n\n');
-          const prompt = `You are an assistant for the Zenrix website. Use the following context snippets and answer the user question concisely and accurately. If the context doesn't have the answer, be honest and recommend contacting support@zenrix.com.np.\n\n${ctx}\n\nQuestion: ${q}\n\nAnswer:`;
+          const prompt = `You are an assistant for the Fashion Hub website. Use the following context snippets and answer the user question concisely and accurately. If the context doesn't have the answer, be honest and recommend contacting support@fashionhub.com.np.\n\n${ctx}\n\nQuestion: ${q}\n\nAnswer:`;
           try{
             const answer = await hf.generateAnswer(prompt);
             if (answer) return res.json({ success: true, answer, snippets });
@@ -75,7 +75,7 @@ router.post('/query', async (req,res,next) => {
         if (!snippets.length) return res.json({ success:true, answer: null, snippets });
         const top = snippets[0];
         const brief = top.text.length > 600 ? top.text.slice(0,600) + '...' : top.text;
-        const answer = `Based on our documentation (source: ${top.source}): ${brief}\n\nIf you need more details, contact support@zenrix.com.np.`;
+        const answer = `Based on our documentation (source: ${top.source}): ${brief}\n\nIf you need more details, contact support@fashionhub.com.np.`;
         return res.json({ success: true, answer, snippets });
       }catch(err){
         console.warn('LLM generation failed:', err.message);

@@ -2,7 +2,7 @@
 ║                                                                              ║
 ║                   ✅ DEPLOYMENT COMPLETE & READY!                          ║
 ║                                                                              ║
-║     Your Zenrix website is fully prepared for public deployment             ║
+║     Your Fashion Hub website is fully prepared for public deployment        ║
 ║                                                                              ║
 ╚══════════════════════════════════════════════════════════════════════════════╝
 
@@ -211,7 +211,7 @@ Run quick mental checklist:
 After deployment, you'll see:
 
 ✅ Green "Deployed" status on Railway dashboard
-✅ Public URL like: https://zenrix-production-xxxxx.railway.app
+✅ Public URL like: https://fashionhub-production-xxxxx.railway.app
 ✅ Website accessible worldwide
 ✅ Admin login works
 ✅ Chatbot responds

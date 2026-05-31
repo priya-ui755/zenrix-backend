@@ -1,93 +1,238 @@
 (function(){
-  // Wait for DOM
-  document.addEventListener('DOMContentLoaded', async () => {
-    // Ensure product list loads when Products tab is shown
-    function showTab(tab) {
-      // Hide all content sections robustly
-      document.querySelectorAll('[id^="content-"]').forEach(el => { el.classList.add('hidden'); try { el.style.display = 'none'; } catch(e){} });
-
-      // Close common modals/overlays so they don't persist across tabs
-      const modalIds = ['#ticketDetailsModal','#editProductModal','#editCareerModal','#editPageModal','#editComponentModal','#orderDetailsModal'];
-      modalIds.forEach(sel => { try { const m = document.querySelector(sel); if (m) { m.classList.add('hidden'); } } catch(e){} });
-
-      // Show requested content
-      const el = document.getElementById('content-' + tab);
-      if (el) {
-        el.classList.remove('hidden');
-        try { el.style.display = ''; } catch(e){}
-        markLoading(el);
-        // scroll top for better UX
-        try { window.scrollTo({ top: 0, behavior: 'smooth' }); } catch(e){}
+  // ========================================
+  // IMMEDIATE: Sidebar toggle (MUST run before DOMContentLoaded)
+  // ========================================
+  // Lightweight standalone initializer to ensure sidebar toggle always attaches
+  function ensureSidebarToggleStandalone() {
+    try {
+      const btn = document.getElementById('sidebarToggle');
+      if (!btn) return;
+      const bodyEl = document.body;
+      const collapsed = localStorage.getItem('adminSidebarCollapsed') === '1';
+      if (collapsed) bodyEl.classList.add('sidebar-collapse'); else bodyEl.classList.remove('sidebar-collapse');
+      btn.setAttribute('aria-expanded', String(!collapsed));
+      // attach handler but avoid adding duplicate listeners
+      if (!btn._sidebarHandlerAdded) {
+        btn.addEventListener('click', function (e) {
+          try { e.preventDefault(); } catch (e) {}
+          try {
+            const isCollapsed = bodyEl.classList.toggle('sidebar-collapse');
+            btn.setAttribute('aria-expanded', String(!isCollapsed));
+            try { localStorage.setItem('adminSidebarCollapsed', isCollapsed ? '1' : '0'); } catch (e) {}
+          } catch (err) {}
+        });
+        btn._sidebarHandlerAdded = true;
       }
+    } catch (e) { /* ignore */ }
+  }
+  try { ensureSidebarToggleStandalone(); document.addEventListener('DOMContentLoaded', ensureSidebarToggleStandalone, { once: true }); } catch (e) {}
 
-      // Update sidebar nav active states
-      document.querySelectorAll('[data-jump-tab]').forEach(a => {
-        try { a.classList.toggle('active', a.getAttribute('data-jump-tab') === tab); } catch(e){}
-      });
-
-      // Update top tab buttons
-      document.querySelectorAll('[data-tab]').forEach(btn => {
+  async function bootDashboardChartsImmediateTopLevel() {
+    if (window.__dashboardChartInit) return;
+    try {
+      window.__dashboardChartInit = 'started';
+      if (!window.Chart) {
         try {
-          const t = btn.getAttribute('data-tab');
-          btn.classList.toggle('border-blue-600', t === tab);
-          btn.classList.toggle('text-blue-600', t === tab);
-        } catch(e){}
-      });
-
-      // Per-tab loaders
-      if (tab === 'products' && typeof loadProducts === 'function') {
-        loadProducts().then(() => { markLoaded(document.getElementById('content-products')); }).catch(()=>{ markLoaded(document.getElementById('content-products')); });
-      }
-      if (tab === 'testimonials' && typeof loadTestimonials === 'function') {
-        loadTestimonials().then(() => { markLoaded(document.getElementById('content-testimonials')); }).catch(()=>{ markLoaded(document.getElementById('content-testimonials')); });
-      }
-
-      // Some tabs need additional refreshes
-      if (tab === 'tickets' && typeof loadTickets === 'function') {
-        try { loadTickets(); } catch(e){}
-      }
-      if (tab === 'subscribers' && typeof loadSubscribers === 'function') {
-        try { loadSubscribers({ silent: true }); } catch(e){}
-      }
-    }
-    document.querySelectorAll('[data-jump-tab]').forEach(btn => {
-      btn.addEventListener('click', e => {
-        e.preventDefault();
-        const tab = btn.getAttribute('data-jump-tab');
-        if (tab) showTab(tab);
-      });
-    });
-    // Reprocess images button
-    const reprocessBtn = document.getElementById('reprocessImagesBtn');
-    if (reprocessBtn) {
-      reprocessBtn.addEventListener('click', async () => {
-        if (!confirm('Reprocess all product images to modern format? This may take a while.')) return;
-        reprocessBtn.disabled = true;
-        reprocessBtn.textContent = 'Processing...';
-        try {
-          const token = (typeof getAdminToken === 'function' ? getAdminToken() : (localStorage ? localStorage.getItem('adminToken') : null));
-          const headers = token ? { 'Authorization': 'Bearer ' + token } : {};
-          const res = await fetch('/api/products/reprocess-images', {
-            method: 'POST',
-            credentials: 'include',
-            headers
-          });
-          const j = await res.json();
-          if (j && j.success) {
-            alert(`Reprocessed: ${j.updated} products. Failed: ${j.failed}`);
-          } else {
-            alert('Failed: ' + (j && j.error ? j.error : 'Unknown error'));
-          }
+          await loadScript('https://cdn.jsdelivr.net/npm/chart.js');
         } catch (e) {
-          alert('Error: ' + (e && e.message ? e.message : e));
+          console.warn('Failed to load Chart.js', e && e.message);
         }
-        reprocessBtn.disabled = false;
-        reprocessBtn.textContent = 'Reprocess All Product Images';
-      });
+      }
+
+      const ordersCtx = document.getElementById('chartOrders')?.getContext('2d');
+      const productsCtx = document.getElementById('chartProducts')?.getContext('2d');
+      const revCtx = document.getElementById('chartRevenue')?.getContext('2d');
+      const payCtx = document.getElementById('chartPayments')?.getContext('2d');
+
+      const ordersData = await fetchOrdersChartData();
+      const productsData = await fetchProductsByCategory();
+      const rev = await fetchRevenueByDay();
+      const payments = await fetchPaymentBreakdown();
+
+      if (ordersCtx) createChart(ordersCtx,'line',{labels:ordersData.labels,datasets:[{label:'Orders',data:ordersData.data,backgroundColor:'rgba(79,70,229,0.12)',borderColor:'#4f46e5',fill:true,tension:0.3}]}, {scales:{y:{beginAtZero:true}}});
+
+      try{
+        const aovSparkCtx = document.getElementById('aovSpark')?.getContext('2d');
+        const aov = await fetchAOVSpark();
+        if (aovSparkCtx) createChart(aovSparkCtx,'line',{labels:aov.labels,datasets:[{data:aov.data,borderColor:'#7c3aed',borderWidth:1,pointRadius:0,fill:false}]} , {plugins:{legend:{display:false}},scales:{x:{display:false},y:{display:false}}});
+      }catch(e){}
+
+      if (productsCtx) createChart(productsCtx,'doughnut',{labels:productsData.labels,datasets:[{label:'Products by category',data:productsData.data,backgroundColor:['#667eea','#a78bfa','#7dd3fc','#f472b6','#fbbf24']} ]});
+      if (revCtx) createChart(revCtx,'line',{labels:rev.labels,datasets:[{label:'Revenue',data:rev.data,backgroundColor:'rgba(5,150,105,0.12)',borderColor:'#059669',fill:true,tension:0.3}]}, {scales:{y:{beginAtZero:true}}});
+      if (payCtx) createChart(payCtx,'doughnut',{labels:payments.labels,datasets:[{data:payments.data,backgroundColor:['#34d399','#60a5fa','#f97316','#fb7185','#a78bfa']} ]});
+
+      window.__dashboardChartInit = 'finished';
+    } catch (e) {
+      console.warn('Charts bootstrap failed', e && e.message);
     }
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', bootDashboardChartsImmediateTopLevel, { once: true });
+  } else {
+    bootDashboardChartsImmediateTopLevel();
+  }
+
+  function initSidebarToggle() {
+    try {
+      const sidebarToggle = document.getElementById('sidebarToggle');
+      function renderProducts(products) {
+        const list = document.getElementById('productsList');
+        if (!list) return;
+
+        // helper to validate image/URL sources
+        function isSafeUrl(u) {
+          return !!(u && typeof u === 'string' && /^(https?:\/\/|\/|data:image\/)/i.test(u));
+        }
+
+        
+
+        // Clear existing content and reset classes
+        list.innerHTML = '';
+        list.className = '';
+        if (currentViewMode === 'list') list.classList.add('space-y-4');
+
+        if (currentViewMode === 'list') {
+          products.forEach(p => {
+            const card = document.createElement('div');
+            card.className = 'bg-white border border-gray-200 rounded-lg p-6 card-hover';
+
+            const row = document.createElement('div'); row.className = 'flex items-start justify-between';
+            const left = document.createElement('div'); left.className = 'flex items-start space-x-4 flex-1';
+
+            if (isSafeUrl(p.image)) {
+              const img = document.createElement('img');
+              img.src = p.image;
+              img.alt = p.name || 'product image';
+              img.className = 'w-20 h-20 object-cover rounded-lg';
+              left.appendChild(img);
+            }
+
+            const main = document.createElement('div'); main.className = 'flex-1';
+            const h3 = document.createElement('h3'); h3.className = 'font-semibold text-gray-800 text-lg'; h3.textContent = p.name || '';
+            const desc = document.createElement('p'); desc.className = 'text-sm text-gray-600 mt-1'; desc.textContent = p.description || '';
+            main.appendChild(h3); main.appendChild(desc);
+
+            const meta = document.createElement('div'); meta.className = 'flex items-center space-x-4 mt-2 text-sm';
+            const saleEndTs = p?.saleEnd ? new Date(p.saleEnd).getTime() : null;
+            const saleActive = p.onSale && Number(p.salePrice) > 0 && (!saleEndTs || saleEndTs > Date.now());
+            const displayPrice = saleActive ? `${formatNpr(p.salePrice)} (was ${formatNpr(p.price)})` : formatNpr(p.price);
+
+            const priceEl = document.createElement('span'); priceEl.className = 'text-blue-600 font-semibold'; priceEl.textContent = displayPrice;
+            const catEl = document.createElement('span'); catEl.className = 'text-gray-500'; catEl.textContent = p.category || '';
+            const stockEl = document.createElement('span'); stockEl.className = p.stock > 0 ? 'text-green-600' : 'text-red-600'; stockEl.textContent = `Stock: ${p.stock || 0}`;
+            meta.appendChild(priceEl); meta.appendChild(catEl); meta.appendChild(stockEl);
+
+            if (p.featured) {
+              const feat = document.createElement('span'); feat.className = 'bg-yellow-100 text-yellow-700 px-2 py-1 rounded text-xs'; feat.textContent = 'Featured'; meta.appendChild(feat);
+            }
+            if (saleActive) {
+              const saleBadge = document.createElement('span'); saleBadge.className = 'bg-emerald-100 text-emerald-700 px-2 py-1 rounded text-xs'; saleBadge.textContent = p.saleLabel || 'On Sale'; meta.appendChild(saleBadge);
+            }
+            if (saleActive && saleEndTs) {
+              const countdown = document.createElement('span'); countdown.className = 'text-xs text-emerald-700'; countdown.setAttribute('data-sale-countdown', p._id); meta.appendChild(countdown);
+            }
+
+            main.appendChild(meta);
+
+            // images strip
+            const images = Array.isArray(p.images) && p.images.length ? p.images : (p.image ? [p.image] : []);
+            if (images.length > 1) {
+              const strip = document.createElement('div'); strip.className = 'flex space-x-2 mt-3';
+              images.slice(0, 4).forEach(src => {
+                if (!isSafeUrl(src)) return;
+                const im = document.createElement('img'); im.src = src; im.className = 'image-preview rounded border'; strip.appendChild(im);
+              });
+              main.appendChild(strip);
+            }
+
+            left.appendChild(main);
+            row.appendChild(left);
+
+            const actions = document.createElement('div'); actions.className = 'flex flex-col space-y-2 ml-4';
+            const editBtn = document.createElement('button'); editBtn.setAttribute('data-edit-product', p._id); editBtn.className = 'px-4 py-2 bg-blue-100 text-blue-600 rounded-lg hover:bg-blue-200 transition whitespace-nowrap'; editBtn.textContent = 'Edit';
+            const delBtn = document.createElement('button'); delBtn.setAttribute('data-delete-product', p._id); delBtn.className = 'px-4 py-2 bg-red-100 text-red-600 rounded-lg hover:bg-red-200 transition whitespace-nowrap'; delBtn.textContent = 'Delete';
+            actions.appendChild(editBtn); actions.appendChild(delBtn);
+
+            row.appendChild(actions);
+            card.appendChild(row);
+            list.appendChild(card);
+          });
+        } else if (currentViewMode === 'tile' || currentViewMode === 'small-icon') {
+          const grid = document.createElement('div');
+          grid.className = currentViewMode === 'tile' ? 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4' : 'grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4';
+          products.forEach(p => {
+            const card = document.createElement('div'); card.className = 'bg-white border border-gray-200 rounded-lg p-4 card-hover';
+            if (currentViewMode === 'tile') card.className = 'bg-white border border-gray-200 rounded-lg p-4 card-hover';
+            else card.className = 'bg-white border border-gray-200 rounded-lg p-3 card-hover text-center';
+
+            if (isSafeUrl(p.image)) {
+              const img = document.createElement('img'); img.src = p.image; img.alt = p.name || ''; img.className = currentViewMode === 'tile' ? 'w-full h-32 object-cover rounded-lg mb-3' : 'w-16 h-16 object-cover rounded-lg mx-auto mb-2';
+              card.appendChild(img);
+            }
+            const h3 = document.createElement('h3'); h3.className = 'font-semibold text-gray-800 ' + (currentViewMode === 'tile' ? 'text-base mb-1' : 'text-sm mb-1 line-clamp-1'); h3.textContent = p.name || '';
+            card.appendChild(h3);
+            if (currentViewMode === 'tile') {
+              const desc = document.createElement('p'); desc.className = 'text-sm text-gray-600 mb-2 line-clamp-2'; desc.textContent = p.description || ''; card.appendChild(desc);
+              const row = document.createElement('div'); row.className = 'flex items-center justify-between';
+              const priceEl = document.createElement('span'); priceEl.className = 'text-blue-600 font-semibold'; priceEl.textContent = formatNpr(p.price);
+              const cat = document.createElement('span'); cat.className = 'text-gray-500 text-sm'; cat.textContent = p.category || '';
+              row.appendChild(priceEl); row.appendChild(cat); card.appendChild(row);
+              const bottom = document.createElement('div'); bottom.className = 'flex items-center justify-between mt-2';
+              const stockEl = document.createElement('span'); stockEl.className = p.stock > 0 ? 'text-green-600 text-sm' : 'text-red-600 text-sm'; stockEl.textContent = `Stock: ${p.stock || 0}`;
+              const btns = document.createElement('div'); btns.className = 'flex space-x-1';
+              const eb = document.createElement('button'); eb.setAttribute('data-edit-product', p._id); eb.className = 'px-3 py-1 bg-blue-100 text-blue-600 rounded hover:bg-blue-200 text-xs'; eb.textContent = 'Edit';
+              const db = document.createElement('button'); db.setAttribute('data-delete-product', p._id); db.className = 'px-3 py-1 bg-red-100 text-red-600 rounded hover:bg-red-200 text-xs'; db.textContent = 'Delete';
+              btns.appendChild(eb); btns.appendChild(db); bottom.appendChild(stockEl); bottom.appendChild(btns); card.appendChild(bottom);
+            } else {
+              const cat = document.createElement('p'); cat.className = 'text-xs text-gray-500'; cat.textContent = p.category || ''; card.appendChild(cat);
+              const actions = document.createElement('div'); actions.className = 'flex justify-center space-x-1 mt-2';
+              const eb = document.createElement('button'); eb.setAttribute('data-edit-product', p._id); eb.className = 'px-2 py-1 bg-blue-100 text-blue-600 rounded text-xs hover:bg-blue-200'; eb.textContent = 'E';
+              const db = document.createElement('button'); db.setAttribute('data-delete-product', p._id); db.className = 'px-2 py-1 bg-red-100 text-red-600 rounded text-xs hover:bg-red-200'; db.textContent = 'D';
+              actions.appendChild(eb); actions.appendChild(db); card.appendChild(actions);
+            }
+            grid.appendChild(card);
+          });
+          list.appendChild(grid);
+        } else if (currentViewMode === 'table') {
+          const wrap = document.createElement('div'); wrap.className = 'overflow-x-auto';
+          const table = document.createElement('table'); table.className = 'min-w-full bg-white border border-gray-200 rounded-lg';
+          const thead = document.createElement('thead'); thead.className = 'bg-gray-50';
+          thead.innerHTML = '<tr>\n                  <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Image</th>\n                  <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Name</th>\n                  <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Price</th>\n                  <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Category</th>\n                  <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Stock</th>\n                  <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Actions</th>\n                </tr>';
+          table.appendChild(thead);
+          const tbody = document.createElement('tbody'); tbody.className = 'divide-y divide-gray-200';
+          products.forEach(p => {
+            const tr = document.createElement('tr'); tr.className = 'hover:bg-gray-50';
+            const tdImg = document.createElement('td'); tdImg.className = 'px-4 py-2';
+            if (isSafeUrl(p.image)) { const im = document.createElement('img'); im.src = p.image; im.alt = p.name || ''; im.className = 'w-12 h-12 object-cover rounded'; tdImg.appendChild(im); }
+            const tdName = document.createElement('td'); tdName.className = 'px-4 py-2 text-sm font-medium text-gray-900'; tdName.textContent = p.name || '';
+            const saleEndTs = p?.saleEnd ? new Date(p.saleEnd).getTime() : null;
+            const saleActive = p.onSale && Number(p.salePrice) > 0 && (!saleEndTs || saleEndTs > Date.now());
+            const displayPrice = saleActive ? `${formatNpr(p.salePrice)} (was ${formatNpr(p.price)})` : formatNpr(p.price);
+            const tdPrice = document.createElement('td'); tdPrice.className = 'px-4 py-2 text-sm text-gray-500'; tdPrice.textContent = displayPrice;
+            const tdCat = document.createElement('td'); tdCat.className = 'px-4 py-2 text-sm text-gray-500'; tdCat.textContent = p.category || '';
+            const tdStock = document.createElement('td'); tdStock.className = 'px-4 py-2 text-sm ' + (p.stock > 0 ? 'text-green-600' : 'text-red-600'); tdStock.textContent = p.stock || 0;
+            const tdActions = document.createElement('td'); tdActions.className = 'px-4 py-2 text-sm';
+            const eb = document.createElement('button'); eb.setAttribute('data-edit-product', p._id); eb.className = 'text-blue-600 hover:text-blue-900 mr-2'; eb.textContent = 'Edit';
+            const db = document.createElement('button'); db.setAttribute('data-delete-product', p._id); db.className = 'text-red-600 hover:text-red-900'; db.textContent = 'Delete';
+            tdActions.appendChild(eb); tdActions.appendChild(db);
+
+            tr.appendChild(tdImg); tr.appendChild(tdName); tr.appendChild(tdPrice); tr.appendChild(tdCat); tr.appendChild(tdStock); tr.appendChild(tdActions);
+            tbody.appendChild(tr);
+          });
+          table.appendChild(tbody); wrap.appendChild(table); list.appendChild(wrap);
+        }
+
+        attachProductEventListeners();
+        startProductSaleCountdowns(products);
+      }
+    } catch (e) { /* ignore */ }
+  }
     // ensure admin scope
     const root = document.querySelector('.admin-app');
-    if (!root) return;
+    if (!root) {
+      console.warn('admin-app root not found during dashboard init');
+    }
 
     // keyboard navigation for sidebar (accessibility)
     (function setupSidebarKeyboard(){
@@ -224,6 +369,57 @@
       form.elements['saleEnd'].value = product.saleEnd ? new Date(product.saleEnd).toISOString().slice(0,16) : '';
       form.elements['saleLabel'].value = product.saleLabel || '';
       modal.classList.remove('hidden');
+      try {
+        modal.style.setProperty('display', 'flex', 'important');
+        modal.style.setProperty('visibility', 'visible');
+        modal.style.setProperty('z-index', '99999');
+      } catch (e) {}
+    }
+
+    async function bootDashboardChartsImmediate() {
+      if (window.__dashboardChartInit) return;
+      try {
+        window.__dashboardChartInit = 'started';
+        if (!window.Chart) {
+          try {
+            await loadScript('https://cdn.jsdelivr.net/npm/chart.js');
+          } catch (e) {
+            console.warn('Failed to load Chart.js', e && e.message);
+          }
+        }
+
+        const ordersCtx = document.getElementById('chartOrders')?.getContext('2d');
+        const productsCtx = document.getElementById('chartProducts')?.getContext('2d');
+        const revCtx = document.getElementById('chartRevenue')?.getContext('2d');
+        const payCtx = document.getElementById('chartPayments')?.getContext('2d');
+
+        const ordersData = await fetchOrdersChartData();
+        const productsData = await fetchProductsByCategory();
+        const rev = await fetchRevenueByDay();
+        const payments = await fetchPaymentBreakdown();
+
+        if (ordersCtx) createChart(ordersCtx,'line',{labels:ordersData.labels,datasets:[{label:'Orders',data:ordersData.data,backgroundColor:'rgba(79,70,229,0.12)',borderColor:'#4f46e5',fill:true,tension:0.3}]}, {scales:{y:{beginAtZero:true}}});
+
+        try{
+          const aovSparkCtx = document.getElementById('aovSpark')?.getContext('2d');
+          const aov = await fetchAOVSpark();
+          if (aovSparkCtx) createChart(aovSparkCtx,'line',{labels:aov.labels,datasets:[{data:aov.data,borderColor:'#7c3aed',borderWidth:1,pointRadius:0,fill:false}]} , {plugins:{legend:{display:false}},scales:{x:{display:false},y:{display:false}}});
+        }catch(e){}
+
+        if (productsCtx) createChart(productsCtx,'doughnut',{labels:productsData.labels,datasets:[{label:'Products by category',data:productsData.data,backgroundColor:['#667eea','#a78bfa','#7dd3fc','#f472b6','#fbbf24']} ]});
+        if (revCtx) createChart(revCtx,'line',{labels:rev.labels,datasets:[{label:'Revenue',data:rev.data,backgroundColor:'rgba(5,150,105,0.12)',borderColor:'#059669',fill:true,tension:0.3}]}, {scales:{y:{beginAtZero:true}}});
+        if (payCtx) createChart(payCtx,'doughnut',{labels:payments.labels,datasets:[{data:payments.data,backgroundColor:['#34d399','#60a5fa','#f97316','#fb7185','#a78bfa']} ]});
+
+        window.__dashboardChartInit = 'finished';
+      } catch (e) {
+        console.warn('Charts bootstrap failed', e && e.message);
+      }
+    }
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', bootDashboardChartsImmediate, { once: true });
+    } else {
+      bootDashboardChartsImmediate();
     }
 
     // Handle edit form submit
@@ -262,7 +458,12 @@
             const j = await res.json();
             if (j && j.success) {
               showToast && showToast('success', 'Product updated');
-              document.getElementById('editProductModal').classList.add('hidden');
+              const modal = document.getElementById('editProductModal');
+              if (modal) {
+                modal.classList.add('hidden');
+                try { modal.style.setProperty('display', 'none', 'important'); } catch (e) {}
+                try { modal.style.setProperty('visibility', 'hidden'); } catch (e) {}
+              }
               loadProducts();
             } else {
               showToast && showToast('error', j && j.error ? j.error : 'Update failed');
@@ -274,7 +475,15 @@
       }
       // Close modal
       const closeBtn = document.getElementById('closeEditModalBtn');
-      if (closeBtn) closeBtn.onclick = () => document.getElementById('editProductModal').classList.add('hidden');
+      if (closeBtn) {
+        closeBtn.onclick = () => {
+          const modal = document.getElementById('editProductModal');
+          if (!modal) return;
+          modal.classList.add('hidden');
+          try { modal.style.setProperty('display', 'none', 'important'); } catch (e) {}
+          try { modal.style.setProperty('visibility', 'hidden'); } catch (e) {}
+        };
+      }
     });
 
     // Delete product
@@ -303,7 +512,7 @@
     let allProducts = [];
     let currentCategory = 'all';
     let currentSearch = '';
-    let currentViewMode = 'list';
+    let currentViewMode = 'table';
     let listenersAdded = false;
 
     async function loadProducts() {
@@ -359,6 +568,13 @@
     function renderProducts(products) {
       const list = document.getElementById('productsList');
       if (!list) return;
+
+      // Reset container-level layout from previous view to avoid visual overlap artifacts.
+      list.className = '';
+      if (currentViewMode === 'list') {
+        list.classList.add('space-y-4');
+      }
+
       let html = '';
       if (currentViewMode === 'list') {
         html = products.map(p => {
@@ -510,13 +726,45 @@
           renderTestimonials(data.data);
         } else {
           console.error('Failed to load testimonials:', data);
+          renderTestimonials(sampleTestimonials);
           if (typeof showToast === 'function') showToast('error', 'Failed to load testimonials');
         }
       } catch (err) {
         console.error('Error loading testimonials:', err);
+        renderTestimonials(sampleTestimonials);
         if (typeof showToast === 'function') showToast('error', 'Error loading testimonials: ' + (err.message || err));
       }
     }
+
+    const sampleTestimonials = [
+      {
+        _id: 'sample-testimonial-1',
+        name: 'Aarav Sharma',
+        review: 'Smooth ordering, fast support, and great product quality.',
+        rating: 5,
+        status: 'approved',
+        createdAt: new Date().toISOString(),
+        isSample: true
+      },
+      {
+        _id: 'sample-testimonial-2',
+        name: 'Sita Karki',
+        review: 'The checkout flow is simple and the delivery updates are clear.',
+        rating: 4,
+        status: 'pending',
+        createdAt: new Date().toISOString(),
+        isSample: true
+      },
+      {
+        _id: 'sample-testimonial-3',
+        name: 'Nabin Thapa',
+        review: 'Support responded quickly and helped me track my order same day.',
+        rating: 5,
+        status: 'approved',
+        createdAt: new Date().toISOString(),
+        isSample: true
+      }
+    ];
 
     function getStatusColor(status) {
       switch (status) {
@@ -531,9 +779,18 @@
       const table = document.getElementById('testimonialsTable');
       if (!table) return;
 
-      const html = testimonials.map(t => `
+      const rows = Array.isArray(testimonials) && testimonials.length ? testimonials : sampleTestimonials;
+      const countBadge = document.getElementById('testimonialCount');
+      if (countBadge) countBadge.textContent = `${rows.length} item${rows.length !== 1 ? 's' : ''}`;
+
+      const html = rows.map(t => `
         <tr class="hover:bg-gray-50" data-testimonial-id="${t._id}">
-          <td class="px-4 py-3 text-sm font-medium text-gray-900">${t.name}</td>
+          <td class="px-4 py-3 text-sm font-medium text-gray-900">
+            <div class="flex items-center gap-2">
+              <span>${t.name}</span>
+              ${t.isSample ? '<span class="px-2 py-0.5 rounded-full text-[10px] font-semibold uppercase tracking-wide bg-slate-100 text-slate-600">Sample</span>' : ''}
+            </div>
+          </td>
           <td class="px-4 py-3 text-sm text-gray-500 max-w-xs truncate" title="${t.review}">${t.review}</td>
           <td class="px-4 py-3 text-sm text-gray-500">
             ${'★'.repeat(t.rating)}${'☆'.repeat(5 - t.rating)}
@@ -557,6 +814,33 @@
       table.innerHTML = html;
       attachTestimonialEventListeners();
     }
+
+    function renderTestimonialsError(message) {
+      const table = document.getElementById('testimonialsTable');
+      if (!table) return;
+      const rows = sampleTestimonials;
+      table.innerHTML = rows.map(t => `
+        <tr class="hover:bg-gray-50" data-testimonial-id="${t._id}">
+          <td class="px-4 py-3 text-sm font-medium text-gray-900">
+            <div class="flex items-center gap-2">
+              <span>${t.name}</span>
+              <span class="px-2 py-0.5 rounded-full text-[10px] font-semibold uppercase tracking-wide bg-slate-100 text-slate-600">Sample</span>
+            </div>
+          </td>
+          <td class="px-4 py-3 text-sm text-gray-500 max-w-xs truncate" title="${t.review}">${t.review}</td>
+          <td class="px-4 py-3 text-sm text-gray-500">${'★'.repeat(t.rating)}${'☆'.repeat(5 - t.rating)}</td>
+          <td class="px-4 py-3 text-sm"><span class="px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(t.status)} status-badge">${t.status}</span></td>
+          <td class="px-4 py-3 text-sm text-gray-500">${new Date(t.createdAt).toLocaleDateString()}</td>
+          <td class="px-4 py-3 text-right text-sm font-medium space-x-2">Sample data</td>
+        </tr>
+      `).join('');
+    }
+
+    try {
+      window.loadTestimonials = loadTestimonials;
+      window.renderTestimonials = renderTestimonials;
+      window.attachTestimonialEventListeners = attachTestimonialEventListeners;
+    } catch (e) {/* ignore in strict CSP contexts */}
 
     function attachTestimonialEventListeners() {
       // Add testimonial button
@@ -916,9 +1200,134 @@
     const _charts = new WeakMap();
 
     function createChart(ctx, type, data, options) {
-      if (!window.Chart) return null;
       try {
         const canvas = (ctx && ctx.canvas) ? ctx.canvas : ctx;
+        if (!canvas) return null;
+
+        function drawFallbackLineChart() {
+          window.__dashboardChartFallbackCount = (window.__dashboardChartFallbackCount || 0) + 1;
+          const width = canvas.clientWidth || canvas.width || 300;
+          const height = canvas.clientHeight || canvas.height || 150;
+          const dataset = (data && data.datasets && data.datasets[0]) ? data.datasets[0] : { data: [] };
+          const values = Array.isArray(dataset.data) ? dataset.data.map(value => Number(value) || 0) : [];
+          const points = values.length && values.some(value => value !== 0)
+            ? values
+            : [12, 18, 9, 22, 14, 26, 30];
+          const minValue = Math.min(...points);
+          const maxValue = Math.max(...points);
+          const range = Math.max(maxValue - minValue, 1);
+          const padding = 14;
+          const chartWidth = Math.max(width - padding * 2, 1);
+          const chartHeight = Math.max(height - padding * 2, 1);
+          const chartCtx = canvas.getContext('2d');
+          if (chartCtx) {
+            chartCtx.lineWidth = 1;
+            chartCtx.strokeStyle = 'rgba(148, 163, 184, 0.18)';
+            for (let i = 0; i <= 3; i++) {
+              const y = padding + (chartHeight / 3) * i;
+              chartCtx.beginPath();
+              chartCtx.moveTo(padding, y);
+              chartCtx.lineTo(width - padding, y);
+              chartCtx.stroke();
+            }
+          }
+
+          const lineColor = dataset.borderColor || '#4f46e5';
+          const fillColor = dataset.backgroundColor || 'rgba(79, 70, 229, 0.15)';
+          const pointsLength = points.length;
+          const stepX = pointsLength > 1 ? chartWidth / (pointsLength - 1) : chartWidth;
+
+          const toY = (value) => {
+            const normalized = (value - minValue) / range;
+            return padding + chartHeight - (normalized * chartHeight);
+          };
+
+          const svgNS = 'http://www.w3.org/2000/svg';
+          const svg = document.createElementNS(svgNS, 'svg');
+          svg.setAttribute('viewBox', `0 0 ${width} ${height}`);
+          svg.setAttribute('preserveAspectRatio', 'none');
+          svg.style.display = 'block';
+          svg.style.width = '100%';
+          svg.style.height = `${height}px`;
+          svg.style.marginTop = '0.25rem';
+
+          const linePoints = points.map((value, index) => `${padding + (stepX * index)},${toY(value)}`).join(' ');
+          const areaPath = `M ${padding},${padding + chartHeight} L ${linePoints.replace(/ /g, ' L ')} L ${padding + chartWidth},${padding + chartHeight} Z`;
+          const gridLines = [0, 1, 2, 3].map(i => {
+            const y = padding + (chartHeight / 3) * i;
+            return `<line x1="${padding}" y1="${y}" x2="${width - padding}" y2="${y}" stroke="rgba(148, 163, 184, 0.22)" stroke-width="1" />`;
+          }).join('');
+
+          svg.innerHTML = `
+            <rect x="0" y="0" width="${width}" height="${height}" rx="14" fill="rgba(248, 250, 252, 0.9)" />
+            ${gridLines}
+            <path d="${areaPath}" fill="${fillColor}" opacity="0.95"></path>
+            <polyline points="${linePoints}" fill="none" stroke="${lineColor}" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"></polyline>
+            ${points.map((value, index) => {
+              const x = padding + (stepX * index);
+              const y = toY(value);
+              return `<circle cx="${x}" cy="${y}" r="2.75" fill="${lineColor}" />`;
+            }).join('')}
+          `;
+
+          canvas.style.display = 'none';
+          if (canvas.parentElement) canvas.parentElement.insertBefore(svg, canvas.nextSibling);
+
+          return { destroy() { try { svg.remove(); } catch(e) {} canvas.style.display = ''; } };
+        }
+
+        function drawFallbackDoughnutChart() {
+          window.__dashboardChartFallbackCount = (window.__dashboardChartFallbackCount || 0) + 1;
+          const width = canvas.clientWidth || canvas.width || 250;
+          const height = canvas.clientHeight || canvas.height || 250;
+          const values = Array.isArray(data && data.datasets && data.datasets[0] && data.datasets[0].data)
+            ? data.datasets[0].data.map(value => Math.max(Number(value) || 0, 0))
+            : [];
+          const chartValues = values.length && values.some(value => value > 0)
+            ? values
+            : [40, 25, 18, 10, 7];
+          const total = chartValues.reduce((sum, value) => sum + value, 0) || 1;
+          const colors = (data && data.datasets && data.datasets[0] && data.datasets[0].backgroundColor) || ['#667eea', '#a78bfa', '#7dd3fc', '#f472b6', '#fbbf24'];
+          const radius = Math.min(width, height) * 0.34;
+          const innerRadius = radius * 0.58;
+          const centerX = width / 2;
+          const centerY = height / 2;
+          let startAngle = -Math.PI / 2;
+
+          const svgNS = 'http://www.w3.org/2000/svg';
+          const svg = document.createElementNS(svgNS, 'svg');
+          svg.setAttribute('viewBox', `0 0 ${width} ${height}`);
+          svg.setAttribute('preserveAspectRatio', 'none');
+          svg.style.display = 'block';
+          svg.style.width = '100%';
+          svg.style.height = `${height}px`;
+
+          const circumference = 2 * Math.PI * radius;
+          let offset = 0;
+          const circles = chartValues.map((value, index) => {
+            const segment = (value / total) * circumference;
+            const strokeDasharray = `${segment} ${Math.max(circumference - segment, 0)}`;
+            const circle = `<circle cx="${centerX}" cy="${centerY}" r="${radius}" fill="none" stroke="${colors[index % colors.length]}" stroke-width="${radius - innerRadius}" stroke-dasharray="${strokeDasharray}" stroke-dashoffset="${-offset}" transform="rotate(-90 ${centerX} ${centerY})" stroke-linecap="butt"></circle>`;
+            offset += segment;
+            return circle;
+          }).join('');
+
+          svg.innerHTML = `
+            <rect x="0" y="0" width="${width}" height="${height}" rx="14" fill="rgba(248, 250, 252, 0.9)" />
+            <circle cx="${centerX}" cy="${centerY}" r="${radius}" fill="none" stroke="rgba(226, 232, 240, 0.75)" stroke-width="${radius - innerRadius}" />
+            ${circles}
+            <circle cx="${centerX}" cy="${centerY}" r="${innerRadius}" fill="#ffffff"></circle>
+          `;
+
+          canvas.style.display = 'none';
+          if (canvas.parentElement) canvas.parentElement.insertBefore(svg, canvas.nextSibling);
+
+          return { destroy() { try { svg.remove(); } catch(e) {} canvas.style.display = ''; } };
+        }
+
+        if (!window.Chart) {
+          return type === 'doughnut' ? drawFallbackDoughnutChart() : drawFallbackLineChart();
+        }
         // Chart.js exposes a getter to retrieve a chart instance attached to a canvas element
         // Try Chart.js API first
         const existing = (typeof Chart.getChart === 'function') ? Chart.getChart(canvas) : null;
@@ -1028,11 +1437,84 @@
       return { labels:['cod','bank-transfer','esewa','khalti','imepay'], data:[40,25,18,10,7] };
     }
 
+    async function fetchAOVSpark(){
+      try{
+        const token = (typeof getAdminToken === 'function' ? getAdminToken() : (localStorage ? localStorage.getItem('adminToken') : null));
+        if (!token) return { labels: ['Day 1','Day 2','Day 3','Day 4','Day 5','Day 6','Day 7'], data: [1200,1500,1400,1800,1600,2000,2100] };
+        const headers = token ? { 'Authorization': 'Bearer ' + token } : {};
+        const res = await safeFetch('/api/admin/orders?limit=500', { headers }, { silent: true });
+        const j = res ? await res.json() : null;
+        if (j && j.success && Array.isArray(j.data)){
+          const days = Array.from({length:7},(_,i)=>{const d=new Date(); d.setDate(d.getDate()-6+i); return d.toLocaleDateString(undefined,{weekday:'short'});});
+          const aovs = days.map(()=>0);
+          const counts = days.map(()=>0);
+          j.data.forEach(o=>{const short=new Date(o.createdAt).toLocaleDateString(undefined,{weekday:'short'}); const idx=days.indexOf(short); if (idx>=0) { aovs[idx]+=Number(o.total||0); counts[idx]+=1; }});
+          return { labels: days, data: aovs.map((sum,i)=>counts[i]>0?Math.round(sum/counts[i]):0) };
+        }
+      }catch(e){}
+      return { labels: ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'], data: [1200,1500,1400,1800,1600,2000,2100] };
+    }
+
+    async function bootDashboardCharts() {
+      if (window.__dashboardChartInit) return;
+      try {
+        window.__dashboardChartInit = 'started';
+        if (!window.Chart) {
+          try {
+            await loadScript('https://cdn.jsdelivr.net/npm/chart.js');
+          } catch (e) {
+            console.warn('Failed to load Chart.js', e && e.message);
+          }
+        }
+
+        const ordersCtx = document.getElementById('chartOrders')?.getContext('2d');
+        const productsCtx = document.getElementById('chartProducts')?.getContext('2d');
+        const revCtx = document.getElementById('chartRevenue')?.getContext('2d');
+        const payCtx = document.getElementById('chartPayments')?.getContext('2d');
+
+        const ordersData = await fetchOrdersChartData();
+        const productsData = await fetchProductsByCategory();
+        const rev = await fetchRevenueByDay();
+        const payments = await fetchPaymentBreakdown();
+
+        if (ordersCtx) createChart(ordersCtx,'line',{labels:ordersData.labels,datasets:[{label:'Orders',data:ordersData.data,backgroundColor:'rgba(79,70,229,0.12)',borderColor:'#4f46e5',fill:true,tension:0.3}]}, {scales:{y:{beginAtZero:true}}});
+
+        try{
+          const aovSparkCtx = document.getElementById('aovSpark')?.getContext('2d');
+          const aov = await fetchAOVSpark();
+          if (aovSparkCtx) createChart(aovSparkCtx,'line',{labels:aov.labels,datasets:[{data:aov.data,borderColor:'#7c3aed',borderWidth:1,pointRadius:0,fill:false}]} , {plugins:{legend:{display:false}},scales:{x:{display:false},y:{display:false}}});
+        }catch(e){}
+
+        if (productsCtx) createChart(productsCtx,'doughnut',{labels:productsData.labels,datasets:[{label:'Products by category',data:productsData.data,backgroundColor:['#667eea','#a78bfa','#7dd3fc','#f472b6','#fbbf24']} ]});
+        if (revCtx) createChart(revCtx,'line',{labels:rev.labels,datasets:[{label:'Revenue',data:rev.data,backgroundColor:'rgba(5,150,105,0.12)',borderColor:'#059669',fill:true,tension:0.3}]}, {scales:{y:{beginAtZero:true}}});
+        if (payCtx) createChart(payCtx,'doughnut',{labels:payments.labels,datasets:[{data:payments.data,backgroundColor:['#34d399','#60a5fa','#f97316','#fb7185','#a78bfa']} ]});
+
+        window.__dashboardChartInit = 'finished';
+      } catch (e) {
+        console.warn('Charts bootstrap failed', e && e.message);
+      }
+    }
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', bootDashboardCharts, { once: true });
+    } else {
+      bootDashboardCharts();
+    }
+
     // render charts
+    (async () => {
     try{
+      if (window.__dashboardChartInit) return;
+      window.__dashboardChartInit = 'started';
       // ensure Chart.js is available (lazy-load if needed)
       if (!window.Chart) {
-        try{ await loadScript('https://cdn.jsdelivr.net/npm/chart.js'); }catch(e){ console.warn('Failed to load Chart.js', e && e.message); }
+        await loadScript('https://cdn.jsdelivr.net/npm/chart.js')
+          .then(() => {
+            console.info('Chart.js loaded after fallback render');
+          })
+          .catch(e => {
+            console.warn('Failed to load Chart.js', e && e.message);
+          });
       }
 
       const ordersCtx = document.getElementById('chartOrders')?.getContext('2d');
@@ -1081,6 +1563,8 @@
         });
       }
 
+      window.__dashboardChartInit = 'finished';
+
     }catch(e){console.warn('Charts init failed', e.message)}
 
     // Quick KPI numbers
@@ -1089,6 +1573,13 @@
       const p = pRes ? await pRes.json() : null;
       if (p && p.success) { const el = document.getElementById('totalProducts'); if (el) { el.textContent = p.data.length; el.classList.remove('skeleton'); } }
     }catch(e){ console.warn('Quick KPI load failed', e && e.message); }
+
+    // Load total pages
+    try{
+      const pagesRes = await safeFetch('/api/pages', {}, { silent: true });
+      const pagesData = pagesRes ? await pagesRes.json() : null;
+      if (pagesData && pagesData.success) { const el = document.getElementById('totalPages'); if (el) { el.textContent = (pagesData.data || []).length; el.classList.remove('skeleton'); } }
+    }catch(e){ console.warn('Pages KPI load failed', e && e.message); }
 
     // revenue, conversion, refunds
     async function fetchRevenueConversion(){
@@ -1176,6 +1667,7 @@
       }
 
     }catch(e){/* ignore */}
+    })().catch(e => { console.warn('Dashboard stats init failed', e && e.message); });
 
     // ensure admin body class so admin css is active
     document.body.classList.add('admin');
@@ -1184,4 +1676,3 @@
     try { if (typeof loadProducts === 'function') loadProducts(); } catch(e) { /* ignore */ }
 
   });
-})();

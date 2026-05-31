@@ -3,14 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Products | Zenrix</title>
+    <title>Products - Fashion Hub</title>
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="/css/tailwind-site.css">
     <script src="/js/format-utils.js"></script>
     <script src="script.js" defer></script>
     <script>
         (function() {
-            const stored = localStorage.getItem('zenrix_theme');
+            const stored = localStorage.getItem('fashionhub_theme');
             const theme = (stored === 'light' || stored === 'dark') ? stored : 'light';
             const themeClass = theme === 'light' ? 'theme-light' : 'theme-dark';
             document.documentElement.classList.add(themeClass);
@@ -70,7 +70,7 @@
 
     <script src="components/navbar.js"></script>
     <script src="components/footer.js"></script>
-<!-- ========== ZENRIX CHATBOT ========== -->
+<!-- ========== FASHION HUB CHATBOT ========== -->
 <div id="chatbot-container">
   <button id="chatbot-toggle" class="fixed bottom-6 right-6 bg-accent text w-14 h-14 rounded-full shadow-lg transition-all z-50 flex items-center justify-center" aria-label="Open chat">
     <img src="/uploads/avatars/chat-avatar.png?v=2" alt="Chatbot Avatar" style="width:56px;height:56px;display:block;border-radius:50%;object-fit:cover;" />
@@ -79,9 +79,9 @@
   <div id="chatbot-window" class="fixed bottom-24 right-6 w-80 h-96 bg-white rounded-lg shadow-xl hidden flex flex-col z-50 border">
     <div class="bg-accent p-3 rounded-t-lg flex justify-between items-center">
       <div class="flex items-center gap-3">
-        <img src="/uploads/avatars/chat-avatar.png?v=2" alt="Zenrix Assistant" style="width:32px;height:32px;border-radius:50%;object-fit:cover;" />
+        <img src="/uploads/avatars/chat-avatar.png?v=2" alt="Fashion Hub Assistant" style="width:32px;height:32px;border-radius:50%;object-fit:cover;" />
         <div>
-          <div class="font-bold">Zenrix Assistant</div>
+          <div class="font-bold">Fashion Hub Assistant</div>
           <div class="text-xs opacity-80">Online • 24/7 Support</div>
         </div>
       </div>

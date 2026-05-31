@@ -15,7 +15,7 @@ const FRONTEND_DIR = path.join(__dirname, 'Frontend');
 
 // Warn when critical env values are missing in local development
 if (!process.env.MONGODB_URI) {
-  console.warn('⚠️  WARNING: MONGODB_URI is not set. Falling back to mongodb://127.0.0.1:27017/zenrix');
+  console.warn('⚠️  WARNING: MONGODB_URI is not set. Falling back to mongodb://127.0.0.1:27017/fashionhub');
 }
 if (!process.env.ADMIN_PASSWORD) {
   console.warn('⚠️  Note: ADMIN_PASSWORD not set. Default admin password will be used (unsafe for production).');
@@ -24,7 +24,7 @@ if (!process.env.JWT_SECRET) {
   console.warn('⚠️  Note: JWT_SECRET not set. Using a fallback secret (do not use in production).');
 }
 
-const MONGO_URI = process.env.MONGODB_URI || 'mongodb://127.0.0.1:27017/zenrix';
+const MONGO_URI = process.env.MONGODB_URI || 'mongodb://127.0.0.1:27017/fashionhub';
 
 // Connect to MongoDB
 mongoose.connect(MONGO_URI, { autoIndex: true })
@@ -279,7 +279,7 @@ process.on('unhandledRejection', (reason, promise) => {
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log('=================================');
-  console.log('✅ Zenrix Server Started!');
+  console.log('✅ Fashion Hub Server Started!');
   console.log(`📡 http://localhost:${PORT}`);
   console.log('=================================');
 });
@@ -418,7 +418,7 @@ async function addSampleProducts() {
     const missingProducts = sampleProducts.filter(product => !existingNames.has(product.name));
 
     if (missingProducts.length) {
-      console.log(`📦 Adding ${missingProducts.length} sample product(s) to Zenrix database...`);
+      console.log(`📦 Adding ${missingProducts.length} sample product(s) to Fashion Hub database...`);
       await Product.insertMany(missingProducts);
       console.log(`✅ Added ${missingProducts.length} sample products (total now ${await Product.countDocuments()})`);
     } else {
@@ -441,15 +441,15 @@ async function addSamplePages() {
 
     console.log('📄 Adding sample CMS pages...');
     const samplePages = [
-      { slug: 'index', title: 'Home', content: '<h1>Welcome to Zenrix</h1><p>Manage homepage content from the Admin Dashboard.</p>', published: true, meta: { description: 'Home' } },
-      { slug: 'about', title: 'About Us', content: '<h1>About Us</h1><p>Zenrix is a sample store managed from the Admin Dashboard.</p>', published: true, meta: { description: 'About Zenrix' } },
-      { slug: 'contact', title: 'Contact Us', content: '<h1>Contact Us</h1><p>Please reach out at <a href="mailto:support@zenrix.com.np">support@zenrix.com.np</a></p>', published: true, meta: { description: 'Contact Zenrix' } },
+      { slug: 'index', title: 'Home', content: '<h1>Welcome to Fashion Hub</h1><p>Manage homepage content from the Admin Dashboard.</p>', published: true, meta: { description: 'Home' } },
+      { slug: 'about', title: 'About Us', content: '<h1>About Us</h1><p>Fashion Hub is a sample store managed from the Admin Dashboard.</p>', published: true, meta: { description: 'About Fashion Hub' } },
+      { slug: 'contact', title: 'Contact Us', content: '<h1>Contact Us</h1><p>Please reach out at <a href="mailto:support@fashionhub.com.np">support@fashionhub.com.np</a></p>', published: true, meta: { description: 'Contact Fashion Hub' } },
       { slug: 'terms', title: 'Terms & Conditions', content: '<h1>Terms & Conditions</h1><p>Standard terms for the site. Edit from admin.</p>', published: true, meta: { description: 'Terms and conditions' } },
       { slug: 'privacy', title: 'Privacy Policy', content: '<h1>Privacy Policy</h1><p>Privacy information placeholder. Edit from admin.</p>', published: true, meta: { description: 'Privacy policy' } },
-      { slug: 'careers', title: 'Careers', content: '<h1>Careers</h1><p>Open positions and opportunities. Edit from admin.</p>', published: true, meta: { description: 'Careers at Zenrix' } },
+      { slug: 'careers', title: 'Careers', content: '<h1>Careers</h1><p>Open positions and opportunities. Edit from admin.</p>', published: true, meta: { description: 'Careers at Fashion Hub' } },
       { slug: 'products', title: 'Products', content: '<h1>Our Products</h1><p>Discover items across categories. This header is managed from the Admin Dashboard.</p>', published: true, meta: { description: 'Shop our products' } },
       { slug: 'product', title: 'Product', content: '<h1>Product</h1><p>Product marketing content. Keep product details dynamic, but manage this marketing block in the CMS.</p>', published: true, meta: { description: 'Product page' } },
-      { slug: 'blog', title: 'Blog', content: '<h1>Blog</h1><p>Company news, guides, and updates. Edit from admin.</p>', published: true, meta: { description: 'Zenrix Blog' } },
+      { slug: 'blog', title: 'Blog', content: '<h1>Blog</h1><p>Company news, guides, and updates. Edit from admin.</p>', published: true, meta: { description: 'Fashion Hub Blog' } },
       { slug: 'wishlist', title: 'Wishlist', content: '<h1>Wishlist</h1><p>Your saved items. Managed from admin.</p>', published: true, meta: { description: 'Wishlist' } },
       { slug: 'settings', title: 'Settings', content: '<h1>Settings</h1><p>Account settings and preferences. Edit from admin.</p>', published: true, meta: { description: 'Account settings' } },
       { slug: 'profile', title: 'Profile', content: '<h1>Profile</h1><p>User profile page managed by the CMS.</p>', published: true, meta: { description: 'User profile' } }
@@ -476,11 +476,11 @@ async function addSampleComponents() {
       { slug: 'navbar', name: 'Main Navbar', html: '<div class="nav-links"><a href="/">Home</a><a href="/products.html">Products</a><a href="/profile.html">Account</a><a href="/contact.html">Contact</a></div>', published: true },
       { slug: 'footer', name: 'Main Footer', html: `<!-- FOOTER TEMPLATE (editable sections) -->
 <div class="footer-about">
-  <a class="brand" href="/"><span class="orb"></span>Zenrix</a>
+  <a class="brand" href="/"><span class="orb"></span>Fashion Hub</a>
   <p class="lede">Your one-stop shop for quality products at affordable prices.</p>
 
   <div class="cta-row" data-footer-cta>
-    <a class="btn primary" href="/products.html">Zenrix</a>
+    <a class="btn primary" href="/products.html">Fashion Hub</a>
     <a class="btn ghost" href="/contact.html">Talk to us</a>
   </div>
 </div>
@@ -521,7 +521,7 @@ async function addSampleComponents() {
 <div class="footer-support">
   <div class="column-title">Support</div>
   <div class="contact-lines">
-    <div><span>Email</span> support@zenrix.com</div>
+    <div><span>Email</span> support@fashionhub.com</div>
     <div><span>Phone</span> <span data-footer-phone>+977 9819922314</span></div>
     <div><span>Chat</span> Live chat 9am-9pm</div>
   </div>
@@ -529,7 +529,7 @@ async function addSampleComponents() {
 </div>
 
 <div class="footer-bottom">
-  <span>&copy; <span data-footer-year></span> Zenrix. Built for modern shoppers.</span>
+  <span>&copy; <span data-footer-year></span> Fashion Hub. Built for modern shoppers.</span>
   <div class="badge-row">
     <span class="mini-badge">Secure checkout</span>
     <span class="mini-badge">48h support</span>

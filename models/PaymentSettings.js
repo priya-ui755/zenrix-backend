@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 
 const DEFAULT_BANK_DETAILS = {
-  accountName: 'Zenrix Pvt. Ltd.',
+  accountName: 'Fashion Hub Pvt. Ltd.',
   accountNumber: '1234567890',
   bankName: 'NMB Bank',
   branch: 'Kathmandu',
@@ -33,7 +33,7 @@ const paymentSettingsSchema = new mongoose.Schema({
     swiftCode: { type: String, default: DEFAULT_BANK_DETAILS.swiftCode }
   },
   qrImageUrl: { type: String, default: '' },
-  instructions: { type: String, default: 'Upload the payment receipt to support@zenrix.com.np for faster verification.' },
+  instructions: { type: String, default: 'Upload the payment receipt to support@fashionhub.com.np for faster verification.' },
   nepaliWallets: {
     esewa: { type: nepaliWalletSchema, default: () => ({ ...DEFAULT_WALLET }) },
     khalti: { type: nepaliWalletSchema, default: () => ({ ...DEFAULT_WALLET }) },

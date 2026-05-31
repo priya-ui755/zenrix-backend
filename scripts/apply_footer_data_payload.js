@@ -51,17 +51,17 @@ async function main() {
       { label: 'Privacy', url: '/privacy.html' },
       { label: 'Terms', url: '/terms.html' }
     ],
-    supportEmail: 'support@zenrix.com',
+    supportEmail: 'support@fashionhub.com',
     // Allow overriding the default phone via env var SUPPORT_PHONE
     supportPhone: process.env.SUPPORT_PHONE || '+977 9819922314',
     chatLink: '/index.html#chat',
     socialLinks: [
-      { name: 'facebook', url: 'https://facebook.com/zenrix' },
-      { name: 'twitter', url: 'https://twitter.com/zenrix' },
-      { name: 'instagram', url: 'https://instagram.com/zenrix' },
-      { name: 'youtube', url: 'https://youtube.com/zenrix' }
+      { name: 'facebook', url: 'https://facebook.com/fashionhub' },
+      { name: 'twitter', url: 'https://twitter.com/fashionhub' },
+      { name: 'instagram', url: 'https://instagram.com/fashionhub' },
+      { name: 'youtube', url: 'https://youtube.com/fashionhub' }
     ],
-    bottomText: '© 2026 Zenrix. Built for modern shoppers.'
+    bottomText: '© 2026 Fashion Hub. Built for modern shoppers.'
   };
 
   // Preserve existing html/name/published values

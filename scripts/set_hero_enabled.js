@@ -14,7 +14,7 @@ async function main() {
   const arg = (process.argv[2] || '').toLowerCase();
   const enabled = arg === 'true' ? true : (arg === 'false' ? false : false);
 
-  const mongoUri = process.env.MONGODB_URI || 'mongodb://127.0.0.1:27017/zenrix';
+  const mongoUri = process.env.MONGODB_URI || 'mongodb://127.0.0.1:27017/fashionhub';
 
   await mongoose.connect(mongoUri, { autoIndex: true });
 

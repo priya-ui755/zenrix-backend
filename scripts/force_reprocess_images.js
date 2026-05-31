@@ -49,7 +49,7 @@ async function normalizeUploadedImage(file, { size = 1200 } = {}) {
 }
 
 async function reprocessAll() {
-    const mongoUrl = process.env.MONGO_URL || 'mongodb://localhost:27017/zenrix';
+    const mongoUrl = process.env.MONGO_URL || 'mongodb://localhost:27017/fashionhub';
     await mongoose.connect(mongoUrl);
     console.log('Connected to MongoDB');
 

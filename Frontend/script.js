@@ -29,7 +29,7 @@ function logout() {
     window.location.href = 'index.html';
 }
 window.logout = logout;
-// ==================== ZENRIX E-COMMERCE ====================
+// ==================== FASHION HUB E-COMMERCE ====================
 // Backend API URL (auto-detect current origin with localhost fallback)
 const DEFAULT_API_URL = 'http://localhost:3000/api';
 const API_URL = (() => {
@@ -45,8 +45,109 @@ const API_URL = (() => {
 })();
 
 // Allows Admin-edited pages/components to override the support email used by the Contact form.
-window.ZENRIX_SUPPORT_EMAIL = window.ZENRIX_SUPPORT_EMAIL || 'support@zenrix.com';
-const CART_STORAGE_KEY = 'zenrix_cart';
+window.FASHIONHUB_SUPPORT_EMAIL = window.FASHIONHUB_SUPPORT_EMAIL || 'support@fashionhub.com';
+
+function getSiteBrandName(fallback = 'Fashion Hub') {
+    try {
+        const cached = localStorage.getItem('siteSettings');
+        if (cached) {
+            const parsed = JSON.parse(cached);
+            const brand = String(parsed.siteTitle || parsed.companyName || '').trim();
+            if (brand) return brand;
+        }
+    } catch (e) { /* ignore */ }
+    return fallback;
+}
+
+function applyBrandToDocumentTitle() {
+    try {
+        const brandName = getSiteBrandName();
+        if (!document.title) return;
+        if (/Fashion Hub/i.test(document.title)) {
+            document.title = document.title.replace(/Fashion Hub/gi, brandName);
+        } else if (brandName && document.title.indexOf(brandName) === -1) {
+            // Keep existing page title structure, but avoid leaving a stale fallback brand behind.
+            document.title = `${document.title}`;
+        }
+    } catch (e) { /* ignore */ }
+}
+
+function applyBrandingEverywhere(root = document) {
+    try {
+        const brandName = getSiteBrandName();
+        if (!brandName || brandName === 'Fashion Hub') return;
+
+        const walker = document.createTreeWalker(root.body || root, NodeFilter.SHOW_TEXT, null);
+        const textNodes = [];
+        let node;
+        while ((node = walker.nextNode())) textNodes.push(node);
+        textNodes.forEach((textNode) => {
+            if (textNode.nodeValue && /Fashion Hub/i.test(textNode.nodeValue)) {
+                textNode.nodeValue = textNode.nodeValue.replace(/Fashion Hub/gi, brandName);
+            }
+        });
+
+        const elements = Array.from((root.body || root).querySelectorAll ? (root.body || root).querySelectorAll('[title],[aria-label],[placeholder],[alt]') : []);
+        elements.forEach((el) => {
+            ['title', 'aria-label', 'placeholder', 'alt'].forEach((attr) => {
+                const value = el.getAttribute(attr);
+                if (value && /Fashion Hub/i.test(value)) {
+                    el.setAttribute(attr, value.replace(/Fashion Hub/gi, brandName));
+                }
+            });
+        });
+
+        applyBrandToDocumentTitle();
+    } catch (e) { /* ignore */ }
+}
+
+window.applyBrandingEverywhere = applyBrandingEverywhere;
+const CART_STORAGE_KEY = 'fashionhub_cart';
+
+// Update hero and other prominent sections from site settings if available
+function syncHeroFromSiteSettings(detail) {
+    try {
+        let settings = null;
+        if (detail && typeof detail === 'object') settings = detail;
+        else {
+            const cached = localStorage.getItem('siteSettings');
+            if (cached) settings = JSON.parse(cached);
+        }
+        if (!settings) return;
+
+        // heroTextOverrides may be stored as an object or stringified JSON
+        let heroOverrides = settings.heroTextOverrides || settings.hero || null;
+        if (typeof heroOverrides === 'string') {
+            try { heroOverrides = JSON.parse(heroOverrides); } catch(e) { /* ignore */ }
+        }
+        if (!heroOverrides || typeof heroOverrides !== 'object') return;
+
+        const title = (heroOverrides.title || '').trim();
+        const subtitle = (heroOverrides.subtitle || '').trim();
+        const badge = (heroOverrides.badge || '').trim();
+
+        const heroTitleEl = document.getElementById('heroTitle');
+        const heroSubtitleEl = document.getElementById('heroSubtitle');
+        const heroBadgeEl = document.getElementById('heroBadgeText');
+
+        if (title && heroTitleEl) {
+            // preserve any existing inner markup unless admin provided HTML intentionally
+            heroTitleEl.innerHTML = title;
+        }
+        if (subtitle && heroSubtitleEl) heroSubtitleEl.textContent = subtitle;
+        if (badge && heroBadgeEl) heroBadgeEl.textContent = badge;
+    } catch (e) { console.warn('syncHeroFromSiteSettings failed', e); }
+}
+
+// Listen for site settings updates dispatched by admin UI
+window.addEventListener('siteSettingsUpdated', (e) => {
+    try { syncHeroFromSiteSettings(e.detail || null); } catch (e) { /* ignore */ }
+});
+
+// Attempt to sync on DOM ready (useful when siteSettings cached in localStorage)
+document.addEventListener('DOMContentLoaded', () => {
+    try { syncHeroFromSiteSettings(null); } catch (e) { /* ignore */ }
+});
 
 function normalizeCartItems(items = []) {
     return items.map(item => ({
@@ -137,7 +238,7 @@ const NPR_NUMBER_FORMATTER = new Intl.NumberFormat('en-IN', {
 });
 
 // ==================== THEME ====================
-const THEME_STORAGE_KEY = 'zenrix_theme';
+const THEME_STORAGE_KEY = 'fashionhub_theme';
 
 function resolvePreferredTheme() {
     const stored = localStorage.getItem(THEME_STORAGE_KEY);
@@ -152,7 +253,7 @@ function applyTheme(theme) {
     document.documentElement.classList.add(next);
     localStorage.setItem(THEME_STORAGE_KEY, theme === 'light' ? 'light' : 'dark');
     try {
-        window.dispatchEvent(new CustomEvent('zenrix-theme-changed', { detail: { theme: theme === 'light' ? 'light' : 'dark' } }));
+        window.dispatchEvent(new CustomEvent('fashionhub-theme-changed', { detail: { theme: theme === 'light' ? 'light' : 'dark' } }));
     } catch (err) {
         console.warn('Theme change event failed', err);
     }
@@ -280,7 +381,8 @@ document.addEventListener('DOMContentLoaded', function() {
             const s = e.detail || (localStorage.getItem('siteSettings') ? JSON.parse(localStorage.getItem('siteSettings')) : null);
             if (!s) return;
             // Make support email available to other modules
-            try { window.ZENRIX_SUPPORT_EMAIL = s.supportEmail || window.ZENRIX_SUPPORT_EMAIL; } catch(e) {}
+            try { window.FASHIONHUB_SUPPORT_EMAIL = s.supportEmail || window.FASHIONHUB_SUPPORT_EMAIL; } catch(e) {}
+            try { applyBrandingEverywhere(document); } catch (e) {}
             // Update contact page items
             try {
                 const phone = (s.supportPhone || '').trim();
@@ -296,6 +398,8 @@ document.addEventListener('DOMContentLoaded', function() {
         } catch (e) {}
     });
 
+
+        try { applyBrandingEverywhere(document); } catch (e) {}
     window.addEventListener('storage', (e) => {
         try {
             if (!e || !e.key) return;
@@ -329,7 +433,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 const sj = await r.json();
                 if (sj && sj.success && sj.data) {
                     try { localStorage.setItem('siteSettings', JSON.stringify(sj.data)); } catch(e){}
-                    try { window.ZENRIX_SUPPORT_EMAIL = sj.data.supportEmail || window.ZENRIX_SUPPORT_EMAIL; } catch(e){}
+                    try { window.FASHIONHUB_SUPPORT_EMAIL = sj.data.supportEmail || window.FASHIONHUB_SUPPORT_EMAIL; } catch(e){}
                     try { window.dispatchEvent(new CustomEvent('siteSettingsUpdated', { detail: sj.data })); } catch(e){}
                 }
             } catch (e) { /* ignore */ }
@@ -358,7 +462,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     const s = payload && payload.data ? payload.data : null;
                     if (s) {
                         try { localStorage.setItem('siteSettings', JSON.stringify(s)); } catch(e){}
-                        try { window.ZENRIX_SUPPORT_EMAIL = s.supportEmail || window.ZENRIX_SUPPORT_EMAIL; } catch(e){}
+                        try { window.FASHIONHUB_SUPPORT_EMAIL = s.supportEmail || window.FASHIONHUB_SUPPORT_EMAIL; } catch(e){}
                         try { window.dispatchEvent(new CustomEvent('siteSettingsUpdated', { detail: s })); } catch(e){}
                     }
                 } catch(e) { console.warn('SSE parse error', e); }
@@ -501,7 +605,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    window.addEventListener('zenrix-theme-toggle', (e) => {
+    window.addEventListener('fashionhub-theme-changed', (e) => {
         const desired = e?.detail?.theme;
         if (desired === 'light' || desired === 'dark') {
             applyTheme(desired);
@@ -1047,12 +1151,12 @@ async function fetchFeaturedProduct() {
 function hydrateProduct(product) {
     if (!product) return;
     currentProduct = product;
-    const name = product.name || 'Zenrix Product';
+    const name = product.name || `${getSiteBrandName()} Product`;
     const priceValue = getNumericPrice(product.price) || 99.99;
     const saleActive = isSaleActive(product);
     const effectivePrice = getEffectivePrice(product) || priceValue;
 
-    document.title = `${name} | Zenrix`;
+    document.title = `${name} | ${getSiteBrandName()}`;
 
     const titleEl = document.getElementById('productTitle');
     if (titleEl) titleEl.textContent = name;
@@ -1090,7 +1194,7 @@ function hydrateProduct(product) {
 function getDemoProduct() {
     return {
         _id: 'demo-product',
-        name: 'Zenrix Studio Headphones',
+        name: 'Fashion Hub Studio Headphones',
         price: 129.99,
         description: 'Signature adaptive sound, obsidian acoustic mesh, and sculpted memory-foam cushions built for marathon listening sessions.',
         stock: 12,
@@ -1222,7 +1326,7 @@ function handleCartAction(product, quantity) {
     const effectivePrice = getEffectivePrice(product) || 0;
     addToCart({
         id: productId,
-        name: product.name || 'Zenrix Product',
+        name: product.name || `${getSiteBrandName()} Product`,
         price: effectivePrice || 99.99,
         image: productState.selectedImage || product.image || fallbackImage,
         color: productState.selectedColor
@@ -1309,7 +1413,7 @@ async function loadPageContent() {
         const json = await res.json();
         if (json.success && json.data) {
             const page = json.data;
-            document.title = `${page.title} | Zenrix`;
+            document.title = `${page.title} | ${getSiteBrandName()}`;
 
             const sanitized = sanitizeHtml(page.content) || '';
             container.innerHTML = sanitized || '<p class="text-gray-600">No content yet.</p>';
@@ -1347,7 +1451,7 @@ async function loadPageContent() {
                     }
 
                     if (email) {
-                        window.ZENRIX_SUPPORT_EMAIL = email;
+                        window.FASHIONHUB_SUPPORT_EMAIL = email;
                         const emailTextEl = document.getElementById('supportEmailText');
                         if (emailTextEl) emailTextEl.textContent = email;
 
@@ -1589,7 +1693,7 @@ function renderHeroCarousel(carousel) {
         slidesRoot.innerHTML = `
             <div class="h-full grid place-items-center px-8">
               <div class="max-w-2xl text-center">
-                <p class="text-sm uppercase tracking-[0.4em] text-white/60">Zenrix</p>
+                <p class="text-sm uppercase tracking-[0.4em] text-white/60">${getSiteBrandName()}</p>
                 <h2 class="text-3xl lg:text-4xl font-black mt-3">Hero is disabled</h2>
                 <p class="text-white/75 mt-3">Add slides from the Admin Dashboard to show a modern carousel here.</p>
                 <a href="products.html" class="inline-flex items-center justify-center mt-6 px-7 py-3 rounded-2xl bg-white text-slate-900 font-semibold shadow-xl shadow-slate-900/20 hover:-translate-y-0.5 transition">Browse products</a>
@@ -1667,7 +1771,7 @@ function renderHeroCarousel(carousel) {
 
         const title = document.createElement('h2');
         title.className = 'hero-title text-white';
-        title.textContent = slide.title || 'Zenrix';
+        title.textContent = slide.title || getSiteBrandName();
         inner.appendChild(title);
 
         if (slide.subtitle) {
@@ -1859,7 +1963,7 @@ function updateCartCount() {
 
     // Update global live region for screen readers if present
     try {
-        const live = document.getElementById('zenrix-cart-live');
+        const live = document.getElementById('fashionhub-cart-live');
         if (live) live.textContent = total > 0 ? `Cart has ${total} item${total === 1 ? '' : 's'}` : 'Cart is empty';
     } catch (e) {}
 }

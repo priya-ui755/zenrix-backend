@@ -9,9 +9,9 @@
 1. Go to: https://mongodb.com/cloud/atlas
 2. Sign up (free)
 3. Create cluster → M0 Free
-4. Create user: zenrix_user
+4. Create user: fashionhub_user
 5. Get connection string:
-   mongodb+srv://zenrix_user:PASSWORD@cluster.xyz.mongodb.net/zenrix?retryWrites=true&w=majority
+  mongodb+srv://fashionhub_user:PASSWORD@cluster.xyz.mongodb.net/fashionhub?retryWrites=true&w=majority
 6. Copy this string - SAVE IT ✅
 ```
 
@@ -21,7 +21,7 @@
 git init
 git add .
 git commit -m "Ready for deployment"
-git remote add origin https://github.com/YOUR-USERNAME/zenrix-backend.git
+git remote add origin https://github.com/YOUR-USERNAME/fashionhub-backend.git
 git branch -M main
 git push -u origin main
 ```
@@ -32,7 +32,7 @@ git push -u origin main
 2. Sign up with GitHub
 3. Click "New Project"
 4. Select "Deploy from GitHub"
-5. Choose your zenrix-backend repo
+5. Choose your fashionhub-backend repo
 6. ✅ Done - Railway imports project
 ```
 
@@ -41,7 +41,7 @@ git push -u origin main
 In Railway Dashboard → Variables tab, copy & paste:
 
 ```
-MONGODB_URI=mongodb+srv://zenrix_user:YOUR_PASSWORD@cluster.xyz.mongodb.net/zenrix?retryWrites=true&w=majority
+MONGODB_URI=mongodb+srv://fashionhub_user:YOUR_PASSWORD@cluster.xyz.mongodb.net/fashionhub?retryWrites=true&w=majority
 JWT_SECRET=aB3dE7fG9hI1jK3lM5nO7pQ9rS1tU3vW5xY7zZ91aB3dE7f
 SESSION_SECRET=zY9wX7vU5tS3rQ1pO9nM7lK5jI3hG1fE9dC7bA5Z3xW1vU9t
 ADMIN_PASSWORD=YourSecurePasswordHere123
@@ -63,7 +63,7 @@ In Railway Dashboard:
 Click: "Deploy" button
 Wait: ~2 minutes for build
 Result: You get a URL like:
-  https://zenrix-production-xxxxx.railway.app
+  https://fashionhub-production-xxxxx.railway.app
 ✅ LIVE! 🎉
 ```
 
@@ -130,7 +130,7 @@ Users can:
 
 **That's it! You're deployed! 🚀**
 
-Your Zenrix website is now publicly accessible. Share the URL and let users experience:
+Your Fashion Hub website is now publicly accessible. Share the URL and let users experience:
 - Premium modern UI  
 - AI-powered chatbot
 - Admin customization panel

@@ -3,14 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Contact Us | Zenrix</title>
+    <title>Contact Us | Fashion Hub</title>
     <link rel="stylesheet" href="/css/tailwind-site.css">
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css">
     <script src="script.js" defer></script>
     <script>
         (function() {
-            const stored = localStorage.getItem('zenrix_theme');
+            const stored = localStorage.getItem('fashionhub_theme');
             const theme = (stored === 'light' || stored === 'dark') ? stored : 'light';
             const themeClass = theme === 'light' ? 'theme-light' : 'theme-dark';
             document.documentElement.classList.add(themeClass);
@@ -26,7 +26,7 @@
             <div class="container mx-auto px-4 relative flex flex-col gap-8 lg:flex-row lg:items-center lg:justify-between">
                 <div class="space-y-4 max-w-2xl">
                     <p class="text-sm uppercase tracking-[0.35em] text-indigo-100">We are here for you</p>
-                    <h1 class="text-3xl md:text-4xl font-bold">Contact Zenrix Support</h1>
+                    <h1 class="text-3xl md:text-4xl font-bold">Contact Fashion Hub Support</h1>
                     <p class="text-slate-200 text-lg">Reach us anytime for orders, returns, or product help. Expect a reply within one business day.</p>
                     <div class="flex flex-wrap gap-3">
                         <a id="contactHeroEmailLink" href="#contactMailtoForm" class="inline-flex items-center gap-2 px-5 py-3 rounded-xl bg-white text-slate-900 font-semibold shadow hover:-translate-y-0.5 transition"><i class="fas fa-envelope"></i>Email support</a>
@@ -74,7 +74,7 @@
                             </div>
                             <div>
                                 <p class="font-semibold text-white">Email</p>
-                                <p id="contactEmailValue" class="text-sm text-slate-300">support@zenrix.com</p>
+                                <p id="contactEmailValue" class="text-sm text-slate-300">support@fashionhub.com</p>
                                 <a id="contactEmailLink" href="#contactMailtoForm" class="text-indigo-200 text-sm font-semibold hover:text-white">Send a message</a>
                             </div>
                         </div>
@@ -215,12 +215,14 @@
         (async () => {
             try {
                 const API = window.API_URL || (location.origin + '/api');
-                const res = await fetch(API + '/components/slug/footer');
+                const res = await fetch(API + '/site-settings');
                 const json = await res.json();
-                if (!json || !json.success || !json.data || !json.data.data) return;
-                const data = json.data.data || {};
+                if (!json || !json.success || !json.data) return;
+                const data = json.data || {};
                 const phone = (data.supportPhone || '').trim();
                 const email = (data.supportEmail || '').trim();
+                const mapEmbedUrl = (data.mapEmbedUrl || '').trim();
+                const address = (data.address || '').trim();
                 const phoneTel = phone.replace(/[^+\d]/g, '');
 
                 const heroPhoneLink = document.getElementById('contactHeroPhoneLink');
@@ -237,8 +239,38 @@
 
                 const contactEmailLink = document.getElementById('contactEmailLink');
                 if (contactEmailLink && email) contactEmailLink.href = '#contactMailtoForm';
+
+                const contactAddressValue = document.getElementById('contactAddressValue');
+                if (contactAddressValue && address) contactAddressValue.textContent = address;
+
+                const contactAddressLink = document.getElementById('contactAddressLink');
+                if (contactAddressLink) {
+                    if (mapEmbedUrl) {
+                        contactAddressLink.href = mapEmbedUrl.replace(/&?output=embed\b/, '');
+                    } else if (address) {
+                        contactAddressLink.href = `https://maps.google.com/?q=${encodeURIComponent(address)}`;
+                    }
+                }
             } catch (e) { /* ignore */ }
         })();
+
+        window.addEventListener('siteSettingsUpdated', (event) => {
+            try {
+                const data = event.detail || {};
+                const address = (data.address || '').trim();
+                const mapEmbedUrl = (data.mapEmbedUrl || '').trim();
+                const contactAddressValue = document.getElementById('contactAddressValue');
+                if (contactAddressValue && address) contactAddressValue.textContent = address;
+                const contactAddressLink = document.getElementById('contactAddressLink');
+                if (contactAddressLink) {
+                    if (mapEmbedUrl) {
+                        contactAddressLink.href = mapEmbedUrl.replace(/&?output=embed\b/, '');
+                    } else if (address) {
+                        contactAddressLink.href = `https://maps.google.com/?q=${encodeURIComponent(address)}`;
+                    }
+                }
+            } catch (e) { /* ignore */ }
+        });
 
         // Load testimonials
         (async () => {

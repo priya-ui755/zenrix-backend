@@ -1,7 +1,7 @@
-# Zenrix Database Restore Script (Windows PowerShell)
+# Fashion Hub Database Restore Script (Windows PowerShell)
 # This script seeds the database with initial data
 
-Write-Host "Restoring Zenrix database..." -ForegroundColor Green
+Write-Host "Restoring Fashion Hub database..." -ForegroundColor Green
 Write-Host ""
 
 # Check if .env exists

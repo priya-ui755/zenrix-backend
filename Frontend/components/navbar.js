@@ -13,10 +13,14 @@ class CustomNavbar extends HTMLElement {
                 }
                 .shell {
                     position: relative;
-                    background: linear-gradient(135deg, rgba(15,23,42,0.95), rgba(30,27,75,0.9), rgba(49,46,129,0.85));
+                    background: linear-gradient(135deg, rgba(15,23,42,0.98), rgba(30,27,75,0.95), rgba(49,46,129,0.92));
                     backdrop-filter: blur(20px);
-                    border-bottom: 1px solid rgba(99,102,241,0.15);
-                    box-shadow: 0 20px 60px rgba(0,0,0,0.4), 0 0 40px rgba(99,102,241,0.08);
+                    border-bottom: 1px solid rgba(99,102,241,0.2);
+                    box-shadow: 0 20px 60px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+                    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+                }
+                .shell:hover {
+                    box-shadow: 0 25px 70px rgba(0,0,0,0.6), inset 0 1px 0 rgba(255, 255, 255, 0.15);
                 }
                 .shell::before {
                     content: "";
@@ -86,10 +90,12 @@ class CustomNavbar extends HTMLElement {
                     color: #cbd5e1;
                     text-decoration: none;
                     font-weight: 600;
-                    padding: 0.55rem 1rem;
-                    border-radius: 14px;
+                    padding: 0.6rem 1.1rem;
+                    border-radius: 10px;
                     border: 1px solid transparent;
-                    transition: all 0.2s ease;
+                    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+                    position: relative;
+                    overflow: hidden;
                 }
                 .nav-links a svg { flex: 0 0 auto; opacity: 0.7; transition: opacity 0.2s ease; }
                 .nav-links a:hover {
@@ -275,7 +281,7 @@ class CustomNavbar extends HTMLElement {
             </style>
             <div class="shell">
                 <nav>
-                    <a href="/" class="brand"><span class="dot"></span>Zenrix</a>
+                    <a href="/" class="brand"><span class="dot"></span><span data-navbar-brand>Fashion Hub</span></a>
                     <div class="nav-links">
                         <a href="/" data-nav-icon="home">
                             <span>Home</span>
@@ -570,6 +576,25 @@ class CustomNavbar extends HTMLElement {
             }
         })();
 
+        const applyNavbarBrand = () => {
+            try {
+                const cached = localStorage.getItem('siteSettings');
+                const settings = cached ? JSON.parse(cached) : null;
+                const brandName = settings && (settings.siteTitle || settings.companyName)
+                    ? String(settings.siteTitle || settings.companyName).trim()
+                    : 'Fashion Hub';
+                const brandEl = this.shadowRoot.querySelector('[data-navbar-brand]');
+                if (brandEl) brandEl.textContent = brandName;
+            } catch (e) {
+                const brandEl = this.shadowRoot.querySelector('[data-navbar-brand]');
+                if (brandEl) brandEl.textContent = 'Fashion Hub';
+            }
+        };
+
+        applyNavbarBrand();
+        this._siteSettingsBrandHandler = () => applyNavbarBrand();
+        window.addEventListener('siteSettingsUpdated', this._siteSettingsBrandHandler);
+
         // Mobile toggle
         const panel = this.shadowRoot.querySelector('.mobile-panel');
         const toggleBtn = this.shadowRoot.querySelector('.mobile-menu-btn');
@@ -589,7 +614,7 @@ class CustomNavbar extends HTMLElement {
         const labelSpan = themeBtn?.querySelector('.theme-label');
 
         const getGlobalTheme = () => {
-            const stored = localStorage.getItem('zenrix_theme');
+            const stored = localStorage.getItem('fashionhub_theme');
             if (stored === 'dark' || stored === 'light') return stored;
             return 'light';
         };
@@ -620,21 +645,21 @@ class CustomNavbar extends HTMLElement {
                     const nextClass = next === 'light' ? 'theme-light' : 'theme-dark';
                     document.documentElement.classList.remove('theme-light', 'theme-dark');
                     document.documentElement.classList.add(nextClass);
-                    localStorage.setItem('zenrix_theme', next);
-                    window.dispatchEvent(new CustomEvent('zenrix-theme-changed', { detail: { theme: next } }));
+                    localStorage.setItem('fashionhub_theme', next);
+                    window.dispatchEvent(new CustomEvent('fashionhub-theme-changed', { detail: { theme: next } }));
                 }
             });
             
             // Listen for theme changes from anywhere (script.js or other components)
-            window.addEventListener('zenrix-theme-changed', (e) => {
+            window.addEventListener('fashionhub-theme-changed', (e) => {
                 syncThemeButton(e.detail?.theme || getGlobalTheme());
             });
         }
 
         // Add a global accessible live region for screen readers if not present
-        if (!document.getElementById('zenrix-cart-live')) {
+        if (!document.getElementById('fashionhub-cart-live')) {
             const live = document.createElement('div');
-            live.id = 'zenrix-cart-live';
+            live.id = 'fashionhub-cart-live';
             live.setAttribute('role', 'status');
             live.setAttribute('aria-live', 'polite');
             live.setAttribute('aria-atomic', 'true');
@@ -654,7 +679,7 @@ class CustomNavbar extends HTMLElement {
         // Update count immediately
         this.updateCartCount = () => {
             try {
-                const cart = JSON.parse(localStorage.getItem('zenrix_cart')) || [];
+                const cart = JSON.parse(localStorage.getItem('fashionhub_cart')) || [];
                 const total = cart.reduce((sum, item) => sum + (item.quantity || 0), 0);
                 const el = this.shadowRoot.getElementById('cartCount');
                 if (el) {
@@ -673,7 +698,7 @@ class CustomNavbar extends HTMLElement {
                 }
 
                 // Update global live region for screen readers
-                const live = document.getElementById('zenrix-cart-live');
+                const live = document.getElementById('fashionhub-cart-live');
                 if (live) {
                     live.textContent = total > 0 ? `Cart has ${total} item${total === 1 ? '' : 's'}` : 'Cart is empty';
                 }
@@ -685,12 +710,16 @@ class CustomNavbar extends HTMLElement {
         // Bind and initialize
         this._boundUpdate = this.updateCartCount.bind(this);
         window.addEventListener('cartUpdated', this._boundUpdate);
-        window.addEventListener('storage', (e) => { if (e.key === 'zenrix_cart') this._boundUpdate(); });
+        window.addEventListener('storage', (e) => { if (e.key === 'fashionhub_cart') this._boundUpdate(); });
         this._lastCount = 0;
         this._boundUpdate();
     }
 
     disconnectedCallback() {
+        if (this._siteSettingsBrandHandler) {
+            window.removeEventListener('siteSettingsUpdated', this._siteSettingsBrandHandler);
+            this._siteSettingsBrandHandler = null;
+        }
         window.removeEventListener('cartUpdated', this._boundUpdate);
     }
 }

@@ -3,7 +3,7 @@
   "docs": {
     "file:README.md:0": {
       "freqs": {
-        "zenrix": 1,
+        "fashionhub": 1,
         "backend": 1,
         "local": 1,
         "dev": 1,
@@ -53,7 +53,7 @@
       },
       "len": 100,
       "source": "README.md",
-      "text": "# Zenrix Backend\r\n\r\nLocal dev instructions:\r\n\r\n1. Copy `.env.example` to `.env` and fill values (MONGODB_URI, ADMIN_PASSWORD, JWT_SECRET).\r\n2. Install dependencies: `npm install`.\r\n3. Start server: `node server.js` or `npm start` if you set it up.\r\n\r\nNotes:\r\n- Admin actions (create/update/delete product, pages, and components) require an admin login. Use `POST /api/admin/login` with `{ password }` to obtain a JWT.\r\n- CMS endpoints:\r\n  - Pages: `GET /api/pages`, `GET /api/pages/slug/:slug`, `POST /api/pages` (protected), `PUT /api/pages/:id` (protected), `DELETE /api/pages/:id` (protected)\r\n  - Components: `GET /api/components`, `GET /api/components/slug/:slug`, `POST /api/components` (protected), `PUT /api/components/:id` (protected), `DELETE /api/components/:id` (protected)\r\n- Admin Dashb",
+      "text": "# Fashion Hub Backend\r\n\r\nLocal dev instructions:\r\n\r\n1. Copy `.env.example` to `.env` and fill values (MONGODB_URI, ADMIN_PASSWORD, JWT_SECRET).\r\n2. Install dependencies: `npm install`.\r\n3. Start server: `node server.js` or `npm start` if you set it up.\r\n\r\nNotes:\r\n- Admin actions (create/update/delete product, pages, and components) require an admin login. Use `POST /api/admin/login` with `{ password }` to obtain a JWT.\r\n- CMS endpoints:\r\n  - Pages: `GET /api/pages`, `GET /api/pages/slug/:slug`, `POST /api/pages` (protected), `PUT /api/pages/:id` (protected), `DELETE /api/pages/:id` (protected)\r\n  - Components: `GET /api/components`, `GET /api/components/slug/:slug`, `POST /api/components` (protected), `PUT /api/components/:id` (protected), `DELETE /api/components/:id` (protected)\r\n- Admin Dashb",
       "meta": {}
     },
     "file:README.md:1": {
@@ -136,7 +136,7 @@
         "repo": 1,
         "url": 1,
         "cd": 1,
-        "zenrix": 1,
+        "fashionhub": 1,
         "backend": 1,
         "install": 2,
         "dependencies": 1,
@@ -165,7 +165,7 @@
       },
       "len": 61,
       "source": "SETUP.md",
-      "text": "# Database Backup & Restore\r\n\r\n## Quick Setup on New Machine\r\n\r\n1. **Clone the repository**\r\n   ```bash\r\n   git clone <your-repo-url>\r\n   cd zenrix-backend\r\n   ```\r\n\r\n2. **Install dependencies**\r\n   ```bash\r\n   npm install\r\n   ```\r\n\r\n3. **Setup environment variables**\r\n   - Copy `.env.example` to `.env` (or create `.env`)\r\n   - Update MongoDB connection string if needed\r\n\r\n4. **Restore database**\r\n   \r\n   **Windows:**\r\n   ```powershell\r\n   .\\db-backup\\restore.ps1\r\n   ```\r\n   \r\n   **Linux/Mac:**\r\n   ```bash\r\n   chmod +x db-backup/restore.sh\r\n   ./db-backup/restore.sh\r\n   ```\r\n\r\n5. **Start the server**\r\n   ```bash\r\n   npm start\r\n   ```\r\n\r\n6.",
+      "text": "# Database Backup & Restore\r\n\r\n## Quick Setup on New Machine\r\n\r\n1. **Clone the repository**\r\n   ```bash\r\n   git clone <your-repo-url>\r\n   cd fashionhub-backend\r\n   ```\r\n\r\n2. **Install dependencies**\r\n   ```bash\r\n   npm install\r\n   ```\r\n\r\n3. **Setup environment variables**\r\n   - Copy `.env.example` to `.env` (or create `.env`)\r\n   - Update MongoDB connection string if needed\r\n\r\n4. **Restore database**\r\n   \r\n   **Windows:**\r\n   ```powershell\r\n   .\\db-backup\\restore.ps1\r\n   ```\r\n   \r\n   **Linux/Mac:**\r\n   ```bash\r\n   chmod +x db-backup/restore.sh\r\n   ./db-backup/restore.sh\r\n   ```\r\n\r\n5. **Start the server**\r\n   ```bash\r\n   npm start\r\n   ```\r\n\r\n6.",
       "meta": {}
     },
     "file:SETUP.md:1": {
@@ -190,7 +190,7 @@
         "users": 1,
         "jane": 1,
         "admin": 1,
-        "zenrix": 1,
+        "fashionhub": 1,
         "products": 1,
         "electronics": 1,
         "fashion": 1,
@@ -220,7 +220,7 @@
       },
       "len": 58,
       "source": "SETUP.md",
-      "text": "**Login with test account**\r\n   - URL: http://localhost:3000\r\n   - Email: `john@example.com`\r\n   - Password: `password123`\r\n\r\n## What Gets Restored\r\n\r\n✅ Sample users (john@example.com, jane@example.com, admin@zenrix.com)  \r\n✅ 5 Products (electronics, fashion, home)  \r\n✅ 3 Sample orders  \r\n✅ CMS pages (about, contact, terms, etc.)  \r\n✅ UI components (navbar, footer)  \r\n✅ Hero sections and career listings\r\n\r\nFor detailed documentation, see [db-backup/README.md](db-backup/README.md)",
+      "text": "**Login with test account**\r\n   - URL: http://localhost:3000\r\n   - Email: `john@example.com`\r\n   - Password: `password123`\r\n\r\n## What Gets Restored\r\n\r\n✅ Sample users (john@example.com, jane@example.com, admin@fashionhub.com)  \r\n✅ 5 Products (electronics, fashion, home)  \r\n✅ 3 Sample orders  \r\n✅ CMS pages (about, contact, terms, etc.)  \r\n✅ UI components (navbar, footer)  \r\n✅ Hero sections and career listings\r\n\r\nFor detailed documentation, see [db-backup/README.md](db-backup/README.md)",
       "meta": {}
     },
     "file:OAUTH_SETUP.md:0": {
@@ -257,7 +257,7 @@
         "new": 1,
         "enter": 1,
         "name": 1,
-        "zenrix": 1,
+        "fashionhub": 1,
         "store": 1,
         "left": 1,
         "sidebar": 1,
@@ -271,7 +271,7 @@
       },
       "len": 77,
       "source": "OAUTH_SETUP.md",
-      "text": "# OAuth Setup Guide\r\n\r\n## 🔐 Social Login Configuration\r\n\r\nThe application now supports Google and Facebook OAuth authentication. To enable these features, you need to obtain API credentials from each provider.\r\n\r\n---\r\n\r\n## 🟦 Google OAuth Setup\r\n\r\n### 1. Create a Google Cloud Project\r\n1. Go to [Google Cloud Console](https://console.cloud.google.com)\r\n2. Click \"Select a project\" → \"New Project\"\r\n3. Enter project name (e.g., \"Zenrix Store\") → Click \"Create\"\r\n\r\n### 2. Enable Google+ API\r\n1. In the left sidebar, go to \"APIs & Services\" → \"Library\"\r\n2. Search for \"Google+ API\"\r\n3. Click on it and press \"Enable\"\r\n\r\n### 3. Create OAuth Credentials\r\n1. Go to \"APIs & Services\" → \"Credentials\"\r\n2. Click \"Create Credentials\" → \"OAuth client ID\"\r\n3.",
+      "text": "# OAuth Setup Guide\r\n\r\n## 🔐 Social Login Configuration\r\n\r\nThe application now supports Google and Facebook OAuth authentication. To enable these features, you need to obtain API credentials from each provider.\r\n\r\n---\r\n\r\n## 🟦 Google OAuth Setup\r\n\r\n### 1. Create a Google Cloud Project\r\n1. Go to [Google Cloud Console](https://console.cloud.google.com)\r\n2. Click \"Select a project\" → \"New Project\"\r\n3. Enter project name (e.g., \"Fashion Hub Store\") → Click \"Create\"\r\n\r\n### 2. Enable Google+ API\r\n1. In the left sidebar, go to \"APIs & Services\" → \"Library\"\r\n2. Search for \"Google+ API\"\r\n3. Click on it and press \"Enable\"\r\n\r\n### 3. Create OAuth Credentials\r\n1. Go to \"APIs & Services\" → \"Credentials\"\r\n2. Click \"Create Credentials\" → \"OAuth client ID\"\r\n3.",
       "meta": {}
     },
     "file:OAUTH_SETUP.md:1": {
@@ -289,7 +289,7 @@
         "fill": 1,
         "application": 3,
         "name": 2,
-        "zenrix": 2,
+        "fashionhub": 2,
         "add": 2,
         "email": 1,
         "skip": 1,
@@ -327,7 +327,7 @@
       },
       "len": 87,
       "source": "OAUTH_SETUP.md",
-      "text": "If prompted, configure the OAuth consent screen:\r\n   - Choose \"External\" user type\r\n   - Fill in application name: \"Zenrix\"\r\n   - Add your email\r\n   - Skip optional fields → Save\r\n4. Back to \"Create OAuth client ID\":\r\n   - Application type: **Web application**\r\n   - Name: \"Zenrix Web Client\"\r\n   - Authorized JavaScript origins: `http://localhost:3000`\r\n   - Authorized redirect URIs: `http://localhost:3000/api/auth/google/callback`\r\n   - Click \"Create\"\r\n5. Copy the **Client ID** and **Client Secret**\r\n\r\n### 4. Add to .env file\r\n```env\r\nGOOGLE_CLIENT_ID=your-actual-client-id.apps.googleusercontent.com\r\nGOOGLE_CLIENT_SECRET=your-actual-client-secret\r\nGOOGLE_CALLBACK_URL=http://localhost:3000/api/auth/google/callback\r\n```\r\n\r\n---\r\n\r\n## 🔵 Facebook OAuth Setup\r\n\r\n### 1.",
+      "text": "If prompted, configure the OAuth consent screen:\r\n   - Choose \"External\" user type\r\n   - Fill in application name: \"Fashion Hub\"\r\n   - Add your email\r\n   - Skip optional fields → Save\r\n4. Back to \"Create OAuth client ID\":\r\n   - Application type: **Web application**\r\n   - Name: \"Fashion Hub Web Client\"\r\n   - Authorized JavaScript origins: `http://localhost:3000`\r\n   - Authorized redirect URIs: `http://localhost:3000/api/auth/google/callback`\r\n   - Click \"Create\"\r\n5. Copy the **Client ID** and **Client Secret**\r\n\r\n### 4. Add to .env file\r\n```env\r\nGOOGLE_CLIENT_ID=your-actual-client-id.apps.googleusercontent.com\r\nGOOGLE_CLIENT_SECRET=your-actual-client-secret\r\nGOOGLE_CALLBACK_URL=http://localhost:3000/api/auth/google/callback\r\n```\r\n\r\n---\r\n\r\n## 🔵 Facebook OAuth Setup\r\n\r\n### 1.",
       "meta": {}
     },
     "file:OAUTH_SETUP.md:2": {
@@ -347,7 +347,7 @@
         "next": 1,
         "enter": 3,
         "name": 1,
-        "zenrix": 1,
+        "fashionhub": 1,
         "store": 1,
         "contact": 1,
         "email": 1,
@@ -384,7 +384,7 @@
       },
       "len": 87,
       "source": "OAUTH_SETUP.md",
-      "text": "Create a Facebook App\r\n1. Go to [Facebook Developers](https://developers.facebook.com)\r\n2. Click \"My Apps\" → \"Create App\"\r\n3. Choose \"Consumer\" → Click \"Next\"\r\n4. Enter app name (e.g., \"Zenrix Store\")\r\n5. Enter app contact email\r\n6. Click \"Create App\"\r\n\r\n### 2. Add Facebook Login Product\r\n1. In your app dashboard, find \"Add a Product\"\r\n2. Click \"Set Up\" on **Facebook Login**\r\n3. Choose \"Web\" platform\r\n4. Enter Site URL: `http://localhost:3000`\r\n5. Click \"Save\" → \"Continue\"\r\n\r\n### 3. Configure Facebook Login Settings\r\n1. In the left sidebar, go to \"Facebook Login\" → \"Settings\"\r\n2. Add to \"Valid OAuth Redirect URIs\":\r\n   ```\r\n   http://localhost:3000/api/auth/facebook/callback\r\n   ```\r\n3. Click \"Save Changes\"\r\n\r\n### 4. Get App Credentials\r\n1. Go to \"Settings\" → \"Basic\"\r\n2.",
+      "text": "Create a Facebook App\r\n1. Go to [Facebook Developers](https://developers.facebook.com)\r\n2. Click \"My Apps\" → \"Create App\"\r\n3. Choose \"Consumer\" → Click \"Next\"\r\n4. Enter app name (e.g., \"Fashion Hub Store\")\r\n5. Enter app contact email\r\n6. Click \"Create App\"\r\n\r\n### 2. Add Facebook Login Product\r\n1. In your app dashboard, find \"Add a Product\"\r\n2. Click \"Set Up\" on **Facebook Login**\r\n3. Choose \"Web\" platform\r\n4. Enter Site URL: `http://localhost:3000`\r\n5. Click \"Save\" → \"Continue\"\r\n\r\n### 3. Configure Facebook Login Settings\r\n1. In the left sidebar, go to \"Facebook Login\" → \"Settings\"\r\n2. Add to \"Valid OAuth Redirect URIs\":\r\n   ```\r\n   http://localhost:3000/api/auth/facebook/callback\r\n   ```\r\n3. Click \"Save Changes\"\r\n\r\n### 4. Get App Credentials\r\n1. Go to \"Settings\" → \"Basic\"\r\n2.",
       "meta": {}
     },
     "file:OAUTH_SETUP.md:3": {
@@ -605,7 +605,7 @@
         "3000": 3,
         "27017": 1,
         "docker": 9,
-        "zenrix": 4,
+        "fashionhub": 4,
         "backend": 3,
         "build": 3,
         "run": 3,
@@ -660,7 +660,7 @@
       },
       "len": 94,
       "source": "README_DOCKER.md",
-      "text": "# Docker: Zenrix Backend\r\n\r\nBuild and run with Docker Compose (starts the app + MongoDB):\r\n\r\n```bash\r\ndocker compose up --build\r\n```\r\n\r\nThe app will be available at http://localhost:3000. Mongo data is stored in a Docker volume named `mongo-data`.\r\n\r\nRun only the app image (no compose):\r\n\r\n```bash\r\ndocker build -t zenrix-backend:latest .\r\ndocker run -e MONGODB_URI=\"mongodb://host.docker.internal:27017/zenrix\" -p 3000:3000 zenrix-backend:latest\r\n```\r\n\r\nNotes:\r\n- Provide secrets (like `JWT_SECRET` and `ADMIN_PASSWORD`) via a `.env` file or CI environment variables rather than the defaults in `docker-compose.yml`.\r\n- To persist uploads, mount the `uploads/` folder as a volume in `docker-compose.yml`.\r\n\r\nSeeding and env file\r\n- Copy `.env.example` to `.env` and edit values locally.\r\n\r\n```bash",
+      "text": "# Docker: Fashion Hub Backend\r\n\r\nBuild and run with Docker Compose (starts the app + MongoDB):\r\n\r\n```bash\r\ndocker compose up --build\r\n```\r\n\r\nThe app will be available at http://localhost:3000. Mongo data is stored in a Docker volume named `mongo-data`.\r\n\r\nRun only the app image (no compose):\r\n\r\n```bash\r\ndocker build -t fashionhub-backend:latest .\r\ndocker run -e MONGODB_URI=\"mongodb://host.docker.internal:27017/fashionhub\" -p 3000:3000 fashionhub-backend:latest\r\n```\r\n\r\nNotes:\r\n- Provide secrets (like `JWT_SECRET` and `ADMIN_PASSWORD`) via a `.env` file or CI environment variables rather than the defaults in `docker-compose.yml`.\r\n- To persist uploads, mount the `uploads/` folder as a volume in `docker-compose.yml`.\r\n\r\nSeeding and env file\r\n- Copy `.env.example` to `.env` and edit values locally.\r\n\r\n```bash",
       "meta": {}
     },
     "file:README_DOCKER.md:1": {
@@ -697,7 +697,7 @@
         "restore": 3,
         "create": 1,
         "compressed": 1,
-        "zenrix": 2,
+        "fashionhub": 2,
         "database": 2,
         "saves": 1,
         "backups": 2,
@@ -718,7 +718,7 @@
       },
       "len": 93,
       "source": "README_DOCKER.md",
-      "text": "cp .env.example .env\r\n```\r\n\r\n- Start services (Compose will use `.env`):\r\n\r\n```bash\r\ndocker compose up --build -d\r\n```\r\n\r\n- Run the seeder (one-off) to populate richer test data:\r\n\r\n```bash\r\ndocker compose run --rm seeder\r\n```\r\n\r\n- If you prefer to seed from the `app` image:\r\n\r\n```bash\r\ndocker compose run --rm app node db-backup/seed-data.js\r\n```\r\n\r\nMongoDB Backup & Restore\r\n- Create a compressed backup of the `zenrix` database (saves to `./db-backups`):\r\n\r\n```bash\r\n./scripts/backup_mongo.sh\r\n```\r\n\r\n- Restore an archive into the database (will drop existing DB data):\r\n\r\n```bash\r\n./scripts/restore_mongo.sh db-backups/zenrix_YYYYMMDDHHMMSS.gz\r\n```\r\n\r\nUploads (MinIO)\r\n- Start MinIO along with other services:\r\n\r\n```bash\r\ndocker compose up -d minio\r\n```\r\n\r\n- Sync local `uploads/` to the MinIO",
+      "text": "cp .env.example .env\r\n```\r\n\r\n- Start services (Compose will use `.env`):\r\n\r\n```bash\r\ndocker compose up --build -d\r\n```\r\n\r\n- Run the seeder (one-off) to populate richer test data:\r\n\r\n```bash\r\ndocker compose run --rm seeder\r\n```\r\n\r\n- If you prefer to seed from the `app` image:\r\n\r\n```bash\r\ndocker compose run --rm app node db-backup/seed-data.js\r\n```\r\n\r\nMongoDB Backup & Restore\r\n- Create a compressed backup of the `fashionhub` database (saves to `./db-backups`):\r\n\r\n```bash\r\n./scripts/backup_mongo.sh\r\n```\r\n\r\n- Restore an archive into the database (will drop existing DB data):\r\n\r\n```bash\r\n./scripts/restore_mongo.sh db-backups/fashionhub_YYYYMMDDHHMMSS.gz\r\n```\r\n\r\nUploads (MinIO)\r\n- Start MinIO along with other services:\r\n\r\n```bash\r\ndocker compose up -d minio\r\n```\r\n\r\n- Sync local `uploads/` to the MinIO",
       "meta": {}
     },
     "file:README_DOCKER.md:2": {
@@ -726,7 +726,7 @@
         "9001": 1,
         "bucket": 1,
         "named": 1,
-        "zenrix": 1,
+        "fashionhub": 1,
         "bash": 1,
         "scripts": 3,
         "sync": 1,
@@ -789,7 +789,7 @@
       },
       "len": 85,
       "source": "README_DOCKER.md",
-      "text": "bucket named `zenrix`:\r\n\r\n```bash\r\n./scripts/sync_uploads_minio.sh\r\n```\r\n\r\n- MinIO console: http://localhost:9001 (use `minioadmin`/`minioadmin` by default). Change credentials in `docker-compose.yml` or via env vars in production.\r\n\r\nNotes:\r\n- The backup/restore scripts stream data through the `mongo` container using `docker compose exec`. Ensure the `mongo` service is running before using them.\r\n- For production backups, schedule `./scripts/backup_mongo.sh` with cron and upload archives to remote storage (S3, network share, etc.).\r\n\r\nVS Code Dev Container\r\n- You can open the project in a consistent containerized dev environment using VS Code Remote - Containers.\r\n\r\n1. Install the `Remote - Containers` extension in VS Code.\r\n2.",
+      "text": "bucket named `fashionhub`:\r\n\r\n```bash\r\n./scripts/sync_uploads_minio.sh\r\n```\r\n\r\n- MinIO console: http://localhost:9001 (use `minioadmin`/`minioadmin` by default). Change credentials in `docker-compose.yml` or via env vars in production.\r\n\r\nNotes:\r\n- The backup/restore scripts stream data through the `mongo` container using `docker compose exec`. Ensure the `mongo` service is running before using them.\r\n- For production backups, schedule `./scripts/backup_mongo.sh` with cron and upload archives to remote storage (S3, network share, etc.).\r\n\r\nVS Code Dev Container\r\n- You can open the project in a consistent containerized dev environment using VS Code Remote - Containers.\r\n\r\n1. Install the `Remote - Containers` extension in VS Code.\r\n2.",
       "meta": {}
     },
     "file:README_DOCKER.md:3": {
@@ -830,20 +830,20 @@
       "freqs": {
         "about": 1,
         "us": 1,
-        "zenrix": 1,
+        "fashionhub": 1,
         "loading": 1,
         "page": 1,
         "content": 1
       },
       "len": 6,
       "source": "/frontend/about.html",
-      "text": "About Us | Zenrix Loading page content…",
+      "text": "About Us | Fashion Hub Loading page content…",
       "meta": {}
     },
     "page:addresses.html:0": {
       "freqs": {
         "addresses": 6,
-        "zenrix": 1,
+        "fashionhub": 1,
         "loading": 1,
         "please": 1,
         "log": 2,
@@ -885,7 +885,7 @@
       },
       "len": 65,
       "source": "/frontend/addresses.html",
-      "text": "My Addresses | Zenrix Loading addresses... Please log in Sign in to manage your saved addresses. Log In Create Account Addresses Saved delivery locations Manage your default delivery address, keep your info up to date, and switch between home and work quickly. Total saved 0 Add address Saved addresses Default address is highlighted. No addresses added yet. Default address Used for checkout by default. Primary No default address selected. Tip: Mark one address as default for faster checkout. Add new address Fill in the delivery details below.",
+      "text": "My Addresses | Fashion Hub Loading addresses... Please log in Sign in to manage your saved addresses. Log In Create Account Addresses Saved delivery locations Manage your default delivery address, keep your info up to date, and switch between home and work quickly. Total saved 0 Add address Saved addresses Default address is highlighted. No addresses added yet. Default address Used for checkout by default. Primary No default address selected. Tip: Mark one address as default for faster checkout. Add new address Fill in the delivery details below.",
       "meta": {}
     },
     "page:addresses.html:1": {
@@ -930,7 +930,7 @@
     "page:careers.html:0": {
       "freqs": {
         "careers": 1,
-        "zenrix": 1,
+        "fashionhub": 1,
         "join": 2,
         "team": 1,
         "re": 1,
@@ -967,13 +967,13 @@
       },
       "len": 42,
       "source": "/frontend/careers.html",
-      "text": "Careers | Zenrix Join Our Team We're looking for talented individuals to join our growing company. Loading job openings... Apply for Position First Name * Last Name * Email * Phone * Resume (PDF, DOC, DOCX) - Max 5MB * Click to upload or drag and drop PDF, DOC, DOCX (Max 5MB) Cover Letter Submit Application Cancel",
+      "text": "Careers | Fashion Hub Join Our Team We're looking for talented individuals to join our growing company. Loading job openings... Apply for Position First Name * Last Name * Email * Phone * Resume (PDF, DOC, DOCX) - Max 5MB * Click to upload or drag and drop PDF, DOC, DOCX (Max 5MB) Cover Letter Submit Application Cancel",
       "meta": {}
     },
     "page:cart.html:0": {
       "freqs": {
         "cart": 6,
-        "zenrix": 1,
+        "fashionhub": 1,
         "loading": 1,
         "please": 1,
         "log": 2,
@@ -1022,7 +1022,7 @@
       },
       "len": 75,
       "source": "/frontend/cart.html",
-      "text": "Cart | Zenrix Loading your cart... Please log in Sign in to see and manage your cart. Log In Create Account Your cart Ready to check out? Review items, adjust quantities, and place your order with a secure checkout. Continue shopping View orders Items 0 In your cart Total NPR 0.00 Estimated Secure checkout Encrypted payment, free shipping. Your cart is empty Add items to see them here. Browse products Order summary Shipping is free; taxes included. Secure Items 0 Subtotal NPR 0.00 Shipping Free Tax (est.) Included Total NPR 0.00 Secure checkout Review your order before paying.",
+      "text": "Cart | Fashion Hub Loading your cart... Please log in Sign in to see and manage your cart. Log In Create Account Your cart Ready to check out? Review items, adjust quantities, and place your order with a secure checkout. Continue shopping View orders Items 0 In your cart Total NPR 0.00 Estimated Secure checkout Encrypted payment, free shipping. Your cart is empty Add items to see them here. Browse products Order summary Shipping is free; taxes included. Secure Items 0 Subtotal NPR 0.00 Shipping Free Tax (est.) Included Total NPR 0.00 Secure checkout Review your order before paying.",
       "meta": {}
     },
     "page:cart.html:1": {
@@ -1044,7 +1044,7 @@
     },
     "page:chatbot.html:0": {
       "freqs": {
-        "zenrix": 1,
+        "fashionhub": 1,
         "assistant": 1,
         "how": 1,
         "can": 1,
@@ -1054,13 +1054,13 @@
       },
       "len": 7,
       "source": "/frontend/chatbot.html",
-      "text": "Zenrix Assistant How can I help you today? ✕ Send",
+      "text": "Fashion Hub Assistant How can I help you today? ✕ Send",
       "meta": {}
     },
     "page:checkout.html:0": {
       "freqs": {
         "checkout": 3,
-        "zenrix": 2,
+        "fashionhub": 2,
         "secure": 1,
         "wrap": 1,
         "up": 1,
@@ -1133,7 +1133,7 @@
       },
       "len": 88,
       "source": "/frontend/checkout.html",
-      "text": "Checkout | Zenrix Secure Checkout Wrap up your order Confirm shipping, pick your preferred Nepali payment flow, and we will start preparing your delivery immediately. Sign in to continue Checkout requires a Zenrix account so we can send order updates and payment confirmations. Log In Create account Your cart is empty Add a few obsessions, then swing back here to finalize payment. Browse Products → Order received! We are validating the payment reference. You'll get a confirmation email shortly. View orders Continue shopping Shipping Where should we deliver? Full Name * Email Phone * Province Street Address * Apartment / Landmark City * Postal Code Delivery Notes Payment Choose a method NRs PAYMENT Select a payment option to view instructions.",
+      "text": "Checkout | Fashion Hub Secure Checkout Wrap up your order Confirm shipping, pick your preferred Nepali payment flow, and we will start preparing your delivery immediately. Sign in to continue Checkout requires a Fashion Hub account so we can send order updates and payment confirmations. Log In Create account Your cart is empty Add a few obsessions, then swing back here to finalize payment. Browse Products → Order received! We are validating the payment reference. You'll get a confirmation email shortly. View orders Continue shopping Shipping Where should we deliver? Full Name * Email Phone * Province Street Address * Apartment / Landmark City * Postal Code Delivery Notes Payment Choose a method NRs PAYMENT Select a payment option to view instructions.",
       "meta": {}
     },
     "page:checkout.html:1": {
@@ -1202,7 +1202,7 @@
         "10001": 1,
         "contact": 2,
         "us": 4,
-        "zenrix": 4,
+        "fashionhub": 4,
         "here": 1,
         "support": 7,
         "reach": 1,
@@ -1273,7 +1273,7 @@
       },
       "len": 109,
       "source": "/frontend/contact.html",
-      "text": "Contact Us | Zenrix We are here for you Contact Zenrix Support Reach us anytime for orders, returns, or product help. Expect a reply within one business day. Email support Call us Response time &lt; 24h Typical on business days Support hours 9–6 Sun–Fri (NPT) Need quick help? Check orders, wishlist, and addresses in your dashboard. Open dashboard Policies Talk to us Pick the channel that works best for you. Support Email support@zenrix.com Send a message Phone +977 9819922314 Call now Live chat Chat with our team during support hours. Coming soon Visit 123 Commerce St, New York, NY 10001 Open map Send a note Drop your query and we will email back. Email form Full name Email Subject Message Send email This form opens your email client to send a message to support@zenrix.com.",
+      "text": "Contact Us | Fashion Hub We are here for you Contact Fashion Hub Support Reach us anytime for orders, returns, or product help. Expect a reply within one business day. Email support Call us Response time &lt; 24h Typical on business days Support hours 9–6 Sun–Fri (NPT) Need quick help? Check orders, wishlist, and addresses in your dashboard. Open dashboard Policies Talk to us Pick the channel that works best for you. Support Email support@fashionhub.com Send a message Phone +977 9819922314 Call now Live chat Chat with our team during support hours. Coming soon Visit 123 Commerce St, New York, NY 10001 Open map Send a note Drop your query and we will email back. Email form Full name Email Subject Message Send email This form opens your email client to send a message to support@fashionhub.com.",
       "meta": {}
     },
     "page:contact.html:1": {
@@ -1305,7 +1305,7 @@
         "899": 1,
         "999": 1,
         "2025": 1,
-        "zenrix": 2,
+        "fashionhub": 2,
         "nepali": 2,
         "digital": 1,
         "marketplace": 1,
@@ -1385,7 +1385,7 @@
       },
       "len": 100,
       "source": "/frontend/index.html",
-      "text": "Zenrix - Nepali Digital Marketplace Loading page content… Zenrix Spotlight • Winter 2025 Nepal's style lab for fearless everyday living. Limited-run electronics, bold fashion capsules, and slow-home objects built with Nepali creators. Same-week delivery nationwide. Browse Collections On Sale 25k+ Members in Kathmandu / Pokhara 48h Insured express dispatch 92% Repeat purchase rate Loading hero picks… Spotlight bundle Curated Weekend Kit New Audio Studio ANC रु 13,299 Wearable Pulse S5 रु 26,599 Carry Urban Explorer रु 8,899 Desk-ready audio, wearable, and carry picks — matched to look and perform together. Loading spotlight bundle… Curating picks रु 32,999 Bundle & save • Ships free Shop bundle Discover Find the next piece that feels like you.",
+      "text": "Fashion Hub - Nepali Digital Marketplace Loading page content… Fashion Hub Spotlight • Winter 2025 Nepal's style lab for fearless everyday living. Limited-run electronics, bold fashion capsules, and slow-home objects built with Nepali creators. Same-week delivery nationwide. Browse Collections On Sale 25k+ Members in Kathmandu / Pokhara 48h Insured express dispatch 92% Repeat purchase rate Loading hero picks… Spotlight bundle Curated Weekend Kit New Audio Studio ANC रु 13,299 Wearable Pulse S5 रु 26,599 Carry Urban Explorer रु 8,899 Desk-ready audio, wearable, and carry picks — matched to look and perform together. Loading spotlight bundle… Curating picks रु 32,999 Bundle & save • Ships free Shop bundle Discover Find the next piece that feels like you.",
       "meta": {}
     },
     "page:index.html:1": {
@@ -1553,7 +1553,7 @@
     "page:index.html:3": {
       "freqs": {
         "24": 1,
-        "zenrix": 1,
+        "fashionhub": 1,
         "assistant": 1,
         "online": 1,
         "support": 1,
@@ -1565,7 +1565,7 @@
       },
       "len": 10,
       "source": "/frontend/index.html",
-      "text": "Zenrix Assistant Online • 24/7 Support ✕ Send Products Delivery Returns Contact",
+      "text": "Fashion Hub Assistant Online • 24/7 Support ✕ Send Products Delivery Returns Contact",
       "meta": {}
     },
     "page:logout.html:0": {
@@ -1595,7 +1595,7 @@
       "freqs": {
         "order": 7,
         "details": 3,
-        "zenrix": 1,
+        "fashionhub": 1,
         "account": 1,
         "premium": 1,
         "member": 1,
@@ -1623,13 +1623,13 @@
       },
       "len": 50,
       "source": "/frontend/order-details.html",
-      "text": "Order Details | Zenrix My Account Premium Member Profile Settings My Orders Wishlist Addresses Order Details Order # Loading... Back to Orders Status Loading... Order Date Loading... Payment Loading... Total Loading... Shipping Address Loading... Payment Details Method: Loading... Status: Pending Order Items Loading order items... Order Summary Subtotal रु 0.00 Shipping Free Tax रु 0.00 Total रु 0.00",
+      "text": "Order Details | Fashion Hub My Account Premium Member Profile Settings My Orders Wishlist Addresses Order Details Order # Loading... Back to Orders Status Loading... Order Date Loading... Payment Loading... Total Loading... Shipping Address Loading... Payment Details Method: Loading... Status: Pending Order Items Loading order items... Order Summary Subtotal रु 0.00 Shipping Free Tax रु 0.00 Total रु 0.00",
       "meta": {}
     },
     "page:orders.html:0": {
       "freqs": {
         "orders": 7,
-        "zenrix": 1,
+        "fashionhub": 1,
         "loading": 1,
         "please": 1,
         "log": 2,
@@ -1662,7 +1662,7 @@
       },
       "len": 42,
       "source": "/frontend/orders.html",
-      "text": "Orders | Zenrix Loading orders... Please log in Sign in to view your orders and tracking Log In Create Account Order Center My Orders Track deliveries, review status, and download invoices Back to dashboard Go to cart Total orders 0 Pending 0 Completed 0 Canceled 0 All Pending Completed Canceled Order history Newest first 0 orders No orders yet.",
+      "text": "Orders | Fashion Hub Loading orders... Please log in Sign in to view your orders and tracking Log In Create Account Order Center My Orders Track deliveries, review status, and download invoices Back to dashboard Go to cart Total orders 0 Pending 0 Completed 0 Canceled 0 All Pending Completed Canceled Order history Newest first 0 orders No orders yet.",
       "meta": {}
     },
     "page:privacy.html:0": {
@@ -1815,7 +1815,7 @@
         "42": 1,
         "99": 2,
         "product": 2,
-        "zenrix": 3,
+        "fashionhub": 3,
         "spotlight": 1,
         "drop": 1,
         "ships": 2,
@@ -1877,7 +1877,7 @@
       },
       "len": 82,
       "source": "/frontend/product.html",
-      "text": "Product | Zenrix Spotlight drop Ships within 24h Easy returns Zenrix Studio curation Battery Life 30h Warranty 24 mo Shipping Free Stock In stock Zenrix Studio Wireless Headphones ★★★★★ • 42 reviews Starting at रु 99.99 Loading product story… Colorways − 1 + Add to Cart Buy Now Ships within 24h • Free worldwide delivery 30-day returns • 2-year warranty Highlights Active noise cancellation with adaptive transparency. 30-hour battery plus 10-minute fast charge for 3 hours playback. Dual-device pairing and low-latency gaming mode. Customer Reviews John D. ★★★★★ “Noise cancellation is unreal and the comfort is next-level.",
+      "text": "Product | Fashion Hub Spotlight drop Ships within 24h Easy returns Fashion Hub Studio curation Battery Life 30h Warranty 24 mo Shipping Free Stock In stock Fashion Hub Studio Wireless Headphones ★★★★★ • 42 reviews Starting at रु 99.99 Loading product story… Colorways − 1 + Add to Cart Buy Now Ships within 24h • Free worldwide delivery 30-day returns • 2-year warranty Highlights Active noise cancellation with adaptive transparency. 30-hour battery plus 10-minute fast charge for 3 hours playback. Dual-device pairing and low-latency gaming mode. Customer Reviews John D. ★★★★★ “Noise cancellation is unreal and the comfort is next-level.",
       "meta": {}
     },
     "page:product.html:1": {
@@ -1887,7 +1887,7 @@
         "favorite": 1,
         "daily": 1,
         "headset": 1,
-        "zenrix": 1,
+        "fashionhub": 1,
         "assistant": 1,
         "online": 1,
         "nepali": 3,
@@ -1924,7 +1924,7 @@
       },
       "len": 45,
       "source": "/frontend/product.html",
-      "text": "Easily my favorite daily headset.” Zenrix Assistant नमस्ते! Online • Nepali buddy Live Friendly Nepali guide Smarter help in seconds Ask in English or Nepali about products, delivery, or returns. I can greet you with a Namaste too. Namaste ready 24/7 support Deals scout नमस्ते! Tap a quick question or type to start. Send Best deals Delivery Returns Gift ideas",
+      "text": "Easily my favorite daily headset.” Fashion Hub Assistant नमस्ते! Online • Nepali buddy Live Friendly Nepali guide Smarter help in seconds Ask in English or Nepali about products, delivery, or returns. I can greet you with a Namaste too. Namaste ready 24/7 support Deals scout नमस्ते! Tap a quick question or type to start. Send Best deals Delivery Returns Gift ideas",
       "meta": {}
     },
     "page:products.html:0": {
@@ -1967,7 +1967,7 @@
         "prices": 1,
         "uses": 1,
         "applicable": 1,
-        "zenrix": 1,
+        "fashionhub": 1,
         "assistant": 1,
         "online": 1,
         "support": 1,
@@ -1978,13 +1978,13 @@
       },
       "len": 58,
       "source": "/frontend/products.html",
-      "text": "Products | ShopNest Products Browse the latest drops. Filter by price, sort by what matters, and jump straight to sale picks when you want the best deals. All On Sale Electronics Fashion Home Beauty Sort Most Popular Price: Low to High Price: High to Low Highest Rated Newest Max price रु 1,000 Drag to cap prices. Uses sale price when applicable. Zenrix Assistant Online • 24/7 Support ✕ Send Products Delivery Returns Contact",
+      "text": "Products | ShopNest Products Browse the latest drops. Filter by price, sort by what matters, and jump straight to sale picks when you want the best deals. All On Sale Electronics Fashion Home Beauty Sort Most Popular Price: Low to High Price: High to Low Highest Rated Newest Max price रु 1,000 Drag to cap prices. Uses sale price when applicable. Fashion Hub Assistant Online • 24/7 Support ✕ Send Products Delivery Returns Contact",
       "meta": {}
     },
     "page:profile.html:0": {
       "freqs": {
         "profile": 4,
-        "zenrix": 1,
+        "fashionhub": 1,
         "loading": 2,
         "please": 1,
         "log": 3,
@@ -2038,7 +2038,7 @@
       },
       "len": 90,
       "source": "/frontend/profile.html",
-      "text": "My Profile | Zenrix Loading profile... Please log in Sign in to see your profile, orders, and wishlist. Log In Create Account Log Out Loading... Bronze Member Your account, orders, and saved items in one place. Orders 0 Pending 0 Wishlist 0 Cart Items 0 Total रु 0.00 Member Tier — — Last Activity No recent orders Recent Orders Your latest purchases. View all No orders yet. Wishlist Items Quick view of saved items. View wishlist No items in wishlist. Saved Addresses Delivery locations. Manage No addresses added yet. Quick Links Order History Go to Cart View Wishlist Manage Addresses Personal Information Manage your details and preferences. Profile First Name Last Name Email (read only) Email can't be changed.",
+      "text": "My Profile | Fashion Hub Loading profile... Please log in Sign in to see your profile, orders, and wishlist. Log In Create Account Log Out Loading... Bronze Member Your account, orders, and saved items in one place. Orders 0 Pending 0 Wishlist 0 Cart Items 0 Total रु 0.00 Member Tier — — Last Activity No recent orders Recent Orders Your latest purchases. View all No orders yet. Wishlist Items Quick view of saved items. View wishlist No items in wishlist. Saved Addresses Delivery locations. Manage No addresses added yet. Quick Links Order History Go to Cart View Wishlist Manage Addresses Personal Information Manage your details and preferences. Profile First Name Last Name Email (read only) Email can't be changed.",
       "meta": {}
     },
     "page:profile.html:1": {
@@ -2157,7 +2157,7 @@
     "page:support.html:0": {
       "freqs": {
         "support": 4,
-        "zenrix": 1,
+        "fashionhub": 1,
         "center": 1,
         "get": 1,
         "help": 1,
@@ -2193,7 +2193,7 @@
       },
       "len": 42,
       "source": "/frontend/support.html",
-      "text": "Support | Zenrix Support Center Get help with your orders, products, or account Please login to create and view support tickets. Create New Ticket Subject * Category * Order Issue Product Question Payment Issue Technical Problem Other Priority Low Medium High Description * Submit Ticket My Tickets Refresh Support Ticket #0000 &times;",
+      "text": "Support | Fashion Hub Support Center Get help with your orders, products, or account Please login to create and view support tickets. Create New Ticket Subject * Category * Order Issue Product Question Payment Issue Technical Problem Other Priority Low Medium High Description * Submit Ticket My Tickets Refresh Support Ticket #0000 &times;",
       "meta": {}
     },
     "page:terms.html:0": {
@@ -2341,19 +2341,19 @@
         "please": 1,
         "us": 1,
         "legal": 1,
-        "zenrix": 1,
+        "fashionhub": 1,
         "com": 1,
         "np": 1
       },
       "len": 23,
       "source": "/frontend/terms.html",
-      "text": "Your continued use of our services after any changes constitutes acceptance of the new terms. 9. Contact Information For any questions regarding this policy, please contact us at legal@zenrix.com.np.",
+      "text": "Your continued use of our services after any changes constitutes acceptance of the new terms. 9. Contact Information For any questions regarding this policy, please contact us at legal@fashionhub.com.np.",
       "meta": {}
     },
     "page:wishlist.html:0": {
       "freqs": {
         "wishlist": 3,
-        "zenrix": 1,
+        "fashionhub": 1,
         "save": 1,
         "now": 1,
         "check": 1,
@@ -2406,7 +2406,7 @@
       },
       "len": 73,
       "source": "/frontend/wishlist.html",
-      "text": "Wishlist | Zenrix Wishlist Save now, check out later. Your saved picks live here. Move them to cart when you are ready, or keep an eye on price drops. 0 items saved Browse products Quick insight Move items to cart 1-click Price shown in NPR Live Stock changes reflected Realtime Fetching your saved items… Saved items Tap into cart or remove items you no longer want. + Add more products No favorites yet Heart products to build your shortlist. They’ll show up here. Browse products Log in to view your wishlist We keep your saved items synced to your account.",
+      "text": "Wishlist | Fashion Hub Wishlist Save now, check out later. Your saved picks live here. Move them to cart when you are ready, or keep an eye on price drops. 0 items saved Browse products Quick insight Move items to cart 1-click Price shown in NPR Live Stock changes reflected Realtime Fetching your saved items… Saved items Tap into cart or remove items you no longer want. + Add more products No favorites yet Heart products to build your shortlist. They’ll show up here. Browse products Log in to view your wishlist We keep your saved items synced to your account.",
       "meta": {}
     },
     "page:wishlist.html:1": {
@@ -2424,7 +2424,7 @@
       "freqs": {
         "h1": 2,
         "welcome": 1,
-        "zenrix": 1,
+        "fashionhub": 1,
         "one": 1,
         "stop": 1,
         "shop": 1,
@@ -2436,7 +2436,7 @@
       },
       "len": 12,
       "source": "db:page:69554ce7b4f651f29d9ea37a",
-      "text": "<h1>Welcome to Zenrix</h1><p>Your one-stop shop for quality products at affordable prices.</p>\nHome",
+      "text": "<h1>Welcome to Fashion Hub</h1><p>Your one-stop shop for quality products at affordable prices.</p>\nHome",
       "meta": {
         "title": "Home"
       }
@@ -2445,7 +2445,7 @@
       "freqs": {
         "h1": 2,
         "about": 2,
-        "zenrix": 1,
+        "fashionhub": 1,
         "committed": 1,
         "providing": 1,
         "best": 1,
@@ -2460,7 +2460,7 @@
       },
       "len": 16,
       "source": "db:page:69554ce7b4f651f29d9ea37b",
-      "text": "<h1>About Zenrix</h1><p>We are committed to providing the best shopping experience with quality products and excellent customer service.</p>\nAbout Us",
+      "text": "<h1>About Fashion Hub</h1><p>We are committed to providing the best shopping experience with quality products and excellent customer service.</p>\nAbout Us",
       "meta": {
         "title": "About Us"
       }
@@ -2476,7 +2476,7 @@
         "us": 2,
         "email": 1,
         "support": 1,
-        "zenrix": 1,
+        "fashionhub": 1,
         "com": 1,
         "br": 2,
         "phone": 1,
@@ -2489,7 +2489,7 @@
       },
       "len": 24,
       "source": "db:page:69554ce7b4f651f29d9ea37c",
-      "text": "<h1>Contact Us</h1><p>Email: support@zenrix.com<br>Phone: +977 9819922314<br>Address: 123 Commerce St, New York, NY 10001</p>\nContact Us",
+      "text": "<h1>Contact Us</h1><p>Email: support@fashionhub.com<br>Phone: +977 9819922314<br>Address: 123 Commerce St, New York, NY 10001</p>\nContact Us",
       "meta": {
         "title": "Contact Us"
       }
@@ -2538,13 +2538,13 @@
         "looking": 1,
         "talented": 1,
         "individuals": 1,
-        "zenrix": 1,
+        "fashionhub": 1,
         "family": 1,
         "careers": 1
       },
       "len": 12,
       "source": "db:page:69554ce7b4f651f29d9ea37f",
-      "text": "<h1>Join Our Team</h1><p>We are always looking for talented individuals to join the Zenrix family.</p>\nCareers",
+      "text": "<h1>Join Our Team</h1><p>We are always looking for talented individuals to join the Fashion Hub family.</p>\nCareers",
       "meta": {
         "title": "Careers"
       }
@@ -2559,11 +2559,11 @@
         "news": 1,
         "trends": 1,
         "insights": 1,
-        "zenrix": 1
+        "fashionhub": 1
       },
       "len": 11,
       "source": "db:page:69554ce7b4f651f29d9ea380",
-      "text": "<h1>Blog</h1><p>Stay updated with the latest news, trends, and insights from Zenrix.</p>\nBlog",
+      "text": "<h1>Blog</h1><p>Stay updated with the latest news, trends, and insights from Fashion Hub.</p>\nBlog",
       "meta": {
         "title": "Blog"
       }
@@ -2608,7 +2608,7 @@
     "9001": 4.384390263345774,
     "10001": 3.9789251552376097,
     "27017": 4.384390263345774,
-    "zenrix": 1.5810298824392393,
+    "fashionhub": 1.5810298824392393,
     "backend": 3.2857779746776643,
     "local": 3.9789251552376097,
     "dev": 3.9789251552376097,
@@ -3610,7 +3610,7 @@
   },
   "vectors": {
     "file:README.md:0": {
-      "zenrix": 1.5810298824392393,
+      "fashionhub": 1.5810298824392393,
       "backend": 3.2857779746776643,
       "local": 3.9789251552376097,
       "dev": 3.9789251552376097,
@@ -3731,7 +3731,7 @@
       "repo": 4.384390263345774,
       "url": 3.1316272948504063,
       "cd": 4.384390263345774,
-      "zenrix": 1.5810298824392393,
+      "fashionhub": 1.5810298824392393,
       "backend": 3.2857779746776643,
       "install": 5.87200294361244,
       "dependencies": 3.9789251552376097,
@@ -3779,7 +3779,7 @@
       "users": 3.9789251552376097,
       "jane": 4.384390263345774,
       "admin": 3.468099531471619,
-      "zenrix": 1.5810298824392393,
+      "fashionhub": 1.5810298824392393,
       "products": 2.304948721665938,
       "electronics": 3.2857779746776643,
       "fashion": 3.2857779746776643,
@@ -3840,7 +3840,7 @@
       "new": 2.592630794117719,
       "enter": 3.9789251552376097,
       "name": 2.774952350911674,
-      "zenrix": 1.5810298824392393,
+      "fashionhub": 1.5810298824392393,
       "store": 3.9789251552376097,
       "left": 3.9789251552376097,
       "sidebar": 3.9789251552376097,
@@ -3866,7 +3866,7 @@
       "fill": 3.691243082785829,
       "application": 7.278196295070453,
       "name": 4.698402749134293,
-      "zenrix": 2.67691628783302,
+      "fashionhub": 2.67691628783302,
       "add": 4.698402749134293,
       "email": 2.438480114290461,
       "skip": 4.384390263345774,
@@ -3918,7 +3918,7 @@
       "next": 3.468099531471619,
       "enter": 8.350221226472312,
       "name": 2.774952350911674,
-      "zenrix": 1.5810298824392393,
+      "fashionhub": 1.5810298824392393,
       "store": 3.9789251552376097,
       "contact": 2.774952350911674,
       "email": 2.438480114290461,
@@ -4146,7 +4146,7 @@
       "3000": 6.895574035493559,
       "27017": 4.384390263345774,
       "docker": 11.088293058669288,
-      "zenrix": 3.7728026932268004,
+      "fashionhub": 3.7728026932268004,
       "backend": 6.895574035493559,
       "build": 7.746488093995497,
       "run": 7.278196295070453,
@@ -4232,7 +4232,7 @@
       "restore": 7.746488093995497,
       "create": 2.369487242803509,
       "compressed": 4.384390263345774,
-      "zenrix": 2.67691628783302,
+      "fashionhub": 2.67691628783302,
       "database": 6.249817818380228,
       "saves": 4.384390263345774,
       "backups": 6.736905908249602,
@@ -4255,7 +4255,7 @@
       "9001": 4.384390263345774,
       "bucket": 4.384390263345774,
       "named": 3.9789251552376097,
-      "zenrix": 1.5810298824392393,
+      "fashionhub": 1.5810298824392393,
       "bash": 3.2857779746776643,
       "scripts": 8.350221226472312,
       "sync": 3.9789251552376097,
@@ -4347,14 +4347,14 @@
     "page:about.html:0": {
       "about": 2.9980959022258835,
       "us": 2.774952350911674,
-      "zenrix": 1.5810298824392393,
+      "fashionhub": 1.5810298824392393,
       "loading": 2.592630794117719,
       "page": 3.1316272948504063,
       "content": 3.2857779746776643
     },
     "page:addresses.html:0": {
       "addresses": 8.369962624692938,
-      "zenrix": 1.5810298824392393,
+      "fashionhub": 1.5810298824392393,
       "loading": 2.592630794117719,
       "please": 2.8803128665695,
       "log": 5.07621762390208,
@@ -4423,7 +4423,7 @@
     },
     "page:careers.html:0": {
       "careers": 3.9789251552376097,
-      "zenrix": 1.5810298824392393,
+      "fashionhub": 1.5810298824392393,
       "join": 6.249817818380228,
       "team": 3.691243082785829,
       "re": 4.384390263345774,
@@ -4460,7 +4460,7 @@
     },
     "page:cart.html:0": {
       "cart": 8.369962624692938,
-      "zenrix": 1.5810298824392393,
+      "fashionhub": 1.5810298824392393,
       "loading": 2.592630794117719,
       "please": 2.8803128665695,
       "log": 5.07621762390208,
@@ -4519,7 +4519,7 @@
       "available": 3.9789251552376097
     },
     "page:chatbot.html:0": {
-      "zenrix": 1.5810298824392393,
+      "fashionhub": 1.5810298824392393,
       "assistant": 3.468099531471619,
       "how": 3.691243082785829,
       "can": 3.1316272948504063,
@@ -4529,7 +4529,7 @@
     },
     "page:checkout.html:0": {
       "checkout": 7.278196295070453,
-      "zenrix": 2.67691628783302,
+      "fashionhub": 2.67691628783302,
       "secure": 3.468099531471619,
       "wrap": 4.384390263345774,
       "up": 2.774952350911674,
@@ -4659,7 +4659,7 @@
       "10001": 3.9789251552376097,
       "contact": 4.698402749134293,
       "us": 6.621853147356911,
-      "zenrix": 3.7728026932268004,
+      "fashionhub": 3.7728026932268004,
       "here": 3.468099531471619,
       "support": 8.832121146208378,
       "reach": 4.384390263345774,
@@ -4750,7 +4750,7 @@
       "899": 4.384390263345774,
       "999": 4.384390263345774,
       "2025": 4.384390263345774,
-      "zenrix": 2.67691628783302,
+      "fashionhub": 2.67691628783302,
       "nepali": 5.563305713771455,
       "digital": 4.384390263345774,
       "marketplace": 4.384390263345774,
@@ -4980,7 +4980,7 @@
     },
     "page:index.html:3": {
       "24": 3.468099531471619,
-      "zenrix": 1.5810298824392393,
+      "fashionhub": 1.5810298824392393,
       "assistant": 3.468099531471619,
       "online": 3.691243082785829,
       "support": 2.9980959022258835,
@@ -5010,7 +5010,7 @@
     "page:order-details.html:0": {
       "order": 7.893985067701754,
       "details": 6.895574035493559,
-      "zenrix": 1.5810298824392393,
+      "fashionhub": 1.5810298824392393,
       "account": 2.369487242803509,
       "premium": 4.384390263345774,
       "member": 3.468099531471619,
@@ -5038,7 +5038,7 @@
     },
     "page:orders.html:0": {
       "orders": 7.637657369144725,
-      "zenrix": 1.5810298824392393,
+      "fashionhub": 1.5810298824392393,
       "loading": 2.592630794117719,
       "please": 2.8803128665695,
       "log": 5.07621762390208,
@@ -5200,7 +5200,7 @@
       "42": 4.384390263345774,
       "99": 7.423418012858375,
       "product": 4.876793609162683,
-      "zenrix": 3.3179687400384843,
+      "fashionhub": 3.3179687400384843,
       "spotlight": 3.691243082785829,
       "drop": 3.1316272948504063,
       "ships": 6.736905908249602,
@@ -5266,7 +5266,7 @@
       "favorite": 4.384390263345774,
       "daily": 4.384390263345774,
       "headset": 4.384390263345774,
-      "zenrix": 1.5810298824392393,
+      "fashionhub": 1.5810298824392393,
       "assistant": 3.468099531471619,
       "online": 3.691243082785829,
       "nepali": 6.895574035493559,
@@ -5340,7 +5340,7 @@
       "prices": 3.9789251552376097,
       "uses": 3.9789251552376097,
       "applicable": 3.9789251552376097,
-      "zenrix": 1.5810298824392393,
+      "fashionhub": 1.5810298824392393,
       "assistant": 3.468099531471619,
       "online": 3.691243082785829,
       "support": 2.9980959022258835,
@@ -5351,7 +5351,7 @@
     },
     "page:profile.html:0": {
       "profile": 7.472984554830662,
-      "zenrix": 1.5810298824392393,
+      "fashionhub": 1.5810298824392393,
       "loading": 4.389705519293308,
       "please": 2.8803128665695,
       "log": 6.291840903016742,
@@ -5500,7 +5500,7 @@
     },
     "page:support.html:0": {
       "support": 7.154339345578277,
-      "zenrix": 1.5810298824392393,
+      "fashionhub": 1.5810298824392393,
       "center": 3.9789251552376097,
       "get": 3.2857779746776643,
       "help": 3.468099531471619,
@@ -5666,13 +5666,13 @@
       "please": 2.8803128665695,
       "us": 2.774952350911674,
       "legal": 3.9789251552376097,
-      "zenrix": 1.5810298824392393,
+      "fashionhub": 1.5810298824392393,
       "com": 2.774952350911674,
       "np": 4.384390263345774
     },
     "page:wishlist.html:0": {
       "wishlist": 6.572071524501532,
-      "zenrix": 1.5810298824392393,
+      "fashionhub": 1.5810298824392393,
       "save": 3.1316272948504063,
       "now": 3.2857779746776643,
       "check": 3.2857779746776643,
@@ -5731,7 +5731,7 @@
     "db:page:69554ce7b4f651f29d9ea37a:0": {
       "h1": 5.07621762390208,
       "welcome": 4.384390263345774,
-      "zenrix": 1.5810298824392393,
+      "fashionhub": 1.5810298824392393,
       "one": 3.2857779746776643,
       "stop": 4.384390263345774,
       "shop": 3.691243082785829,
@@ -5744,7 +5744,7 @@
     "db:page:69554ce7b4f651f29d9ea37b:0": {
       "h1": 5.07621762390208,
       "about": 5.07621762390208,
-      "zenrix": 1.5810298824392393,
+      "fashionhub": 1.5810298824392393,
       "committed": 3.9789251552376097,
       "providing": 4.384390263345774,
       "best": 3.468099531471619,
@@ -5767,7 +5767,7 @@
       "us": 4.698402749134293,
       "email": 2.438480114290461,
       "support": 2.9980959022258835,
-      "zenrix": 1.5810298824392393,
+      "fashionhub": 1.5810298824392393,
       "com": 2.774952350911674,
       "br": 6.736905908249602,
       "phone": 3.1316272948504063,
@@ -5805,7 +5805,7 @@
       "looking": 3.9789251552376097,
       "talented": 3.9789251552376097,
       "individuals": 3.9789251552376097,
-      "zenrix": 1.5810298824392393,
+      "fashionhub": 1.5810298824392393,
       "family": 4.384390263345774,
       "careers": 3.9789251552376097
     },
@@ -5818,7 +5818,7 @@
       "news": 4.384390263345774,
       "trends": 4.384390263345774,
       "insights": 4.384390263345774,
-      "zenrix": 1.5810298824392393
+      "fashionhub": 1.5810298824392393
     },
     "db:page:6955532e048fffbf7dbcde2a:0": {
       "br": 3.9789251552376097,

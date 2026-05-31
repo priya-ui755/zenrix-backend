@@ -11,8 +11,8 @@ router.post('/login', (req, res) => {
   console.debug('[AdminRoutes] login attempt');
   if (!password) return res.status(400).json({ success: false, error: 'Password required' });
 
-  const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'admin';
-  const JWT_SECRET = process.env.JWT_SECRET || 'zenrix-secret';
+  const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'admin123';
+  const JWT_SECRET = process.env.JWT_SECRET || 'fashionhub-secret';
 
   // Timing-safe compare to reduce password oracle leakage.
   const a = Buffer.from(String(password));

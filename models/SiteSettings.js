@@ -2,13 +2,13 @@ const mongoose = require('mongoose');
 
 const siteSettingsSchema = new mongoose.Schema({
   slug: { type: String, default: 'site-settings' },
-  siteTitle: { type: String, default: 'Zenrix' },
-  companyName: { type: String, default: 'Zenrix' },
-  supportEmail: { type: String, default: 'support@zenrix.com' },
+  siteTitle: { type: String, default: 'Fashion Hub' },
+  companyName: { type: String, default: 'Fashion Hub' },
+  supportEmail: { type: String, default: 'support@fashionhub.com' },
   supportPhone: { type: String, default: '+9779819922314' },
   supportChatLink: { type: String, default: '/index.html#chat' },
   supportHours: { type: String, default: '' },
-  legalEmail: { type: String, default: 'legal@zenrix.com.np' },
+  legalEmail: { type: String, default: 'legal@fashionhub.com.np' },
   address: { type: String, default: '123 Commerce St, New York, NY 10001' },
   mapEmbedUrl: { type: String, default: 'https://www.google.com/maps?q=123+Commerce+St+New+York+NY+10001&output=embed' },
   socialLinks: {
@@ -18,7 +18,7 @@ const siteSettingsSchema = new mongoose.Schema({
     linkedin: { type: String, default: '' }
   },
   footerHtml: { type: String, default: '' },
-  footerBottomText: { type: String, default: '© 2026 Zenrix. All rights reserved.' },
+  footerBottomText: { type: String, default: '© 2026 Fashion Hub. All rights reserved.' },
   heroTextOverrides: { type: Object, default: {} },
   // New branding fields
   logoUrl: { type: String, default: '' },
@@ -38,13 +38,13 @@ siteSettingsSchema.statics.getOrCreate = async function () {
     const footer = await Component.findOne({ slug: 'footer' });
     if (footer && footer.data) {
       const data = footer.data || {};
-      const seed = {
-        supportEmail: data.supportEmail || 'support@zenrix.com',
+        const seed = {
+        supportEmail: data.supportEmail || 'support@fashionhub.com',
         supportPhone: data.supportPhone || '+9779819922314',
         supportChatLink: data.chatLink || '/index.html#chat',
         mapEmbedUrl: data.mapEmbed || '',
         address: data.address || '',
-        footerBottomText: data.bottomText || '© 2026 Zenrix. All rights reserved.'
+        footerBottomText: data.bottomText || '© 2026 Fashion Hub. All rights reserved.'
       };
       s = await this.create(seed);
       return s;

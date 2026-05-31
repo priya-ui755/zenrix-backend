@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Checkout | Zenrix</title>
+    <title>Checkout - Fashion Hub</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -13,7 +13,7 @@
     <script src="script.js" defer></script>
     <script>
         (function() {
-            const stored = localStorage.getItem('zenrix_theme');
+            const stored = localStorage.getItem('fashionhub_theme');
             const theme = (stored === 'light' || stored === 'dark') ? stored : 'light';
             const themeClass = theme === 'light' ? 'theme-light' : 'theme-dark';
             document.documentElement.classList.add(themeClass);
@@ -67,7 +67,7 @@
                         </svg>
                     </div>
                     <h2 class="text-2xl font-semibold text-white">Sign in to continue</h2>
-                    <p class="text-slate-400">Checkout requires a Zenrix account so we can send order updates and payment confirmations.</p>
+                    <p class="text-slate-400">Checkout requires a Fashion Hub account so we can send order updates and payment confirmations.</p>
                     <div class="flex flex-wrap gap-4 justify-center">
                         <a href="login.html" class="px-6 py-3 rounded-full bg-white text-slate-900 font-semibold">Log In</a>
                         <a href="register.html" class="px-6 py-3 rounded-full border border-white/40 text-white font-semibold">Create account</a>
@@ -116,7 +116,7 @@
                             </div>
                             <div>
                                 <label class="text-sm text-slate-400" for="email">Email</label>
-                                <input id="email" name="email" type="email" class="input-field mt-1" placeholder="you@zenrix.com.np" autocomplete="email">
+                                <input id="email" name="email" type="email" class="input-field mt-1" placeholder="you@fashionhub.com" autocomplete="email">
                             </div>
                             <div>
                                 <label class="text-sm text-slate-400" for="phone">Phone *</label>

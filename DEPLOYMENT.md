@@ -1,4 +1,4 @@
-# 🚀 Zenrix Public Deployment Guide
+# 🚀 Fashion Hub Public Deployment Guide
 
 ## Quick Links
 - **Railway.app** (Recommended ⭐) - https://railway.app
@@ -20,12 +20,12 @@
 5. Choose nearest region to you
 6. Click "Create Cluster" (takes ~3 minutes)
 7. Click "Connect":
-   - Username: `zenrix_user`
+   - Username: `fashionhub_user`
    - Password: Generate secure password
    - Add your IP (or "Allow from anywhere" for testing)
 8. Copy connection string:
    ```
-   mongodb+srv://zenrix_user:YOUR_PASSWORD@cluster.mongodb.net/zenrix?retryWrites=true&w=majority
+   mongodb+srv://fashionhub_user:YOUR_PASSWORD@cluster.mongodb.net/fashionhub?retryWrites=true&w=majority
    ```
 
 **Save this connection string** - you'll need it next.
@@ -52,7 +52,7 @@
    - Go to "Variables" tab
    - Add these variables:
      ```
-     MONGODB_URI=mongodb+srv://zenrix_user:PASSWORD@cluster.mongodb.net/zenrix?retryWrites=true&w=majority
+   MONGODB_URI=mongodb+srv://fashionhub_user:PASSWORD@cluster.mongodb.net/fashionhub?retryWrites=true&w=majority
      JWT_SECRET=generate-random-string-here-min-32-chars
      SESSION_SECRET=generate-another-random-string-here
      ADMIN_PASSWORD=change-from-admin123-to-something-secure
@@ -75,7 +75,7 @@
 3. Click "New +" → "Web Service"
 4. Connect to your repo
 5. Configure:
-   - **Name:** zenrix-app
+   - **Name:** fashionhub-app
    - **Environment:** Node
    - **Build Command:** `npm install`
    - **Start Command:** `node server.js`

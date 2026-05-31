@@ -1,5 +1,5 @@
 /**
- * Zenrix Database Seed Script
+ * Fashion Hub Database Seed Script
  * 
  * This script populates the MongoDB database with initial data
  * including users, products, pages, components, and sample orders.
@@ -22,7 +22,7 @@ const Career = require('../models/Career');
 const Subscriber = require('../models/Subscriber');
 
 // Connect to MongoDB
-const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://localhost:27017/zenrix';
+const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://localhost:27017/fashionhub';
 
 console.log('🔌 Connecting to MongoDB...');
 mongoose.connect(MONGODB_URI)
@@ -87,7 +87,7 @@ async function seedDatabase() {
       {
         firstName: 'Admin',
         lastName: 'User',
-        email: 'admin@zenrix.com',
+        email: 'admin@fashionhub.com',
         password: await bcrypt.hash(process.env.ADMIN_PASSWORD || 'admin123', 10),
         phone: '+1234567892',
         membershipTier: 'Platinum'
@@ -275,13 +275,13 @@ async function seedDatabase() {
     // ========== PAGES (CMS) ==========
     console.log('📄 Creating CMS pages...');
     const pages = await Page.insertMany([
-      { slug: 'index', title: 'Home', content: '<h1>Welcome to Zenrix</h1><p>Your one-stop shop for quality products at affordable prices.</p>', published: true, meta: { description: 'Zenrix - Quality products at great prices' } },
-      { slug: 'about', title: 'About Us', content: '<h1>About Zenrix</h1><p>We are committed to providing the best shopping experience with quality products and excellent customer service.</p>', published: true, meta: { description: 'About Zenrix' } },
-      { slug: 'contact', title: 'Contact Us', content: '<h1>Contact Us</h1><p>Email: support@zenrix.com<br>Phone: +977 9819922314<br>Address: 123 Commerce St, New York, NY 10001</p>', published: true, meta: { description: 'Contact Zenrix' } },
+      { slug: 'index', title: 'Home', content: '<h1>Welcome to Fashion Hub</h1><p>Your one-stop shop for quality products at affordable prices.</p>', published: true, meta: { description: 'Fashion Hub - Quality products at great prices' } },
+      { slug: 'about', title: 'About Us', content: '<h1>About Fashion Hub</h1><p>We are committed to providing the best shopping experience with quality products and excellent customer service.</p>', published: true, meta: { description: 'About Fashion Hub' } },
+      { slug: 'contact', title: 'Contact Us', content: '<h1>Contact Us</h1><p>Email: support@fashionhub.com<br>Phone: +977 9819922314<br>Address: 123 Commerce St, New York, NY 10001</p>', published: true, meta: { description: 'Contact Fashion Hub' } },
       { slug: 'terms', title: 'Terms & Conditions', content: '<h1>Terms & Conditions</h1><p>By accessing this website, you agree to be bound by these terms and conditions.</p>', published: true, meta: { description: 'Terms and conditions' } },
       { slug: 'privacy', title: 'Privacy Policy', content: '<h1>Privacy Policy</h1><p>We respect your privacy and are committed to protecting your personal information.</p>', published: true, meta: { description: 'Privacy policy' } },
-      { slug: 'careers', title: 'Careers', content: '<h1>Join Our Team</h1><p>We are always looking for talented individuals to join the Zenrix family.</p>', published: true, meta: { description: 'Careers at Zenrix' } },
-      { slug: 'blog', title: 'Blog', content: '<h1>Blog</h1><p>Stay updated with the latest news, trends, and insights from Zenrix.</p>', published: true, meta: { description: 'Zenrix Blog' } }
+      { slug: 'careers', title: 'Careers', content: '<h1>Join Our Team</h1><p>We are always looking for talented individuals to join the Fashion Hub team.</p>', published: true, meta: { description: 'Careers at Fashion Hub' } },
+      { slug: 'blog', title: 'Blog', content: '<h1>Blog</h1><p>Stay updated with the latest news, trends, and insights from Fashion Hub.</p>', published: true, meta: { description: 'Fashion Hub Blog' } }
     ]);
     console.log(`✅ Created ${pages.length} CMS pages\n`);
 
@@ -304,11 +304,11 @@ async function seedDatabase() {
         name: 'Main Footer',
         html: `<!-- FOOTER TEMPLATE (editable sections) -->
 <div class="footer-about">
-  <a class="brand" href="/"><span class="orb"></span>Zenrix</a>
+  <a class="brand" href="/"><span class="orb"></span>Fashion Hub</a>
   <p class="lede">Your one-stop shop for quality products at affordable prices.</p>
 
   <div class="cta-row" data-footer-cta>
-    <a class="btn primary" href="/products.html">Zenrix</a>
+    <a class="btn primary" href="/products.html">Fashion Hub</a>
     <a class="btn ghost" href="/contact.html">Talk to us</a>
   </div>
 </div>
@@ -349,7 +349,7 @@ async function seedDatabase() {
 <div class="footer-support">
   <div class="column-title">Support</div>
   <div class="contact-lines">
-    <div><span>Email</span> support@zenrix.com</div>
+    <div><span>Email</span> support@fashionhub.com</div>
     <div><span>Phone</span> <span data-footer-phone>+977 9819922314</span></div>
     <div><span>Chat</span> Live chat 9am-9pm</div>
   </div>
@@ -357,7 +357,7 @@ async function seedDatabase() {
 </div>
 
 <div class="footer-bottom">
-  <span>&copy; <span data-footer-year></span> Zenrix. Built for modern shoppers.</span>
+  <span>&copy; <span data-footer-year></span> Fashion Hub. Built for modern shoppers.</span>
   <div class="badge-row">
     <span class="mini-badge">Secure checkout</span>
     <span class="mini-badge">48h support</span>
@@ -374,7 +374,7 @@ async function seedDatabase() {
     const heroes = await Hero.insertMany([
       {
         page: 'home',
-        title: 'Welcome to Zenrix',
+        title: 'Welcome to Fashion Hub',
         subtitle: 'Quality Products, Unbeatable Prices',
         ctaText: 'Shop Now',
         ctaLink: '/products.html',
@@ -433,7 +433,7 @@ async function seedDatabase() {
     console.log('   Email: john@example.com');
     console.log('   Password: password123\n');
 
-    console.log('   Email: admin@zenrix.com');
+    console.log('   Email: admin@fashionhub.com');
     console.log(`   Password: ${process.env.ADMIN_PASSWORD || 'admin123'}\n`);
 
     process.exit(0);

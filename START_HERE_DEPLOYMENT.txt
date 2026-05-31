@@ -1,5 +1,5 @@
 ╔════════════════════════════════════════════════════════════════════════════╗
-║          🎉 ZENRIX WEBSITE - DEPLOYMENT READY! 🎉                           ║
+║          🎉 FASHION HUB WEBSITE - DEPLOYMENT READY! 🎉                           ║
 ║                  Your project is ready to go live!                           ║
 ╚════════════════════════════════════════════════════════════════════════════╝
 
@@ -83,7 +83,7 @@ Step 2: Create Railway Account (2 min)
 Step 3: Create Railway Project (1 min)
   • "New Project"
   • "Deploy from GitHub"
-  • Select zenrix-backend repo
+  • Select fashionhub-backend repo
 
 Step 4: Add Environment Variables (1 min)
   • MONGODB_URI = [from MongoDB Atlas]
@@ -252,7 +252,7 @@ Your deployment is successful when:
 
 All documents are in your project root:
 
-  c:\Users\DELL\zenrix-backend\
+  c:\Users\DELL\fashionhub-backend\
   ├── README_DEPLOYMENT.md ← YOU ARE HERE
   ├── QUICK_START_DEPLOYMENT.txt ← READ NEXT
   ├── DEPLOYMENT.md
@@ -278,6 +278,6 @@ All documents are in your project root:
 
 
 ═════════════════════════════════════════════════════════════════════════════
-🎉 Your Zenrix website is ready to go live! 🎉
+🎉 Your Fashion Hub website is ready to go live! 🎉
    Follow the guide above and deploy with confidence! 💪
 ═════════════════════════════════════════════════════════════════════════════
