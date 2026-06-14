@@ -1,6 +1,6 @@
 <div id="fashionhub-chatbot" class="fashionhub-chatbot">
   <button class="chat-toggle" id="chatbotToggle" aria-label="Open chat">
-    <img src="/uploads/avatars/chat-avatar.png?v=1" alt="Chatbot Avatar" style="width:56px;height:56px;display:block;border-radius:50%;object-fit:cover;" />
+    <img class="chat-avatar" src="/uploads/avatars/chat-avatar.png?v=1" alt="Chatbot Avatar" />
   </button>
 
   <div class="chat-window" id="chatbotWindow" aria-hidden="true">
@@ -28,11 +28,12 @@
   .fashionhub-chatbot { position: fixed; right: 24px; bottom: 24px; z-index: 9999; font-family: Inter, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial; }
   .chat-toggle { width: 64px; height: 64px; border-radius: 50%; border: none; padding: 0; display: inline-flex; align-items: center; justify-content: center; box-shadow: 0 10px 30px rgba(2,6,23,0.4); background: linear-gradient(135deg,#0ea5a9,#0ea5a9); cursor: pointer; }
   .chat-toggle img { width: 56px; height: 56px; border-radius: 50%; display: block; }
+  .chat-avatar { width: 56px; height: 56px; display: block; border-radius: 50%; object-fit: cover; object-position: center 18%; }
 
   .chat-window { width: 340px; max-height: 520px; display: none; flex-direction: column; background: #ffffff; border-radius: 14px; box-shadow: 0 20px 60px rgba(2,6,23,0.45); overflow: hidden; }
   .chat-head { display:flex; align-items:center; justify-content:space-between; padding:10px 12px; background: linear-gradient(90deg,#0ea5a9,#0f9aa8); color:#fff; }
   .chat-title { display:flex; gap:10px; align-items:center; }
-  .chat-head-avatar { width:42px; height:42px; border-radius:8px; object-fit:cover; }
+  .chat-head-avatar { width:42px; height:42px; border-radius:50%; object-fit:cover; object-position: center 18%; }
   .title { font-weight:700; }
   .subtitle { font-size:12px; opacity:0.9; }
   .chat-close { background:transparent; border:none; color:#fff; font-size:18px; cursor:pointer; }

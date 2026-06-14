@@ -395,8 +395,40 @@ document.addEventListener('DOMContentLoaded', function() {
             } catch (ee) { /* ignore */ }
             // Update footer map embed if present
             try { if (s.mapEmbedUrl) { localStorage.setItem('footerMapEmbed', s.mapEmbedUrl); window.dispatchEvent(new CustomEvent('footerMapUpdated', { detail: { mapEmbed: s.mapEmbedUrl } })); } } catch(e) {}
+            // Also update any static footer email text nodes that may contain the old default
+            try { if (s.supportEmail) updateStaticFooterEmail(s.supportEmail); } catch(e) {}
         } catch (e) {}
     });
+
+    function updateStaticFooterEmail(email){
+        try{
+            // Update simple known ids
+            const possibleIds = ['contactEmailValue','contactEmailLink'];
+            possibleIds.forEach(id=>{
+                try{ const el = document.getElementById(id); if(el){ if(el.tagName === 'A') el.href = `mailto:${email}`; el.textContent = email; } }catch(e){}
+            });
+
+            // Also update explicit footerSupportEmail anchor if present
+            try { const f = document.getElementById('footerSupportEmail'); if (f) { f.href = `mailto:${email}`; f.textContent = email; } } catch(e){}
+
+            // Replace any visible text nodes in footer containing 'support@' or 'support@fashionhub.com'
+            const footer = document.querySelector('footer') || document.querySelector('.site-footer') || document.getElementById('footer');
+            if (!footer) return;
+            const walker = document.createTreeWalker(footer, NodeFilter.SHOW_TEXT, null);
+            const nodes = [];
+            let n;
+            while((n = walker.nextNode())) nodes.push(n);
+            nodes.forEach(tn => {
+                try{
+                    if (/support@/i.test(tn.nodeValue)) tn.nodeValue = tn.nodeValue.replace(/support@[\w.-]+/i, email);
+                }catch(e){}
+            });
+            // Also update mailto links in footer
+            footer.querySelectorAll && footer.querySelectorAll('a[href^="mailto:"]').forEach(a => {
+                try{ a.href = `mailto:${email}`; if (/support@/i.test(a.textContent)) a.textContent = email; }catch(e){}
+            });
+        }catch(e){}
+    }
 
 
         try { applyBrandingEverywhere(document); } catch (e) {}
@@ -468,6 +500,29 @@ document.addEventListener('DOMContentLoaded', function() {
                 } catch(e) { console.warn('SSE parse error', e); }
             });
             es.addEventListener('error', function(e){ /* EventSource handles reconnect automatically */ });
+        } catch (e) {}
+    })();
+    // Periodic fallback: poll site-settings periodically in case SSE isn't available
+    (function(){
+        try {
+            const POLL_MS = 20000; // 20s
+            async function pollSiteSettings(){
+                try {
+                    const r = await fetch((window.API_URL || '/api') + '/site-settings', { cache: 'no-store' });
+                    if (!r.ok) return;
+                    const sj = await r.json();
+                    if (sj && sj.success && sj.data){
+                        const current = localStorage.getItem('siteSettings');
+                        const next = JSON.stringify(sj.data);
+                        if (current !== next){
+                            try { localStorage.setItem('siteSettings', next); } catch(e){}
+                            try { window.FASHIONHUB_SUPPORT_EMAIL = sj.data.supportEmail || window.FASHIONHUB_SUPPORT_EMAIL; } catch(e){}
+                            try { window.dispatchEvent(new CustomEvent('siteSettingsUpdated', { detail: sj.data })); } catch(e){}
+                        }
+                    }
+                } catch (e) { /* ignore transient errors */ }
+            }
+            setInterval(pollSiteSettings, POLL_MS);
         } catch (e) {}
     })();
     
@@ -775,6 +830,58 @@ function applyProductFilters() {
             products = products.filter(product => (product.category || '').toLowerCase() === targetCategory);
         }
     }
+
+    // Ensure footer email is updated on initial DOM ready (in case footer markup loads later)
+    try {
+        document.addEventListener('DOMContentLoaded', () => {
+            try {
+                const s = localStorage.getItem('siteSettings') ? JSON.parse(localStorage.getItem('siteSettings')) : null;
+                if (s && s.supportEmail) updateStaticFooterEmail(s.supportEmail);
+            } catch (e) { /* ignore */ }
+        });
+    } catch (e) {}
+
+    // Replace any visible support email occurrences across the document and watch for late DOM mutations
+    function replaceSupportEmailEverywhere(email){
+        try{
+            if (!email) return;
+            const re = /support@[\w.-]+/gi;
+            // Update text nodes across body
+            const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT, null);
+            const texts = [];
+            let node;
+            while ((node = walker.nextNode())) texts.push(node);
+            texts.forEach(tn => {
+                try { if (re.test(tn.nodeValue)) tn.nodeValue = tn.nodeValue.replace(re, email); } catch(e){}
+            });
+            // Update mailto links
+            document.querySelectorAll('a[href^="mailto:"]').forEach(a => {
+                try{
+                    if (re.test(a.href) || re.test(a.textContent)) {
+                        a.href = `mailto:${email}`;
+                        a.textContent = email;
+                    }
+                }catch(e){}
+            });
+        }catch(e){}
+    }
+
+    // Observe DOM changes and replace support email when nodes are added (catches late-rendered footer)
+    try{
+        const observer = new MutationObserver((mutations) => {
+            try{
+                const s = localStorage.getItem('siteSettings') ? JSON.parse(localStorage.getItem('siteSettings')) : null;
+                const email = s && s.supportEmail ? s.supportEmail : null;
+                if (!email) return;
+                let changed = false;
+                for (const m of mutations){ if (m.addedNodes && m.addedNodes.length) { changed = true; break; } }
+                if (changed) {
+                    replaceSupportEmailEverywhere(email);
+                }
+            }catch(e){}
+        });
+        observer.observe(document.documentElement || document.body, { childList: true, subtree: true });
+    }catch(e){}
 
     if (catalogFilters.featuredOnly) {
         products = products.filter(product => product.featured);

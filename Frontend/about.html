@@ -22,7 +22,7 @@
     <!-- Hero Section -->
     <section class="bg-gradient-to-r from-blue-600 to-purple-700 text-white py-20">
         <div class="container mx-auto px-4 text-center">
-            <h1 class="text-5xl font-bold mb-6">About Fashion Hub</h1>
+            <h1 id="aboutHeroTitle" class="text-5xl font-bold mb-6">About Fashion Hub</h1>
             <p class="text-xl max-w-3xl mx-auto">Discover our story, our mission, and the amazing team behind Fashion Hub</p>
         </div>
     </section>
@@ -113,7 +113,22 @@
                 const response = await fetch('/api/pages/slug/about');
                 const data = await response.json();
                 if (data.success) {
-                    document.getElementById('companyContent').innerHTML = data.data.content;
+                    // Normalize incoming content: remove or replace any top-level About heading
+                    try {
+                        const brand = (typeof getSiteBrandName === 'function') ? getSiteBrandName() : 'Fashion Hub';
+                        let html = String(data.data.content || '');
+                        // Replace first <h1>...</h1> with brand-aware subheading
+                        if (/\<h1\b[^>]*\>/i.test(html)) {
+                            html = html.replace(/\<h1\b[^>]*\>[\s\S]*?\<\/h1\>/i, `<h2 class="text-3xl font-bold text-center mb-8">About ${brand}</h2>`);
+                        }
+                        // Also handle markdown-style heading in raw content
+                        html = html.replace(/^#\s*About.*$/im, `About ${brand}`);
+                        // As a last resort, replace literal 'About Zenrix' occurrences
+                        html = html.replace(/About\s+Zenrix/gi, `About ${brand}`);
+                        document.getElementById('companyContent').innerHTML = html;
+                    } catch (e) {
+                        document.getElementById('companyContent').innerHTML = data.data.content;
+                    }
                 } else {
                     document.getElementById('companyContent').innerHTML = '<p>Company information coming soon...</p>';
                 }
@@ -167,6 +182,12 @@
 
         // Load content when page loads
         document.addEventListener('DOMContentLoaded', () => {
+            try {
+                const brand = (typeof getSiteBrandName === 'function') ? getSiteBrandName() : 'Fashion Hub';
+                const hero = document.getElementById('aboutHeroTitle');
+                if (hero) hero.textContent = `About ${brand}`;
+                if (document.title && document.title.indexOf('Fashion Hub') !== -1) document.title = document.title.replace(/Fashion Hub/g, brand);
+            } catch (e) { /* ignore */ }
             loadCompanyContent();
             loadTeam();
         });

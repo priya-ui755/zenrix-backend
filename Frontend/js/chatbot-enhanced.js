@@ -413,7 +413,7 @@
             appendMessage('⚠️ There was an issue creating your ticket. Please try again or email us at {supportEmail} with your details.', 'bot');
           }
         }catch(e){
-          appendMessage('⚠️ Failed to submit ticket. No worries — email us directly at {supportEmail} and we\\'ll help!', 'bot');
+          appendMessage('⚠️ Failed to submit ticket. No worries — email us directly at {supportEmail} and we\'ll help!', 'bot');
         }
       });
     }, 50);
@@ -431,17 +431,23 @@
     const sendBtn = document.getElementById('chatbot-send') || document.getElementById('chatbotSend');
     const inputEl = document.getElementById('chatbot-input') || document.getElementById('chatbotInput');
     const closeBtn = document.getElementById('chatbot-close') || document.getElementById('chatClose');
+    const closeBtns = Array.from(document.querySelectorAll('#chatbot-close, #chatClose, .chat-close, .chat-close-btn'));
     
     console.log('🤖 Chatbot init:', { toggles: toggles.length, chatWindow: !!chatWindow, messages: !!messages, sendBtn: !!sendBtn, inputEl: !!inputEl, closeBtn: !!closeBtn });
 
+    // Track open state reliably instead of querying styles every time
     function isChatOpen(){
+      try { return !!openState; } catch (e) { /* fallback below */ }
       if (!chatWindow) return false;
       if (chatWindow.classList.contains('hidden')) return false;
       if (chatWindow.style.display) return chatWindow.style.display !== 'none';
       return window.getComputedStyle(chatWindow).display !== 'none';
     }
 
+    // internal open state
+    let openState = false;
     function setChatVisibility(open){
+      openState = !!open;
       if (!chatWindow) return;
       const usesHidden = chatWindow.classList.contains('hidden');
       if (usesHidden){
@@ -455,14 +461,16 @@
 
     // Load chat history on init
     const history = getChatHistory();
+    // Initialize openState from DOM so script and markup are aligned
+    try { openState = !!(chatWindow && !(chatWindow.classList.contains('hidden')) && (chatWindow.style.display ? chatWindow.style.display !== 'none' : window.getComputedStyle(chatWindow).display !== 'none')); } catch(e) { openState = false; }
 
     // Attach toggles
     toggles.forEach((btn, idx) => {
       btn.addEventListener('click', () => {
         console.log('🤖 Chatbot toggle clicked', idx);
         if (!chatWindow) return;
-        const nextOpen = !isChatOpen();
-        console.log('🤖 Setting visibility to:', nextOpen);
+        const nextOpen = !openState;
+        console.log('🤖 Setting visibility to:', nextOpen, ' (openState was', openState, ')');
         setChatVisibility(nextOpen);
         if (nextOpen && messages && messages.children.length === 0){
           setTimeout(() => {
@@ -478,9 +486,45 @@
       });
     });
 
-    if (closeBtn){
-      closeBtn.addEventListener('click', () => setChatVisibility(false));
+    if (closeBtns && closeBtns.length){
+      closeBtns.forEach(cb => { try { cb.addEventListener('click', () => setChatVisibility(false)); } catch(e){} });
+    } else if (closeBtn){
+      try { closeBtn.addEventListener('click', () => setChatVisibility(false)); } catch(e){}
     }
+
+    // Close chat on Escape key
+    try {
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') setChatVisibility(false);
+      });
+    } catch (e) {}
+
+    // Expose a global close method to hide any chat instances
+    try {
+      window.closeAllChatWindows = function(){
+        try{
+          const wins = Array.from(document.querySelectorAll('#chatbot-window, #chatbotWindow, .chat-window'));
+          if (wins.length){
+            wins.forEach(win => {
+              try { win.classList.add('hidden'); win.style.display = 'none'; win.setAttribute('aria-hidden','true'); } catch(e){}
+            });
+            return true;
+          }
+        }catch(e){}
+        try { setChatVisibility(false); } catch(e){}
+        return false;
+      };
+
+      // Delegate close clicks to support SVG/path clicks and multiple widget variants
+      document.addEventListener('click', function (e) {
+        const btn = e.target instanceof Element ? e.target.closest('.chat-close, #chatbot-close, #chatClose, .chat-close-btn') : null;
+        if (!btn) return;
+        // Close nearest chat window if present, otherwise close all
+        const win = btn.closest('.chat-window') || btn.closest('#chatbot-window') || btn.closest('#chatbotWindow');
+        if (win){ try { win.classList.add('hidden'); win.style.display='none'; win.setAttribute('aria-hidden','true'); return; } catch(e){} }
+        window.closeAllChatWindows();
+      }, { capture: true });
+    } catch (e) {}
 
     // Quick buttons support
     $all('.quick-btn').forEach(q => q.addEventListener('click', (e)=>{

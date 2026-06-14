@@ -57,6 +57,16 @@ router.get('/', async (req, res) => {
   }
 });
 
+// GET all staff for admin (includes inactive)
+router.get('/admin/all', requireAdmin, async (req, res) => {
+  try {
+    const staff = await Staff.find().sort({ order: 1, name: 1 }).lean();
+    res.json({ success: true, count: staff.length, data: staff });
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
 // GET single staff
 router.get('/:id', async (req, res) => {
   try {

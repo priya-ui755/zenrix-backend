@@ -72,20 +72,25 @@
     <script src="components/footer.js"></script>
 <!-- ========== FASHION HUB CHATBOT ========== -->
 <div id="chatbot-container">
-  <button id="chatbot-toggle" class="fixed bottom-6 right-6 bg-accent text w-14 h-14 rounded-full shadow-lg transition-all z-50 flex items-center justify-center" aria-label="Open chat">
-    <img src="/uploads/avatars/chat-avatar.png?v=2" alt="Chatbot Avatar" style="width:56px;height:56px;display:block;border-radius:50%;object-fit:cover;" />
+  <button id="chatbot-toggle" class="fixed bottom-6 right-6 w-14 h-14 rounded-full shadow-lg transition-all z-50 flex items-center justify-center" aria-label="Open chat" style="padding:0;background:transparent;border:0;overflow:hidden;">
+    <img src="/uploads/avatars/chat-avatar.png?v=2" alt="Chatbot Avatar" style="width:100%;height:100%;display:block;border-radius:50%;object-fit:cover;object-position:center 18%;" />
   </button>
 
   <div id="chatbot-window" class="fixed bottom-24 right-6 w-80 h-96 bg-white rounded-lg shadow-xl hidden flex flex-col z-50 border">
     <div class="bg-accent p-3 rounded-t-lg flex justify-between items-center">
       <div class="flex items-center gap-3">
-        <img src="/uploads/avatars/chat-avatar.png?v=2" alt="Fashion Hub Assistant" style="width:32px;height:32px;border-radius:50%;object-fit:cover;" />
+        <img src="/uploads/avatars/chat-avatar.png?v=2" alt="Fashion Hub Assistant" style="width:32px;height:32px;border-radius:50%;object-fit:cover;object-position:center 18%;" />
         <div>
           <div class="font-bold">Fashion Hub Assistant</div>
           <div class="text-xs opacity-80">Online • 24/7 Support</div>
         </div>
       </div>
-      <button id="chatbot-close" aria-label="Close chat" class="text">✕</button>
+      <button id="chatbot-close" aria-label="Close chat" class="chat-close text">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+          <path d="M18 6L6 18" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+          <path d="M6 6L18 18" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+        </svg>
+      </button>
     </div>
 
     <div id="chatbot-messages" class="flex-grow p-3 overflow-y-auto space-y-3 bg-white"></div>
@@ -107,6 +112,25 @@
 
 <!-- Chatbot JS (external) -->
 <script src="js/chatbot-enhanced.js" defer></script>
+<script>
+(function(){
+  try{
+    const toggle = document.getElementById('chatbot-toggle');
+    const chatWindow = document.getElementById('chatbot-window');
+    if (!toggle || !chatWindow) return;
+    toggle.style.padding = '0'; toggle.style.background = 'transparent'; toggle.style.border = '0'; toggle.style.overflow = 'hidden';
+    const img = toggle.querySelector('img');
+    if (img) { img.style.width='100%'; img.style.height='100%'; img.style.display='block'; img.style.objectFit='cover'; img.style.objectPosition='center 18%'; }
+    toggle.addEventListener('click', function(){
+      try{
+        const isHidden = chatWindow.classList.contains('hidden') || window.getComputedStyle(chatWindow).display === 'none';
+        if (isHidden) { chatWindow.classList.remove('hidden'); chatWindow.style.display = 'flex'; chatWindow.setAttribute('aria-hidden','false'); }
+        else { chatWindow.classList.add('hidden'); chatWindow.style.display = 'none'; chatWindow.setAttribute('aria-hidden','true'); }
+      }catch(e){}
+    });
+  }catch(e){}
+})();
+</script>
 <!-- ========== END CHATBOT ========== -->
 </body>
 </html>

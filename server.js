@@ -107,6 +107,50 @@ app.get('/admin-dashboard.html', (req, res) => {
   }
 });
 
+// Server-side HTML injector: render selected HTML files with dynamic site settings
+// This ensures first-paint contains up-to-date support email, site title, etc.
+app.use(async (req, res, next) => {
+  try {
+    if (req.method !== 'GET') return next();
+    const isHome = req.path === '/' || req.path === '';
+    const isHtml = /\.html$/i.test(req.path || '');
+    if (!isHome && !isHtml) return next();
+
+    const relPath = isHome ? 'index.html' : req.path.replace(/^\//, '');
+    const filePath = path.join(FRONTEND_DIR, relPath);
+    if (!fs.existsSync(filePath)) return next();
+
+    let html = fs.readFileSync(filePath, 'utf8');
+    // Load site settings from DB and apply substitutions
+    try {
+      const SiteSettings = require('./models/SiteSettings');
+      const s = await SiteSettings.getOrCreate();
+      const supportEmail = (s && s.supportEmail) ? String(s.supportEmail).trim() : 'support@fashionhub.com';
+      const siteTitle = (s && (s.siteTitle || s.companyName)) ? String(s.siteTitle || s.companyName).trim() : 'Fashion Hub';
+      const bootScript = `<script>window.FASHIONHUB_SUPPORT_EMAIL=${JSON.stringify(supportEmail)};window.FASHIONHUB_SITE_TITLE=${JSON.stringify(siteTitle)};</script>`;
+      // Replace explicit email occurrences and simple placeholders
+      html = html.replace(/support@[\w.-]+/gi, supportEmail);
+      html = html.replace(/{{\s*supportEmail\s*}}/g, supportEmail);
+      html = html.replace(/{{\s*siteTitle\s*}}/g, siteTitle);
+      html = html.replace(/{{\s*companyName\s*}}/g, siteTitle);
+      if (html.includes('</head>')) {
+        html = html.replace('</head>', `${bootScript}</head>`);
+      } else if (html.includes('</body>')) {
+        html = html.replace('</body>', `${bootScript}</body>`);
+      } else {
+        html = bootScript + html;
+      }
+    } catch (e) {
+      console.warn('Failed to inject site settings into HTML', e.message);
+    }
+
+    res.setHeader('Content-Type', 'text/html; charset=utf-8');
+    return res.send(html);
+  } catch (err) {
+    return next(err);
+  }
+});
+
 // Intercept uploads requests and serve placeholder for missing files (middleware style)
 app.use('/uploads', (req, res, next) => {
   try {
@@ -227,10 +271,7 @@ app.use('/api/admin', adminRoutes);
 // Live updates stream (SSE) for client-side auto-refresh
 app.use('/api/updates', require('./routes/UpdatesRoutes'));
 
-// Temporary staff route
-app.get('/api/staff', (req, res) => {
-    res.json({ success: true, count: 0, data: [] });
-});
+// (Removed duplicate staff route that was overriding StaffRoutes)
 
 app.get('/api/health', (_req, res) => {
   res.json({ success: true, status: 'ok', timestamp: Date.now() });

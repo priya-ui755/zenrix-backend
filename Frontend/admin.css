@@ -162,7 +162,7 @@ body:not(.adminlte-enabled) .admin-sidebar nav a.active:before {
 
 /* AdminLTE Premium Modern Tweaks */
 :root {
-    --admin-navbar-h: 62px;
+    --admin-navbar-h: 72px;
     --admin-sidebar-w: 270px;
     --admin-sidebar-w-collapsed: 5rem;
 }
@@ -311,9 +311,9 @@ body.adminlte-enabled .main-header.navbar {
     z-index: 1040;
     /* Use admin theme accent colors */
     background: linear-gradient(90deg, var(--accent) 0%, var(--accent-dark) 70%) !important;
-    border-bottom: 1px solid rgba(255,255,255,0.08);
+    border-bottom: none;
     color: #ffffff;
-    box-shadow: 0 10px 36px rgba(12, 16, 45, 0.16);
+    box-shadow: none;
     backdrop-filter: blur(8px);
 }
 body.adminlte-enabled .main-header.navbar .brand-text {
@@ -374,21 +374,21 @@ body.adminlte-enabled .main-header .navbar-nav .nav-link {
     background: linear-gradient(180deg, rgba(255,255,255,0.06), rgba(255,255,255,0.02));
     border: 1px solid rgba(255,255,255,0.12);
     color: #ffffff !important;
-    padding: 0.45rem 0.75rem;
+    padding: 0.55rem 0.85rem;
     border-radius: 0.6rem;
-    box-shadow: 0 8px 22px rgba(12,16,45,0.12);
+    box-shadow: none;
     backdrop-filter: blur(6px);
     display: inline-flex;
     align-items: center;
     gap: .4rem;
-    transition: transform 0.12s ease, box-shadow 0.12s ease, background 0.12s ease;
+    transition: transform 0.12s ease, background 0.12s ease;
 }
 
 body.adminlte-enabled .main-header .btn:hover,
 body.adminlte-enabled .main-header .btn.btn-link:hover,
 body.adminlte-enabled .main-header .navbar-nav .nav-link:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 12px 32px rgba(12,16,45,0.18);
+    transform: translateY(-1px);
+    box-shadow: none;
     background: linear-gradient(180deg, rgba(255,255,255,0.10), rgba(255,255,255,0.03));
 }
 
@@ -553,6 +553,7 @@ body.adminlte-enabled .content-wrapper{
 	width:calc(100% - var(--admin-sidebar-w)) !important;
 	min-height:100vh;
 	margin-top:var(--admin-navbar-h) !important;
+	padding-top: 0 !important;
 	background: #ffffff !important;
 }
 body.adminlte-enabled.sidebar-collapse .content-wrapper{
@@ -625,19 +626,199 @@ body.sidebar-collapse .sidebar .form-inline {
 	display: none !important;
 }
 
-/* Navbar layout polish */
+/* ========================================
+   PREMIUM NAVBAR LAYOUT — Toggle Left, Controls Right
+   ======================================== */
 body.adminlte-enabled .main-header .navbar-nav{align-items:center}
 body.adminlte-enabled .main-header.navbar{
-    padding-left: 0.85rem !important;
-    padding-right: 1rem !important;
+    padding: 0 1.25rem !important;
+    height: var(--admin-navbar-h) !important;
+    min-height: var(--admin-navbar-h) !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
 }
-body.adminlte-enabled .main-header .navbar-nav.ms-auto{
+/* Left side: sidebar toggle */
+body.adminlte-enabled .main-header > .navbar-nav:not(.ms-auto):not(.navbar-right-group) {
+    flex-shrink: 0 !important;
+}
+/* Right side: all controls */
+body.adminlte-enabled .main-header .navbar-nav.ms-auto,
+body.adminlte-enabled .main-header .navbar-nav.navbar-right-group {
     margin-left: auto !important;
-    gap: 0.5rem;
+    gap: 0.35rem;
+    align-items: center;
+    flex-shrink: 0;
 }
-body.adminlte-enabled .main-header #logoutBtn{
-    margin-left: 0.65rem !important;
+
+/* ── Sidebar Toggle Button (Left) ── */
+.navbar-toggle-btn {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    width: 44px !important;
+    height: 44px !important;
+    padding: 0 !important;
+    border-radius: 10px !important;
+    color: rgba(255,255,255,0.88) !important;
+    background: rgba(255,255,255,0.08) !important;
+    border: 1px solid rgba(255,255,255,0.12) !important;
+    backdrop-filter: blur(6px);
+    transition: all 0.22s cubic-bezier(0.4,0,0.2,1) !important;
+    font-size: 1.1rem !important;
 }
+.navbar-toggle-btn:hover {
+    background: rgba(255,255,255,0.16) !important;
+    color: #ffffff !important;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 14px rgba(12,16,45,0.2);
+}
+
+/* ── Right Group Container ── */
+.navbar-right-group {
+    display: flex !important;
+    align-items: center !important;
+    gap: 0.25rem !important;
+    list-style: none !important;
+    padding: 0 !important;
+    margin: 0 !important;
+}
+.navbar-right-group > .nav-item {
+    display: flex !important;
+    align-items: center !important;
+}
+
+/* ── Brand Logo (Right Side) ── */
+.admin-brand-logo {
+    display: flex !important;
+    align-items: center !important;
+    gap: 0.6rem !important;
+    padding: 0.35rem 0.75rem 0.35rem 0.45rem !important;
+    border-radius: 10px !important;
+    background: rgba(255,255,255,0.08) !important;
+    border: 1px solid rgba(255,255,255,0.1) !important;
+    backdrop-filter: blur(6px);
+    transition: all 0.22s ease !important;
+    cursor: default;
+    white-space: nowrap;
+}
+.admin-brand-logo:hover {
+    background: rgba(255,255,255,0.14) !important;
+}
+.admin-brand-logo svg {
+    flex-shrink: 0;
+}
+.admin-brand-text {
+    font-size: 0.82rem !important;
+    font-weight: 700 !important;
+    color: #ffffff !important;
+    letter-spacing: 0.02em;
+    line-height: 1.2;
+}
+
+/* ── Divider between brand and controls ── */
+.navbar-divider {
+    width: 1px !important;
+    height: 24px !important;
+    background: rgba(255,255,255,0.18) !important;
+    border-radius: 999px;
+    margin: 0 0.2rem;
+    flex-shrink: 0;
+}
+
+/* ── Notification Bell Button ── */
+.navbar-icon-btn {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    position: relative !important;
+    width: 42px !important;
+    height: 42px !important;
+    padding: 0 !important;
+    border-radius: 10px !important;
+    color: rgba(255,255,255,0.9) !important;
+    background: rgba(255,255,255,0.06) !important;
+    border: 1px solid rgba(255,255,255,0.1) !important;
+    backdrop-filter: blur(6px);
+    transition: all 0.22s cubic-bezier(0.4,0,0.2,1) !important;
+}
+.navbar-icon-btn:hover {
+    background: rgba(255,255,255,0.14) !important;
+    color: #ffffff !important;
+    transform: translateY(-1px);
+    box-shadow: none;
+}
+.navbar-icon-btn i {
+    font-size: 1.05rem !important;
+    color: inherit !important;
+}
+.navbar-icon-btn .navbar-badge {
+    position: absolute !important;
+    top: 4px !important;
+    right: 2px !important;
+    font-size: 0.6rem !important;
+    min-width: 16px !important;
+    height: 16px !important;
+    line-height: 16px !important;
+    padding: 0 4px !important;
+    border-radius: 999px !important;
+}
+
+/* ── Auth Sign (User Shield Icon) ── */
+.navbar-auth-sign {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    width: 42px !important;
+    height: 42px !important;
+    border-radius: 10px !important;
+    background: rgba(255,255,255,0.06) !important;
+    border: 1px solid rgba(255,255,255,0.1) !important;
+    color: rgba(255,255,255,0.85) !important;
+    backdrop-filter: blur(6px);
+    transition: all 0.22s ease !important;
+    white-space: nowrap;
+}
+.navbar-auth-sign i {
+    font-size: 0.95rem !important;
+    color: inherit !important;
+}
+
+/* ── Logout Button (Premium Glass) ── */
+.navbar-logout-btn {
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 0.45rem !important;
+    padding: 0.5rem 1rem !important;
+    border-radius: 10px !important;
+    font-size: 0.82rem !important;
+    font-weight: 600 !important;
+    color: rgba(255,255,255,0.92) !important;
+    background: linear-gradient(180deg, rgba(239,68,68,0.22), rgba(239,68,68,0.12)) !important;
+    border: 1px solid rgba(239,68,68,0.25) !important;
+    backdrop-filter: blur(6px);
+    transition: all 0.22s cubic-bezier(0.4,0,0.2,1) !important;
+    white-space: nowrap;
+    cursor: pointer;
+}
+.navbar-logout-btn:hover {
+    background: linear-gradient(180deg, rgba(239,68,68,0.35), rgba(239,68,68,0.2)) !important;
+    color: #ffffff !important;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 14px rgba(239,68,68,0.25);
+}
+.navbar-logout-btn i {
+    font-size: 0.9rem !important;
+}
+.navbar-logout-btn .logout-text {
+    font-size: 0.82rem !important;
+}
+
+/* ── Legacy logout button override (if visible) ── */
+body.adminlte-enabled .main-header #logoutBtn {
+    margin-left: 0 !important;
+}
+
 /* Header auth sign replaced: use #adminAuthSign styling instead */
 body.adminlte-enabled .main-header .star-btn{padding:8px 14px;font-size:14px;border-width:2px;line-height:1}
 body.adminlte-enabled .main-header #adminAuthSign{display:inline-flex;align-items:center;white-space:nowrap;color:inherit}
@@ -665,7 +846,7 @@ body.showing-auth .main-sidebar {
 body.adminlte-enabled .admin-main {
     padding-left: 1.5rem !important;
     padding-right: 1.5rem !important;
-    padding-top: 1rem !important;
+    padding-top: 0 !important;
     padding-bottom: 2rem !important;
     width: 100% !important;
     max-width: none !important;
@@ -681,11 +862,6 @@ body.adminlte-enabled .content-wrapper {
     box-shadow: none !important;
 }
 
-/* SMALL UI TWEAKS: Improve left gutter and constrain wide forms to prevent overlap */
-.content-wrapper {
-    padding-left: 1.5rem !important; /* small gutter from sidebar */
-    padding-right: 1.5rem !important;
-}
 
 /* Constrain long form areas so fields don't span edge-to-edge */
 #content-products .card,
@@ -1273,8 +1449,7 @@ button.btn-success {
     padding: 0 !important;
 }
 
-/* Enhanced form layout for content sections */
-#content-products form,
+/* Enhanced form layout for content sections - preserve inline grid definitions */
 #content-pages form,
 #content-components form,
 #content-footer-editor form,
@@ -1282,8 +1457,8 @@ button.btn-success {
 #content-payments form,
 #content-careers form,
 #content-staff form {
-    display: grid;
-    grid-template-columns: 1fr;
+    display: flex;
+    flex-direction: column;
     gap: 1.5rem;
     width: 100%;
 }
@@ -1313,8 +1488,8 @@ button.btn-success {
 /* Ensure forms fill their containers */
 form {
     width: 100%;
-    display: grid;
-    grid-template-columns: 1fr;
+    display: flex;
+    flex-direction: column;
     gap: 1.5rem;
 }
 
@@ -1570,6 +1745,7 @@ body.adminlte-enabled .sidebar::before {
 /* Additional sidebar styles to eliminate any visual separation */
 body.adminlte-enabled .main-sidebar {
     outline: none !important;
+    box-shadow: none !important;
     -webkit-box-shadow: none !important;
     background: #ffffff !important;
     border-right: 0 !important;
@@ -2107,7 +2283,7 @@ input::placeholder, textarea::placeholder { color: rgba(15,23,42,0.5); }
 .auth-card .btn-ghost { color: #0f172a !important; border-color: rgba(15,23,42,0.12) !important; }
 
 /* ========================================
-   PREMIUM ADMIN SHELL OVERRIDES
+   PREMIUM ADMIN SHELL OVERRIDES (minimal - premium styles in admin-premium-overhaul.css)
    ======================================== */
 body.adminlte-enabled,
 .wrapper.admin-app,
@@ -2119,21 +2295,6 @@ body.adminlte-enabled,
     font-family: 'Inter', 'Space Grotesk', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif !important;
 }
 
-body.adminlte-enabled {
-    background:
-        radial-gradient(circle at top left, rgba(99, 102, 241, 0.10), transparent 32%),
-        radial-gradient(circle at top right, rgba(139, 92, 246, 0.08), transparent 28%),
-        linear-gradient(180deg, #f8fafc 0%, #f3f4f6 100%) !important;
-    color: #0f172a !important;
-}
-
-body.adminlte-enabled .main-header {
-    background: rgba(255, 255, 255, 0.88) !important;
-    backdrop-filter: blur(14px);
-    border-bottom: 1px solid rgba(15, 23, 42, 0.08) !important;
-    box-shadow: 0 8px 24px rgba(15, 23, 42, 0.06) !important;
-}
-
 body.adminlte-enabled .main-header .navbar,
 body.adminlte-enabled .main-header .navbar-nav,
 body.adminlte-enabled .main-header .nav-link,
@@ -2141,33 +2302,9 @@ body.adminlte-enabled .main-header button {
     font-family: inherit !important;
 }
 
-body.adminlte-enabled .content-wrapper {
-    background:
-        linear-gradient(180deg, rgba(248, 250, 252, 0.96) 0%, rgba(241, 245, 249, 0.98) 100%) !important;
-}
-
 body.adminlte-enabled .admin-main {
-    max-width: 1600px !important;
-    margin: 0 auto !important;
-    padding: 1.5rem 1.5rem 2.5rem !important;
-}
-
-body.adminlte-enabled #adminContent {
-    display: flex !important;
-    flex-direction: column !important;
-    gap: 1.25rem !important;
-}
-
-body.adminlte-enabled #adminContent > * {
-    margin-top: 0 !important;
-    margin-bottom: 0 !important;
-}
-
-body.adminlte-enabled .gradient-bg {
-    background: linear-gradient(135deg, #0f172a 0%, #312e81 55%, #8b5cf6 100%) !important;
-    border: 1px solid rgba(255, 255, 255, 0.10) !important;
-    border-radius: 28px !important;
-    box-shadow: 0 24px 60px rgba(15, 23, 42, 0.18) !important;
+    padding: 0 1.5rem 2.5rem !important;
+    width: 100% !important;
 }
 
 body.adminlte-enabled .gradient-bg h1,
@@ -2175,43 +2312,6 @@ body.adminlte-enabled .gradient-bg p,
 body.adminlte-enabled .gradient-bg button,
 body.adminlte-enabled .gradient-bg span {
     font-family: inherit !important;
-}
-
-body.adminlte-enabled .card,
-body.adminlte-enabled .info-box,
-body.adminlte-enabled .small-box,
-body.adminlte-enabled .callout,
-body.adminlte-enabled .content-box,
-body.adminlte-enabled .table,
-body.adminlte-enabled .sticky > div {
-    background: rgba(255, 255, 255, 0.90) !important;
-    border: 1px solid rgba(15, 23, 42, 0.08) !important;
-    border-radius: 24px !important;
-    box-shadow: 0 10px 30px rgba(15, 23, 42, 0.07) !important;
-    backdrop-filter: blur(10px);
-}
-
-body.adminlte-enabled .card,
-body.adminlte-enabled .small-box,
-body.adminlte-enabled .info-box,
-body.adminlte-enabled .callout {
-    overflow: hidden;
-}
-
-body.adminlte-enabled .card-header {
-    padding: 1.1rem 1.35rem !important;
-    background: linear-gradient(135deg, rgba(99, 102, 241, 0.06), rgba(139, 92, 246, 0.04)) !important;
-    border-bottom: 1px solid rgba(15, 23, 42, 0.06) !important;
-}
-
-body.adminlte-enabled .card-body {
-    padding: 1.25rem 1.35rem !important;
-}
-
-body.adminlte-enabled .card-footer {
-    padding: 0.95rem 1.35rem !important;
-    background: rgba(99, 102, 241, 0.02) !important;
-    border-top: 1px solid rgba(15, 23, 42, 0.06) !important;
 }
 
 body.adminlte-enabled .card h1,
@@ -2228,29 +2328,6 @@ body.adminlte-enabled .card th {
     font-family: inherit !important;
 }
 
-body.adminlte-enabled .nav-sidebar .nav-link {
-    margin: 0.15rem 0.35rem !important;
-    padding: 0.8rem 0.95rem !important;
-    border-radius: 16px !important;
-    color: #475569 !important;
-    font-weight: 600 !important;
-    transition: all 0.22s ease !important;
-}
-
-body.adminlte-enabled .nav-sidebar .nav-link:hover,
-body.adminlte-enabled .nav-sidebar .nav-link.active {
-    background: linear-gradient(135deg, rgba(99, 102, 241, 0.14), rgba(139, 92, 246, 0.10)) !important;
-    color: #111827 !important;
-    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.28);
-}
-
-body.adminlte-enabled .nav-sidebar .nav-link .nav-icon {
-    width: 1.45rem !important;
-    min-width: 1.45rem !important;
-    margin-right: 0.75rem !important;
-    color: inherit !important;
-}
-
 body.adminlte-enabled .nav-sidebar .nav-link p {
     letter-spacing: 0.01em !important;
 }
@@ -2263,14 +2340,6 @@ body.adminlte-enabled .btn-primary,
 body.adminlte-enabled .btn-secondary {
     border-radius: 14px !important;
     font-family: inherit !important;
-}
-
-body.adminlte-enabled .btn,
-body.adminlte-enabled .btn-link,
-body.adminlte-enabled .btn-primary,
-body.adminlte-enabled .btn-secondary,
-body.adminlte-enabled .btn-danger {
-    box-shadow: 0 8px 20px rgba(15, 23, 42, 0.06) !important;
 }
 
 body.adminlte-enabled input,
@@ -2293,22 +2362,6 @@ body.adminlte-enabled select:focus {
 body.adminlte-enabled .table {
     border-collapse: separate !important;
     border-spacing: 0 !important;
-}
-
-body.adminlte-enabled .table thead th {
-    background: rgba(248, 250, 252, 0.95) !important;
-    color: #475569 !important;
-    text-transform: uppercase;
-    letter-spacing: 0.06em;
-    font-size: 0.72rem !important;
-}
-
-body.adminlte-enabled .table tbody tr {
-    transition: background-color 0.18s ease, transform 0.18s ease !important;
-}
-
-body.adminlte-enabled .table tbody tr:hover {
-    background: rgba(99, 102, 241, 0.04) !important;
 }
 
 body.adminlte-enabled .sticky.top-2 {
